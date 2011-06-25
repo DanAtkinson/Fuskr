@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			body{
+				font-family:Calibri,Verdana
+			}
+
+			h1{
+				font-size:16px;
+			}
+
+			h2{
+				font-size:14px;
+			}
+
+			div{
+				padding-bottom:20px;
+				width:400px;
+			}
+			
+			div p{
+				font-size:12px;
+			}
+			
+			p.bold{
+				font-weight:bold;
+			}
+			
+			p.whiteColour{
+				color:#F00;
+			}
+			
+			img{
+				border:2px solid black;
+				height:75px;
+				margin:5px;
+				vertical-align:middle;
+				width:75px;
+			}
+		</style>
+	<body>
+		<h1>Options</h1>
+		<div>
+			<label>
+				<input type="checkbox" name="openInForeground" id="openInForeground" />
+				Open new 'fusks' in the foreground
+			</label>
+			<p>Default option is <em>&quot;enabled&quot;</em>.</p>
+			<p>When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead.</p>
+		</div>
+		<div>
+			<label>
+				<input type="checkbox" name="keepRecentFusks" id="keepRecentFusks" />
+				Keep a recent history of 'fusks'
+			</label>
+			<p>Default option is <em>&quot;enabled&quot;</em>.</p>
+			<p>Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery.</p>
+			<div>
+				<p class="bold">Last <span class="totalFusks"></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>
+				<select size="20" id="recentFusks">
+				</select>
+			</div>
+		</div>
+		<!--
+		<div>
+			<label>
+				<input type="checkbox" name="shareFusks" id="shareFusks" />
+				Share 'fusks' with others.
+			</label>
+			<p>Default option is <em>&quot;disabled&quot;</em>.</p>
+			<p>This feature is currently not implemented. When it is, you will be able to share your galleries with others, should you wish.</p>
+			<p class="bold">Your privacy is important to us, and therefore, if and when this feature is implemented, it will be disabled by default.</p>
+		</div>
+		-->
+		<input type="button" class="saveButton" value="Save" />
+		<div id="saveInfo">
+		</div>
+		<div class="info">
+			<h2>For Your Information</h2>
+			<p>
+				Are you having problems with Fuskr?
+				If so, pop along to our <a href="http://code.google.com/p/chromefusk/issues/list">Google Code project</a> site and help us to help you by filling in an issue.
+			</p>
+		</div>
+		<script type="text/javascript" src="/Scripts/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				var openInForegroundVal = localStorage.getItem("openInForeground");
+				var openInForeground = parseInt(openInForegroundVal, 10);
+				if (openInForeground !== 0 && openInForeground !== 1) {
+					localStorage.setItem("openInForeground", 1);
+					openInForeground = 1;
+				}
+				$("input#openInForeground").attr("checked", openInForeground === 1 ? "checked" : "");
+
+
+				var keepRecentFusksVal = localStorage.getItem("keepRecentFusks");
+				var keepRecentFusks = parseInt(keepRecentFusksVal, 10);
+				if (keepRecentFusks !== 0 && keepRecentFusks !== 1) {
+					localStorage.setItem("keepRecentFusks", 1);
+					keepRecentFusks = 1;
+				}
+				$("input#keepRecentFusks").attr("checked", keepRecentFusks === 1 ? "checked" : "");
+
+				//Get the history
+				var history = localStorage.getItem("history");
+
+				if(history != null) {
+					//Push the rest of the urls onto the pile onto the array
+					var tempHistory = history.split("||");
+					for(var i = 0; i < tempHistory.length; i++) {
+						$("select#recentFusks").append("<option>"+tempHistory[i]+"</option>");
+					}
+					
+					var selectLength = tempHistory.length > 10 ? 10 : tempHistory.length;
+					$("p span.totalFusks").html(tempHistory.length);
+					
+					$("select#recentFusks").attr("size", selectLength);
+					
+					$("select#recentFusks option").click(function() {
+						chrome.tabs.create({ url:"/Html/images.htm?url=" + $(this).val(), selected: openInForeground === 1 });
+						return false;
+					});
+				}
+
+				/*var shareFusks = parseInt(localStorage.getItem("shareFusks"), 10);
+				if (shareFusks !== 0 && shareFusks !== 1) {
+					localStorage.setItem("shareFusks", 0);
+					shareFusks = 0;
+				}
+				$("input#shareFusks").attr("checked", shareFusks === 1 ? "checked" : "");
+				*/
+
+				//Save those options!
+				$("input.saveButton").click(function() {
+					$("input:checkbox").each(function() {
+						localStorage.setItem($(this).attr("id"), $(this).is(':checked') ? 1 : 0);
+					});
+					
+					$("div#saveInfo").animate({ opacity: 0.1 }, "slow", function(){
+						$("div#saveInfo").html("<p>Saved!</p>");
+					}).animate({ opacity: 1.0 }, "slow");
+				});
+			});
+		</script>
+	</body>
+</html>

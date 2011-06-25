@@ -1,0 +1,44 @@
+body{
+	font-size: 12px;
+	min-width:357px;
+	font-family: helvetica, verdana;
+	text-align: center;
+}
+
+img{
+	border: 0px;
+	margin:auto;
+	margin-bottom:4px;
+}
+
+a, a:hover, a:visited{
+	color: #b33c04;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+a.resizeImage{
+	float:left;
+	padding-right:10px;
+}
+
+div#bottom{
+	clear:both;
+	padding-top:20px;
+}
+
+div.rating{
+	border: 1px solid #ccc;
+	clear:both;
+	margin:0 auto;
+	padding:20px 0;
+	width:500px;
+}
+
+.wrap{
+	border: 1px solid #ccc;
+	float: left;
+	margin: 7px;
+	padding: 3px;
+	text-align: center;
+}

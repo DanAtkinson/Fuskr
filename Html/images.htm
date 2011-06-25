@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript"src="/Scripts/jquery.min.js"></script>
+		<script type="text/javascript"src="/Scripts/jquery.tmpl.min.js"></script>
+		<script type="text/javascript"src="/Scripts/Fuskr.js"></script>
+		<style>
+			.error { display: none; }
+		</style>
+		<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
+		<script id="imageTemplate" type="text/x-jquery-tmpl">
+			<div class="wrap" id="image_${Index}">
+				<a href="#image_${Index+1}">
+					<img class="fuskImage" alt="${Link}" src="${Link}">
+				</a>
+				<a href="#" class="resizeImage">Resize</a>
+				<div>				
+					<div>
+						<a href="${Link}" target="_blank" title="Click to open this image in a new tab">${Link}</a>
+					</div>
+					<div>
+						(Click image for next picture) | 
+						<a href="#top" title="Go to top of page">Top</a> | 
+						<a href="#bottom" title="Go to bottom of page">Bottom</a> |
+						{{if Index > 0}}<a href="#image_${Index-1}" title="Previous Image">&lt;</a> | {{/if}}
+						{{if Index < Total-1}}<a href="#image_${Index+1}" title="Next Image">&gt;</a> {{/if}}
+					</div>
+				</div>
+			</div>
+		</script>
+	</head>
+	<body>
+		<div id="all">
+			<div id="top">
+				<p><a href="#" class="toggleBrokenLinks"><span class="showHide">Show</span> broken images (<span class="broken">0</span>/<span class="total">0</span>)</a></p>
+				<p><a href="#" class="resizeImages">Resize images to fit on page</a></p>
+				<p class="fuskUrl">&nbsp;</p>
+			</div>
+			<div id="content">
+			</div>
+			<div id="bottom">
+				<p><a href="#" class="toggleBrokenLinks"><span class="showHide">Show</span> broken images (<span class="broken">0</span>/<span class="total">0</span>)</a></p>
+				<p><a href="#" class="resizeImages">Resize images to fit on page</a></p>
+				<p class="fuskUrl">&nbsp;</p>
+			</div>
+		</div>
+		<script type="text/javascript">
+			(function() {
+				var brokenImagesCount = 0,
+					resizeOn = false;
+
+				$(function() {
+
+					var currentUrl = (function() {
+						var query = window.location.search.substring(1);
+						var vars = query.split("&");
+						for (var i = 0; i < vars.length; i++) {
+							var pair = vars[i].split("=");
+							if (pair[0] == "url") {
+								return pair[1];
+							}
+						}
+					})();
+
+					document.title = "Fuskr - " + currentUrl;
+					
+					//Throwback to Firefusk. Probably something for the options page?
+					currentUrl = currentUrl.replace(/(\w+)\.photobucket\.com/,"photobucket.com");
+					
+					$("p.fuskUrl").html(currentUrl);
+					
+					var parsedLinks = Fuskr.GetLinks(currentUrl);
+					var linkData = $.map(parsedLinks, function(item,i){
+						return { "Index" : i, "Link" : item, "Total" : parsedLinks.length };
+					});
+					
+					
+					$("a.toggleBrokenLinks span.total").html(linkData.length);
+					
+					$("#imageTemplate").tmpl(linkData).appendTo("#content");
+
+					//Get the users current option regarding showing images in their full resolution or scaling them to the current window size.
+					$("a.resizeImages").click(function() {
+						resizeOn = !resizeOn;
+
+						if(resizeOn) {
+							$("div.wrap img").css("width","100%");
+							$(this).text("Resize images to full width");
+						} else {
+							$("div.wrap img").css("width","");
+							$(this).text("Resize images to fit on page");
+						}
+						return false;
+					});
+
+					$("a.resizeImage").click(function() {
+						if($(this).hasClass("resized")) {
+							$(this).removeClass("resized");
+							$(this).parent().find("img").css("width","");
+						} else {
+							$(this).addClass("resized").parent().find("img").css("width","100%");
+						}
+						return false;
+					});
+
+					$("a.toggleBrokenLinks").click(function() {
+						$(this).find("span.showHide").html(!document.styleSheets[0].disabled ? "Hide" : "Show");
+						document.styleSheets[0].disabled = !document.styleSheets[0].disabled;
+						return false;
+					});
+
+					$("img.fuskImage").error(function() {
+						brokenImagesCount++;
+						$(this).closest(".wrap").addClass("error");
+						$("a.toggleBrokenLinks span.broken").html(brokenImagesCount);
+					});
+				});
+			})();
+		</script>
+	</body>
+</html>
