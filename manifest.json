@@ -1,6 +1,6 @@
 {
 	"name": "Fuskr",
-	"version": "1.8",
+	"version": "1.9",
 	"description": "A Chromeified port of FireFusk",
 	"background_page": "Html/background.htm",
 	"options_page": "Html/options.htm",
