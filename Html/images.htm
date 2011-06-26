@@ -1,15 +1,22 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<script type="text/javascript"src="/Scripts/jquery.min.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+		<script type="text/javascript">
+		if (typeof jQuery == 'undefined')
+		{
+			document.write(unescape("%3Cscript src='/Scripts/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));
+		}
+		</script>
 		<script type="text/javascript"src="/Scripts/jquery.tmpl.min.js"></script>
 		<script type="text/javascript"src="/Scripts/Fuskr.js"></script>
 		<style>
 			.error { display: none; }
+			.hide { display:none; }
 		</style>
 		<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
 		<script id="imageTemplate" type="text/x-jquery-tmpl">
-			<div class="wrap" id="image_${Index}">
+			<div class="hide wrap" id="image_${Index}">
 				<a href="#image_${Index+1}">
 					<img class="fuskImage" alt="${Link}" src="${Link}">
 				</a>
@@ -63,21 +70,23 @@
 					})();
 
 					document.title = "Fuskr - " + currentUrl;
-					
-					//Throwback to Firefusk. Probably something for the options page?
-					currentUrl = currentUrl.replace(/(\w+)\.photobucket\.com/,"photobucket.com");
-					
+
 					$("p.fuskUrl").html(currentUrl);
-					
+
 					var parsedLinks = Fuskr.GetLinks(currentUrl);
+
 					var linkData = $.map(parsedLinks, function(item,i){
 						return { "Index" : i, "Link" : item, "Total" : parsedLinks.length };
 					});
-					
-					
+
 					$("a.toggleBrokenLinks span.total").html(linkData.length);
-					
+
 					$("#imageTemplate").tmpl(linkData).appendTo("#content");
+
+					//Start the images hidden and show as each one loads.
+					$("div#content img.fuskImage").load(function () {
+						$(this).parents("div.wrap").removeClass("hide");
+					});
 
 					//Get the users current option regarding showing images in their full resolution or scaling them to the current window size.
 					$("a.resizeImages").click(function() {
