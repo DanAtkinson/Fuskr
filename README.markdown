@@ -9,3 +9,37 @@ How to use
   * '-' will return a gallery with images that only come before it.
 4. Now choose how large you want your gallery to be - 10/20/50/100/200/500 or 'Other' (you choose!).
 5. Your gallery will appear in the tab next to your current one. If an image isn't returned (404 or some other error), it will be hidden from view, but you can toggle that too!
+
+
+Version History
+===============
+
+* 1.8 -
+ * Change of name to Fuskr.
+ * Jonathon Bolster has put a lot of work into making Fuskr modular, and there are now a few unit tests around to make sure everything's hunky dory!
+ * Fixed some issues with previous/next functionality not working when there are images missing. It also scrolls smoothly as well.
+* 1.7 -
+ * Added linkage below images.
+* 1.6 -
+ * A few bug fixes. Incognito works properly now, but only in v9 as there are some Chrome bugs outstanding.
+* 1.5 -
+ * Fixing a bug with the '+' icon showing up unnecessarily.
+ * Galleries created in incognito mode are no longer stored.
+ * Added the ability to scale images to the current window size.
+ * Added some information about the current gallery (number of images and broken images).
+* 1.4 -
+ * Clicking a created image will jump the user to the next one. Manual fusks are a little more difficult so maybe that's one for later...
+ * Added an options page! Currently the only two options are below.
+ * Added recent fusks history. This allows you to keep track of and, if desired, go back to a previous one that you may have closed. This feature will only store 10 at maximum, can be disabled completely, or the history can be wiped.
+ * Added an option for opening a gallery in the foreground.
+* 1.3 -
+ * Fixed a bug where having a nested gallery meant that the images were returned in the wrong order. - Kudos Jonathon!
+ * Fixed an issue where the ChromeFusk option appears, even when the image is not 'fusk-able' - Kudos Jonathon!
+ * Fixed an issue where choosing a manual gallery and not entering a url would still try to create a new tab. Kudos Jonathon!
+ * Provided an 'option' for having the new gallery show on creation, or open in the background (default is open in the foreground).
+* 1.2 -
+ * Fixed a bug where the horizontal scrollbar was not visible for galleries where the images were bigger than the page.
+ * Added the ability to use create a gallery based on a thumbnail, which will go to the linked image instead.
+* 1.1 - About 5 minutes after I released 1.0, I realised that Chrome had finally allowed extensions to create context menus, so I ripped my application apart and rebuilt it in thirty minutes to use the context menus.
+* 1.0 -
+ * Initial release.
