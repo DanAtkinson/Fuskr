@@ -14,6 +14,8 @@ How to use
 Version History
 ===============
 
+* 1.9 -
+ * Fuskr wasn't working on Macs.
 * 1.8 -
  * Change of name to Fuskr.
  * Jonathon Bolster has put a lot of work into making Fuskr modular, and there are now a few unit tests around to make sure everything's hunky dory!
