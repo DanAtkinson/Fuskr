@@ -34,16 +34,15 @@
 				<a href="{{Link}}" class="nextImage">\
 					<img class="fuskImage" alt="{{Link}}" src="{{Link}}">\
 				</a>\
-				<a href="{{Link}}" class="resizeImage">Resize</a>\
 				<div>\
 					<div>\
 						<a href="{{Link}}" target="_blank" title="Click to open this image in a new tab">{{Link}}</a>\
 					</div>\
 					<div>\
-						(Click image for next picture) | \
-						<a href="#top" title="Go to top of page">Top</a> | \
-						<a href="#bottom" title="Go to bottom of page">Bottom</a> |\
-						<a href="#" class="previousImage {{PreviousImage}}" title="Previous Image">&lt;</a> | \
+						(Click image for next picture)&nbsp;|&nbsp;\
+						<a href="#top" title="Go to top of page">Top</a>&nbsp;|&nbsp;\
+						<a href="#bottom" title="Go to bottom of page">Bottom</a>&nbsp;|&nbsp;\
+						<a href="#" class="previousImage {{PreviousImage}}" title="Previous Image">&lt;</a>&nbsp;|&nbsp;\
 						<a href="#" class="nextImage {{NextImage}}" title="Next Image">&gt;</a>\
 					</div>\
 				</div>\
@@ -51,13 +50,13 @@
 		';
 		
 		$.each(linkData, function(i, $Link) {
-			var showPreviousImageLink = i === 0 ? "hide" : "";
-			var showNextImage = i < ($Link.Total - 1) ? "hide" : "";
+			var showPreviousImageLink = i === 0;;
+			var showNextImage = i > ($Link.Total - 1);
 			var thisImageTemplate = imageTemplate;
 			thisImageTemplate = replaceAll(thisImageTemplate, "{{Link}}", $Link.Link);
 			thisImageTemplate = replaceAll(thisImageTemplate, "{{Index}}", i);
-			thisImageTemplate = replaceAll(thisImageTemplate, "{{PreviousImage}}", showPreviousImageLink);
-			thisImageTemplate = replaceAll(thisImageTemplate, "{{NextImage}}", showNextImage);
+			thisImageTemplate = replaceAll(thisImageTemplate, "{{PreviousImage}}", showPreviousImageLink ? "hide" : "");
+			thisImageTemplate = replaceAll(thisImageTemplate, "{{NextImage}}", showNextImage ? "hide" : "");
 			thisImageTemplate = replaceAll(thisImageTemplate, "\t", "");
 			$(thisImageTemplate).appendTo("#content");
 		});
@@ -78,17 +77,6 @@
 			} else {
 				$("div.wrap img").css("width","");
 				$(this).text("Resize images to fit on page");
-			}
-			return false;
-		});
-
-		$("a.resizeImage").click(function(e) {
-			e.preventDefault();
-			if($(this).hasClass("resized")) {
-				$(this).removeClass("resized");
-				$(this).parent().find("img").css("width","");
-			} else {
-				$(this).addClass("resized").parent().find("img").css("width","100%");
 			}
 			return false;
 		});

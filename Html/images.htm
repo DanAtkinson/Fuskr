@@ -2,7 +2,6 @@
 <html>
 	<head>
 		<script type="text/javascript" src="/Scripts/jquery.min.js"></script>
-		<script type="text/javascript"src="/Scripts/jsrender.js"></script>
 		<script type="text/javascript"src="/Scripts/fuskr.js"></script>
 		<style>
 			.error { display: none; }
@@ -19,26 +18,6 @@
 				<p class="fuskUrl">&nbsp;</p>
 			</div>
 			<div id="content">
-				<script id="imageTemplate" type="text/x-jsrender">
-					<div class="hide wrap" id="image_{{:Index}}">
-						<a href="#" class="nextImage">
-							<img class="fuskImage" alt="{{:Link}}" src="{{:Link}}">
-						</a>
-						<a href="#" class="resizeImage">Resize</a>
-						<div>				
-							<div>
-								<a href="{{:Link}}" target="_blank" title="Click to open this image in a new tab">{{:Link}}</a>
-							</div>
-							<div>
-								(Click image for next picture) | 
-								<a href="#top" title="Go to top of page">Top</a> | 
-								<a href="#bottom" title="Go to bottom of page">Bottom</a> |
-								{{if Index > 0}}<a href="#" class="previousImage" title="Previous Image">&lt;</a> | {{/if}}
-								{{if Index < Total-1}}<a href="#" class="nextImage" title="Next Image">&gt;</a> {{/if}}
-							</div>
-						</div>
-					</div>
-				</script>
 			</div>
 			<div id="bottom" class="info">
 				<p><span class="total">0</span> Images | <span class="loaded">0</span> Loaded | <span class="broken">0</span> Failed</p>

@@ -17,11 +17,6 @@ a, a:hover, a:visited{
 	text-decoration: none;
 }
 
-a.resizeImage{
-	float:left;
-	padding-right:10px;
-}
-
 div#bottom{
 	clear:both;
 	padding-top:20px;
