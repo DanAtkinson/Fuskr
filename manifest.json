@@ -4,16 +4,22 @@
 	"version": "1.9.1",
 	"description": "A Chromeified port of FireFusk",
 	"background": {
-		"page": "Html/background.htm"
+		"scripts": [
+			"Scripts/fuskr.js",
+			"Scripts/background.js"
+		]
 	},
 	"options_page": "Html/options.htm",
 	"incognito": "split",
-	"permissions":[
+	//"content_security_policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
+	"permissions": [
 		"tabs",
 		"http://*/*",
 		"https://*/*",
 		"contextMenus"
 	],
+	"homepage_url": "http://fuskr.com/",
+	"offline_enabled": false,
 	"icons" : {
 		"16" : "Images/Icon-16.png",
 		"48" : "Images/Icon-48.png",
