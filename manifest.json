@@ -11,7 +11,6 @@
 	},
 	"options_page": "Html/options.htm",
 	"incognito": "split",
-	//"content_security_policy": "default-src 'self' 'unsafe-inline' 'unsafe-eval'",
 	"permissions": [
 		"tabs",
 		"http://*/*",

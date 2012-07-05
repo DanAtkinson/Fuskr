@@ -14,6 +14,8 @@ How to use
 Version History
 ===============
 
+* 1.9.1 -
+ * Some changes to the application in order to take into account recent security update to Google Chrome which will be enforced shortly.
 * 1.9 -
  * Fuskr wasn't working on Macs.
 * 1.8 -

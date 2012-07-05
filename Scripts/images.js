@@ -29,9 +29,39 @@
 
 		$("div.info span.total").html(linkData.length);
 
-		console.log(JSON.stringify(linkData));
-		$("#content").html($("#imageTemplate").render(linkData));
-
+		var imageTemplate = '\
+			<div class="hide wrap" id="image_{{Index}}">\
+				<a href="{{Link}}" class="nextImage">\
+					<img class="fuskImage" alt="{{Link}}" src="{{Link}}">\
+				</a>\
+				<a href="{{Link}}" class="resizeImage">Resize</a>\
+				<div>\
+					<div>\
+						<a href="{{Link}}" target="_blank" title="Click to open this image in a new tab">{{Link}}</a>\
+					</div>\
+					<div>\
+						(Click image for next picture) | \
+						<a href="#top" title="Go to top of page">Top</a> | \
+						<a href="#bottom" title="Go to bottom of page">Bottom</a> |\
+						<a href="#" class="previousImage {{PreviousImage}}" title="Previous Image">&lt;</a> | \
+						<a href="#" class="nextImage {{NextImage}}" title="Next Image">&gt;</a>\
+					</div>\
+				</div>\
+			</div>\
+		';
+		
+		$.each(linkData, function(i, $Link) {
+			var showPreviousImageLink = i === 0 ? "hide" : "";
+			var showNextImage = i < ($Link.Total - 1) ? "hide" : "";
+			var thisImageTemplate = imageTemplate;
+			thisImageTemplate = replaceAll(thisImageTemplate, "{{Link}}", $Link.Link);
+			thisImageTemplate = replaceAll(thisImageTemplate, "{{Index}}", i);
+			thisImageTemplate = replaceAll(thisImageTemplate, "{{PreviousImage}}", showPreviousImageLink);
+			thisImageTemplate = replaceAll(thisImageTemplate, "{{NextImage}}", showNextImage);
+			thisImageTemplate = replaceAll(thisImageTemplate, "\t", "");
+			$(thisImageTemplate).appendTo("#content");
+		});
+		
 		//Start the images hidden and show as each one loads.
 		$("div#content img.fuskImage").load(function () {
 			$("div.info span.loaded").html(loaded++);
@@ -99,6 +129,9 @@
 			}
 		}
 
+		function replaceAll(txt, replace, replacement) {
+			return txt.replace(new RegExp(replace, 'g'), replacement);
+		}
 		$("img.fuskImage").error(function() {
 			brokenImagesCount++;
 			$(this).closest(".wrap").addClass("error");
