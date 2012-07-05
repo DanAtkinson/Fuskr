@@ -56,7 +56,7 @@
 			</label>
 			<p>Default option is <em>&quot;enabled&quot;</em>.</p>
 			<p>Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery.</p>
-			<div>
+			<div id="recentFusksArea">
 				<p class="bold">Last <span class="totalFusks"></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>
 				<select size="20" id="recentFusks">
 				</select>
@@ -80,69 +80,10 @@
 			<h2>For Your Information</h2>
 			<p>
 				Are you having problems with Fuskr?
-				If so, pop along to our <a href="https://github.com/DanAtkinson/Fuskr/issues">Google Code project</a> site and help us to help you by filling in an issue.
+				If so, pop along to our <a href="https://github.com/DanAtkinson/Fuskr/issues">Github project</a> site and help us to help you by filling in an issue.
 			</p>
 		</div>
 		<script type="text/javascript" src="/Scripts/jquery.min.js"></script>
-		<script type="text/javascript">
-			$(function() {
-				var openInForegroundVal = localStorage.getItem("openInForeground");
-				var openInForeground = parseInt(openInForegroundVal, 10);
-				if (openInForeground !== 0 && openInForeground !== 1) {
-					localStorage.setItem("openInForeground", 1);
-					openInForeground = 1;
-				}
-				$("input#openInForeground").attr("checked", openInForeground === 1 ? "checked" : "");
-
-
-				var keepRecentFusksVal = localStorage.getItem("keepRecentFusks");
-				var keepRecentFusks = parseInt(keepRecentFusksVal, 10);
-				if (keepRecentFusks !== 0 && keepRecentFusks !== 1) {
-					localStorage.setItem("keepRecentFusks", 1);
-					keepRecentFusks = 1;
-				}
-				$("input#keepRecentFusks").attr("checked", keepRecentFusks === 1 ? "checked" : "");
-
-				//Get the history
-				var history = localStorage.getItem("history");
-
-				if(history != null) {
-					//Push the rest of the urls onto the pile onto the array
-					var tempHistory = history.split("||");
-					for(var i = 0; i < tempHistory.length; i++) {
-						$("select#recentFusks").append("<option>"+tempHistory[i]+"</option>");
-					}
-					
-					var selectLength = tempHistory.length > 10 ? 10 : tempHistory.length;
-					$("p span.totalFusks").html(tempHistory.length);
-					
-					$("select#recentFusks").attr("size", selectLength);
-					
-					$("select#recentFusks option").click(function() {
-						chrome.tabs.create({ url:"/Html/images.htm?url=" + $(this).val(), selected: openInForeground === 1 });
-						return false;
-					});
-				}
-
-				/*var shareFusks = parseInt(localStorage.getItem("shareFusks"), 10);
-				if (shareFusks !== 0 && shareFusks !== 1) {
-					localStorage.setItem("shareFusks", 0);
-					shareFusks = 0;
-				}
-				$("input#shareFusks").attr("checked", shareFusks === 1 ? "checked" : "");
-				*/
-
-				//Save those options!
-				$("input.saveButton").click(function() {
-					$("input:checkbox").each(function() {
-						localStorage.setItem($(this).attr("id"), $(this).is(':checked') ? 1 : 0);
-					});
-					
-					$("div#saveInfo").animate({ opacity: 0.1 }, "slow", function(){
-						$("div#saveInfo").html("<p>Saved!</p>");
-					}).animate({ opacity: 1.0 }, "slow");
-				});
-			});
-		</script>
+		<script type="text/javascript" src="/Scripts/options.js"></script>
 	</body>
 </html>
