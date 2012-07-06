@@ -49,6 +49,7 @@
 			</div>\
 		';
 		
+		$("#content").empty();
 		$.each(linkData, function(i, $Link) {
 			var showPreviousImageLink = i === 0;;
 			var showNextImage = i > ($Link.Total - 1);

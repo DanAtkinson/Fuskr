@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Fuskr",
-	"version": "1.9.1",
+	"version": "1.9.2",
 	"description": "A Chromeified port of FireFusk",
 	"background": {
 		"scripts": [

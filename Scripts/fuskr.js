@@ -1,9 +1,9 @@
 ;var Fuskr = (function(ret){
 
-	var regex = /^(.*?)\[(\d+)\-(\d+)\](.*)$/,
-		groupRegex = /\{\d+\}/;
+	var regex = /^(.*?)\[(\d+)\-(\d+)\](.*)$/;
+	var groupRegex = /\{\d+\}/;
 
-		function PadString(number, stringLength, padding) {
+	function PadString(number, stringLength, padding) {
 		var numStr = ""+number;
 		if(!padding) return numStr;
 
@@ -41,6 +41,14 @@
 
 		return retUrls;
 	}
+	
+	ret.ConvertIntToChar = function(i) { 
+		return String.fromCharCode(i);
+	}
+
+	ret.ConvertCharToInt = function(a) { 
+		return a.charCodeAt();
+	}	
 
 	ret.IsFuskable = function(url) {
 		return regex.test(url);
