@@ -17,7 +17,6 @@
 			}
 		})();
 
-console.log(currentUrl);
 		document.title = "Fuskr - " + currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
 
 		$("p.fuskUrl").html(currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, ""));
