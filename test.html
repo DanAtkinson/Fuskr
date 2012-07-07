@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset='utf-8'>
+		<title>Fuskr @ GitHub</title>
+		<style type="text/css">
+			body {
+				margin-top: 1.0em;
+				background-color: #F2E6E9;
+				font-family: Helvetica, Arial, FreeSans, san-serif;
+				color: #756F71;
+			}
+			#container {
+				margin: 0 auto;
+				width: 850px;
+			}
+			h1 { font-size: 3.8em; color: #756F71; margin-bottom: 3px; }
+			h1 .small { font-size: 0.4em; }
+			h1 a { text-decoration: none }
+			h2 { font-size: 1.5em; color: #756F71; }
+			h3 { text-align: center; color: #756F71; }
+			a { color: #AC75D9; }
+			.description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
+			.download { float: right; }
+			pre { background: #000; color: #fff; padding: 15px;}
+			hr { border: 0; width: 80%; border-bottom: 1px solid #aaa}
+			.footer { text-align:center; padding-top:30px; font-style: italic; }
+		</style>
+		<script type="text/javascript" src="Scripts/jquery.min.js"></script>
+		<script type="text/javascript"src="Scripts/fuskr.js"></script>
+	</head>
+	<body>
+		<a href="somepage1.html"><img src="somepic1.jpg"></a>
+		<form>
+			<input type="text" id="text" size="100" value="" />
+			<input type="button" id="submit" value="Submit" /><br/>
+			<textarea id="results" cols="80" rows="30"></textarea>
+		</form>
+		<script>
+			$(function(){
+				console.log(Fuskr.ConvertCharToInt("A"), Fuskr.ConvertCharToInt("Z"));
+				console.log(Fuskr.ConvertCharToInt("a"), Fuskr.ConvertCharToInt("z"));
+				$("#submit").click(function(){
+					var parsedLinks = Fuskr.GetLinks($("#text").val());
+
+					//$("#results").val("");
+					$.each(parsedLinks, function(i,v){
+						$("#results").val($("#results").val() + v + "\r\n");
+					});
+				});
+			});
+		</script>
+	</body>
+</html>
