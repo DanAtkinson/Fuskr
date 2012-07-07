@@ -1,8 +1,7 @@
 (function() {
-	var numbers = ["10", "20", "50", "100", "200", "500", "Other"];
-	var recentId = 0;
-	var ids = [];
-	var historyIds = [];
+	var ids = [],
+		recentId = 0,
+		historyIds = [];
 
 	//Target urls tell Chrome what urls are acceptable.
 	var targetUrls = (function() {
@@ -15,14 +14,12 @@
 	})();
 
 	var parentId = chrome.contextMenus.create({ "title": "Fusk", "contexts": ["all"] });
-	//var imageNameMenuId = chrome.contextMenus.create({ "title": "---", "parentId": parentId, "contexts": ["image"] });
-	//chrome.contextMenus.create({ "parentId": parentId, "contexts": ["image"], "type": "separator" });
 	var incDecMenuId = chrome.contextMenus.create({ "title": "+/-", "parentId": parentId, "contexts": ["image"], "targetUrlPatterns": targetUrls });
 	var incMenuId = chrome.contextMenus.create({ "title": "+", "parentId": parentId, "contexts": ["image"], "targetUrlPatterns": targetUrls });
 	var decMenuId = chrome.contextMenus.create({ "title": "-", "parentId": parentId, "contexts": ["image"], "targetUrlPatterns": targetUrls });
 	chrome.contextMenus.create({ "parentId": parentId, "contexts": ["image"], "type": "separator" });
 	chrome.contextMenus.create({ "parentId": parentId, "title": "Create from selection", "contexts": ["selection"], /*"selectionPatterns": ["/\[\d+-\d+\]/"],*/ "onclick": createFromSelectionOnClick });
-	var manualId = chrome.contextMenus.create({ "title": "Manual", "parentId": parentId, "contexts": ["all"], "onclick": manualOnClick });
+	chrome.contextMenus.create({ "title": "Manual", "parentId": parentId, "contexts": ["all"], "onclick": manualOnClick });
 	chrome.contextMenus.create({ "parentId": parentId, "contexts": ["all"], "type": "separator" });
 	chrome.contextMenus.create({ "title": "Options", "parentId": parentId, "contexts": ["all"], "onclick": optionsOnClick });
 
@@ -30,6 +27,7 @@
 		createRecentMenu();
 	}
 
+	var numbers = ["10", "20", "50", "100", "200", "500", "Other"];
 	for(var i = 0; i < numbers.length; i++) {
 		ids.push([chrome.contextMenus.create({ "title": numbers[i], "parentId": incDecMenuId, "contexts": ["image"], "onclick": choiceOnClick }), 0, numbers[i]]);
 		ids.push([chrome.contextMenus.create({ "title": numbers[i], "parentId": incMenuId, "contexts": ["image"], "onclick": choiceOnClick }), 1, numbers[i]]);
@@ -147,7 +145,7 @@
 
 		//Save the urls
 		localStorage.setItem("history", historyArray.join("||"));
-		
+
 		//now need to reset the 'Recent' context menus and add them again.
 		if(getRecentFusksOption()) {
 			createRecentMenu();
@@ -156,7 +154,7 @@
 
 	function getRecentFusksOption() {
 		var keepRecentFusksVal = localStorage.getItem("keepRecentFusks");
-		
+
 		if(keepRecentFusksVal == null) {
 			return true;
 		}
@@ -194,6 +192,7 @@
 
 		for(var i = 0; i < ids.length; i++) {
 			var imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
+			//console.log(imageUrl, info.linkUrl, info.srcUrl);
 
 			if(ids[i][0] == info.menuItemId) {
 				direction = parseInt(ids[i][1], 10);
@@ -239,7 +238,7 @@
 		}
 
 		firstNum = (firstNum < 0 ? 0 : firstNum).toString();
-		lastNum = (lastNum < 0 ?  0 : lastNum).toString();
+		lastNum = (lastNum < 0 ? 0 : lastNum).toString();
 
 		while(firstNum.length < number.length) {
 			firstNum = "0" + firstNum;
