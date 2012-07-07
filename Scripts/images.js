@@ -17,9 +17,10 @@
 			}
 		})();
 
-		document.title = "Fuskr - " + currentUrl;
+console.log(currentUrl);
+		document.title = "Fuskr - " + currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
 
-		$("p.fuskUrl").html(currentUrl);
+		$("p.fuskUrl").html(currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, ""));
 
 		var parsedLinks = Fuskr.GetLinks(currentUrl);
 
@@ -64,7 +65,7 @@
 		
 		//Start the images hidden and show as each one loads.
 		$("div#content img.fuskImage").load(function () {
-			$("div.info span.loaded").html(loaded++);
+			$("div.info span.loaded").html(++loaded);
 			$(this).parents("div.wrap").removeClass("hide").addClass("loaded");
 		});
 
