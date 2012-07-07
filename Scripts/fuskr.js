@@ -1,13 +1,12 @@
-;var Fuskr = (function(ret){
-
+;var Fuskr = (function(ret) {
 	var regex = /^(.*?)\[(\d+)\-(\d+)\](.*)$/;
 	var groupRegex = /\{\d+\}/;
 
 	function PadString(number, stringLength, padding) {
-		var numStr = ""+number;
+		var numStr = "" + number;
 		if(!padding) return numStr;
 
-		while(numStr.length < stringLength){
+		while(numStr.length < stringLength) {
 			numStr = padding + numStr;
 		}
 
@@ -20,28 +19,29 @@
 			endNumber = parseInt(endNumString, 10),
 			paddedLength = startNumString.length;
 
-			while(startNumber <= endNumber){
+			while(startNumber <= endNumber) {
 			var thisNumString = PadString(startNumber, paddedLength, "0"),
 				link = prefix + thisNumString + suffix;
 
-			if(groupRegex.test(link)){
+			if(groupRegex.test(link)) {
 				link = link.replace(new RegExp("\\\{"+groupNumber+"\\\}", 'g'), thisNumString);
 			}
 
-			if(ret.IsFuskable(link)){
+			if(ret.IsFuskable(link)) {
 				var links = ret.GetLinks(link, groupNumber+1);
-				for(var i = 0; i < links.length; i++){
+				for(var i = 0; i < links.length; i++) {
 					retUrls.push(links[i]);
 				}
-			}else{
+			} else {
 				retUrls.push(link);
 			}
+
 			startNumber++;
 		}
 
 		return retUrls;
 	}
-	
+
 	ret.ConvertIntToChar = function(i) { 
 		return String.fromCharCode(i);
 	}
@@ -55,10 +55,10 @@
 	};
 
 	ret.GetLinks = function(url, groupNumber) {
-		var links = [],
-			groupNumber = groupNumber || 0;
+		var links = [];
+		groupNumber = groupNumber || 0;
 
-		if(ret.IsFuskable(url)){
+		if(ret.IsFuskable(url)) {
 			var matches = regex.exec(url);
 			links = GetUrls(matches[1],matches[4], matches[2], matches[3],groupNumber);
 		}
