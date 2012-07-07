@@ -192,7 +192,6 @@
 
 		for(var i = 0; i < ids.length; i++) {
 			var imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
-			//console.log(imageUrl, info.linkUrl, info.srcUrl);
 
 			if(ids[i][0] == info.menuItemId) {
 				direction = parseInt(ids[i][1], 10);
