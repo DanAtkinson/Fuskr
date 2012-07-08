@@ -1,8 +1,8 @@
 {
 	"manifest_version": 2,
 	"name": "Fuskr",
-	"version": "2.0",
-	"description": "A Chromeified port of FireFusk",
+	"version": "2.1",
+	"description": "Create photo galleries from a single image based on the image name.",
 	"background": {
 		"scripts": [
 			"Scripts/fuskr.js",
@@ -19,9 +19,9 @@
 	],
 	"homepage_url": "http://fuskr.com/",
 	"offline_enabled": false,
-	"icons" : {
-		"16" : "Images/Icon-16.png",
-		"48" : "Images/Icon-48.png",
-		"128" : "Images/Icon-128.png"
+	"icons": {
+		"16": "Images/16x16.png",
+		"48": "Images/48x48.png",
+		"128": "Images/128x128.png"
 	}
 }
