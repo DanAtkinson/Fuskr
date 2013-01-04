@@ -3,6 +3,7 @@
 	"name": "Fuskr",
 	"version": "2.2",
 	"description": "Create photo galleries from a single image based on the image name.",
+	"omnibox": { "keyword" : "fuskr" },
 	"background": {
 		"scripts": [
 			"Scripts/fuskr.js",
@@ -11,11 +12,13 @@
 	},
 	"options_page": "Html/options.htm",
 	"incognito": "split",
+	"omnibox": { "keyword" : "fuskr" },
 	"permissions": [
 		"tabs",
 		"http://*/*",
 		"https://*/*",
-		"contextMenus"
+		"contextMenus",
+		"\u003Call_urls\u003E"
 	],
 	"homepage_url": "http://fuskr.com/",
 	"offline_enabled": false,
