@@ -4,7 +4,7 @@
 		<link rel="stylesheet" href="/Scripts/jquery-ui-1.9.2/css/smoothness/jquery-ui-1.9.2.custom.css" type="text/css">
 		<link rel="stylesheet" href="/Styles/options.css" type="text/css">
 		<script type="text/javascript" src="/Scripts/jquery.min.js"></script>
-		<script  type="text/javascript"src="/Scripts/jquery-ui-1.9.2/js/jquery-ui-1.9.2.custom.min.js"></script>
+		<script type="text/javascript"src="/Scripts/jquery-ui-1.9.2/js/jquery-ui-1.9.2.custom.min.js"></script>
 		<script type="text/javascript"src="/Scripts/options.js"></script>
 	</head>
 	<body class="no-select">
@@ -13,8 +13,10 @@
 			<div id="tab-container">
 				<div class="tab active foreground-button" data-type="foreground">Foreground</div>
 				<div class="tab history-button" data-type="history">History</div>
+				<div class="tab about-button" data-type="about">About</div>
 			</div>
 		</div>
+
 		<div id="content">
 			<div class="tab-content show foreground foreground-tab">
 				<h2>Foreground</h2>
@@ -37,6 +39,7 @@
 					</tr>
 				</table>
 			</div>
+
 			<div class="tab-content history history-tab">
 				<h2>History</h2>
 				<table class="setting group">
@@ -61,7 +64,25 @@
 					</tr>
 				</table>
 			</div>
-			<div id="credits" class="hide">
+			<div class="tab-content about about-tab">
+				<h2>About Fuskr</h2>
+				<table class="setting group">
+					<tr>
+						<td class="setting group-content">
+							<div class="setting bundle text">
+								<div class="setting container text">
+									<p>Fuskr was borne of a frustation that my favourite Firefox plugin <a href="http://addons.mozilla.org/en-US/firefox/addon/2087/" title="Firefusk on Mozilla Addons">Firefusk</a> created by <a href="http://www.xoxosoma.com/" title="Jonathan Soma">Jonathan Soma</a> wasn't available for Chrome.</p>
+									<p>Once I'd stopped crying, I remembered that I was a developer and could do almost anything if I put my mind to it.</p>
+									<p><i>Then</i>, I remembered that I was actually a pretty rubbish developer and asked for help from Jonathon Bolster.</p>
+									<p>Jonathon gratefully helped and actually rewrote pretty much all of the code for Fuskr to make it so damned extensible and also provided lots of unit tests for it.</p>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="credits">
 				<h2>Credits</h2>
 				<div id="logo">
 					<img src="/images/128x128.png" alt="Fuskr" />
@@ -69,7 +90,6 @@
 				<div id="info">
 					<p>Fuskr (originally called ChromeFusk) was created in 2011 by <a href="https://twitter.com/danbo" title="Dan on Twitter">Dan Atkinson</a> with oodles of help from Jonathon Bolster</a> from <a href="http://bolsterweb.com" title="Jonathon Bolster">BolsterWeb</a>.</p>
 					<p>The Fuskr logos were created by <a href="https://twitter.com/richardstelmach" title="Richard on Twitter">Richard Stelmach</a> of <a href="http://www.creativebinge.co.uk" title="Creative Binge">Creative Binge</a>.</p>
-					<p>Fuskr was borne of a frustation that my favourite Firefox plugin <a href="http://addons.mozilla.org/en-US/firefox/addon/2087/" title="Firefusk on Mozilla Addons">Firefusk</a> created by <a href="http://www.xoxosoma.com/" title="Jonathan Soma">Jonathan Soma</a> wasn't available for Chrome. Once I'd stopped crying, I remembered that I was a developer and could do almost anything if I put my mind to it. Then I remembered that I was actually a pretty rubbish developer and asked for help from Jonathon Bolster. Jonathon gratefully helped and actually rewrote pretty much all of the code for Fuskr to make it so damned extensible and also provided lots of unit tests for it.</p>
 				</div>
 			</div>
 		</div>
