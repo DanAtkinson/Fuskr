@@ -15,9 +15,10 @@ Version History
 ===============
 
 * 2.2 -
+ * Added the ability to create a fusk by typing 'fuskr' in the omnibox, followed by your fusk url!
  * Updated libraries used by Fuskr.
 * 2.1 -
- * New logo and images
+ * Updated Fuskr with new icon/image goodness kindly provided by Richard Stelmach of Creative Binge!
 * 2.0 -
  * Alphabetical fusking is now possible! You can now do fusks such as http://example.com/path/file/[a-z].jpg or even http://domain.com/path/file/[a-z]and[c-g]and[j-m].jpg
  * Changes to the options page to make it much cleaner.

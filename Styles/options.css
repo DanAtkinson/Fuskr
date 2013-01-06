@@ -121,6 +121,19 @@ a img{
 	overflow:auto;
 }
 
+	#main{
+		min-height:100%;
+		position:relative;
+	}
+
+		#versionsBlock{
+			padding-bottom:200px;
+		}
+
+			#versionsBlock ul li{
+				margin-left:10px;
+			}
+
 	.tab-content{
 		display:none;
 		position:absolute;
@@ -133,14 +146,17 @@ a img{
 	}
 
 
-#credits{
-	position:absolute;
-	bottom:0;
-	left:15px;
+footer {
+	background-color:#FFF;
+    position:fixed;
+    bottom:0;
+	left:222px;
+    width:87%;
 }
 
 	#credits h2{
 		margin-bottom:0;
+		margin-left:15px;
 	}
 
 	#credits p{
@@ -149,13 +165,10 @@ a img{
 
 	#logo{
 		float:left;
-		width:13%;
 	}
 
 	#info{
-		float:right;
 		padding-top:20px;
-		width:86%;
 	}
 
 /* Headings */
