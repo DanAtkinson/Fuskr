@@ -1,20 +1,25 @@
-body{
-	font-size: 12px;
-	min-width:357px;
-	font-family: helvetica, verdana;
-	text-align: center;
+html{
+	background-color:#FFF;
+	border:0;
+	color:#222222;
+	cursor:default;
+	font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size:14px;
+	margin:0;
+	padding:0;
+	text-align:center;
 }
 
 img{
-	border: 0px;
+	border:0px;
 	margin:auto;
 	margin-bottom:4px;
 }
 
 a, a:hover, a:visited{
-	color: #b33c04;
-	cursor: pointer;
-	text-decoration: none;
+	color:#b33c04;
+	cursor:pointer;
+	text-decoration:none;
 }
 
 div#bottom{
@@ -23,7 +28,7 @@ div#bottom{
 }
 
 div.rating{
-	border: 1px solid #ccc;
+	border:1px solid #ccc;
 	clear:both;
 	margin:0 auto;
 	padding:20px 0;
@@ -31,9 +36,13 @@ div.rating{
 }
 
 .wrap{
-	border: 1px solid #ccc;
-	float: left;
-	margin: 7px;
-	padding: 3px;
-	text-align: center;
+	border:1px solid #ccc;
+	float:left;
+	margin:7px;
+	padding:3px;
+	text-align:center;
+}
+
+.fuskTotals{
+	font-weight:bold;
 }
