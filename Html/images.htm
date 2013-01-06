@@ -8,6 +8,25 @@
 			.hide { display:none; }
 		</style>
 		<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
+		<script type="text/html" id="item_tmpl">
+			<div class="hide wrap" id="image_<%= Index %>">
+				<a href="<%= Link %>" class="nextImage">
+					<img class="fuskImage" alt="<%= Link %>" src="<%= Link %>">
+				</a>
+				<div>
+					<div>
+						<a href="<%= Link %>" target="_blank" title="Click to open this image in a new tab"><%= Link %></a>
+					</div>
+					<div>
+						(Click image for next picture)&nbsp;|&nbsp;
+						<a href="#top" title="Go to top of page">Top</a>&nbsp;|&nbsp;
+						<a href="#bottom" title="Go to bottom of page">Bottom</a>&nbsp;|&nbsp;
+						<a href="#" class="previousImage <%= PreviousImage %>" title="Previous Image">&lt;</a>&nbsp;|&nbsp;
+						<a href="#" class="nextImage <%= NextImage %>" title="Next Image">&gt;</a>
+					</div>
+				</div>
+			</div>
+		</script>
 	</head>
 	<body>
 		<div id="all">

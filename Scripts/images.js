@@ -1,10 +1,48 @@
+// Simple JavaScript Templating
+// John Resig - http://ejohn.org/ - MIT Licensed
+(function(){
+	var cache = {};
+
+	this.tmpl = function tmpl(str, data){
+
+		// Figure out if we're getting a template, or if we need to
+		// load the template - and be sure to cache the result.
+		var fn = !/\W/.test(str) ?
+			cache[str] = cache[str] ||
+			tmpl(document.getElementById(str).innerHTML) :
+
+			// Generate a reusable function that will serve as a template
+			// generator (and which will be cached).
+			new Function("obj",
+			"var p=[],print=function(){p.push.apply(p,arguments);};" +
+
+			// Introduce the data as local variables using with(){}
+			"with(obj){p.push('" +
+
+			// Convert the template into pure JavaScript
+			str
+				.replace(/[\r\t\n]/g, " ")
+				.split("<%").join("\t")
+				.replace(/((^|%>)[^\t]*)'/g, "$1\r")
+				.replace(/\t=(.*?)%>/g, "',$1,'")
+				.split("\t").join("');")
+				.split("%>").join("p.push('")
+				.split("\r").join("\\'")
+			+ "');}return p.join('');");
+
+		// Provide some basic currying to the user
+		return data ? fn( data ) : fn;
+	};
+})();
+
 $(function() {
+
 	var brokenImagesCount = 0,
 		loaded = 0,
 		total
 		resizeOn = false,
 		showHiddenImages = false;
-
+		
 	var currentUrl = (function() {
 		var query = window.location.search.substring(1);
 		var vars = query.split("&");
@@ -16,52 +54,36 @@ $(function() {
 		}
 	})();
 
-	var title = currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
-	document.title = "Fuskr - " + title;
-	$("p.fuskUrl").html(title);
+	go(currentUrl);
 
-	var parsedLinks = Fuskr.GetLinks(currentUrl);
-	total = parsedLinks.length;
-	$("div.info span.total").html(total);
+	function go(currentUrl) {
+		var $content = $("#content");
+		var title = currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
+		document.title = "Fuskr - " + title;
+		$("p.fuskUrl").html(title);
 
-	var linkData = $.map(parsedLinks, function(item, i) {
-		return { "Index" : i, "Link" : item, "Total" : parsedLinks.length };
-	});
+		var parsedLinks = Fuskr.GetLinks(currentUrl);
+		total = parsedLinks.length;
+		$("div.info span.total").html(total);
 
-	var imageTemplate = '\
-		<div class="hide wrap" id="image_{{Index}}">\
-			<a href="{{Link}}" class="nextImage">\
-				<img class="fuskImage" alt="{{Link}}" src="{{Link}}">\
-			</a>\
-			<div>\
-				<div>\
-					<a href="{{Link}}" target="_blank" title="Click to open this image in a new tab">{{Link}}</a>\
-				</div>\
-				<div>\
-					(Click image for next picture)&nbsp;|&nbsp;\
-					<a href="#top" title="Go to top of page">Top</a>&nbsp;|&nbsp;\
-					<a href="#bottom" title="Go to bottom of page">Bottom</a>&nbsp;|&nbsp;\
-					<a href="#" class="previousImage {{PreviousImage}}" title="Previous Image">&lt;</a>&nbsp;|&nbsp;\
-					<a href="#" class="nextImage {{NextImage}}" title="Next Image">&gt;</a>\
-				</div>\
-			</div>\
-		</div>\
-	';
-	
-	$("#content").empty();
+		var linkData = $.map(parsedLinks, function(item, i) {
+			return {
+				"Index" : i,
+				"Link" : item,
+				"Total" : parsedLinks.length,
+				"PreviousImage": i === 0 ? "hide" : "",
+				"NextImage": i > (parsedLinks.length - 1) ? "hide" : ""
+			};
+		});
 
-	$.each(linkData, function(i, $Link) {
-		var showPreviousImageLink = i === 0;;
-		var showNextImage = i > ($Link.Total - 1);
-		var thisImageTemplate = imageTemplate;
-		thisImageTemplate = replaceAll(thisImageTemplate, "{{Link}}", $Link.Link);
-		thisImageTemplate = replaceAll(thisImageTemplate, "{{Index}}", i);
-		thisImageTemplate = replaceAll(thisImageTemplate, "{{PreviousImage}}", showPreviousImageLink ? "hide" : "");
-		thisImageTemplate = replaceAll(thisImageTemplate, "{{NextImage}}", showNextImage ? "hide" : "");
-		thisImageTemplate = replaceAll(thisImageTemplate, "\t", "");
-		$(thisImageTemplate).appendTo("#content");
-	});
-	
+		$content.empty();
+
+		var show_user = tmpl("item_tmpl");
+		for ( var i = 0; i < linkData.length; i++ ) {
+			$content.append(show_user(linkData[i]));
+		}
+	}
+
 	//Start the images hidden and show as each one loads.
 	$("div#content img.fuskImage")
 		.load(function () {

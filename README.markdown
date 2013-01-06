@@ -14,6 +14,8 @@ How to use
 Version History
 ===============
 
+* 2.3 -
+ * Fixed some template issues and added more information and credits to the options page.
 * 2.2 -
  * Added the ability to create a fusk by typing 'fuskr' in the omnibox, followed by your fusk url!
  * Updated libraries used by Fuskr.
