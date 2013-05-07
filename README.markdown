@@ -14,6 +14,9 @@ How to use
 Version History
 ===============
 
+* 2.4 -
+ * Updated to jQuery v2 and jQuery UI 1.10.3.
+ * Minor styling changes to the image gallery page.
 * 2.3 -
  * Fixed some template issues and added more information and credits to the options page.
 * 2.2 -
