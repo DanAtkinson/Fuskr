@@ -37,9 +37,10 @@
 
 $(function() {
 
+	var image = $('<img src="/Images/128x128.png" />');
 	var brokenImagesCount = 0,
 		loaded = 0,
-		total
+		total = 0,
 		resizeOn = false,
 		showHiddenImages = false;
 		
@@ -58,12 +59,18 @@ $(function() {
 
 	function go(currentUrl) {
 		var $content = $("#content");
+
+		var info = tmpl("info_tmpl");
+		$content.before(info({ Position: "top" }));
+		$content.after(info({ Position: "bottom" }));
+
 		var title = currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
 		document.title = "Fuskr - " + title;
 		$("p.fuskUrl").html(title);
 
 		var parsedLinks = Fuskr.GetLinks(currentUrl);
 		total = parsedLinks.length;
+
 		$("div.info span.total").html(total);
 
 		var linkData = $.map(parsedLinks, function(item, i) {
@@ -77,6 +84,7 @@ $(function() {
 		});
 
 		$content.empty();
+
 
 		var show_user = tmpl("item_tmpl");
 		for ( var i = 0; i < linkData.length; i++ ) {

@@ -22,27 +22,35 @@ a, a:hover, a:visited{
 	text-decoration:none;
 }
 
-div#bottom{
-	clear:both;
-	padding-top:20px;
+.info{
+	background:#FFF url(/Images/128x128.png) no-repeat left top;
+	padding-left:130px;
+	text-align:left;
+	min-height:128px;
+	padding-top:10px;
 }
 
-div.rating{
-	border:1px solid #ccc;
-	clear:both;
-	margin:0 auto;
-	padding:20px 0;
-	width:500px;
-}
+	div#bottom{
+		clear:both;
+		padding-top:20px;
+	}
 
-.wrap{
-	border:1px solid #ccc;
-	float:left;
-	margin:7px;
-	padding:3px;
-	text-align:center;
-}
+	div.rating{
+		border:1px solid #ccc;
+		clear:both;
+		margin:0 auto;
+		padding:20px 0;
+		width:500px;
+	}
 
-.fuskTotals{
-	font-weight:bold;
-}
+	.wrap{
+		border:1px solid #ccc;
+		float:left;
+		margin:7px;
+		padding:3px;
+		text-align:center;
+	}
+
+	.fuskTotals{
+		font-weight:bold;
+	}
