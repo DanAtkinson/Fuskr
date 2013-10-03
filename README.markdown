@@ -1,7 +1,7 @@
 How to use
 ==========
 
-1. Go ahead and install Fuskr from the Google Chrome extensions gallery.
+1. Go ahead and install Fuskr from the [Google Chrome extensions gallery](https://chrome.google.com/webstore/detail/fuskr/glieaboaghdnlglpkekghloldikefofo).
 2. On your desired image, right click and choose 'Fusk'.
 3. Choose which direction:
   * '+/-' will return a gallery with images that come before and after it.
