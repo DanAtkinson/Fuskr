@@ -3,6 +3,7 @@
 <head>
 	<meta charset='utf-8'>
 	<title>Fuskr @ GitHub</title>
+	<link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/glieaboaghdnlglpkekghloldikefofo">
 	<style type="text/css">
 		body {
 			margin-top: 1.0em;
@@ -61,6 +62,8 @@
 		<div class="description">
 			<p>Fuskr is a Google Chome image gallery <a href="https://chrome.google.com/webstore/detail/glieaboaghdnlglpkekghloldikefofo" title="Fuskr download">extension</a> and is a port of <a href="https://addons.mozilla.org/en-US/firefox/addon/2087/" title="FireFusk">FireFusk</a>.</p>
 		</div>
+
+		<button onclick="chrome.webstore.install()" id="install-button">Add to Chrome</button>
 
 		<h2>Authors</h2>
 		<p>
@@ -211,5 +214,17 @@
 			get the source code on GitHub : <a href="http://github.com/DanAtkinson/Fuskr">DanAtkinson/Fuskr</a>
 		</div>
 	</div>
+
+	<script type="text/javascript">
+		(function () {
+			if (chrome.app.isInstalled) {
+				document.getElementById('install-button').style.display = 'none';
+			}
+
+			if (document.getElementById('extension-is-installed')) {
+				document.getElementById('install-button').style.display = 'none';
+			}
+		} () );
+	</script>
 </body>
 </html>
