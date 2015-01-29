@@ -1,6 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Fuskr",
+	"short_name": "Fuskr",
 	"version": "2.5",
 	"description": "Create photo galleries from a single image based on the image name.",
 	"omnibox": { "keyword" : "fuskr" },
@@ -10,14 +11,6 @@
 			"Scripts/background.js"
 		]
 	},
-	/*"page_action": {
-		"default_icon": { 
-			"19": "Images/16x16.png",
-			"38": "Images/48x48.png"
-		},
-		"default_title": "Fuskr"//,
-		//"default_popup": "popup.html"
-	},*/
 	"options_page": "Html/options.htm",
 	"incognito": "split",
 	"omnibox": { "keyword" : "fuskr" },
