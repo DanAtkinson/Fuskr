@@ -14,6 +14,8 @@ How to use
 Version History
 ===============
 
+* 2.5 -
+ * Updated to jQuery v2.1.3 and jQuery UI 1.11.2.
 * 2.4 -
  * Updated to jQuery v2 and jQuery UI 1.10.3.
  * Minor styling changes to the image gallery page.
