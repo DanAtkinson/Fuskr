@@ -1,7 +1,7 @@
 {
 	"manifest_version": 2,
 	"name": "Fuskr",
-	"version": "2.4",
+	"version": "2.5",
 	"description": "Create photo galleries from a single image based on the image name.",
 	"omnibox": { "keyword" : "fuskr" },
 	"background": {
@@ -29,7 +29,7 @@
 		"\u003Call_urls\u003E"
 	],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
-	"homepage_url": "http://fuskr.com/",
+	"homepage_url": "http://danatkinson.github.io/Fuskr/",
 	"offline_enabled": false,
 	"icons": {
 		"16": "Images/16x16.png",
