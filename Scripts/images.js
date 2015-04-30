@@ -43,7 +43,7 @@ $(function() {
 		total = 0,
 		resizeOn = false,
 		showHiddenImages = false;
-		
+
 	var currentUrl = (function() {
 		var query = window.location.search.substring(1);
 		var vars = query.split("&");
@@ -55,20 +55,18 @@ $(function() {
 		}
 	})();
 
-	go(currentUrl);
-
-	function go(currentUrl) {
+	(function (url) {
 		var $content = $("#content");
 
 		var info = tmpl("info_tmpl");
 		$content.before(info({ Position: "top" }));
 		$content.after(info({ Position: "bottom" }));
 
-		var title = currentUrl.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
+		var title = url.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
 		document.title = "Fuskr - " + title;
 		$("p.fuskUrl").html(title);
 
-		var parsedLinks = Fuskr.GetLinks(currentUrl);
+		var parsedLinks = Fuskr.GetLinks(url);
 		total = parsedLinks.length;
 
 		$("div.info span.total").html(total);
@@ -90,7 +88,7 @@ $(function() {
 		for ( var i = 0; i < linkData.length; i++ ) {
 			$content.append(show_user(linkData[i]));
 		}
-	}
+	}(currentUrl));
 
 	//Start the images hidden and show as each one loads.
 	$("div#content img.fuskImage")
@@ -126,6 +124,20 @@ $(function() {
 		$(this).find("span.showHide").html(!document.styleSheets[0].disabled ? "Hide" : "Show");
 		document.styleSheets[0].disabled = !document.styleSheets[0].disabled;
 		return false;
+	});
+
+	$("a.downloadImages").click(function() {
+		var imageUrl = "";
+		//https://developer.chrome.com/extensions/downloads#method-download
+		//chrome.downloads.download
+		$("div.loaded a.imageLink").each(function () {
+			var imageUrl = $(this).attr("href");
+			chrome.downloads.download({
+				url: imageUrl
+			},function () {
+				console.log("Completed download");
+			});
+		});
 	});
 
 	$("a.previousImage").click(function(e) {

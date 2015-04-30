@@ -22,6 +22,7 @@
 	chrome.contextMenus.create({ "title": "Manual", "parentId": parentId, "contexts": ["all"], "onclick": manualOnClick });
 	chrome.contextMenus.create({ "parentId": parentId, "contexts": ["all"], "type": "separator" });
 	chrome.contextMenus.create({ "title": "Options", "parentId": parentId, "contexts": ["all"], "onclick": optionsOnClick });
+	chrome.contextMenus.create({ "title": "Help", "parentId": parentId, "contexts": ["all"], "onclick": helpOnClick });
 
 	// This event is fired each time the user updates the text in the omnibox, as long as the extension's keyword mode is still active.
 	/*chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
@@ -90,6 +91,10 @@
 
 	function optionsOnClick(info, tab) {
 		chrome.tabs.create({ url:"/Html/options.htm", index: (tab.index + 1) });
+	}
+
+	function helpOnClick(info, tab) {
+		chrome.tabs.create({ url:"/Html/help.htm", index: (tab.index + 1)});
 	}
 
 	function manualOnClick(info, tab) {

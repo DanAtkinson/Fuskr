@@ -1,7 +1,7 @@
 <!doctype html>
-<html>
+<html lang="en">
 	<head>
-		<script type="text/javascript" src="/Scripts/jquery.min.js"></script>
+		<script type="text/javascript" src="/Scripts/jquery-1.11.2.min.js"></script>
 		<script type="text/javascript"src="/Scripts/fuskr.js"></script>
 		<style>
 			.error { display: none; }
@@ -15,7 +15,7 @@
 				</a>
 				<div>
 					<div>
-						<a href="<%= Link %>" target="_blank" title="Click to open this image in a new tab"><%= Link %></a>
+						<a href="<%= Link %>" target="_blank" title="Click to open this image in a new tab" class="imageLink"><%= Link %></a>
 					</div>
 					<div>
 						(Click image for next picture)&nbsp;|&nbsp;
@@ -30,6 +30,7 @@
 		<script type="text/html" id="info_tmpl">
 			<div id="<%= Position %>" class="info" title="Fuskr">
 				<p class="fuskTotals"><span class="total">0</span> Images | <span class="loaded">0</span> Loaded | <span class="broken">0</span> Failed</p>
+				<p><a href="#" class="downloadImages">Download Images</a></p>
 				<p><a href="#" class="toggleBrokenLinks" title="Toggle gallery to show/hide images that have did not load"><span class="showHide">Show</span> broken images</a></p>
 				<p><a href="#" class="resizeImages" title="Resize images">Resize images to fit on page</a></p>
 				<p class="fuskUrl">&nbsp;</p>
