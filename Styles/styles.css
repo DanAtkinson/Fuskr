@@ -22,15 +22,11 @@ a, a:hover, a:visited{
 	text-decoration:none;
 }
 
-#dialogs{
-	display:none;
-}
-
 .code{
-    font-family: Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
-    background-color: #eee;
-    white-space: pre-wrap;
-    padding: 1px 5px 1px 5px;
+    font-family:Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+    background-color:#eee;
+    white-space:pre-wrap;
+    padding:1px 5px 1px 5px;
 }
 
 .info{
@@ -66,7 +62,31 @@ a, a:hover, a:visited{
 		font-weight:bold;
 	}
 
-div#download-form {text-align:left;}
-	div#download-form { width: 350px; margin: 20px 0; }
-    div#download-form table { margin: 1em 0; border-collapse: collapse; width: 100%; }
-    div#download-form table td, div#download-form table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }
+#dialogs{
+	display:none;
+}
+
+	div#dialogs .dialog-form {
+		text-align:left;
+	}
+
+	div#dialogs .dialog-form {
+		width:350px;
+		margin:20px 0;
+	}
+
+	div#dialogs .dialog-form table {
+		margin:1em 0;
+		border-collapse:collapse;
+		width:100%;
+	}
+
+	div#dialogs .dialog-form table td, div#dialogs .dialog-form table th {
+		border:1px solid #eee;
+		padding:.6em 10px;
+		text-align:left;
+	}
+
+	input#saveName {
+		width:500px;
+	}

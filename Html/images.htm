@@ -31,8 +31,9 @@
 	</script>
 	<script type="text/html" id="info_tmpl">
 		<div id="<%= Position %>" class="info" title="Fuskr">
+			<p><%= Link %></p>
 			<p class="fuskTotals"><span class="total">0</span> Images | <span class="loaded">0</span> Loaded | <span class="broken">0</span> Failed</p>
-			<p><a href="#" class="downloadImages">Download Images</a></p>
+			<p><a href="#" class="downloadImages">Download Images</a> | <a href="#" class="saveFusk" title="Save Fusk">Save Fusk</a></p>
 			<p><a href="#" class="toggleBrokenLinks" title="Toggle gallery to show/hide images that have did not load"><span class="showHide">Show</span> broken images</a></p>
 			<p><a href="#" class="resizeImages" title="Resize images">Resize images to fit on page</a></p>
 			<p class="fuskUrl">&nbsp;</p>
@@ -46,37 +47,28 @@
 	<script type="text/javascript" src="/Scripts/images.js"></script>
 
 	<div id="dialogs">
-		<div id="download-form" title="Download Images">
-			<!--<p class="validateTips">All form fields are required.</p>-->
-
+		<div class="dialog-form" id="download-form" title="Download Images">
 			<form>
-				<fieldset>
-					<legend>Filename Conflict Resolution</legend>
-					<label>
-						<p>In case of a conflict of filenames, what do you want to do?</p>
-						<p><b>Unique:</b> To avoid duplication, the filename will be changed to include a number after the filename eg <span class="code">filename1 (1).jpg</span>.</p>
-						<p><b>Overwrite:</b> The existing file will be overwritten with the new file.</p>
-						<p><b>Prompt:</b> You will be prompted to choose a filename.</p>
-						<select name="conflictResolution" class="ui-widget-content ui-corner-all">
-							<option value="uniquify" selected="selected">Unique</option>
-							<option value="overwrite">Overwrite</option>
-							<option value="prompt">Prompt</option>
-						</select>
-					</label>
-				</fieldset>
+				<label>
+					<p>In case of a conflict of filenames, what do you want to do?</p>
+					<p><b>Unique:</b> To avoid duplication, the filename will be appended with a number eg <span class="code">filename1 (1).jpg</span>.</p>
+					<p><b>Overwrite:</b> The existing file will be overwritten with the new file.</p>
+					<p><b>Prompt:</b> You will be prompted to choose a filename.</p>
+					<select id="conflictResolution" class="ui-widget-content ui-corner-all">
+						<option value="uniquify" selected="selected">Unique</option>
+						<option value="overwrite">Overwrite</option>
+						<option value="prompt">Prompt</option>
+					</select>
+				</label>
+			</form>
+		</div>
 
-<!--
-				<label for="name">Name</label>
-				<input type="text" name="name" id="name" value="Jane Smith" class="text ui-widget-content ui-corner-all">
-				<label for="email">Email</label>
-				<input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">
-				<label for="password">Password</label>
-				<input type="password" name="password" id="password" value="xxxxxxx" class="text ui-widget-content ui-corner-all">
-
--->
-					<!-- Allow form submission with keyboard without duplicating the dialog button -->
-					<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
-				</fieldset>
+		<div class="dialog-form" id="save-form" title="Save Fusk">
+			<form>
+				<label>
+					<p>What name do you wish to give this fusk (defaults to this url if empty)?</p>
+					<input type="text" id="saveName" value="" />
+				</label>
 			</form>
 		</div>
 	</div>

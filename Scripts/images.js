@@ -37,12 +37,10 @@
 
 $(function() {
 
-	var image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, dialog;
+	var i, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, downloadDialog, saveDialog;
 
 	(function () {
 		var
-			i = 0,
-			url = "",
 			pair = "",
 			linkData,
 			show_user,
@@ -68,12 +66,14 @@ $(function() {
 			$("p.fuskUrl").html(title);
 
 			parsedLinks = Fuskr.GetLinks(url);
+
+			$content.before(info({ Link: url, Position: "top" }));
+			$content.after(info({ Link: url, Position: "bottom" }));
+
+			$("input#saveName").val(url);
 		} else {
 
 		}
-
-		$content.before(info({ Position: "top" }));
-		$content.after(info({ Position: "bottom" }));
 
 		total = parsedLinks.length;
 
@@ -104,19 +104,19 @@ $(function() {
 		conflictAction: "uniquify";
 		image = $('<img src="/Images/128x128.png" />');
 
-		dialog = $("#download-form").dialog({
+		downloadDialog = $("#download-form").dialog({
 			autoOpen: false,
-			height: 500,
-			width: 650,
+			height: 270,
+			width: 550,
 			modal: true,
 			buttons: {
 				Cancel: function() {
 					$("#download-form form")[0].reset();
-					dialog.dialog("close");
+					downloadDialog.dialog("close");
 				},
 				Download: function () {
-					conflictAction = $("#download-form form select").val();
-					dialog.dialog("close");
+					conflictAction = $("#download-form form select#conflictResolution").val();
+					downloadDialog.dialog("close");
 					downloadAll();
 				}
 			},
@@ -124,8 +124,6 @@ $(function() {
 				$("#download-form form")[0].reset();
 			}
 		});
-
-
 	}());
 
 	//Start the images hidden and show as each one loads.
@@ -167,7 +165,7 @@ $(function() {
 	$("a.downloadImages").click(function(e) {
 		e.preventDefault();
 
-		dialog.dialog( "open" );
+		downloadDialog.dialog("open");
 	});
 
 	$("a.previousImage").click(function(e) {
@@ -180,10 +178,61 @@ $(function() {
 		scrollTo($(this), 1);
 	});
 
+	$("a.saveFusk").click(function(e) {
+		e.preventDefault();
+
+		saveDialog = $("#save-form").dialog({
+			autoOpen: false,
+			height: 270,
+			width: 550,
+			modal: true,
+			buttons: {
+				Cancel: function() {
+					saveDialog.dialog("close");
+				},
+				Save: function () {
+					saveFusk();
+					saveDialog.dialog("close");
+				}
+			}
+		});
+
+		saveDialog.dialog("open");
+		$("#saveName").select();
+	});
+
+	function saveFusk () {
+		var alreadySaved, savedFusksOption, name;
+		name = $("#saveName").val();
+		savedFusksOption = localStorage.getItem("savedFusks");
+
+		if(savedFusksOption == null || savedFusksOption == "" || savedFusksOption === '\"[]\"') {
+			savedFusksOption = [{name: name, url: url}];
+		} else {
+			savedFusksOption = JSON.parse(savedFusksOption);
+		}
+
+		alreadySaved = false;
+		for(i = 0; i < savedFusksOption.length; i++) {
+			if (name === savedFusksOption[i].name) {
+				alreadySaved = true;
+				savedFusksOption[i].url = url;
+				break;
+			}
+		}
+
+		if(alreadySaved === false) {
+			savedFusksOption.push({name: name, url: url });
+		}
+
+		localStorage.setItem("savedFusks", JSON.stringify(savedFusksOption));
+	}
+
 	function scrollTo(element, direction) {
-		var offset = 0;
-		var parent = element.parents("div.wrap");
-		var elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
+		var offset, parent, elementSelector;
+		offset = 0;
+		parent = element.parents("div.wrap");
+		elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
 
 		//get the offset of the target anchor
 		if(direction === 1) {

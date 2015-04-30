@@ -1,10 +1,15 @@
 (function() {
-	var ids = [],
+	var i = 0,
+		ids = [],
 		recentId = 0,
-		historyIds = [];
+		parentId = -1,
+		savedIds = [],
+		historyIds = [],
+		targetUrls,
+		numbers = ["10", "20", "50", "100", "200", "500", "Other"];
 
 	//Target urls tell Chrome what urls are acceptable.
-	var targetUrls = (function() {
+	targetUrls = (function() {
 		var targetUrls = [];
 		//Create regex patterns to match only urls that contain numbers
 		for (var i = 0; i <= 9; i++) {
@@ -13,95 +18,128 @@
 		return targetUrls;
 	})();
 
-	var parentId = chrome.contextMenus.create({ "title": "Fusk", "contexts": ["all"] });
-	var incDecMenuId = chrome.contextMenus.create({ "title": "+/-", "parentId": parentId, "contexts": ["image"], "targetUrlPatterns": targetUrls });
-	var incMenuId = chrome.contextMenus.create({ "title": "+", "parentId": parentId, "contexts": ["image"], "targetUrlPatterns": targetUrls });
-	var decMenuId = chrome.contextMenus.create({ "title": "-", "parentId": parentId, "contexts": ["image"], "targetUrlPatterns": targetUrls });
-	chrome.contextMenus.create({ "parentId": parentId, "contexts": ["image"], "type": "separator" });
-	chrome.contextMenus.create({ "parentId": parentId, "title": "Create from selection", "contexts": ["selection"], /*"selectionPatterns": ["/\[\d+-\d+\]/"],*/ "onclick": createFromSelectionOnClick });
-	chrome.contextMenus.create({ "title": "Manual", "parentId": parentId, "contexts": ["all"], "onclick": manualOnClick });
-	chrome.contextMenus.create({ "parentId": parentId, "contexts": ["all"], "type": "separator" });
-	chrome.contextMenus.create({ "title": "Options", "parentId": parentId, "contexts": ["all"], "onclick": optionsOnClick });
-	chrome.contextMenus.create({ "title": "Help", "parentId": parentId, "contexts": ["all"], "onclick": helpOnClick });
+	(function () {
+		var incDecMenuId, incMenuId, decMenuId, numbers = ["10", "20", "50", "100", "200", "500", "Other"];
 
-	// This event is fired each time the user updates the text in the omnibox, as long as the extension's keyword mode is still active.
-	/*chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
-		console.log('inputChanged: ' + text);
-		suggest([
-			{content: text + " one", description: "the first one"},
-			{content: text + " number two", description: "the second entry"}
-		]);
-	});*/
+		//First, empty all the context menus for this extension.
+		chrome.contextMenus.removeAll();
 
-	// This event is fired with the user accepts the input in the omnibox.
-	chrome.omnibox.onInputEntered.addListener(function(text) {
-		chrome.tabs.getSelected(null, function(tab){
-			createTab(text, tab);
+		parentId = createContextMenu(null, "Fusk", "all");
+		incDecMenuId = createContextMenu(parentId, "+/-", "image", null, null, targetUrls);
+		incMenuId = createContextMenu(parentId, "+", "image", null, null, targetUrls);
+		decMenuId = createContextMenu(parentId, "-", "image", null, null, targetUrls);
+
+		for(i = 0; i < numbers.length; i++) {
+			ids.push([createContextMenu(incDecMenuId, numbers[i], "image", null, choiceOnClick), 0, numbers[i]]);
+			ids.push([createContextMenu(incMenuId, numbers[i], "image", null, choiceOnClick), 1, numbers[i]]);
+			ids.push([createContextMenu(decMenuId, numbers[i], "image", null, choiceOnClick), -1, numbers[i]]);
+		}
+
+		createContextMenu(parentId, null, "image", "separator");
+		createContextMenu(parentId, "Create from selection", "selection", null, createFromSelectionOnClick);
+		createContextMenu(parentId, "Manual", null, null, manualOnClick);
+		createContextMenu(parentId, null, null, "separator");
+		//createContextMenu(parentId, "Help", null, null, helpOnClick);
+		createContextMenu(parentId, "Options", null, null, optionsOnClick);
+
+		// This event is fired each time the user updates the text in the omnibox, as long as the extension's keyword mode is still active.
+		/*chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
+			console.log('inputChanged: ' + text);
+			suggest([
+				{content: text + " one", description: "the first one"},
+				{content: text + " number two", description: "the second entry"}
+			]);
+		});*/
+
+		// This event is fired with the user accepts the input in the omnibox.
+		chrome.omnibox.onInputEntered.addListener(function(text) {
+			chrome.tabs.getSelected(null, function(tab){
+				createTab(text, tab);
+			});
 		});
-	});
 
-	if(getRecentFusksOption()) {
-		createRecentMenu();
-	}
+		if(getRecentFusksOption()) {
+			createRecentMenu();
+		}
 
-	var numbers = ["10", "20", "50", "100", "200", "500", "Other"];
-	for(var i = 0; i < numbers.length; i++) {
-		ids.push([chrome.contextMenus.create({ "title": numbers[i], "parentId": incDecMenuId, "contexts": ["image"], "onclick": choiceOnClick }), 0, numbers[i]]);
-		ids.push([chrome.contextMenus.create({ "title": numbers[i], "parentId": incMenuId, "contexts": ["image"], "onclick": choiceOnClick }), 1, numbers[i]]);
-		ids.push([chrome.contextMenus.create({ "title": numbers[i], "parentId": decMenuId, "contexts": ["image"], "onclick": choiceOnClick }), -1, numbers[i]]);
-	}
+		if(getSavedFusksOption()) {
+			createSavedFusksMenu();
+		}
+	} ());
 
-	function createRecentMenu() {
+	function createRecentMenu () {
+		var history, historyArray, historyCount, historyId;
+
 		if(recentId != 0) {
 			chrome.contextMenus.remove(recentId);
 			recentId = 0;
 		}
 
 		//Get the history
-		var history = localStorage.getItem("history");
-		var historyArray = [];
+		history = localStorage.getItem("history");
+		historyArray = [];
 		historyIds = [];
 
 		if(history == null) {
 			return false;
 		}
 
-		recentId = chrome.contextMenus.create({ "title": "Recent", "parentId": parentId, "contexts": ["all"] });
+		recentId = createContextMenu(parentId, "Recent");
 
 		//Split out the history into an array
 		historyArray = history.split("||");
-		var historyCount = historyArray.length > 10 ? 10 : historyArray.length;
+		historyCount = historyArray.length > 10 ? 10 : historyArray.length;
 
-		for(var i = 0; i < historyCount; i++) {
+		for(i = 0; i < historyCount; i++) {
 			//Add the menu
-			var historyId = chrome.contextMenus.create({ "title": historyArray[i], "parentId": recentId, "contexts": ["all"], "onclick": recentOnClick });
+			historyId = createContextMenu(recentId, historyArray[i], null, null, recentOnClick);
 			historyIds.push([historyId, historyArray[i]]);
 		}
 
 		if(historyArray.length > 0) {
-			chrome.contextMenus.create({ "parentId": recentId, "contexts": ["all"], "type": "separator" });
-			chrome.contextMenus.create({ "title": "Clear Recent Activity", "parentId": recentId, "contexts": ["all"], "onclick": clearRecentOnClick });
+			createContextMenu(recentId, null, null, "separator");
+			createContextMenu(recentId, "Clear Recent Activity", null, null, clearRecentOnClick);
 		}
 	}
 
-	function clearRecentOnClick() {
+	function createSavedFusksMenu () {
+		var savedFusksOption, savedId;
+
+		savedFusksOption = localStorage.getItem("savedFusks");
+
+		if(savedFusksOption != null) {
+			savedFusksOption = JSON.parse(savedFusksOption);
+			if (savedFusksOption.length) {
+				recentId = createContextMenu(parentId, "Saved");
+
+				for (i = 0; i < savedFusksOption.length; i++) {
+					savedId = createContextMenu(recentId, savedFusksOption[i].name, "all", null, savedOnClick);
+					savedIds.push(savedId, savedFusksOption[i]);
+				}
+			}
+		}
+		//'"[{"name":"Foo","url":"http://google.com"},{"name":"Bar","url":"http://bing.com"}]'
+	}
+
+	function clearRecentOnClick () {
 		localStorage.removeItem("history");
 		createRecentMenu();
 	}
 
-	function optionsOnClick(info, tab) {
+	function optionsOnClick (info, tab) {
 		chrome.tabs.create({ url:"/Html/options.htm", index: (tab.index + 1) });
 	}
 
-	function helpOnClick(info, tab) {
+	function helpOnClick (info, tab) {
 		chrome.tabs.create({ url:"/Html/help.htm", index: (tab.index + 1)});
 	}
 
-	function manualOnClick(info, tab) {
-		var imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
-		var manualCheck = /\[\d+-\d+\]/;
-		var alphabetCheck = /\[\w-\w\]/;
-		var url = prompt("Please enter the url", imageUrl);
+	function manualOnClick (info, tab) {
+		var imageUrl, manualCheck, alphabetCheck, url;
+		imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
+		manualCheck = /\[\d+-\d+\]/;
+		alphabetCheck = /\[\w-\w\]/;
+		url = prompt("Please enter the url", imageUrl);
 
 		if(url) {
 			if(manualCheck.exec(url) == null && alphabetCheck.exec(url) == null) {
@@ -113,9 +151,10 @@
 		}
 	}
 
-	function createFromSelectionOnClick(info, tab) {
-		var url = info.selectionText;
-		var manualCheck = /\[\d+-\d+\]/;
+	function createFromSelectionOnClick (info, tab) {
+		var url, manualCheck;
+		url = info.selectionText;
+		manualCheck = /\[\d+-\d+\]/;
 
 		if(manualCheck.exec(url) == null) {
 			alert("This is not a valid fusk - http://example.com/[1-8].jpg");
@@ -125,8 +164,8 @@
 		createTab(url, tab);
 	}
 
-	function recentOnClick(info, tab) {
-		for(var i = 0; i < historyIds.length; i++) {
+	function recentOnClick (info, tab) {
+		for(i = 0; i < historyIds.length; i++) {
 			if(historyIds[i][0] == info.menuItemId) {
 				createTab(historyIds[i][1], tab);
 				break;
@@ -134,28 +173,39 @@
 		}
 	}
 
-	function createTab(url, tab) {
+	function savedOnClick (info, tab) {
+		for(i = 0; i < savedIds.length; i++) {
+			if(savedIds[i][0] == info.menuItemId) {
+				createTab(savedIds[i][1].url, tab);
+				break;
+			}
+		}
+	}
+
+	function createTab (url, tab) {
 		addUrlToLocalStorage(url, tab);
 
 		chrome.tabs.create({ windowId: tab.windowId, url:"/Html/images.htm?url=" + url, index: (tab.index + 1), selected: getOpenInForeground() });
 	}
 
-	function addUrlToLocalStorage(url, tab) {
+	function addUrlToLocalStorage (url, tab) {
+		var history, historyArray, tempHistory;
+
 		if(tab.incognito || getRecentFusksOption() == false) {
-		//As a rule, do not store incognito data in localstorage.
+			//As a rule, do not store incognito data in localstorage.
 			return false;
 		}
 
 		//Get the history
-		var history = localStorage.getItem("history");
-		var historyArray = [];
+		history = localStorage.getItem("history");
+		historyArray = [];
 
 		historyArray.push(url);
 
 		if(history != null) {
 			//Push the rest of the urls onto the pile onto the array
-			var tempHistory = history.split("||");
-			for(var i = 0; i < tempHistory.length; i++) {
+			tempHistory = history.split("||");
+			for(i = 0; i < tempHistory.length; i++) {
 				historyArray.push(tempHistory[i]);
 			}
 		}
@@ -174,7 +224,7 @@
 		}
 	}
 
-	function getRecentFusksOption() {
+	function getRecentFusksOption () {
 		var keepRecentFusksVal = localStorage.getItem("keepRecentFusks");
 
 		if(keepRecentFusksVal == null) {
@@ -191,14 +241,28 @@
 		return keepRecentFusks != 0;
 	}
 
-	function getOpenInForeground() {
-		var openInForegroundVal = localStorage.getItem("openInForeground");
+	function getSavedFusksOption () {
+		var savedFusksOption;
+
+		savedFusksOption = localStorage.getItem("savedFusks");
+		if(savedFusksOption == null || savedFusksOption === '\"[]\"') {
+			localStorage.setItem("savedFusks", JSON.stringify("[]"));
+			return false;
+		}
+
+		return true;
+	}
+
+	function getOpenInForeground () {
+		var openInForegroundVal, openInForeground;
+
+		openInForegroundVal = localStorage.getItem("openInForeground");
 
 		if(openInForegroundVal == null) {
 			return true;
 		}
 
-		var openInForeground = parseInt(openInForegroundVal, 10);
+		openInForeground = parseInt(openInForegroundVal, 10);
 
 		if (openInForeground !== 0 && openInForeground !== 1) {
 			//Populate the local storage with the default value.
@@ -209,17 +273,16 @@
 	}
 
 	function choiceOnClick(info, tab) {
-		var count = 0;
-		var direction = 0;
+		var count = 0, direction = 0, imageUrl = "", response = "";
 
-		for(var i = 0; i < ids.length; i++) {
-			var imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
+		for(i = 0; i < ids.length; i++) {
+			imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
 
 			if(ids[i][0] == info.menuItemId) {
 				direction = parseInt(ids[i][1], 10);
 
 				if(ids[i][2] == "Other") {
-					var response = prompt("How many?");
+					response = prompt("How many?");
 
 					if(parseInt(response, 10) == false) {
 						alert("Not a valid number!");
@@ -239,15 +302,17 @@
 	}
 
 	function createUrl(currentUrl, count, direction) {
-		var findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
-		var digitsCheck = findDigitsRegexp.exec(currentUrl);
+		var findDigitsRegexp, digitsCheck, begin, number, end, firstNum, lastNum;
 
-		var begin = digitsCheck[1];
-		var number = digitsCheck[2];
-		var end = digitsCheck[3];
+		findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+		digitsCheck = findDigitsRegexp.exec(currentUrl);
 
-		var firstNum = parseInt(number, 10);
-		var lastNum = firstNum;
+		begin = digitsCheck[1];
+		number = digitsCheck[2];
+		end = digitsCheck[3];
+
+		firstNum = parseInt(number, 10);
+		lastNum = firstNum;
 
 		if(direction == 0) {
 			firstNum -= count;
@@ -270,5 +335,9 @@
 		}
 
 		return begin + "[" + firstNum + "-" + lastNum + "]" + end;
+	}
+
+	function createContextMenu(id, title, context, itemType, onclickCallback, targetUrlPatterns) {
+		return chrome.contextMenus.create({ parentId: id, title: title, contexts: [context || "all"], type: itemType || "normal", onclick: onclickCallback, targetUrlPatterns: targetUrlPatterns });
 	}
 })();
