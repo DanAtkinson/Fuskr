@@ -90,3 +90,41 @@ a, a:hover, a:visited{
 	input#saveName {
 		width:500px;
 	}
+
+.viewerItem
+{
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	position: fixed;
+	z-index: 100;
+}
+
+.viewerItem a
+{
+	display:block;
+	width:100%;
+	height:100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.viewerItem.small
+{
+	top: 10%;
+	bottom: 10%;
+	z-index: 99;
+	opacity: 0.2;
+}
+
+.viewerItem.modal
+{
+	background-color: #000;
+	z-index:98;
+}
+
+#viewer { display:none; }
+.viewerItem.current a { background-position: 50% 50%;}
+.viewerItem a.previousImage { background-position: 35% 50%; }
+.viewerItem a.nextImage { background-position: 65% 50%; } }

@@ -36,6 +36,7 @@
 			<p><a href="#" class="downloadImages">Download Images</a> | <a href="#" class="saveFusk" title="Save Fusk">Save Fusk</a></p>
 			<p><a href="#" class="toggleBrokenLinks" title="Toggle gallery to show/hide images that have did not load"><span class="showHide">Show</span> broken images</a></p>
 			<p><a href="#" class="resizeImages" title="Resize images">Resize images to fit on page</a></p>
+			<p><a href="#" class="showViewer" title="Show viewer">Show images in viewer</a></p>
 			<p class="fuskUrl">&nbsp;</p>
 		</div>
 	</script>
@@ -43,6 +44,12 @@
 <body>
 	<div id="all">
 		<div id="content">&nbsp;</div>
+		<div id="viewer">
+			<div class="viewerItem modal"></div>
+			<div class="viewerItem small"><a class="previousImage"></a></div>
+			<div class="viewerItem current"><a></a></div>
+			<div class="viewerItem small"><a class="nextImage"></a></div>
+		</div>
 	</div>
 	<script type="text/javascript" src="/Scripts/images.js"></script>
 
