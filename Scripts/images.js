@@ -37,7 +37,7 @@
 
 $(function() {
 
-	var image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, dialog;
+	var image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, dialog, showViewer, currentSelectedImage;
 
 	(function () {
 		var
@@ -128,6 +128,27 @@ $(function() {
 
 	}());
 
+	function setCurrentImageInViewer($currentImage)
+	{ 
+		// There is no element (we've reached an end)
+		if($currentImage.length == 0) return;
+
+		currentSelectedImage = $currentImage;
+
+		// get img (if it exists + was loaded)
+		var elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
+
+		var parent = $currentImage.parents("div.wrap");
+
+		var img = $currentImage[0];
+		var prev_img = parent.prevAll(elementSelector).first().find(".fuskImage")[0];
+		var next_img = parent.nextAll(elementSelector).first().find(".fuskImage")[0];
+
+		$(".viewerItem.current a").css("background-image", "url(" + (img && img.src) +")");
+		$(".viewerItem a.previousImage").css("background-image", "url(" + (prev_img && prev_img.src) +")");
+		$(".viewerItem a.nextImage").css("background-image", "url(" + (next_img && next_img.src) +")");
+	}
+
 	//Start the images hidden and show as each one loads.
 	$("div#content img.fuskImage")
 		.load(function () {
@@ -156,6 +177,23 @@ $(function() {
 		return false;
 	});
 
+	function toggleViewer()
+	{
+		// First view
+		if (!currentSelectedImage) {
+			currentSelectedImage = $("div.loaded").find(".fuskImage").first();
+			setCurrentImageInViewer(currentSelectedImage, 1);
+		}
+
+		showViewer = !showViewer;
+    	$("#viewer").toggle(showViewer);
+	}
+
+	$("a.showViewer, .viewerItem a").click(function(e) {
+		e.preventDefault();
+		toggleViewer();
+	});
+
 	$("a.toggleBrokenLinks").click(function(e) {
 		e.preventDefault();
 		showHiddenImages = !showHiddenImages;
@@ -180,21 +218,49 @@ $(function() {
 		scrollTo($(this), 1);
 	});
 
+	// Hook into the Left/Right keys. This is down even if the viewer is not shown
+	// so that the current viewed item is synced
+	$(document).keydown(function(e) {
+	    switch(e.which) {
+	        case 27: // escape
+				toggleViewer()
+	        break;
+
+	        case 37: // left
+	        	scrollTo(currentSelectedImage, -1);
+	        break;
+
+	        case 39: // right
+	        	scrollTo(currentSelectedImage, 1);
+	        break;
+
+	        default: return; // exit this handler for other keys
+	    }
+	    e.preventDefault(); // prevent the default action (scroll / move caret)
+	});
+
 	function scrollTo(element, direction) {
 		var offset = 0;
 		var parent = element.parents("div.wrap");
 		var elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
 
+		var $nextImage = parent.nextAll(elementSelector).first();
+		var $prevImage = parent.prevAll(elementSelector).first();
+
 		//get the offset of the target anchor
+		//update the image in the viewer window
 		if(direction === 1) {
-			offset = parent.nextAll(elementSelector).first().offset();
+			offset = $nextImage.offset();
+			setCurrentImageInViewer($nextImage.find(".fuskImage"));
 		} else {
-			offset = parent.prevAll(elementSelector).first().offset();
+			offset = $prevImage.offset();
+			setCurrentImageInViewer($prevImage.find(".fuskImage"));
 		}
 
 		if(offset != null) {
 			//goto that anchor by setting the body scroll top to anchor top
-			$('html, body').animate({scrollTop:offset.top}, 500);
+			//skip animation if we are in Viewer mode
+			$('html, body').animate({scrollTop:offset.top}, showViewer ? 0 : 500);
 		}
 	}
 
