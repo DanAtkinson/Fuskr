@@ -37,41 +37,49 @@
 
 $(function() {
 
-	var image = $('<img src="/Images/128x128.png" />');
-	var brokenImagesCount = 0,
-		loaded = 0,
-		total = 0,
-		resizeOn = false,
-		showHiddenImages = false;
+	var image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, dialog;
 
-	var currentUrl = (function() {
-		var query = window.location.search.substring(1);
-		var vars = query.split("&");
-		for (var i = 0; i < vars.length; i++) {
-			var pair = vars[i].split("=");
+	(function () {
+		var
+			i = 0,
+			url = "",
+			pair = "",
+			linkData,
+			show_user,
+			title = "",
+			parsedLinks = "",
+			$content = $("#content"),
+			info = tmpl("info_tmpl"),
+			query = window.location.search.substring(1),
+			vars = query.split("&");
+
+		//Set url.
+		for (i = 0; i < vars.length; i++) {
+			pair = vars[i].split("=");
 			if (pair[0] == "url") {
-				return pair[1];
+				url = pair[1];
+				break;
 			}
 		}
-	})();
 
-	(function (url) {
-		var $content = $("#content");
+		if (url !== "") {
+			title = url.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
+			document.title = "Fuskr - " + title;
+			$("p.fuskUrl").html(title);
 
-		var info = tmpl("info_tmpl");
+			parsedLinks = Fuskr.GetLinks(url);
+		} else {
+
+		}
+
 		$content.before(info({ Position: "top" }));
 		$content.after(info({ Position: "bottom" }));
 
-		var title = url.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
-		document.title = "Fuskr - " + title;
-		$("p.fuskUrl").html(title);
-
-		var parsedLinks = Fuskr.GetLinks(url);
 		total = parsedLinks.length;
 
 		$("div.info span.total").html(total);
 
-		var linkData = $.map(parsedLinks, function(item, i) {
+		linkData = $.map(parsedLinks, function(item, i) {
 			return {
 				"Index" : i,
 				"Link" : item,
@@ -83,12 +91,42 @@ $(function() {
 
 		$content.empty();
 
-
-		var show_user = tmpl("item_tmpl");
-		for ( var i = 0; i < linkData.length; i++ ) {
+		show_user = tmpl("item_tmpl");
+		for (i = 0; i < linkData.length; i++) {
 			$content.append(show_user(linkData[i]));
 		}
-	}(currentUrl));
+
+		brokenImagesCount = 0;
+		loaded = 0;
+		total = 0;
+		resizeOn = false;
+		showHiddenImages = false;
+		conflictAction: "uniquify";
+		image = $('<img src="/Images/128x128.png" />');
+
+		dialog = $("#download-form").dialog({
+			autoOpen: false,
+			height: 500,
+			width: 650,
+			modal: true,
+			buttons: {
+				Cancel: function() {
+					$("#download-form form")[0].reset();
+					dialog.dialog("close");
+				},
+				Download: function () {
+					conflictAction = $("#download-form form select").val();
+					dialog.dialog("close");
+					downloadAll();
+				}
+			},
+			close: function() {
+				$("#download-form form")[0].reset();
+			}
+		});
+
+
+	}());
 
 	//Start the images hidden and show as each one loads.
 	$("div#content img.fuskImage")
@@ -126,18 +164,10 @@ $(function() {
 		return false;
 	});
 
-	$("a.downloadImages").click(function() {
-		var imageUrl = "";
-		//https://developer.chrome.com/extensions/downloads#method-download
-		//chrome.downloads.download
-		$("div.loaded a.imageLink").each(function () {
-			var imageUrl = $(this).attr("href");
-			chrome.downloads.download({
-				url: imageUrl
-			},function () {
-				console.log("Completed download");
-			});
-		});
+	$("a.downloadImages").click(function(e) {
+		e.preventDefault();
+
+		dialog.dialog( "open" );
 	});
 
 	$("a.previousImage").click(function(e) {
@@ -176,5 +206,17 @@ $(function() {
 
 	function replaceAll(txt, replace, replacement) {
 		return txt.replace(new RegExp(replace, 'g'), replacement);
+	}
+
+	function downloadAll() {
+		$("div.loaded a.imageLink").each(function () {
+			//https://developer.chrome.com/extensions/downloads#method-download
+			chrome.downloads.download({
+				url: $(this).attr("href"),
+				conflictAction: conflictAction
+			},function (downloadId) {
+				console.log("Completed download", downloadId);
+			});
+		});
 	}
 });

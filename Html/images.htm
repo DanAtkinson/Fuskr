@@ -1,46 +1,84 @@
 <!doctype html>
 <html lang="en">
-	<head>
-		<script type="text/javascript" src="/Scripts/jquery-2.1.3.min.js"></script>
-		<script type="text/javascript"src="/Scripts/fuskr.js"></script>
-		<style>
-			.error { display: none; }
-			.hide { display:none; }
-		</style>
-		<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
-		<script type="text/html" id="item_tmpl">
-			<div class="hide wrap" id="image_<%= Index %>">
-				<a href="<%= Link %>" class="nextImage">
-					<img class="fuskImage" alt="<%= Link %>" src="<%= Link %>">
-				</a>
+<head>
+	<link rel="stylesheet" href="/Scripts/jquery-ui-1.11.4/jquery-ui.min.css" type="text/css">
+	<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
+	<script type="text/javascript" src="/Scripts/jquery-2.1.3.min.js"></script>
+	<script type="text/javascript" src="/Scripts/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+	<script type="text/javascript"src="/Scripts/fuskr.js"></script>
+	<style>
+		.error { display: none; }
+		.hide { display:none; }
+	</style>
+	<script type="text/html" id="item_tmpl">
+		<div class="hide wrap" id="image_<%= Index %>">
+			<a href="<%= Link %>" class="nextImage">
+				<img class="fuskImage" alt="<%= Link %>" src="<%= Link %>">
+			</a>
+			<div>
 				<div>
-					<div>
-						<a href="<%= Link %>" target="_blank" title="Click to open this image in a new tab" class="imageLink"><%= Link %></a>
-					</div>
-					<div>
-						(Click image for next picture)&nbsp;|&nbsp;
-						<a href="#top" title="Go to top of page">Top</a>&nbsp;|&nbsp;
-						<a href="#bottom" title="Go to bottom of page">Bottom</a>&nbsp;|&nbsp;
-						<a href="#" class="previousImage <%= PreviousImage %>" title="Previous Image">&lt;</a>&nbsp;|&nbsp;
-						<a href="#" class="nextImage <%= NextImage %>" title="Next Image">&gt;</a>
-					</div>
+					<a href="<%= Link %>" target="_blank" title="Click to open this image in a new tab" class="imageLink"><%= Link %></a>
+				</div>
+				<div>
+					(Click image for next picture)&nbsp;|&nbsp;
+					<a href="#top" title="Go to top of page">Top</a>&nbsp;|&nbsp;
+					<a href="#bottom" title="Go to bottom of page">Bottom</a>&nbsp;|&nbsp;
+					<a href="#" class="previousImage <%= PreviousImage %>" title="Previous Image">&lt;</a>&nbsp;|&nbsp;
+					<a href="#" class="nextImage <%= NextImage %>" title="Next Image">&gt;</a>
 				</div>
 			</div>
-		</script>
-		<script type="text/html" id="info_tmpl">
-			<div id="<%= Position %>" class="info" title="Fuskr">
-				<p class="fuskTotals"><span class="total">0</span> Images | <span class="loaded">0</span> Loaded | <span class="broken">0</span> Failed</p>
-				<p><a href="#" class="downloadImages">Download Images</a></p>
-				<p><a href="#" class="toggleBrokenLinks" title="Toggle gallery to show/hide images that have did not load"><span class="showHide">Show</span> broken images</a></p>
-				<p><a href="#" class="resizeImages" title="Resize images">Resize images to fit on page</a></p>
-				<p class="fuskUrl">&nbsp;</p>
-			</div>
-		</script>
-	</head>
-	<body>
-		<div id="all">
-			<div id="content">&nbsp;</div>
 		</div>
-		<script type="text/javascript" src="/Scripts/images.js"></script>
-	</body>
+	</script>
+	<script type="text/html" id="info_tmpl">
+		<div id="<%= Position %>" class="info" title="Fuskr">
+			<p class="fuskTotals"><span class="total">0</span> Images | <span class="loaded">0</span> Loaded | <span class="broken">0</span> Failed</p>
+			<p><a href="#" class="downloadImages">Download Images</a></p>
+			<p><a href="#" class="toggleBrokenLinks" title="Toggle gallery to show/hide images that have did not load"><span class="showHide">Show</span> broken images</a></p>
+			<p><a href="#" class="resizeImages" title="Resize images">Resize images to fit on page</a></p>
+			<p class="fuskUrl">&nbsp;</p>
+		</div>
+	</script>
+</head>
+<body>
+	<div id="all">
+		<div id="content">&nbsp;</div>
+	</div>
+	<script type="text/javascript" src="/Scripts/images.js"></script>
+
+	<div id="dialogs">
+		<div id="download-form" title="Download Images">
+			<!--<p class="validateTips">All form fields are required.</p>-->
+
+			<form>
+				<fieldset>
+					<legend>Filename Conflict Resolution</legend>
+					<label>
+						<p>In case of a conflict of filenames, what do you want to do?</p>
+						<p><b>Unique:</b> To avoid duplication, the filename will be changed to include a number after the filename eg <span class="code">filename1 (1).jpg</span>.</p>
+						<p><b>Overwrite:</b> The existing file will be overwritten with the new file.</p>
+						<p><b>Prompt:</b> You will be prompted to choose a filename.</p>
+						<select name="conflictResolution" class="ui-widget-content ui-corner-all">
+							<option value="uniquify" selected="selected">Unique</option>
+							<option value="overwrite">Overwrite</option>
+							<option value="prompt">Prompt</option>
+						</select>
+					</label>
+				</fieldset>
+
+<!--
+				<label for="name">Name</label>
+				<input type="text" name="name" id="name" value="Jane Smith" class="text ui-widget-content ui-corner-all">
+				<label for="email">Email</label>
+				<input type="text" name="email" id="email" value="jane@smith.com" class="text ui-widget-content ui-corner-all">
+				<label for="password">Password</label>
+				<input type="password" name="password" id="password" value="xxxxxxx" class="text ui-widget-content ui-corner-all">
+
+-->
+					<!-- Allow form submission with keyboard without duplicating the dialog button -->
+					<input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</body>
 </html>
