@@ -1,6 +1,6 @@
 // Simple JavaScript Templating
 // John Resig - http://ejohn.org/ - MIT Licensed
-(function(){
+(function (){
 	var cache = {};
 
 	this.tmpl = function tmpl(str, data){
@@ -14,7 +14,7 @@
 			// Generate a reusable function that will serve as a template
 			// generator (and which will be cached).
 			new Function("obj",
-			"var p=[],print=function(){p.push.apply(p,arguments);};" +
+			"var p=[],print=function (){p.push.apply(p,arguments);};" +
 
 			// Introduce the data as local variables using with(){}
 			"with(obj){p.push('" +
@@ -33,11 +33,11 @@
 		// Provide some basic currying to the user
 		return data ? fn( data ) : fn;
 	};
-})();
+} ());
 
-$(function() {
+$(function () {
 
-	var i, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, downloadDialog, saveDialog;
+	var i, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, downloadDialog, saveDialog, showViewer, currentSelectedImage, $brokenLinkStyles;
 
 	(function () {
 		var
@@ -45,11 +45,20 @@ $(function() {
 			linkData,
 			show_user,
 			title = "",
-			parsedLinks = "",
+			parsedLinks = [],
 			$content = $("#content"),
 			info = tmpl("info_tmpl"),
 			query = window.location.search.substring(1),
 			vars = query.split("&");
+
+		total = 0;
+		loaded = 0;
+		resizeOn = false;
+		brokenImagesCount = 0;
+		showHiddenImages = false;
+		conflictAction: "uniquify";
+		$brokenLinkStyles = $("#brokenLinkStyles")[0];
+		image = $('<img src="/Images/128x128.png" />');
 
 		//Set url.
 		for (i = 0; i < vars.length; i++) {
@@ -72,14 +81,14 @@ $(function() {
 
 			$("input#saveName").val(url);
 		} else {
-
+			//Throw an error because we don't have a valid url.
 		}
 
 		total = parsedLinks.length;
 
 		$("div.info span.total").html(total);
 
-		linkData = $.map(parsedLinks, function(item, i) {
+		linkData = $.map(parsedLinks, function (item, i) {
 			return {
 				"Index" : i,
 				"Link" : item,
@@ -91,18 +100,11 @@ $(function() {
 
 		$content.empty();
 
+		//Build item template.
 		show_user = tmpl("item_tmpl");
 		for (i = 0; i < linkData.length; i++) {
 			$content.append(show_user(linkData[i]));
 		}
-
-		brokenImagesCount = 0;
-		loaded = 0;
-		total = 0;
-		resizeOn = false;
-		showHiddenImages = false;
-		conflictAction: "uniquify";
-		image = $('<img src="/Images/128x128.png" />');
 
 		downloadDialog = $("#download-form").dialog({
 			autoOpen: false,
@@ -110,7 +112,7 @@ $(function() {
 			width: 550,
 			modal: true,
 			buttons: {
-				Cancel: function() {
+				Cancel: function () {
 					$("#download-form form")[0].reset();
 					downloadDialog.dialog("close");
 				},
@@ -120,7 +122,7 @@ $(function() {
 					downloadAll();
 				}
 			},
-			close: function() {
+			close: function () {
 				$("#download-form form")[0].reset();
 			}
 		});
@@ -133,7 +135,7 @@ $(function() {
 			$(this).parents("div.wrap").removeClass("hide").addClass("loaded");
 			checkForCompletion();
 		})
-		.error(function() {
+		.error(function () {
 			brokenImagesCount++;
 			$(this).closest(".wrap").addClass("error");
 			$("div.info span.broken").html(brokenImagesCount);
@@ -141,7 +143,7 @@ $(function() {
 		});
 
 	//Get the users current option regarding showing images in their full resolution or scaling them to the current window size.
-	$("a.resizeImages").click(function() {
+	$("a.resizeImages").click(function () {
 		resizeOn = !resizeOn;
 
 		if(resizeOn) {
@@ -154,31 +156,67 @@ $(function() {
 		return false;
 	});
 
-	$("a.toggleBrokenLinks").click(function(e) {
+	$("a.showViewer, .viewerItem a").click(function (e) {
+		e.preventDefault();
+		toggleViewer();
+	});
+
+	$("a.toggleBrokenLinks").click(function (e) {
 		e.preventDefault();
 		showHiddenImages = !showHiddenImages;
-		$(this).find("span.showHide").html(!document.styleSheets[0].disabled ? "Hide" : "Show");
-		document.styleSheets[0].disabled = !document.styleSheets[0].disabled;
+		$(this).find("span.showHide").html(!$brokenLinkStyles.disabled ? "Hide" : "Show");
+		$brokenLinkStyles.disabled = !$brokenLinkStyles.disabled;
 		return false;
 	});
 
-	$("a.downloadImages").click(function(e) {
+	$("a.removeBrokenImages").click(function (e) {
 		e.preventDefault();
 
+		$("div#content > div.error").remove();
+
+		$(".brokenImageLinks").remove();
+	});
+
+	$("a.downloadImages").click(function (e) {
+		e.preventDefault();
 		downloadDialog.dialog("open");
 	});
 
-	$("a.previousImage").click(function(e) {
+	$("a.previousImage").click(function (e) {
 		e.preventDefault();
 		scrollTo($(this), -1);
 	});
 
-	$("a.nextImage").click(function(e) {
+	$("a.nextImage").click(function (e) {
 		e.preventDefault();
 		scrollTo($(this), 1);
 	});
 
-	$("a.saveFusk").click(function(e) {
+	// Hook into the Left/Right keys. This is down even if the viewer is not shown
+	// so that the current viewed item is synced
+	$(document).keydown(function (e) {
+
+		getCurrentSelectedImage();
+
+	    switch(e.which) {
+	        case 27: // escape
+				toggleViewer()
+	        break;
+
+	        case 37: // left
+	        	scrollTo(currentSelectedImage, -1);
+	        break;
+
+	        case 39: // right
+	        	scrollTo(currentSelectedImage, 1);
+	        break;
+
+	        default: return; // exit this handler for other keys
+	    }
+	    e.preventDefault(); // prevent the default action (scroll / move caret)
+	});
+
+	$("a.saveFusk").click(function (e) {
 		e.preventDefault();
 
 		saveDialog = $("#save-form").dialog({
@@ -187,7 +225,7 @@ $(function() {
 			width: 550,
 			modal: true,
 			buttons: {
-				Cancel: function() {
+				Cancel: function () {
 					saveDialog.dialog("close");
 				},
 				Save: function () {
@@ -200,6 +238,14 @@ $(function() {
 		saveDialog.dialog("open");
 		$("#saveName").select();
 	});
+
+	function toggleViewer () {
+		// First view
+		getCurrentSelectedImage();
+
+		showViewer = !showViewer;
+    	$("#viewer").toggle(showViewer);
+	}
 
 	function saveFusk () {
 		var alreadySaved, savedFusksOption, name;
@@ -228,22 +274,36 @@ $(function() {
 		localStorage.setItem("savedFusks", JSON.stringify(savedFusksOption));
 	}
 
+	function getCurrentSelectedImage() {
+		if (!currentSelectedImage) {
+			currentSelectedImage = $("div.loaded").find(".fuskImage").first();
+			setCurrentImageInViewer(currentSelectedImage, 1);
+		}
+	}
+
 	function scrollTo(element, direction) {
 		var offset, parent, elementSelector;
 		offset = 0;
 		parent = element.parents("div.wrap");
 		elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
 
+		var $nextImage = parent.nextAll(elementSelector).first();
+		var $prevImage = parent.prevAll(elementSelector).first();
+
 		//get the offset of the target anchor
+		//update the image in the viewer window
 		if(direction === 1) {
-			offset = parent.nextAll(elementSelector).first().offset();
+			offset = $nextImage.offset();
+			setCurrentImageInViewer($nextImage.find(".fuskImage"));
 		} else {
-			offset = parent.prevAll(elementSelector).first().offset();
+			offset = $prevImage.offset();
+			setCurrentImageInViewer($prevImage.find(".fuskImage"));
 		}
 
 		if(offset != null) {
 			//goto that anchor by setting the body scroll top to anchor top
-			$('html, body').animate({scrollTop:offset.top}, 500);
+			//skip animation if we are in Viewer mode
+			$('html, body').animate({scrollTop:offset.top}, showViewer ? 0 : 500);
 		}
 	}
 
@@ -263,9 +323,27 @@ $(function() {
 			chrome.downloads.download({
 				url: $(this).attr("href"),
 				conflictAction: conflictAction
-			},function (downloadId) {
-				console.log("Completed download", downloadId);
 			});
 		});
+	}
+
+	function setCurrentImageInViewer($currentImage) {
+		// There is no element (we've reached an end)
+		if($currentImage.length == 0) return;
+
+		currentSelectedImage = $currentImage;
+
+		// get img (if it exists + was loaded)
+		var elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
+
+		var parent = $currentImage.parents("div.wrap");
+
+		var img = $currentImage[0];
+		var prev_img = parent.prevAll(elementSelector).first().find(".fuskImage")[0];
+		var next_img = parent.nextAll(elementSelector).first().find(".fuskImage")[0];
+
+		$(".viewerItem.current a").css("background-image", "url(" + (img && img.src) +")");
+		$(".viewerItem a.previousImage").css("background-image", "url(" + (prev_img && prev_img.src) +")");
+		$(".viewerItem a.nextImage").css("background-image", "url(" + (next_img && next_img.src) +")");
 	}
 });
