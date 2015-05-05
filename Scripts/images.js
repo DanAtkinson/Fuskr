@@ -374,26 +374,28 @@ $(function () {
 	}
 
 	function setCurrentImageInViewer($currentImage) {
+		var elementSelector, parent, currentImage, previousImage, nextImage;
 		// There is no element (we've reached an end)
-		if($currentImage.length == 0) return;
+		if($currentImage.length === 0) return;
 
 		$currentSelectedImage = $currentImage;
 
 		// get img (if it exists + was loaded)
-		var elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
+		elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
 
-		var parent = $currentImage.parents("div.wrap");
+		parent = $currentImage.parents("div.wrap");
 
-		var img = $currentImage[0];
-		var prev_img = parent.prevAll(elementSelector).first().find(".fuskImage")[0];
-		var next_img = parent.nextAll(elementSelector).first().find(".fuskImage")[0];
+		currentImage = $currentImage[0];
+		$(".viewerItem.current a").css("background-image", "url(" + (currentImage && currentImage.src) +")");
 
-		$(".viewerItem.current a").css("background-image", "url(" + (img && img.src) +")");
-		if (prev_img) {
-			$(".viewerItem a.previousImage").css("background-image", "url(" + (prev_img && prev_img.src) +")");
+		previousImage = parent.prevAll(elementSelector).first().find(".fuskImage")[0];
+		if (previousImage) {
+			$(".viewerItem a.previousImage").css("background-image", "url(" + (previousImage && previousImage.src) +")");
 		}
-		if(next_img) {
-			$(".viewerItem a.nextImage").css("background-image", "url(" + (next_img && next_img.src) +")");
+
+		nextImage = parent.nextAll(elementSelector).first().find(".fuskImage")[0];
+		if(nextImage) {
+			$(".viewerItem a.nextImage").css("background-image", "url(" + (nextImage && nextImage.src) +")");
 		}
 	}
 });
