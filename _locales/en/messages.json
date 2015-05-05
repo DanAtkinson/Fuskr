@@ -1,5 +1,4 @@
 {
-    //Main
     "ManifestName": {
         "message": "Fuskr",
         "description": "The title of the application, displayed in the web store."
@@ -8,9 +7,6 @@
         "message": "Create photo galleries from a single image based on the image name.",
         "description": "The description of the application, displayed in the web store."
     },
-    //Application
-
-    //Context Menu
     "Application_ContextMenu_Fusk": {
         "message": "Fusk"
     },
@@ -56,8 +52,6 @@
     "Application_ContextMenu_Saved": {
         "message": "Saved"
     },
-
-    //Prompts
     "Application_Prompt_PleaseEnterTheUrl": {
         "message": "Please enter the url:"
     },
@@ -67,8 +61,6 @@
     "Application_Prompt_NotAValidFusk": {
         "message": "This is not a valid fusk - http://example.com/[1-8].jpg"
     },
-
-    //Images Page
     "Images_Done": {
         "message": "Done!"
     },
@@ -120,8 +112,6 @@
     "Images_RemoveBrokenImages": {
         "message": "Remove broken images"
     },
-
-    //Download Dialog
     "Images_DownloadDialog_Title": {
         "message": "Download Images"
     },
@@ -149,16 +139,12 @@
     "Images_DownloadDialog_ConflictQuestion": {
         "message": "In case of a conflict of filenames, what do you want to do?"
     },
-
-    //Save Dialog
     "Images_SaveDialog_Title": {
         "message": "Save Fusk"
     },
     "Images_SaveDialog_Question": {
         "message": "What name do you wish to give this fusk (defaults to this url if empty)?"
     },
-
-    //Options
     "Options_Title": {
         "message": "Fuskr Options"
     },
@@ -186,7 +172,6 @@
     "Options_OpenNewFusksInForeground_Description": {
         "message": "When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead."
     },
-
     "Options_History_Keep": {
         "message": "Keep a recent history of fusks"
     },
@@ -196,7 +181,6 @@
     "Options_History_Keep_Limit": {
         "message": "<p class='bold'>Last <span class='totalFusks'></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>"
     },
-
     "Options_Credits_Title": {
         "message": "Credits"
     },
