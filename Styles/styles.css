@@ -66,25 +66,10 @@ a, a:hover, a:visited{
 	display:none;
 }
 
-	div#dialogs .dialog-form {
-		text-align:left;
-	}
-
-	div#dialogs .dialog-form {
-		width:350px;
+	.dialog-form {
 		margin:20px 0;
-	}
-
-	div#dialogs .dialog-form table {
-		margin:1em 0;
-		border-collapse:collapse;
-		width:100%;
-	}
-
-	div#dialogs .dialog-form table td, div#dialogs .dialog-form table th {
-		border:1px solid #eee;
-		padding:.6em 10px;
 		text-align:left;
+		width:350px;
 	}
 
 	input#saveName {

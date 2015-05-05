@@ -18,7 +18,6 @@
 
 			// Introduce the data as local variables using with(){}
 			"with(obj){p.push('" +
-
 			// Convert the template into pure JavaScript
 			str
 				.replace(/[\r\t\n]/g, " ")
@@ -37,13 +36,17 @@
 
 $(function () {
 
-	var i, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, downloadDialog, saveDialog, showViewer, $currentSelectedImage, $brokenLinkStyles;
+	var i, applicationName, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, dialogTemplate, downloadDialog, templateData, saveDialog, showViewer, $currentSelectedImage, $brokenLinkStyles;
+
+	function l18nify(name, base) {
+		return chrome.i18n.getMessage((base === "" ? base : "Images_") + name);
+	}
 
 	(function () {
 		var
 			pair = "",
 			linkData,
-			show_user,
+			itemTemplate,
 			title = "",
 			parsedLinks = [],
 			$content = $("#content"),
@@ -57,6 +60,7 @@ $(function () {
 		brokenImagesCount = 0;
 		showHiddenImages = false;
 		conflictAction: "uniquify";
+		applicationName = l18nify("ManifestName", "");
 		$brokenLinkStyles = $("#brokenLinkStyles")[0];
 		image = $('<img src="/Images/128x128.png" />');
 
@@ -71,61 +75,82 @@ $(function () {
 
 		if (url !== "") {
 			title = url.replace(/(^(http\:\/\/|https\:\/\/)?(www\.)?)/g, "");
-			document.title = "Fuskr - " + title;
+			document.title = applicationName + " - " + title;
 			$("p.fuskUrl").html(title);
 
 			parsedLinks = Fuskr.GetLinks(url);
 
-			$content.before(info({ Link: url, Position: "top" }));
-			$content.after(info({ Link: url, Position: "bottom" }));
+			templateData = {
+				Link: url,
+				Position: "top",
+				ManifestName: applicationName,
+				Images: l18nify("Images"),
+				Loaded: l18nify("Loaded"),
+				Failed: l18nify("Failed"),
+				DownloadImages: l18nify("DownloadImages"),
+				SaveFusk: l18nify("SaveFusk"),
+				ResizeImagesToFullWidth: l18nify("ResizeImagesToFullWidth"),
+				ResizeImagesToFitOnPage: l18nify("ResizeImagesToFitOnPage"),
+				ToggleBrokenImages: l18nify("ToggleBrokenImages"),
+				RemoveBrokenImages: l18nify("RemoveBrokenImages"),
+				ShowImagesInViewer: l18nify("ShowImagesInViewer")
+			};
+
+			$content.before(info(templateData));
+			templateData.Position = "bottom";
+			$content.after(info(templateData));
+
+			templateData = {
+				DownloadTitle: l18nify("DownloadDialog_Title"),
+				Unique: l18nify("DownloadDialog_Unique"),
+				UniqueInfo: l18nify("DownloadDialog_UniqueInfo"),
+				UniqueInfoFilename: l18nify("DownloadDialog_UniqueInfoFilename"),
+				Overwrite: l18nify("DownloadDialog_Overwrite"),
+				OverwriteInfo: l18nify("DownloadDialog_OverwriteInfo"),
+				Prompt: l18nify("DownloadDialog_Prompt"),
+				PromptInfo: l18nify("DownloadDialog_PromptInfo"),
+				ConflictQuestion: l18nify("DownloadDialog_ConflictQuestion"),
+				SaveTitle: l18nify("SaveDialog_Title"),
+				SaveQuestion: l18nify("SaveDialog_Question")
+			};
+			dialogTemplate = tmpl("dialogs");
+			$content.after(dialogTemplate(templateData));
 
 			$("input#saveName").val(url);
 		} else {
 			//Throw an error because we don't have a valid url.
 		}
-
 		total = parsedLinks.length;
 
 		$("div.info span.total").html(total);
 
 		linkData = $.map(parsedLinks, function (item, i) {
+
 			return {
-				"Index" : i,
-				"Link" : item,
-				"Total" : parsedLinks.length,
-				"PreviousImage": i === 0 ? "hide" : "",
-				"NextImage": i > (parsedLinks.length - 1) ? "hide" : ""
+				Index : i,
+				Link : item,
+				Total : parsedLinks.length,
+				ShowPreviousImageLink: i === 0 ? "hide" : "",
+				LinkTitle: l18nify("ClickToOpenInNewTab"),
+				ClickForNextPicture: l18nify("ClickForNextPicture"),
+				NextImage: i > (parsedLinks.length - 1) ? "hide" : "",
+				TopName: l18nify("Top"),
+				TopTitle: l18nify("GoToTop"),
+				BottomName: l18nify("Bottom"),
+				BottomTitle: l18nify("GoToBottom"),
+				LinkTitle: l18nify("ClickToOpenInNewTab"),
+				PreviousImageTitle: l18nify("PreviousImageTitle"),
+				NextImageTitle: l18nify("NextImageTitle")
 			};
 		});
 
 		$content.empty();
 
 		//Build item template.
-		show_user = tmpl("item_tmpl");
+		itemTemplate = tmpl("item_tmpl");
 		for (i = 0; i < linkData.length; i++) {
-			$content.append(show_user(linkData[i]));
+			$content.append(itemTemplate(linkData[i]));
 		}
-
-		downloadDialog = $("#download-form").dialog({
-			autoOpen: false,
-			height: 270,
-			width: 550,
-			modal: true,
-			buttons: {
-				Cancel: function () {
-					$("#download-form form")[0].reset();
-					downloadDialog.dialog("close");
-				},
-				Download: function () {
-					conflictAction = $("#download-form form select#conflictResolution").val();
-					downloadDialog.dialog("close");
-					downloadAll();
-				}
-			},
-			close: function () {
-				$("#download-form form")[0].reset();
-			}
-		});
 	}());
 
 	//Start the images hidden and show as each one loads.
@@ -148,10 +173,10 @@ $(function () {
 
 		if(resizeOn) {
 			$("div.wrap img").css("width","100%");
-			$(this).text("Resize images to full width");
+			$(this).text(l18nify("ResizeImagesToFullWidth"));
 		} else {
 			$("div.wrap img").css("width","");
-			$(this).text("Resize images to fit on page");
+			$(this).text(l18nify("ResizeImagesToFitOnPage"));
 		}
 		return false;
 	});
@@ -164,7 +189,7 @@ $(function () {
 	$("a.toggleBrokenLinks").click(function (e) {
 		e.preventDefault();
 		showHiddenImages = !showHiddenImages;
-		$(this).find("span.showHide").html(!$brokenLinkStyles.disabled ? "Hide" : "Show");
+		//$(this).find("span.showHide").html(!$brokenLinkStyles.disabled ? "Hide" : "Show");
 		$brokenLinkStyles.disabled = !$brokenLinkStyles.disabled;
 		return false;
 	});
@@ -179,6 +204,28 @@ $(function () {
 
 	$("a.downloadImages").click(function (e) {
 		e.preventDefault();
+
+		downloadDialog = $("#download-form").dialog({
+			autoOpen: false,
+			height: 270,
+			width: 550,
+			modal: true,
+			buttons: {
+				Cancel: function () {
+					$("#download-form form")[0].reset();
+					downloadDialog.dialog("close");
+				},
+				Download: function () {
+					conflictAction = $("#download-form form select#conflictResolution").val();
+					downloadDialog.dialog("close");
+					downloadAll();
+				}
+			},
+			close: function () {
+				$("#download-form form")[0].reset();
+			}
+		});
+
 		downloadDialog.dialog("open");
 	});
 
@@ -308,7 +355,7 @@ $(function () {
 
 	function checkForCompletion() {
 		if(total == (brokenImagesCount + loaded)) {
-			$("p.fuskTotals").append(" Done!");
+			$("p.fuskTotals").append(" " + l18nify("Done"));
 		}
 	}
 

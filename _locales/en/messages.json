@@ -1,4 +1,5 @@
 {
+    //Main
     "ManifestName": {
         "message": "Fuskr",
         "description": "The title of the application, displayed in the web store."
@@ -6,5 +7,154 @@
     "ManifestDescription": {
         "message": "Create photo galleries from a single image based on the image name.",
         "description": "The description of the application, displayed in the web store."
+    }
+    //Application
+
+    //Context Menu
+    "Application_ContextMenu_Fusk": {
+        "message": "Fusk"
+    },
+    "Application_ContextMenu_10": {
+        "message": "10"
+    },
+    "Application_ContextMenu_20": {
+        "message": "20"
+    },
+    "Application_ContextMenu_50": {
+        "message": "50"
+    },
+    "Application_ContextMenu_100": {
+        "message": "100"
+    },
+    "Application_ContextMenu_200": {
+        "message": "200"
+    },
+    "Application_ContextMenu_500": {
+        "message": "500"
+    },
+    "Application_ContextMenu_Other": {
+        "message": "Other"
+    },
+    "Application_ContextMenu_CreateFromSelection": {
+        "message": "Create from selection"
+    },
+    "Application_ContextMenu_Manual": {
+        "message": "Manual"
+    },
+    "Application_ContextMenu_Help": {
+        "message": "Help"
+    },
+    "Application_ContextMenu_Recent": {
+        "message": "Recent"
+    },
+    "Application_ContextMenu_ClearRecentActivity": {
+        "message": "Clear recent activity"
+    },
+    "Application_ContextMenu_Options": {
+        "message": "Options"
+    },
+    "Application_ContextMenu_Saved": {
+        "message": "Saved"
+    },
+
+    //Prompts
+    "Application_Prompt_PleaseEnterTheUrl": {
+        "message": "Please enter the url:"
+    },
+    "Application_Prompt_HowMany": {
+        "message": "How many?:"
+    },
+    "Application_Prompt_NotAValidFusk": {
+        "message": "This is not a valid fusk - http://example.com/[1-8].jpg"
+    },
+
+    //Images Page
+    "Images_Done": {
+        "message": "Done!"
+    },
+    "Images_Images": {
+        "message": "Images"
+    },
+    "Images_Loaded": {
+        "message": "Loaded"
+    },
+    "Images_Failed": {
+        "message": "Failed"
+    },
+    "Images_DownloadImages": {
+        "message": "Download Images"
+    },
+    "Images_SaveFusk": {
+        "message": "Save Fusk"
+    },
+    "Images_Top": {
+        "message": "Top"
+    },
+    "Images_Bottom": {
+        "message": "Bottom"
+    },
+    "Images_ClickToOpenInNewTab": {
+        "message": "Click to open this image in a new tab"
+    },
+    "Images_ClickForNextPicture": {
+        "message": "Click image for next picture"
+    },
+    "Images_ResizeImagesToFullWidth": {
+        "message": "Resize images to full width"
+    },
+    "Images_ResizeImagesToFitOnPage": {
+        "message": "Resize images to fit on page"
+    },
+    "Images_GoToTop": {
+        "message": "Go to the top of the page"
+    },
+    "Images_GoToBottom": {
+        "message": "Go to the bottom of the page"
+    },
+    "Images_ShowImagesInViewer": {
+        "message": "Show images in viewer"
+    },
+    "Images_ToggleBrokenImages": {
+        "message": "Toggle broken images"
+    },
+    "Images_RemoveBrokenImages": {
+        "message": "Remove broken images"
+    },
+
+    //Download Dialog
+    "Images_DownloadDialog_Title": {
+        "message": "Download Images"
+    },
+    "Images_DownloadDialog_Unique": {
+        "message": "Unique"
+    },
+    "Images_DownloadDialog_UniqueInfo": {
+        "message": "To avoid duplication, the filename will be appended with a number eg "
+    },
+    "Images_DownloadDialog_UniqueInfoFilename": {
+        "message": "filename1 (1).jpg"
+    },
+    "Images_DownloadDialog_Overwrite": {
+        "message": "Overwrite"
+    },
+    "Images_DownloadDialog_OverwriteInfo": {
+        "message": "The existing file will be overwritten with the new file."
+    },
+    "Images_DownloadDialog_Prompt": {
+        "message": "Prompt"
+    },
+    "Images_DownloadDialog_PromptInfo": {
+        "message": "You will be prompted to choose a filename."
+    },
+    "Images_DownloadDialog_ConflictQuestion": {
+        "message": "In case of a conflict of filenames, what do you want to do?"
+    },
+
+    //Save Dialog
+    "Images_SaveDialog_Title": {
+        "message": "Save Fusk"
+    },
+    "Images_SaveDialog_Question": {
+        "message": "What name do you wish to give this fusk (defaults to this url if empty)?"
     }
 }

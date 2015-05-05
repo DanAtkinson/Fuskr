@@ -6,7 +6,7 @@
 		savedIds = [],
 		historyIds = [],
 		targetUrls,
-		numbers = ["10", "20", "50", "100", "200", "500", "Other"];
+		numbers = [l18nify("ContextMenu_10"), l18nify("ContextMenu_20"), l18nify("ContextMenu_50"), l18nify("ContextMenu_100"), l18nify("ContextMenu_200"), l18nify("ContextMenu_500"), l18nify("ContextMenu_Other")];
 
 	//Target urls tell Chrome what urls are acceptable.
 	targetUrls = (function() {
@@ -19,12 +19,12 @@
 	})();
 
 	(function () {
-		var incDecMenuId, incMenuId, decMenuId, numbers = ["10", "20", "50", "100", "200", "500", "Other"];
+		var incDecMenuId, incMenuId, decMenuId, numbers = [l18nify("ContextMenu_10"), l18nify("ContextMenu_20"), l18nify("ContextMenu_50"), l18nify("ContextMenu_100"), l18nify("ContextMenu_200"), l18nify("ContextMenu_500"), l18nify("ContextMenu_Other")];
 
 		//First, empty all the context menus for this extension.
 		chrome.contextMenus.removeAll();
 
-		parentId = createContextMenu(null, "Fusk", "all");
+		parentId = createContextMenu(null, l18nify("ContextMenu_Fusk"), "all");
 		incDecMenuId = createContextMenu(parentId, "+/-", "image", null, null, targetUrls);
 		incMenuId = createContextMenu(parentId, "+", "image", null, null, targetUrls);
 		decMenuId = createContextMenu(parentId, "-", "image", null, null, targetUrls);
@@ -36,11 +36,11 @@
 		}
 
 		createContextMenu(parentId, null, "image", "separator");
-		createContextMenu(parentId, "Create from selection", "selection", null, createFromSelectionOnClick);
-		createContextMenu(parentId, "Manual", null, null, manualOnClick);
+		createContextMenu(parentId, l18nify("ContextMenu_CreateFromSelection"), "selection", null, createFromSelectionOnClick);
+		createContextMenu(parentId, l18nify("ContextMenu_Manual"), null, null, manualOnClick);
 		createContextMenu(parentId, null, null, "separator");
-		//createContextMenu(parentId, "Help", null, null, helpOnClick);
-		createContextMenu(parentId, "Options", null, null, optionsOnClick);
+		//createContextMenu(parentId, l18nify("ContextMenu_Help"), null, null, helpOnClick);
+		createContextMenu(parentId, l18nify("ContextMenu_Options"), null, null, optionsOnClick);
 
 		// This event is fired each time the user updates the text in the omnibox, as long as the extension's keyword mode is still active.
 		/*chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
@@ -69,6 +69,10 @@
 		*/
 	} ());
 
+	function l18nify(name) {
+		return chrome.i18n.getMessage("Application_" + name);
+	}
+
 	function createRecentMenu () {
 		var history, historyArray, historyCount, historyId;
 
@@ -86,7 +90,7 @@
 			return false;
 		}
 
-		recentId = createContextMenu(parentId, "Recent");
+		recentId = createContextMenu(parentId, l18nify("ContextMenu_Recent"));
 
 		//Split out the history into an array
 		historyArray = history.split("||");
@@ -100,7 +104,7 @@
 
 		if(historyArray.length > 0) {
 			createContextMenu(recentId, null, null, "separator");
-			createContextMenu(recentId, "Clear Recent Activity", null, null, clearRecentOnClick);
+			createContextMenu(recentId, l18nify("ContextMenu_ClearRecentActivity"), null, null, clearRecentOnClick);
 		}
 	}
 
@@ -112,7 +116,7 @@
 		if(savedFusksOption != null) {
 			savedFusksOption = JSON.parse(savedFusksOption);
 			if (savedFusksOption.length) {
-				recentId = createContextMenu(parentId, "Saved");
+				recentId = createContextMenu(parentId, l18nify("ContextMenu_Saved"));
 
 				for (i = 0; i < savedFusksOption.length; i++) {
 					savedId = createContextMenu(recentId, savedFusksOption[i].name, "all", null, savedOnClick);
@@ -120,7 +124,6 @@
 				}
 			}
 		}
-		//'"[{"name":"Foo","url":"http://google.com"},{"name":"Bar","url":"http://bing.com"}]'
 	}
 
 	function clearRecentOnClick () {
@@ -141,11 +144,11 @@
 		imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
 		manualCheck = /\[\d+-\d+\]/;
 		alphabetCheck = /\[\w-\w\]/;
-		url = prompt("Please enter the url", imageUrl);
+		url = prompt(l18nify("Prompt_PleaseEnterTheUrl"), imageUrl);
 
 		if(url) {
 			if(manualCheck.exec(url) == null && alphabetCheck.exec(url) == null) {
-				alert("This is not a valid fusk - http://example.com/[1-8].jpg");
+				alert(l18nify("Prompt_NotAValidFusk"));
 				return false;
 			}
 
@@ -159,7 +162,7 @@
 		manualCheck = /\[\d+-\d+\]/;
 
 		if(manualCheck.exec(url) == null) {
-			alert("This is not a valid fusk - http://example.com/[1-8].jpg");
+			alert(l18nify("Prompt_NotAValidFusk"));
 			return false;
 		}
 
@@ -283,8 +286,8 @@
 			if(ids[i][0] == info.menuItemId) {
 				direction = parseInt(ids[i][1], 10);
 
-				if(ids[i][2] == "Other") {
-					response = prompt("How many?");
+				if(ids[i][2] == l18nify("ContextMenu_Other")) {
+					response = prompt(l18nify("Prompt_HowMany"));
 
 					if(parseInt(response, 10) == false) {
 						alert("Not a valid number!");
