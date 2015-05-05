@@ -1,0 +1,10 @@
+{
+    "ManifestName": {
+        "message": "Fuskr",
+        "description": "The title of the application, displayed in the web store."
+    },
+    "ManifestDescription": {
+        "message": "Create photo galleries from a single image based on the image name.",
+        "description": "The description of the application, displayed in the web store."
+    }
+}

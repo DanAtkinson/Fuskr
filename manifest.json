@@ -1,8 +1,9 @@
 {
 	"manifest_version": 2,
-	"name": "Fuskr",
+	"name": "__MSG_ManifestName__",
+	"description": "__MSG_ManifestDescription__",
 	"version": "2.6",
-	"description": "Create photo galleries from a single image based on the image name.",
+	"default_locale": "en",
 	"omnibox": { "keyword" : "fuskr" },
 	"background": {
 		"scripts": [
