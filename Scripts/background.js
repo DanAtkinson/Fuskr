@@ -62,9 +62,11 @@
 			createRecentMenu();
 		}
 
+		/*
 		if(getSavedFusksOption()) {
 			createSavedFusksMenu();
 		}
+		*/
 	} ());
 
 	function createRecentMenu () {

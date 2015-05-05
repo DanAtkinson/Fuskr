@@ -37,7 +37,7 @@
 
 $(function () {
 
-	var i, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, downloadDialog, saveDialog, showViewer, currentSelectedImage, $brokenLinkStyles;
+	var i, url, image, brokenImagesCount, loaded, total, resizeOn, showHiddenImages, conflictAction, currentUrl, downloadDialog, saveDialog, showViewer, $currentSelectedImage, $brokenLinkStyles;
 
 	(function () {
 		var
@@ -195,20 +195,19 @@ $(function () {
 	// Hook into the Left/Right keys. This is down even if the viewer is not shown
 	// so that the current viewed item is synced
 	$(document).keydown(function (e) {
-
-		getCurrentSelectedImage();
-
 	    switch(e.which) {
 	        case 27: // escape
-				toggleViewer()
+				toggleViewer();
 	        break;
 
 	        case 37: // left
-	        	scrollTo(currentSelectedImage, -1);
+				getCurrentSelectedImage();
+	        	scrollTo($currentSelectedImage, -1);
 	        break;
 
 	        case 39: // right
-	        	scrollTo(currentSelectedImage, 1);
+				getCurrentSelectedImage();
+	        	scrollTo($currentSelectedImage, 1);
 	        break;
 
 	        default: return; // exit this handler for other keys
@@ -275,9 +274,9 @@ $(function () {
 	}
 
 	function getCurrentSelectedImage() {
-		if (!currentSelectedImage) {
-			currentSelectedImage = $("div.loaded").find(".fuskImage").first();
-			setCurrentImageInViewer(currentSelectedImage, 1);
+		if (!$currentSelectedImage && $("div.loaded .fuskImage").length) {
+			$currentSelectedImage = $("div.loaded .fuskImage:first");
+			setCurrentImageInViewer($currentSelectedImage, 1);
 		}
 	}
 
@@ -331,7 +330,7 @@ $(function () {
 		// There is no element (we've reached an end)
 		if($currentImage.length == 0) return;
 
-		currentSelectedImage = $currentImage;
+		$currentSelectedImage = $currentImage;
 
 		// get img (if it exists + was loaded)
 		var elementSelector = showHiddenImages ? "div.wrap" : "div.loaded";
@@ -343,7 +342,11 @@ $(function () {
 		var next_img = parent.nextAll(elementSelector).first().find(".fuskImage")[0];
 
 		$(".viewerItem.current a").css("background-image", "url(" + (img && img.src) +")");
-		$(".viewerItem a.previousImage").css("background-image", "url(" + (prev_img && prev_img.src) +")");
-		$(".viewerItem a.nextImage").css("background-image", "url(" + (next_img && next_img.src) +")");
+		if (prev_img) {
+			$(".viewerItem a.previousImage").css("background-image", "url(" + (prev_img && prev_img.src) +")");
+		}
+		if(next_img) {
+			$(".viewerItem a.nextImage").css("background-image", "url(" + (next_img && next_img.src) +")");
+		}
 	}
 });

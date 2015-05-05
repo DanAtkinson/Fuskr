@@ -125,6 +125,6 @@ a, a:hover, a:visited{
 }
 
 #viewer { display:none; }
-.viewerItem.current a { background-position: 50% 50%;}
+.viewerItem.current a { background-position: 50% 50%; }
 .viewerItem a.previousImage { background-position: 35% 50%; }
 .viewerItem a.nextImage { background-position: 65% 50%; } }
