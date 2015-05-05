@@ -1,30 +1,97 @@
-$(function() {
-	setOpenInForeground();
+// Simple JavaScript Templating
+// John Resig - http://ejohn.org/ - MIT Licensed
+(function (){
+	var cache = {};
 
-	setKeepRecentFusks();
+	this.tmpl = function tmpl(str, data){
 
-	getHistory();
+		// Figure out if we're getting a template, or if we need to
+		// load the template - and be sure to cache the result.
+		var fn = !/\W/.test(str) ?
+			cache[str] = cache[str] ||
+			tmpl(document.getElementById(str).innerHTML) :
 
-	if($.trim($("#recentFusks").html()) === "") {
-		$("#recentFusksArea")
-		.hide()
-		.before('<p class="bold">There are currently no records of any galleries created. When you start using Fuskr, the gallery links will appear below!</p>');
-	}
+			// Generate a reusable function that will serve as a template
+			// generator (and which will be cached).
+			new Function("obj",
+			"var p=[],print=function (){p.push.apply(p,arguments);};" +
 
-	$("#openInForeground, #keepRecentFusks").change(function() {
-		localStorage.setItem($(this).attr("id"), $(this).is(':checked') ? 1 : 0);
-		$(this).parents("div.tab-content").effect("highlight", {}, 1000);
-	});
+			// Introduce the data as local variables using with(){}
+			"with(obj){p.push('" +
+			// Convert the template into pure JavaScript
+			str
+				.replace(/[\r\t\n]/g, " ")
+				.split("<%").join("\t")
+				.replace(/((^|%>)[^\t]*)'/g, "$1\r")
+				.replace(/\t=(.*?)%>/g, "',$1,'")
+				.split("\t").join("');")
+				.split("%>").join("p.push('")
+				.split("\r").join("\\'")
+			+ "');}return p.join('');");
 
-	$(".tab").click(function(){
-		if(!$(this).hasClass("active")) {
-			$(".tab-content").removeClass("show");
-			$("." + $(this).attr("data-type")).addClass("show");
+		// Provide some basic currying to the user
+		return data ? fn( data ) : fn;
+	};
+} ());
 
-			$(".tab").removeClass("active");
-			$(this).addClass("active");
+$(function () {
+	var $content = $("body");
+
+	(function () {
+		document.title = l18nify("Title");
+
+		var pageTemplate = tmpl("pageTemplate");
+		$content.append(pageTemplate({
+			Fuskr: l18nify("ManifestName", ""),
+			Tab_Foreground: l18nify("Tab_Foreground"),
+			Tab_Settings: l18nify("Tab_Settings"),
+			Tab_History: l18nify("Tab_History"),
+			Tab_VersionHistory: l18nify("Tab_VersionHistory"),
+			Tab_About: l18nify("Tab_About"),
+			OpenNewFusksInForeground: l18nify("OpenNewFusksInForeground"),
+			OpenNewFusksInForeground_Default: l18nify("OpenNewFusksInForeground_Default"),
+			OpenNewFusksInForeground_Description: l18nify("OpenNewFusksInForeground_Description"),
+			About_Description: l18nify("About_Description"),
+			History_Keep: l18nify("History_Keep"),
+			History_Keep_Default: l18nify("History_Keep_Default"),
+			History_Keep_Limit: l18nify("History_Keep_Limit"),
+
+			CreditsTitle: l18nify("Credits_Title"),
+			Credits_Description: l18nify("Credits_Description")
+		}));
+
+		setOpenInForeground();
+
+		setKeepRecentFusks();
+
+		getHistory();
+
+		if($.trim($("#recentFusks").html()) === "") {
+			$("#recentFusksArea")
+			.hide()
+			.before('<p class="bold">There are currently no records of any galleries created. When you start using Fuskr, the gallery links will appear below!</p>');
 		}
-	});
+
+		$("#openInForeground, #keepRecentFusks").change(function() {
+			localStorage.setItem($(this).attr("id"), $(this).is(':checked') ? 1 : 0);
+			$(this).parents("div.tab-content").effect("highlight", {}, 1000);
+		});
+
+		$(".tab").click(function(){
+			if(!$(this).hasClass("active")) {
+				$(".tab-content").removeClass("show");
+				$("." + $(this).attr("data-type")).addClass("show");
+
+				$(".tab").removeClass("active");
+				$(this).addClass("active");
+			}
+		});
+	} ());
+
+	function l18nify(name, base) {
+console.log(name, "= '", chrome.i18n.getMessage((base === "" ? base : "Options_") + name), "'");
+		return chrome.i18n.getMessage((base === "" ? base : "Options_") + name);
+	}
 
 	function setKeepRecentFusks() {
 		//Keep Recent Fusks value`

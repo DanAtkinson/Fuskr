@@ -100,7 +100,8 @@ $(function () {
 			templateData.Position = "bottom";
 			$content.after(info(templateData));
 
-			templateData = {
+			dialogTemplate = tmpl("dialogs");
+			$content.after(dialogTemplate({
 				DownloadTitle: l18nify("DownloadDialog_Title"),
 				Unique: l18nify("DownloadDialog_Unique"),
 				UniqueInfo: l18nify("DownloadDialog_UniqueInfo"),
@@ -112,9 +113,7 @@ $(function () {
 				ConflictQuestion: l18nify("DownloadDialog_ConflictQuestion"),
 				SaveTitle: l18nify("SaveDialog_Title"),
 				SaveQuestion: l18nify("SaveDialog_Question")
-			};
-			dialogTemplate = tmpl("dialogs");
-			$content.after(dialogTemplate(templateData));
+			}));
 
 			$("input#saveName").val(url);
 		} else {

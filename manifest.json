@@ -3,7 +3,7 @@
 	"name": "__MSG_ManifestName__",
 	"description": "__MSG_ManifestDescription__",
 	"version": "2.6",
-	"default_locale": "en",
+	"default_locale": "en_GB",
 	"omnibox": { "keyword" : "fuskr" },
 	"background": {
 		"scripts": [
