@@ -308,6 +308,7 @@
 					response = prompt(l18nify("Prompt_HowMany"));
 
 					if(parseInt(response, 10) == false) {
+						alert(l18nify("Prompt_NotAValidNumber"));
 						break;
 					}
 					count = parseInt(response, 10);
