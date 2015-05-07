@@ -61,6 +61,9 @@
     "Application_Prompt_NotAValidFusk": {
         "message": "This is not a valid fusk - http://example.com/[1-8].jpg"
     },
+    "Application_Prompt_NotAValidNumber": {
+        "message": "This is not a valid number."
+    },
     "Images_Done": {
         "message": "Done!"
     },
