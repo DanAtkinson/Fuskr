@@ -2,7 +2,7 @@
 	"manifest_version": 2,
 	"name": "__MSG_ManifestName__",
 	"description": "__MSG_ManifestDescription__",
-	"version": "2.6",
+	"version": "2.7",
 	"default_locale": "en_GB",
 	"omnibox": { "keyword" : "fuskr" },
 	"background": {
@@ -20,7 +20,7 @@
 		"http://*/*",
 		"https://*/*",
 		"contextMenus",
-		"\u003Call_urls\u003E"
+		"activeTab"
 	],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
 	"homepage_url": "http://danatkinson.github.io/Fuskr/",
