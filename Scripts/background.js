@@ -278,27 +278,43 @@
 	}
 
 	function choiceOnClick(info, tab) {
-		var count = 0, direction = 0, imageUrl = "", response = "";
+		var count = 0, direction = 0, imageUrl = "", response = "", findDigitsRegexp, digitsCheck;
+		findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+
+		if (info.linkUrl !== null) {
+			digitsCheck = findDigitsRegexp.exec(info.linkUrl);
+			if (digitsCheck !== null) {
+				imageUrl = info.linkUrl;
+			}
+		}
+		if (digitsCheck === null && info.srcUrl !== null) {
+			digitsCheck = findDigitsRegexp.exec(info.srcUrl);
+			if (digitsCheck !== null) {
+				imageUrl = info.srcUrl;
+			}
+		}
+
+		if (imageUrl === "") {
+			alert(l18nify("Prompt_NotAValidFusk"));
+			return;
+		}
 
 		for(i = 0; i < ids.length; i++) {
-			imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
-
 			if(ids[i][0] == info.menuItemId) {
+
 				direction = parseInt(ids[i][1], 10);
 
 				if(ids[i][2] == l18nify("ContextMenu_Other")) {
 					response = prompt(l18nify("Prompt_HowMany"));
 
 					if(parseInt(response, 10) == false) {
-						alert("Not a valid number!");
 						break;
 					}
 					count = parseInt(response, 10);
 				} else {
 					count = parseInt(ids[i][2], 10);
 				}
-
-				url = createUrl(imageUrl, count, direction);
+				url = createUrl(imageUrl, count, direction, digitsCheck);
 
 				createTab(url, tab);
 				break;
@@ -306,11 +322,8 @@
 		}
 	}
 
-	function createUrl(currentUrl, count, direction) {
-		var findDigitsRegexp, digitsCheck, begin, number, end, firstNum, lastNum;
-
-		findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
-		digitsCheck = findDigitsRegexp.exec(currentUrl);
+	function createUrl(currentUrl, count, direction, digitsCheck) {
+		var begin, number, end, firstNum, lastNum;
 
 		begin = digitsCheck[1];
 		number = digitsCheck[2];
