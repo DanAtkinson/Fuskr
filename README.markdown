@@ -1,6 +1,8 @@
 How to use
 ==========
 
+[![Join the chat at https://gitter.im/DanAtkinson/Fuskr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DanAtkinson/Fuskr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 1. Go ahead and install Fuskr from the [Google Chrome extensions gallery](https://chrome.google.com/webstore/detail/fuskr/glieaboaghdnlglpkekghloldikefofo).
 2. On your desired image, right click and choose 'Fusk'.
 3. Choose which direction:
