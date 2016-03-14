@@ -1,0 +1,16 @@
+<form>
+	<label>
+		<p>{{ 'DownloadDialog_ConflictQuestion' | translate }}</p>
+		<p><b>{{ 'DownloadDialog_Unique' | translate }}:</b> {{ 'DownloadDialog_UniqueInfo' | translate }} <span class="code">{{ 'DownloadDialog_UniqueInfoFilename' | translate }}.</span></p>
+		<p><b>{{ 'DownloadDialog_Overwrite' | translate }}:</b> {{ 'DownloadDialog_OverwriteInfo' | translate }}</p>
+		<p><b>{{ 'DownloadDialog_Prompt' | translate }}:</b> {{ 'DownloadDialog_PromptInfo' | translate }}</p>
+		<select id="conflictResolution" class="ui-widget-content ui-corner-all" ng-model="conflictResolution">
+			<option value="uniquify" selected="selected">{{ 'DownloadDialog_Unique' | translate }}</option>
+			<option value="overwrite">{{ 'DownloadDialog_Overwrite' | translate }}</option>
+			<option value="prompt">{{ 'DownloadDialog_Prompt' | translate }}</option>
+		</select>
+	</label>
+	<div>
+		<button class="download" ng-click="downloadAll()">{{ 'DownloadImages' | translate }}</button>
+	</div>
+</form>

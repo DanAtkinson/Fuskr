@@ -1,0 +1,53 @@
+<div id="content" ng-class="{'fullwidth': fullWidthImages}">
+	<div class="info">
+		<p>{{ originalUrl }}</p>
+		<ul class="linklist totals">
+			<li><span ng-pluralize count="images.length" when="pluraliseForImages('Images')"></span></li>
+			<li><span ng-pluralize count="totalSuccess()" when="pluraliseForImages('Loaded')"></span></li>
+			<li ng-show="totalFailed() > 0"><span ng-pluralize count="totalFailed()" when="pluraliseForImages('Failed')"></span></li>
+			<li ng-show="isFinishedLoading()"><strong>{{ 'Done' | translate }}</strong></li>
+		</ul>
+		<ul class="linklist nav">
+			<li ng-show="isFinishedLoading() && totalSuccess() > 0"><a ng-click="download()">{{ 'DownloadImages' | translate }}</a></li>
+			<li ng-show="totalFailed() > 0"><a ng-click="showBrokenImages=!showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
+			<li ng-show="totalSuccess() > 0">
+				<a ng-click="fullWidthImages=!fullWidthImages">
+					{{  fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
+				</a>
+			</li>
+			<li ng-show="totalSuccess() > 0"><a ng-click="showViewer=!showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
+		</ul>
+	</div>
+	<div class="wrap" ng-repeat="image in (filteredImages = (images | filter: shouldDisplayImage(image)))">
+		<figure>
+			<a ng-show="!image.loaded || image.success" id="image{{ $index }}" ng-click="scrollToAnchor('image' + ($index+1), $index+1)">
+				<img class="fuskImage" ng-src="{{ image.url }}" ng-model="image" imageonload>
+			</a>
+			<figcaption ng-hide="hideDetails">
+				<a ng-href="{{ image.url }}" target="_blank" class="imageLink">{{ image.url }}</a>
+
+				<ul class="linklist" ng-hide="hideDetails">
+					<li><a ng-click="scrollToAnchor('top')" title="{{ 'GoToTop' | translate }}">{{ 'Top' | translate }}</a></li>
+					<li><a ng-click="scrollToAnchor('bottom')" title="{{ 'GoToBottom' | translate }}">{{ 'Bottom' | translate }}</a></li>
+					<li ng-hide="$first"><a ng-click="scrollToAnchor('image' + ($index-1), $index-1)">&lt;</a></li>
+					<li ng-hide="$last"><a ng-click="scrollToAnchor('image' + ($index+1), $index+1)">&gt;</a></li>
+				</ul>
+			</figcaption>
+		</figure>
+	</div>
+</div>
+<div id="viewer" ng-show="showViewer">
+	<div class="viewerItem modal"></div>
+	<div class="viewerItem small">
+		<a class="previousImage" ng-style="{'background-image': 'url(' + filteredImages[selectedImageId-1].url + ')'}"></a>
+	</div>
+	<div class="viewerItem current" ng-click="scrollToAnchor(null, selectedImageId+1)">
+		<a ng-style="{'background-image': 'url(' + filteredImages[selectedImageId].url + ')'}"></a>
+	</div>
+	<div class="viewerItem small">
+		<a class="nextImage" ng-style="{'background-image': 'url(' + filteredImages[selectedImageId+1].url + ')'}"></a>
+	</div>
+	<div class="close">
+		<span ng-click="showViewer=!showViewer">&#10006;</span>
+	</div>
+</div>
