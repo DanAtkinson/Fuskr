@@ -68,13 +68,13 @@
         "message": "Done!"
     },
     "Images_Images": {
-        "message": "Images"
+        "message": "{} Images"
     },
     "Images_Loaded": {
-        "message": "Loaded"
+        "message": "{} Loaded"
     },
     "Images_Failed": {
-        "message": "Failed"
+        "message": "{} Failed"
     },
     "Images_DownloadImages": {
         "message": "Download Images"
@@ -183,6 +183,9 @@
     },
     "Options_History_Keep_Limit": {
         "message": "<p class='bold'>Last <span class='totalFusks'></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>"
+    },
+    "Options_History_NoRecent" : {
+        "message": "There are currently no records of any galleries created. When you start using Fuskr, the gallery links will appear below!"
     },
     "Options_Credits_Title": {
         "message": "Credits"

@@ -1,85 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" ng-app="fuskrApp">
 <head>
-	<link rel="stylesheet" href="/Scripts/jquery-ui-1.11.4/jquery-ui.min.css" type="text/css">
+	<title>{{manifestName}} - {{ pageTitle }}</title>
 	<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
-	<script type="text/javascript" src="/Scripts/jquery-2.1.3.min.js"></script>
-	<script type="text/javascript" src="/Scripts/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+	<link rel="stylesheet" href="/Scripts/vendor/popeye.min.css" type="text/css">
+	<script type="text/javascript" src="/Scripts/vendor/angular.min.js"></script>
+	<script type="text/javascript" src="/Scripts/vendor/angular-ui-router.min.js"></script>
+	<script type="text/javascript" src="/Scripts/vendor/popeye.min.js"></script>
 	<script type="text/javascript"src="/Scripts/fuskr.js"></script>
-	<style id="brokenLinkStyles">
-		.error { display: none; }
-		.hide { display:none; }
-	</style>
-	<script type="text/html" id="item_tmpl">
-		<div class="hide wrap" id="image_<%= Index %>">
-			<a href="<%= Link %>" class="nextImage">
-				<img class="fuskImage" alt="<%= Link %>" src="<%= Link %>">
-			</a>
-			<div>
-				<div>
-					<a href="<%= Link %>" target="_blank" title="<%= LinkTitle %>" class="imageLink"><%= Link %></a>
-				</div>
-				<div>
-					(<%= ClickForNextPicture %>)&nbsp;|&nbsp;
-					<a href="#top" title="<%= TopTitle %>"><%= TopName %></a>&nbsp;|&nbsp;
-					<a href="#bottom" title="<%= BottomTitle %>"><%= BottomName %></a>&nbsp;|&nbsp;
-					<span class="<%= ShowPreviousImageLink %>"><a href="#" class="previousImage" title="<%= PreviousImageTitle %>">&lt;</a>&nbsp;|&nbsp;</span>
-					<a href="#" class="nextImage <%= NextImage %>" title="<%= NextImageTitle %>">&gt;</a>
-				</div>
-			</div>
-		</div>
-	</script>
-	<script type="text/html" id="info_tmpl">
-		<div id="<%= Position %>" class="info" title="<%= ManifestName %>">
-			<p><%= Link %></p>
-			<p class="fuskTotals"><span class="total">0</span> <%= Images %> | <span class="loaded">0</span> <%= Loaded %> | <span class="broken">0</span> <%= Failed %></p>
-			<p><a href="#" class="downloadImages" title="<%= DownloadImages %>"><%= DownloadImages %></a><!-- | <a href="#" class="saveFusk" title="<%= SaveFusk %>"><%= SaveFusk %></a> --></p>
-			<p class="brokenImageLinks"><a href="#" class="toggleBrokenLinks" title="<%= ToggleBrokenImages %>"><%= ToggleBrokenImages %></a> | <a href="#" class="removeBrokenImages"><%= RemoveBrokenImages %></a></p>
-			<p><a href="#" class="resizeImages" title="<%= ResizeImagesToFitOnPage %>"><%= ResizeImagesToFitOnPage %></a></p>
-			<p><a href="#" class="showViewer" title="<%= ShowImagesInViewer %>"><%= ShowImagesInViewer %></a></p>
-			<p class="fuskUrl">&nbsp;</p>
-		</div>
-	</script>
-	<script type="text/html" id="dialogs">
-		<div id="dialogs">
-			<div class="dialog-form" id="download-form" title="<%= DownloadTitle %>">
-				<form>
-					<label>
-						<p><%= ConflictQuestion %></p>
-						<p><b><%= Unique %>:</b> <%= UniqueInfo %> <span class="code"><%= UniqueInfoFilename %>.</span></p>
-						<p><b><%= Overwrite %>:</b> <%= OverwriteInfo %></p>
-						<p><b><%= Prompt %>:</b> <%= PromptInfo %></p>
-						<select id="conflictResolution" class="ui-widget-content ui-corner-all">
-							<option value="uniquify" selected="selected"><%= Unique %></option>
-							<option value="overwrite"><%= Overwrite %></option>
-							<option value="prompt"><%= Prompt %></option>
-						</select>
-					</label>
-				</form>
-			</div>
-
-			<div class="dialog-form" id="save-form" title="<%= SaveTitle %>">
-				<form>
-					<label>
-						<p><%= SaveQuestion %></p>
-						<input type="text" id="saveName" value="" />
-					</label>
-				</form>
-			</div>
-		</div>
-	</script>
+	<script type="text/javascript" src="/Scripts/app.js"></script>
+	<script type="text/javascript" src="/Scripts/images.js"></script>
 </head>
 <body>
-	<div id="all">
-		<div id="content">&nbsp;</div>
-		<div id="viewer">
-			<div class="viewerItem modal"></div>
-			<div class="viewerItem small"><a class="previousImage"></a></div>
-			<div class="viewerItem current"><a></a></div>
-			<div class="viewerItem small"><a class="nextImage"></a></div>
-		</div>
-	</div>
-
-	<script type="text/javascript" src="/Scripts/images.js"></script>
+	<div id="top"></div>
+	<div ui-view></div>
+	<div id="bottom"></div>
 </body>
 </html>

@@ -22,6 +22,21 @@ a, a:hover, a:visited{
 	text-decoration:none;
 }
 
+
+button.download {
+    margin: .5em .4em .5em 0;
+    float: right;
+    padding: 5px;
+}
+
+#content.fullwidth img{
+	width: auto;
+}
+
+#content.fullwidth img.fuskImage{
+	width: 100%;
+}
+
 .code{
     font-family:Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
     background-color:#eee;
@@ -35,6 +50,7 @@ a, a:hover, a:visited{
 	text-align:left;
 	min-height:128px;
 	padding-top:10px;
+	clear: both;
 }
 
 	div#bottom{
@@ -58,10 +74,6 @@ a, a:hover, a:visited{
 		text-align:center;
 	}
 
-	.fuskTotals{
-		font-weight:bold;
-	}
-
 #dialogs{
 	display:none;
 }
@@ -75,6 +87,23 @@ a, a:hover, a:visited{
 	input#saveName {
 		width:500px;
 	}
+
+#viewer .close
+{
+	color: #fff;
+    font-size: 30px;
+    display: block;
+    z-index: 101;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+#viewer .close:hover
+{
+	color: #ccc;
+}
 
 .viewerItem
 {
@@ -109,7 +138,24 @@ a, a:hover, a:visited{
 	z-index:98;
 }
 
-#viewer { display:none; }
+ul.totals {
+	font-weight: bold;
+}
+
+ul.linklist {
+	padding:0;
+}
+
+ul.linklist li {
+	display: inline;
+	padding-right: 5px;
+}
+
+ul.linklist li~li { 
+	border-left: 1px solid #000000;
+	padding-left:5px;
+}
+
 .viewerItem.current a { background-position: 50% 50%; }
 .viewerItem a.previousImage { background-position: 35% 50%; }
 .viewerItem a.nextImage { background-position: 65% 50%; } }

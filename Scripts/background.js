@@ -190,7 +190,7 @@
 	function createTab (url, tab) {
 		addUrlToLocalStorage(url, tab);
 
-		chrome.tabs.create({ windowId: tab.windowId, url:"/Html/images.htm?url=" + url, index: (tab.index + 1), selected: getOpenInForeground() });
+		chrome.tabs.create({ windowId: tab.windowId, url:"/Html/images.htm#/fusk/" + url, index: (tab.index + 1), selected: getOpenInForeground() });
 	}
 
 	function addUrlToLocalStorage (url, tab) {
