@@ -16,6 +16,12 @@ How to use
 Version History
 ===============
 
+
+* 3.0 -
+ * Application templating rewritten using [AngularJS](https://angularjs.org/).
+* 2.7 -
+ * Reduced the permissions level greatly. Previously, Fuskr required that you give us access to all websites and all browsing activity, but we only care about your current tab. Google Chrome now has that ability, so we’ve reduced the permissions needed accordingly!
+ * Fixed an annoying bug where Fuskr wouldn’t work on some links that didn’t have numbers, and wouldn’t revert to the image url.
 * 2.6 -
  * You can now download images directly from the gallery page!
  * You can now view the page in a slideshow!
