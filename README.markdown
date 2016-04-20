@@ -16,7 +16,8 @@ How to use
 Version History
 ===============
 
-
+* 3.1 -
+ * Fixed an issue with the fusk option not showing on links.
 * 3.0 -
  * Application templating rewritten using [AngularJS](https://angularjs.org/).
 * 2.7 -
