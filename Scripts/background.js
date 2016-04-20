@@ -24,10 +24,23 @@
 		//First, empty all the context menus for this extension.
 		chrome.contextMenus.removeAll();
 
+		parentId = createContextMenu({Title: l18nify("ContextMenu_Fusk"), Context: ["all"] });
+		incDecMenuId = createContextMenu({Id: parentId, Title: "+/-", Context: ["image", "video", "audio", "link"], TargetUrlPatterns: targetUrls });
+		incMenuId = createContextMenu({Id: parentId, Title: "+", Context: ["image", "video", "audio", "link"], TargetUrlPatterns: targetUrls });
+		decMenuId = createContextMenu({Id: parentId, Title: "-", Context: ["image", "video", "audio", "link"], TargetUrlPatterns: targetUrls });
 
 		for (i = 0; i < numbers.length; i++) {
+			ids.push([createContextMenu({Id: incDecMenuId, Title: numbers[i], Context: ["image", "video", "audio", "link"], OnclickCallback: choiceOnClick }), 0, numbers[i]]);
+			ids.push([createContextMenu({Id: incMenuId, Title: numbers[i], Context: ["image", "video", "audio", "link"], OnclickCallback: choiceOnClick }), 1, numbers[i]]);
+			ids.push([createContextMenu({Id: decMenuId, Title: numbers[i], Context: ["image", "video", "audio", "link"], OnclickCallback: choiceOnClick }), -1, numbers[i]]);
 		}
 
+		createContextMenu({Id: parentId, Context: ["image", "video", "audio", "link"], ItemType: "separator" });
+		createContextMenu({Id: parentId, Title: l18nify("ContextMenu_CreateFromSelection"), Context: ["selection"], OnclickCallback: createFromSelectionOnClick });
+		createContextMenu({Id: parentId, Title: l18nify("ContextMenu_Manual"), OnclickCallback: manualOnClick });
+		createContextMenu({Id: parentId, ItemType: "separator" });
+		//createContextMenu({Id: parentId, Title: l18nify("ContextMenu_Help"), OnclickCallback: helpOnClick });
+		createContextMenu({Id: parentId, Title: l18nify("ContextMenu_Options"), OnclickCallback: optionsOnClick });
 
 		// This event is fired each time the user updates the text in the omnibox, as long as the extension's keyword mode is still active.
 		/*chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
@@ -77,6 +90,7 @@
 			return false;
 		}
 
+		recentId = createContextMenu({Id: parentId, Title: l18nify("ContextMenu_Recent") });
 
 		//Split out the history into an array
 		historyArray = history.split("||");
@@ -85,11 +99,14 @@
 		for (i = 0; i < historyCount; i++) {
 			if (historyArray[i] !== "") {
 				//Add the menu
+				historyId = createContextMenu({Id: recentId, Title: historyArray[i], OnclickCallback: recentOnClick });
 				historyIds.push([historyId, historyArray[i]]);
 			}
 		}
 
 		if (historyArray.length > 0) {
+			createContextMenu({Id: recentId, ItemType: "separator" });
+			createContextMenu({Id: recentId, Title: l18nify("ContextMenu_ClearRecentActivity"), OnclickCallback: clearRecentOnClick });
 		}
 	}
 
@@ -101,8 +118,10 @@
 		if(savedFusksOption != null) {
 			savedFusksOption = JSON.parse(savedFusksOption);
 			if (savedFusksOption.length) {
+				recentId = createContextMenu({Id: parentId, Title: l18nify("ContextMenu_Saved") });
 
 				for (i = 0; i < savedFusksOption.length; i++) {
+					savedId = createContextMenu({Id: recentId, Title: savedFusksOption[i].name, Context: "all", OnclickCallback: savedOnClick });
 					savedIds.push(savedId, savedFusksOption[i]);
 				}
 			}
@@ -339,6 +358,7 @@
 		return begin + "[" + firstNum + "-" + lastNum + "]" + end;
 	}
 
+	function createContextMenu(obj) {
 		return chrome.contextMenus.create({ parentId: obj.Id, title: obj.Title, contexts: obj.Context || ["all"], type: obj.ItemType || "normal", onclick: obj.OnclickCallback || null, targetUrlPatterns: obj.TargetUrlPatterns || null });
 	};
 } ());
