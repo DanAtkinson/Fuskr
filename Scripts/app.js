@@ -77,7 +77,7 @@
 
 		this.scrollTo = function(eID) {
 
-			// This scrolling function 
+			// This scrolling function
 			// is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
 
 			var startY = currentYPosition();
@@ -136,5 +136,6 @@
 
 	app.run(function($rootScope, helpers) {
 		$rootScope.manifestName = helpers.translate("ManifestName", "");
+		$rootScope.manifestLanguage = helpers.translate("ManifestLanguage", "");
 	});
 }());
