@@ -35,6 +35,25 @@
 			</figcaption>
 		</figure>
 	</div>
+	<div class="info">
+		<p>{{ originalUrl }}</p>
+		<ul class="linklist totals">
+			<li><span ng-pluralize count="images.length" when="pluraliseForImages('Images')"></span></li>
+			<li><span ng-pluralize count="totalSuccess()" when="pluraliseForImages('Loaded')"></span></li>
+			<li ng-show="totalFailed() > 0"><span ng-pluralize count="totalFailed()" when="pluraliseForImages('Failed')"></span></li>
+			<li ng-show="isFinishedLoading()"><strong>{{ 'Done' | translate }}</strong></li>
+		</ul>
+		<ul class="linklist nav">
+			<li ng-show="isFinishedLoading() && totalSuccess() > 0"><a ng-click="download()">{{ 'DownloadImages' | translate }}</a></li>
+			<li ng-show="totalFailed() > 0"><a ng-click="showBrokenImages=!showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
+			<li ng-show="totalSuccess() > 0">
+				<a ng-click="fullWidthImages=!fullWidthImages">
+					{{  fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
+				</a>
+			</li>
+			<li ng-show="totalSuccess() > 0"><a ng-click="showViewer=!showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
+		</ul>
+	</div>
 </div>
 <div id="viewer" ng-show="showViewer">
 	<div class="viewerItem modal"></div>
