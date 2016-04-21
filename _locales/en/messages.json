@@ -7,7 +7,7 @@
         "message": "Create photo galleries from a single image based on the image name.",
         "description": "The description of the application, displayed in the web store."
     },
-    "Language": {
+    "ManifestLanguage": {
         "message": "en",
         "description": "The BCP-47 language code."
     },
