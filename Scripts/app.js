@@ -16,43 +16,36 @@
 		};
 	});
 
-	app.service('fuskrService', function() {
+	app.service('fuskrService', function($http) {
 		this.getLinks = function(url) {
 			return Fuskr.GetLinks(url).map(function(url, i) {
-				return {
+				var imageItem =  {
 					url: url,
 					loaded: false,
 					success: false,
-					active: (i == 0)
+					active: (i == 0),
+					src: null
 				}
+
+				$http({
+				    url: imageItem.url,
+				    responseType: 'blob',
+				    method: 'GET',
+				})
+				.then(function(response){
+					imageItem.success = (response.status >= 200 && response.status <400);
+					imageItem.loaded = true;
+					imageItem.src = (response.data) ? URL.createObjectURL(response.data) : null;
+					imageItem.data = response.data;
+				}, function(){
+					imageItem.success = false;
+					imageItem.loaded = true;
+				})
+
+				return imageItem;
 			});
 		}
 	});
-
-	app.directive('imageonload', function() {
-		return {
-			restrict: 'A',
-			scope: {
-				ngModel: '='
-			},
-			require: 'ngModel',
-			link: function(scope, element, attrs, ngModel) {
-				element.bind('load', function() {
-					scope.$apply(function() {
-						ngModel.$viewValue.success = true;
-						ngModel.$viewValue.loaded = true;
-					});
-				});
-				element.bind('error', function() {
-					scope.$apply(function() {
-						ngModel.$viewValue.success = false;
-						ngModel.$viewValue.loaded = true;
-					});
-				});
-			}
-		};
-	});
-
 
 	app.service('helpers', function(translateFilter) {
 

@@ -67,6 +67,7 @@
 		$scope.shouldDisplayImage = shouldDisplayImage;
 		$scope.scrollToAnchor = scrollToAnchor;
 		$scope.download = download;
+		$scope.downloadZip = downloadZip;
 
 		$document.bind('keydown', keyboardBinding);
 
@@ -133,5 +134,21 @@
 				}
 			});
 		};
+
+		function downloadZip(){
+			var zip = new JSZip();
+			zip.file("Fuskr.txt", "These images were downloaded using Fuskr.\r\n\r\nFusk URL: " + $rootScope.originalUrl);
+
+			var validImages = $scope.images.filter(x => x.loaded && x.success);
+
+			validImages.forEach(function(img){
+				zip.file(img.url.split('/').pop(), img.data, {blob: true});
+			})
+
+			zip.generateAsync({type:"blob"})
+			.then(function(content) {
+				saveAs(content, "fuskr.zip");
+			});
+         }
 	});
 }());

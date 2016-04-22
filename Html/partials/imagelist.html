@@ -9,6 +9,7 @@
 		</ul>
 		<ul class="linklist nav">
 			<li ng-show="isFinishedLoading() && totalSuccess() > 0"><a ng-click="download()">{{ 'DownloadImages' | translate }}</a></li>
+			<li ng-show="isFinishedLoading() && totalSuccess() > 0"><a ng-click="downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
 			<li ng-show="totalFailed() > 0"><a ng-click="showBrokenImages=!showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
 			<li ng-show="totalSuccess() > 0">
 				<a ng-click="fullWidthImages=!fullWidthImages">
@@ -21,7 +22,7 @@
 	<div class="wrap" ng-repeat="image in (filteredImages = (images | filter: shouldDisplayImage(image)))" ng-show="image.loaded || image.success">
 		<figure>
 			<a id="image{{ $index }}" ng-click="scrollToAnchor('image' + ($index+1), $index+1)">
-				<img class="fuskImage" ng-src="{{ image.url }}" ng-model="image" imageonload>
+				<img class="fuskImage" ng-src="{{ image.src }}" ng-model="image">
 			</a>
 			<figcaption ng-hide="hideDetails">
 				<a ng-href="{{ image.url }}" target="_blank" class="imageLink">{{ image.url }}</a>
