@@ -36,6 +36,7 @@
 					imageItem.success = (response.status >= 200 && response.status <400);
 					imageItem.loaded = true;
 					imageItem.src = (response.data) ? URL.createObjectURL(response.data) : null;
+					imageItem.data = response.data;
 				}, function(){
 					imageItem.success = false;
 					imageItem.loaded = true;

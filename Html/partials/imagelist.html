@@ -9,6 +9,7 @@
 		</ul>
 		<ul class="linklist nav">
 			<li ng-show="isFinishedLoading() && totalSuccess() > 0"><a ng-click="download()">{{ 'DownloadImages' | translate }}</a></li>
+			<li ng-show="isFinishedLoading() && totalSuccess() > 0"><a ng-click="downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
 			<li ng-show="totalFailed() > 0"><a ng-click="showBrokenImages=!showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
 			<li ng-show="totalSuccess() > 0">
 				<a ng-click="fullWidthImages=!fullWidthImages">
