@@ -21,7 +21,7 @@
 	<div class="wrap" ng-repeat="image in (filteredImages = (images | filter: shouldDisplayImage(image)))" ng-show="image.loaded || image.success">
 		<figure>
 			<a id="image{{ $index }}" ng-click="scrollToAnchor('image' + ($index+1), $index+1)">
-				<img class="fuskImage" ng-src="{{ image.url }}" ng-model="image" imageonload>
+				<img class="fuskImage" ng-src="{{ image.src }}" ng-model="image">
 			</a>
 			<figcaption ng-hide="hideDetails">
 				<a ng-href="{{ image.url }}" target="_blank" class="imageLink">{{ image.url }}</a>
