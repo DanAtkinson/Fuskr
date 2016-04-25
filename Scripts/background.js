@@ -30,9 +30,17 @@
 		decMenuId = createContextMenu({Id: parentId, Title: "-", Context: ["image", "video", "audio", "link"], TargetUrlPatterns: targetUrls });
 
 		for (i = 0; i < numbers.length; i++) {
-			ids.push([createContextMenu({Id: incDecMenuId, Title: numbers[i], Context: ["image", "video", "audio", "link"], OnclickCallback: choiceOnClick }), 0, numbers[i]]);
-			ids.push([createContextMenu({Id: incMenuId, Title: numbers[i], Context: ["image", "video", "audio", "link"], OnclickCallback: choiceOnClick }), 1, numbers[i]]);
-			ids.push([createContextMenu({Id: decMenuId, Title: numbers[i], Context: ["image", "video", "audio", "link"], OnclickCallback: choiceOnClick }), -1, numbers[i]]);
+			ids.push([createContextMenu({Id: incDecMenuId, Title: numbers[i], Context: ["image", "link"], OnclickCallback: imageChoiceOnClick }), 0, numbers[i]]);
+			ids.push([createContextMenu({Id: incDecMenuId, Title: numbers[i], Context: ["video"], OnclickCallback: videoChoiceOnClick }), 0, numbers[i]]);
+			ids.push([createContextMenu({Id: incDecMenuId, Title: numbers[i], Context: ["audio"], OnclickCallback: audioChoiceOnClick }), 0, numbers[i]]);
+
+			ids.push([createContextMenu({Id: incMenuId, Title: numbers[i], Context: ["image", "link"], OnclickCallback: imageChoiceOnClick }), 1, numbers[i]]);
+			ids.push([createContextMenu({Id: incMenuId, Title: numbers[i], Context: ["video"], OnclickCallback: videoChoiceOnClick }), 1, numbers[i]]);
+			ids.push([createContextMenu({Id: incMenuId, Title: numbers[i], Context: ["audio"], OnclickCallback: audioChoiceOnClick }), 1, numbers[i]]);
+
+			ids.push([createContextMenu({Id: decMenuId, Title: numbers[i], Context: ["image", "link"], OnclickCallback: imageChoiceOnClick }), -1, numbers[i]]);
+			ids.push([createContextMenu({Id: decMenuId, Title: numbers[i], Context: ["video"], OnclickCallback: videoChoiceOnClick }), -1, numbers[i]]);
+			ids.push([createContextMenu({Id: decMenuId, Title: numbers[i], Context: ["audio"], OnclickCallback: audioChoiceOnClick }), -1, numbers[i]]);
 		}
 
 		createContextMenu({Id: parentId, Context: ["image", "video", "audio", "link"], ItemType: "separator" });
@@ -134,7 +142,7 @@
 	}
 
 	function optionsOnClick (info, tab) {
-		chrome.tabs.create({ url:"/Html/options.htm", index: (tab.index + 1) });
+		chrome.runtime.openOptionsPage();
 	}
 
 	function helpOnClick (info, tab) {
@@ -279,9 +287,30 @@
 		return openInForeground != 0;
 	}
 
-	function choiceOnClick(info, tab) {
+	function imageChoiceOnClick (info, tab) {
+		choiceOnClick(0, info, tab);
+	}
+	function videoChoiceOnClick (info, tab) {
+		choiceOnClick(1, info, tab);
+	}
+	function audioChoiceOnClick (info, tab) {
+		choiceOnClick(2, info, tab);
+	}
+	function choiceOnClick(type, info, tab) {
 		var count = 0, direction = 0, imageUrl = "", response = "", findDigitsRegexp, digitsCheck;
 		findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+
+		switch (type) {
+			case 0:
+				//image
+				break;
+			case 1:
+				//video
+				break;
+			case 2:
+				//audio
+				break;
+		}
 
 		if (info.linkUrl !== null) {
 			digitsCheck = findDigitsRegexp.exec(info.linkUrl);
