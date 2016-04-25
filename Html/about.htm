@@ -1,0 +1,106 @@
+3<!doctype html>
+<html lang="{{manifestLanguage}}" ng-app="fuskrApp">
+	<head>
+		<title>{{manifestName}} - {{ pageTitle }}</title>
+		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+		<!--<link rel="stylesheet" href="/Styles/options.css" type="text/css">
+		<link rel="stylesheet" href="/Scripts/vendor/popeye.min.css" type="text/css">-->
+		<script type="text/javascript" src="/Scripts/vendor/angular.min.js"></script>
+		<script type="text/javascript" src="/Scripts/vendor/angular-ui-router.min.js"></script>
+		<script type="text/javascript" src="/Scripts/vendor/popeye.min.js"></script>
+		<script type="text/javascript" src="/Scripts/app.js"></script>
+		<script type="text/javascript" src="/Scripts/options.js"></script>
+	</head>
+	<body>
+		<div id="sidebar">
+			<h1 id="settings-label">{{ 'Tab_Settings' | translate:'Options' }}</h1>
+			<div id="tab-container">
+				<div class="tab" ui-sref-active="active" ui-sref="OptionsForeground">{{ 'Tab_Foreground' | translate:'Options' }}</div>
+				<div class="tab" ui-sref-active="active" ui-sref="OptionsHistory">{{ 'Tab_History' | translate:'Options' }}</div>
+				<div class="tab" ui-sref-active="active" ui-sref="OptionsVersionHistory">{{ 'Tab_VersionHistory' | translate:'Options' }}</div>
+				<div class="tab" ui-sref-active="active" ui-sref="OptionsAbout">{{ 'Tab_About' | translate:'Options' }}</div>
+			</div>
+		</div>
+
+		<div id="content">
+			<div id="main">
+				<div class="tab-content show">
+					<div ui-view />
+				</div>
+			</div>
+		</div>
+
+		<script type="text/ng-template" id="/Html/partials/options-foreground.html">
+			<h2>{{ 'Tab_Foreground' | translate:'Options' }}</h2>
+			<table class="setting group">
+				<tr>
+					<td class="setting group-content">
+						<div class="setting bundle text">
+							<div class="setting container text">
+								<label>
+									<input type="checkbox" ng-model="openInForeground" ng-change="saveToStorage('openInForeground',openInForeground)" />
+									{{ 'OpenNewFusksInForeground' | translate:'Options' }}
+								</label>
+								<div class="setting container text">
+									<p class="setting element description" ng-bind-html="'OpenNewFusksInForeground_Default' | translateHtml:'Options'"></p>
+									<p class="setting element description">{{ 'OpenNewFusksInForeground_Description' | translateHtml:'Options' }}</p>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</script>
+
+		<script type="text/ng-template" id="/Html/partials/options-history.html">
+			<h2>{{ 'Tab_History' | translate:'Options' }}</h2>
+			<table class="setting group">
+				<tr>
+					<td class="setting group-content">
+						<div class="setting bundle text">
+							<div class="setting container text">
+								<label>
+									<input type="checkbox" ng-model="keepRecentFusks" ng-change="saveToStorage('keepRecentFusks',keepRecentFusks)" />
+									{{ 'History_Keep' | translate:'Options' }}
+								</label>
+								<div ng-bind-html="'History_Keep_Default' | translateHtml:'Options'"></div>
+								<div ng-hide="history.length > 0">
+									{{ 'History_NoRecent' | translate:'Options' }}
+								</div>
+								<div ng-show="history.length > 0">
+									<div ng-bind-html="'History_Keep_Limit' | translateHtml:'Options'"></div>
+									<select size="10" id="recentFusks">
+										<option ng-repeat="url in (history | limitTo: 10) track by $index" ng-click="openFusk(url)">{{url}}</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</script>
+
+		<script type="text/ng-template" id="/Html/partials/options-about.html">
+			<h2>{{ 'Tab_About' | translate:'Options' }}</h2>
+			<table class="setting group">
+				<tr>
+					<td class="setting group-content">
+						<div class="setting bundle text">
+							<div class="setting container text" ng-bind-html="'About_Description' | translateHtml:'Options'">
+							</div>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</script>
+
+		<footer id="credits">
+			<h2>{{ 'Credits_Title' | translate:'Options' }} </h2>
+			<div id="logo">
+				<img src="/images/128x128.png" alt="{{ 'Fuskr' | translate:'Options' }}" />
+			</div>
+			<div id="info" ng-bind-html="'Credits_Description' | translateHtml:'Options'">
+			</div>
+		</footer>
+	</body>
+</html>
