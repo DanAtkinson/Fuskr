@@ -1,0 +1,32 @@
+{
+  "name": "Fuskr",
+  "description": "[![Join the chat at https://gitter.im/DanAtkinson/Fuskr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DanAtkinson/Fuskr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)",
+  "version": "3.2.0",
+  "main": "index.htm",
+  "dependencies": {
+    "FileSaver": "^0.10.0",
+    "angular": "^1.5.5",
+    "angular-md5": "^0.1.10",
+    "angular-popeye": "^1.0.5",
+    "grunt": "^1.0.1",
+    "jszip": "^3.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DanAtkinson/Fuskr.git"
+  },
+  "keywords": [
+    "image",
+    "slideshow"
+  ],
+  "author": "Dan Atkinson and Jonathon Bolster",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanAtkinson/Fuskr/issues"
+  },
+  "homepage": "https://github.com/DanAtkinson/Fuskr"
+}
