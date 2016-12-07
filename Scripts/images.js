@@ -1,34 +1,41 @@
-;(function() {
+/*global angular,chrome*/
+(function () {
+	"use strict";
 
 	var app = angular.module('fuskrApp');
 
-	app.config(function($stateProvider, $urlRouterProvider) {
+	app.config(function ($stateProvider, $urlRouterProvider) {
 
 		$stateProvider
 			.state('main', {
 				url: "/fusk/{path:.*}",
 				templateUrl: "/Html/partials/imagelist.html",
 				controller: "ImageListController",
-				onEnter: function($rootScope, $stateParams) {
+				onEnter: function ($rootScope, $stateParams) {
 					$rootScope.pageTitle = $stateParams.path.replace(/(https*:)*\/\/(www\.)*/i, "");
 					$rootScope.originalUrl = $stateParams.path;
 				},
 				resolve: {
-					images: function(fuskrService, $stateParams) {
+					images: function (fuskrService, $stateParams) {
 						return fuskrService.getLinks($stateParams.path);
 					}
 				}
 			});
 	});
 
-	app.controller('ImageDownloadController', function($scope, images, helpers) {
-		$scope.conflictResolution = helpers.getStorage('conflictResolution', 'uniquify');
-		$scope.downloadAll = downloadAll;
+	app.controller('ImageDownloadController', function ($scope, images, helpers) {
+		// TODO: Replace this with a directive to auto-save to storage
+		function saveToStorage(name, value) {
+			if (typeof value === "boolean") {
+				value = value ? 1 : 0;
+			}
+			helpers.setStorage(name, value);
+		}
 
 		function downloadAll() {
 			saveToStorage('conflictResolution', $scope.conflictResolution);
 
-			images.forEach(function(image) {
+			images.forEach(function (image) {
 				chrome.downloads.download({
 					url: image.url,
 					conflictAction: $scope.conflictResolution
@@ -38,14 +45,11 @@
 			$scope.$close();
 		}
 
-		// TODO: Replace this with a directive to auto-save to storage
-		function saveToStorage(name, value) {
-			if (typeof(value) == "boolean") value = value ? 1 : 0;
-			helpers.setStorage(name, value);
-		}
+		$scope.downloadAll = downloadAll;
+		$scope.conflictResolution = helpers.getStorage('conflictResolution', 'uniquify');
 	});
 
-	app.controller('ImageListController', function($document, $rootScope, $scope, helpers, images, Popeye) {
+	app.controller('ImageListController', function ($document, $rootScope, $scope, helpers, images, Popeye) {
 
 		// An array of image objects
 		$scope.images = images;
@@ -81,7 +85,7 @@
 		};
 
 		function shouldDisplayImage() {
-			return function(img) {
+			return function (img) {
 				return !img.loaded || img.success || $scope.showBrokenImages;
 			};
 		}
@@ -99,21 +103,21 @@
 				case 37:
 					/* Left */
 					e.preventDefault();
-					$scope.$apply(function() {
+					$scope.$apply(function () {
 						scrollToAnchor(false ? null : 'image' + ($scope.selectedImageId - 1), $scope.selectedImageId - 1)
 					});
 					break;
 				case 39:
 					/* Right */
 					e.preventDefault();
-					$scope.$apply(function() {
+					$scope.$apply(function () {
 						scrollToAnchor(false ? null : 'image' + ($scope.selectedImageId + 1), $scope.selectedImageId + 1)
 					});
 					break;
 				case 27:
 					/* Escape */
 					e.preventDefault();
-					$scope.$apply(function() {
+					$scope.$apply(function () {
 						$scope.showViewer = !$scope.showViewer;
 					});
 					break;
@@ -128,7 +132,7 @@
 				templateUrl: "/Html/partials/download.html",
 				controller: "ImageDownloadController",
 				resolve: {
-					images: function($http) {
+					images: function ($http) {
 						return validImages;
 					}
 				}
@@ -141,14 +145,14 @@
 
 			var validImages = $scope.images.filter(x => x.loaded && x.success);
 
-			validImages.forEach(function(img){
+			validImages.forEach(function (img){
 				zip.file(img.url.split('/').pop(), img.data, {blob: true});
 			})
 
 			zip.generateAsync({type:"blob"})
-			.then(function(content) {
+			.then(function (content) {
 				saveAs(content, "fuskr.zip");
 			});
-         }
+		}
 	});
 }());

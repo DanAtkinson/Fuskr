@@ -2,6 +2,7 @@
 	"manifest_version": 2,
 	"name": "__MSG_ManifestName__",
 	"description": "__MSG_ManifestDescription__",
+	"author": "Dan Atkinson, Jonathon Bolster, and Richard Stelmach",
 	"version": "3.2",
 	"default_locale": "en_GB",
 	"omnibox": { "keyword" : "fuskr" },
@@ -20,7 +21,9 @@
 		"http://*/*",
 		"https://*/*",
 		"contextMenus",
-		"activeTab"
+		"activeTab",
+		"history",
+		"storage"
 	],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
 	"homepage_url": "http://danatkinson.github.io/Fuskr/",

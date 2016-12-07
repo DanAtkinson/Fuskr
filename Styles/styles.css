@@ -24,9 +24,9 @@ a, a:hover, a:visited{
 
 
 button.download {
-    margin: .5em .4em .5em 0;
-    float: right;
-    padding: 5px;
+	margin: .5em .4em .5em 0;
+	float: right;
+	padding: 5px;
 }
 
 #content.fullwidth img{
@@ -38,10 +38,10 @@ button.download {
 }
 
 .code{
-    font-family:Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
-    background-color:#eee;
-    white-space:pre-wrap;
-    padding:1px 5px 1px 5px;
+	font-family:Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+	background-color:#eee;
+	white-space:pre-wrap;
+	padding:1px 5px 1px 5px;
 }
 
 .info{
@@ -91,13 +91,13 @@ button.download {
 #viewer .close
 {
 	color: #fff;
-    font-size: 30px;
-    display: block;
-    z-index: 101;
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    cursor: pointer;
+	font-size: 30px;
+	display: block;
+	z-index: 101;
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	cursor: pointer;
 }
 
 #viewer .close:hover

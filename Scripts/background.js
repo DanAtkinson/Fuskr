@@ -1,4 +1,7 @@
-(function() {
+/*global module,chrome,l18nify*/
+(function () {
+	"use strict";
+
 	var i = 0,
 		ids = [],
 		recentId = 0,
@@ -9,14 +12,15 @@
 		numbers = [l18nify("ContextMenu_10"), l18nify("ContextMenu_20"), l18nify("ContextMenu_50"), l18nify("ContextMenu_100"), l18nify("ContextMenu_200"), l18nify("ContextMenu_500"), l18nify("ContextMenu_Other")];
 
 	//Target urls tell Chrome what urls are acceptable.
-	targetUrls = (function() {
-		var targetUrls = [];
+	targetUrls = (function () {
+		var i, targetUrls;
+		targetUrls = [];
 		//Create regex patterns to match only urls that contain numbers
-		for (var i = 0; i <= 9; i++) {
+		for (i = 0; i <= 9; i++) {
 			targetUrls.push('*://*/*' + i + '*');
 		}
 		return targetUrls;
-	})();
+	}());
 
 	(function () {
 		var incDecMenuId, incMenuId, decMenuId, numbers = [l18nify("ContextMenu_10"), l18nify("ContextMenu_20"), l18nify("ContextMenu_50"), l18nify("ContextMenu_100"), l18nify("ContextMenu_200"), l18nify("ContextMenu_500"), l18nify("ContextMenu_Other")];
@@ -390,4 +394,4 @@
 	function createContextMenu(obj) {
 		return chrome.contextMenus.create({ parentId: obj.Id, title: obj.Title, contexts: obj.Context || ["all"], type: obj.ItemType || "normal", onclick: obj.OnclickCallback || null, targetUrlPatterns: obj.TargetUrlPatterns || null });
 	};
-} ());
+}());
