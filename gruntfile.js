@@ -136,6 +136,7 @@
 							nonull: true,
 							flatten: true,
 							src: ['dist/css/app_all_*'],
+							dest: 'dist/css/',
 							filter: 'isFile'
 						}
 					]
