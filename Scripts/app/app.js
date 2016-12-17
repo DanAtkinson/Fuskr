@@ -1,4 +1,4 @@
-;(function() {
+(function() {
 	var app = angular.module('fuskrApp', ['ui.router', 'pathgather.popeye']);
 
 	app.filter('translate', function() {

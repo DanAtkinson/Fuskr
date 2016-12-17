@@ -1,15 +1,10 @@
-3<!doctype html>
+<!doctype html>
 <html lang="{{manifestLanguage}}" ng-app="fuskrApp">
 	<head>
 		<title>{{manifestName}} - {{ pageTitle }}</title>
 		<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
 		<link rel="stylesheet" href="/Styles/options.css" type="text/css">
-		<link rel="stylesheet" href="/Scripts/vendor/popeye.min.css" type="text/css">
-		<script type="text/javascript" src="/Scripts/vendor/angular.min.js"></script>
-		<script type="text/javascript" src="/Scripts/vendor/angular-ui-router.min.js"></script>
-		<script type="text/javascript" src="/Scripts/vendor/popeye.min.js"></script>
-		<script type="text/javascript" src="/Scripts/app.js"></script>
-		<script type="text/javascript" src="/Scripts/options.js"></script>
+		<link rel="stylesheet" href="/Styles/vendor.min.css" type="text/css">
 	</head>
 	<body>
 		<div id="sidebar">
@@ -102,5 +97,7 @@
 			<div id="info" ng-bind-html="'Credits_Description' | translateHtml:'Options'">
 			</div>
 		</footer>
+        <script type="text/javascript" src="/Scripts/vendor.min.js"></script>
+        <script type="text/javascript" src="/Scripts/app.min.js"></script>
 	</body>
 </html>

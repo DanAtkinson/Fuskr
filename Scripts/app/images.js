@@ -58,9 +58,25 @@
 		$scope.fullWidthImages = false;
 
 		// Lambda functions
-		$scope.totalSuccess = () => $scope.images.map(x => x.loaded && x.success ? 1 : 0).reduce((a, b) => a + b);
-		$scope.totalFailed = () => $scope.images.map(x => x.loaded && !x.success ? 1 : 0).reduce((a, b) => a + b);
-		$scope.isFinishedLoading = () => $scope.images.every(x => x.loaded);
+		$scope.totalSuccess = function () {
+            return $scope.images.map(function(x){
+                return x.loaded && x.success ? 1 : 0;
+            }).reduce(function (a, b) {
+                return a + b;
+            },0);
+        };
+
+		$scope.totalFailed = function () {
+            return $scope.images.map(function(x){
+                return x.loaded && !x.success ? 1 : 0;
+            }).reduce(function (a, b) {
+                return a + b;
+            }, 0);
+        };
+
+		$scope.isFinishedLoading = function () {
+            return $scope.images.every(function(x){ return x.loaded; });
+        };
 
 		// Scoped functions
 		$scope.pluraliseForImages = pluraliseForImages;
@@ -122,7 +138,9 @@
 
 		function download() {
 
-			var validImages = $scope.images.filter(x => x.loaded && x.success);
+			var validImages = $scope.images.filter(function (x){
+                return x.loaded && x.success;
+            });
 
 			var modal = Popeye.openModal({
 				templateUrl: "/Html/partials/download.html",
@@ -139,7 +157,9 @@
 			var zip = new JSZip();
 			zip.file("Fuskr.txt", "These images were downloaded using Fuskr.\r\n\r\nFusk URL: " + $rootScope.originalUrl);
 
-			var validImages = $scope.images.filter(x => x.loaded && x.success);
+			var validImages = $scope.images.filter(function (x){
+                return x.loaded && x.success;
+            });
 
 			validImages.forEach(function(img){
 				zip.file(img.url.split('/').pop(), img.data, {blob: true});

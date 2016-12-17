@@ -1,0 +1,9 @@
+{
+    preset: "airbnb",
+
+    requireTrailingComma: false,
+    validateIndentation: 4,
+    maximumLineLength: 1000,
+    disallowMultipleVarDecl: false,
+    requirePaddingNewLinesAfterBlocks: false
+}
