@@ -47,11 +47,11 @@ module.exports = function (grunt) {
                     'LICENCE',
                     '_locales/**/*'
                 ]
-            },
+            }
         },
         sasslint: {
             options: {
-                configFile: '.sass-lint.yml',
+                configFile: '.sass-lint.yml'
             },
             main: ['<%= config.styles.src %>']
         },
@@ -181,7 +181,7 @@ module.exports = function (grunt) {
             tests: {
                 files: ['Tests/**/*.spec.js'],
                 tasks: ['karma:release']
-            },
+            }
         },
         concurrent: {
             dev: {
