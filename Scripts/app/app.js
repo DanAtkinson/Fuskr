@@ -1,134 +1,145 @@
-(function() {
-	var app = angular.module('fuskrApp', ['ui.router', 'pathgather.popeye']);
+/* jshint undef: false */
+/*globals angular, chrome, Fuskr, URL, pageYOffset */
+(function () {
+    "use strict";
 
-	app.filter('translate', function() {
-		return function(name, base) {
-			base = typeof(base) == "undefined" ? "Images_" : (base === "" ? "" : base + "_");
-			return chrome && chrome.i18n && chrome.i18n.getMessage(base + name) || (base + name);
-		};
-	});
+    var app = angular.module('fuskrApp', ['ui.router', 'pathgather.popeye']);
 
-	app.filter('translateHtml', function($sce) {
-		return function(name, base) {
-			base = typeof(base) == "undefined" ? "Images_" : (base === "" ? "" : base + "_");
-			var translation = chrome && chrome.i18n && chrome.i18n.getMessage(base + name) || (base + name);
-			return $sce.trustAsHtml(translation);
-		};
-	});
+    app.filter('translate', function () {
+        return function (name, base) {
+            base = typeof base === "undefined" ? "Images_" : (base === "" ? "" : base + "_");
+            return chrome && chrome.i18n && (chrome.i18n.getMessage(base + name) || (base + name));
+        };
+    });
 
-	app.service('fuskrService', function($http) {
-		this.getLinks = function(url) {
-			return Fuskr.GetLinks(url).map(function(url, i) {
-				var imageItem =  {
-					url: url,
-					loaded: false,
-					success: false,
-					active: (i == 0),
-					src: null
-				}
+    app.filter('translateHtml', function ($sce) {
+        return function (name, base) {
+            base = typeof base === "undefined" ? "Images_" : (base === "" ? "" : base + "_");
+            var translation = chrome && chrome.i18n && (chrome.i18n.getMessage(base + name) || (base + name));
+            return $sce.trustAsHtml(translation);
+        };
+    });
 
-				$http({
-				    url: imageItem.url,
-				    responseType: 'blob',
-				    method: 'GET',
-				})
-				.then(function(response){
-					imageItem.success = (response.status >= 200 && response.status <400);
-					imageItem.loaded = true;
-					imageItem.src = (response.data) ? URL.createObjectURL(response.data) : null;
-					imageItem.data = response.data;
-				}, function(){
-					imageItem.success = false;
-					imageItem.loaded = true;
-				})
+    app.service('fuskrService', function ($http) {
+        this.getLinks = function (url) {
+            return Fuskr.GetLinks(url).map(function (url, i) {
+                var imageItem = {
+                    url: url,
+                    loaded: false,
+                    success: false,
+                    active: (i === 0),
+                    src: null
+                };
 
-				return imageItem;
-			});
-		}
-	});
+                $http({
+                    url: imageItem.url,
+                    responseType: 'blob',
+                    method: 'GET'
+                }).then(function (response) {
+                    imageItem.success = (response.status >= 200 && response.status < 400);
+                    imageItem.loaded = true;
+                    imageItem.src = (response.data) ? URL.createObjectURL(response.data) : null;
+                    imageItem.data = response.data;
+                }, function () {
+                    imageItem.success = false;
+                    imageItem.loaded = true;
+                });
 
-	app.service('helpers', function(translateFilter) {
+                return imageItem;
+            });
+        };
+    });
 
-		this.getStorage = function(name, defaultValue) {
-			var value = localStorage.getItem(name);
+    app.service('helpers', function (translateFilter) {
 
-			if ((typeof(value) === "undefined" || value === null) && typeof(defaultValue) !== "undefined") {
-				value = defaultValue;
-				this.setStorage(name, value);
-			}
+        this.getStorage = function (name, defaultValue) {
+            var value = localStorage.getItem(name);
 
-			return value;
-		}
+            if ((typeof value === "undefined" || value === null) && typeof defaultValue !== "undefined") {
+                value = defaultValue;
+                this.setStorage(name, value);
+            }
 
-		this.setStorage = function(name, value) {
-			localStorage.setItem(name, value);
-		}
+            return value;
+        };
 
-		this.translate = function(base, text) {
-			return translateFilter(base, text);
-		}
+        this.setStorage = function (name, value) {
+            localStorage.setItem(name, value);
+        };
 
-		this.scrollTo = function(eID) {
+        this.translate = function (base, text) {
+            return translateFilter(base, text);
+        };
 
-			// This scrolling function
-			// is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
+        this.scrollTo = function (eID) {
 
-			var startY = currentYPosition();
-			var stopY = elmYPosition(eID);
-			var distance = stopY > startY ? stopY - startY : startY - stopY;
-			if (distance < 100) {
-				scrollTo(0, stopY);
-				return;
-			}
-			var speed = Math.round(distance / 100);
-			if (speed >= 20) speed = 20;
-			var step = Math.round(distance / 25);
-			var leapY = stopY > startY ? startY + step : startY - step;
-			var timer = 0;
-			if (stopY > startY) {
-				for (var i = startY; i < stopY; i += step) {
-					setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
-					leapY += step;
-					if (leapY > stopY) leapY = stopY;
-					timer++;
-				}
-				return;
-			}
-			for (var i = startY; i > stopY; i -= step) {
-				setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
-				leapY -= step;
-				if (leapY < stopY) leapY = stopY;
-				timer++;
-			}
+            function elmYPosition(eID) {
+                var y, elm, node;
 
-			function currentYPosition() {
-				// Firefox, Chrome, Opera, Safari
-				if (self.pageYOffset) return self.pageYOffset;
-				// Internet Explorer 6 - standards mode
-				if (document.documentElement && document.documentElement.scrollTop)
-					return document.documentElement.scrollTop;
-				// Internet Explorer 6, 7 and 8
-				if (document.body.scrollTop) return document.body.scrollTop;
-				return 0;
-			}
+                elm = document.getElementById(eID);
+                y = elm.offsetTop;
+                node = elm;
+                while (node.offsetParent && node.offsetParent !== document.body) {
+                    node = node.offsetParent;
+                    y += node.offsetTop;
+                }
+                return y;
+            }
 
-			function elmYPosition(eID) {
-				var elm = document.getElementById(eID);
-				var y = elm.offsetTop;
-				var node = elm;
-				while (node.offsetParent && node.offsetParent != document.body) {
-					node = node.offsetParent;
-					y += node.offsetTop;
-				}
-				return y;
-			}
+            // This scrolling function
+            // is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
 
-		};
+            var i,
+                step,
+                timer,
+                speed,
+                leapY,
+                startY = pageYOffset,
+                stopY = elmYPosition(eID),
+                distance = stopY > startY ? stopY - startY : startY - stopY;
 
-	});
+            if (distance < 100) {
+                scrollTo(0, stopY);
+                return;
+            }
 
-	app.run(function($rootScope, helpers) {
-		$rootScope.manifestName = helpers.translate("ManifestName", "");
-		$rootScope.manifestLanguage = helpers.translate("ManifestLanguage", "");
-	});
+            speed = Math.round(distance / 100);
+            if (speed >= 20) {
+                speed = 20;
+            }
+
+            step = Math.round(distance / 25);
+            leapY = stopY > startY ? startY + step : startY - step;
+            timer = 0;
+
+            if (stopY > startY) {
+                for (i = startY; i < stopY; i += step) {
+                    setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
+                    leapY += step;
+                    if (leapY > stopY) {
+                        leapY = stopY;
+                    }
+
+                    timer += 1;
+                }
+                return;
+            }
+            for (i = startY; i > stopY; i -= step) {
+                setTimeout("window.scrollTo(0, " + leapY + ")", timer * speed);
+                leapY -= step;
+                if (leapY < stopY) {
+                    leapY = stopY;
+                }
+
+                timer += 1;
+            }
+
+        };
+
+    });
+
+    app.run(function ($rootScope, helpers) {
+        $rootScope.manifestName = helpers.translate("ManifestName", "");
+        $rootScope.manifestLanguage = helpers.translate("ManifestLanguage", "");
+    });
 }());
