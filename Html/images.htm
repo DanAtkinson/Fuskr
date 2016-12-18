@@ -3,19 +3,13 @@
 <head>
 	<title>{{manifestName}} - {{ pageTitle }}</title>
 	<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
-	<link rel="stylesheet" href="/Scripts/vendor/popeye.min.css" type="text/css">
-	<script type="text/javascript" src="/Scripts/vendor/angular.min.js"></script>
-	<script type="text/javascript" src="/Scripts/vendor/angular-ui-router.min.js"></script>
-	<script type="text/javascript" src="/Scripts/vendor/popeye.min.js"></script>
-	<script type="text/javascript" src="/Scripts/vendor/jszip.min.js"></script>
-	<script type="text/javascript" src="/Scripts/vendor/filesaver.min.js"></script>
-	<script type="text/javascript" src="/Scripts/fuskr.js"></script>
-	<script type="text/javascript" src="/Scripts/app.js"></script>
-	<script type="text/javascript" src="/Scripts/images.js"></script>
+	<link rel="stylesheet" href="/Styles/vendor.min.css" type="text/css">
 </head>
 <body>
 	<div id="top"></div>
 	<div ui-view></div>
 	<div id="bottom"></div>
+    <script type="text/javascript" src="/Scripts/vendor.min.js"></script>
+    <script type="text/javascript" src="/Scripts/app.min.js"></script>
 </body>
 </html>

@@ -1,0 +1,161 @@
+html{
+	background-color:#FFF;
+	border:0;
+	color:#222222;
+	cursor:default;
+	font-family:"Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size:14px;
+	margin:0;
+	padding:0;
+	text-align:center;
+}
+
+img{
+	border:0px;
+	margin:auto;
+	margin-bottom:4px;
+}
+
+a, a:hover, a:visited{
+	color:#b33c04;
+	cursor:pointer;
+	text-decoration:none;
+}
+
+
+button.download {
+    margin: .5em .4em .5em 0;
+    float: right;
+    padding: 5px;
+}
+
+#content.fullwidth img{
+	width: auto;
+}
+
+#content.fullwidth img.fuskImage{
+	width: 100%;
+}
+
+.code{
+    font-family:Consolas,Menlo,Monaco,Lucida Console,Liberation Mono,DejaVu Sans Mono,Bitstream Vera Sans Mono,Courier New,monospace,sans-serif;
+    background-color:#eee;
+    white-space:pre-wrap;
+    padding:1px 5px 1px 5px;
+}
+
+.info{
+	background:#FFF url(/Images/128x128.png) no-repeat left top;
+	padding-left:130px;
+	text-align:left;
+	min-height:128px;
+	padding-top:10px;
+	clear: both;
+}
+
+	div#bottom{
+		clear:both;
+		padding-top:20px;
+	}
+
+	div.rating{
+		border:1px solid #ccc;
+		clear:both;
+		margin:0 auto;
+		padding:20px 0;
+		width:500px;
+	}
+
+	.wrap{
+		border:1px solid #ccc;
+		float:left;
+		margin:7px;
+		padding:3px;
+		text-align:center;
+	}
+
+#dialogs{
+	display:none;
+}
+
+	.dialog-form {
+		margin:20px 0;
+		text-align:left;
+		width:350px;
+	}
+
+	input#saveName {
+		width:500px;
+	}
+
+#viewer .close
+{
+	color: #fff;
+    font-size: 30px;
+    display: block;
+    z-index: 101;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+}
+
+#viewer .close:hover
+{
+	color: #ccc;
+}
+
+.viewerItem
+{
+	top: 0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	position: fixed;
+	z-index: 100;
+}
+
+.viewerItem a
+{
+	display:block;
+	width:100%;
+	height:100%;
+	background-repeat: no-repeat;
+	background-size: contain;
+}
+
+.viewerItem.small
+{
+	top: 10%;
+	bottom: 10%;
+	z-index: 99;
+	opacity: 0.2;
+}
+
+.viewerItem.modal
+{
+	background-color: #000;
+	z-index:98;
+}
+
+ul.totals {
+	font-weight: bold;
+}
+
+ul.linklist {
+	padding:0;
+}
+
+ul.linklist li {
+	display: inline;
+	padding-right: 5px;
+}
+
+ul.linklist li~li {
+	border-left: 1px solid #000000;
+	padding-left:5px;
+}
+
+.viewerItem.current a { background-position: 50% 50%; }
+.viewerItem a.previousImage { background-position: 35% 50%; }
+.viewerItem a.nextImage { background-position: 65% 50%; }

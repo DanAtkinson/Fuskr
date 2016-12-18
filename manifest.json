@@ -7,8 +7,7 @@
 	"omnibox": { "keyword" : "fuskr" },
 	"background": {
 		"scripts": [
-			"Scripts/fuskr.js",
-			"Scripts/background.js"
+			"Scripts/background.min.js"
 		]
 	},
 	"options_page": "Html/options.htm",
