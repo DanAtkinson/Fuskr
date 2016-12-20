@@ -1,6 +1,5 @@
-/*jslint regexp: true */
 var Fuskr = (function (ret) {
-    "use strict";
+    'use strict';
 
     var groupRegex = /\{\d+\}/,
         numericRegex = /^(.*?)\[(\d+)\-(\d+)\](.*)$/,
@@ -11,7 +10,7 @@ var Fuskr = (function (ret) {
         if (!padding) {
             return numStr;
         }
-        
+
         while (numStr.length < stringLength) {
             numStr = padding + numStr;
         }
@@ -62,7 +61,7 @@ var Fuskr = (function (ret) {
             paddedLength = startNumString.length;
 
         while (startNumber <= endNumber) {
-            thisNumString = padString(startNumber, paddedLength, "0");
+            thisNumString = padString(startNumber, paddedLength, '0');
             link = prefix + thisNumString + suffix;
 
             if (groupRegex.test(link)) {

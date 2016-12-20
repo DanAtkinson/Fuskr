@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fuskr Options</title>
+    <link rel="stylesheet" href="/Styles/options.css" type="text/css">
+</head>
+<body data-ng-app="fuskrApp">
+    <div class="option-group">
+        <label>
+            <input id="openInForeground" type="checkbox" data-ng-model="opt.openInForeground" data-ng-change="saveOpenInForeground()" />
+            <span data-ng-bind-html="'OpenNewFusksInForeground' | translate:'Options'"></span>
+        </label>
+        <p class="description" data-ng-bind-html="'OpenNewFusksInForeground_Description' | translate:'Options'"></p>
+    </div>
+    <div class="option-group">
+        <label>
+            <input id="keepRecentFusks" type="checkbox" data-ng-model="opt.keepRecentFusks" data-ng-change="saveKeepRecentFusks()" />
+            <span data-ng-bind-html="'History_Keep' | translate:'Options'"></span>
+        </label>
+        <p data-ng-bind-html="'History_Keep_Description' | translate:'Options'"></p>
+    </div>
+    <div id="status"></div>
+    <button id="save">Save</button>
+
+    <script type="text/javascript" src="/Scripts/vendor.min.js"></script>
+    <script type="text/javascript" src="/Scripts/app.min.js"></script>
+    <script type="text/javascript" src="/Scripts/options.min.js"></script>
+</body>
+</html>
