@@ -10,7 +10,10 @@
 			"Scripts/background.min.js"
 		]
 	},
-	"options_page": "Html/options.htm",
+    "options_ui": {
+       "page": "Html/options.html",
+       "chrome_style": true
+     },
 	"incognito": "split",
 	"omnibox": { "keyword" : "fuskr" },
 	"permissions": [

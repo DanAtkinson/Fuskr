@@ -173,17 +173,14 @@
     "Options_OpenNewFusksInForeground": {
         "message": "Open new fusks in the foreground"
     },
-    "Options_OpenNewFusksInForeground_Default": {
-        "message": "Default option is <em>&quot;enabled&quot;</em>"
-    },
     "Options_OpenNewFusksInForeground_Description": {
         "message": "When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead."
     },
     "Options_History_Keep": {
         "message": "Keep a recent history of fusks"
     },
-    "Options_History_Keep_Default": {
-        "message": "<p>Default option is <em>&quot;enabled&quot;</em>.</p><p>Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery.</p>"
+    "Options_History_Keep_Description": {
+        "message": "Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery."
     },
     "Options_History_Keep_Limit": {
         "message": "<p class='bold'>Last <span class='totalFusks'></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>"
