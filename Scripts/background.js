@@ -82,7 +82,7 @@
     function createRecentMenu() {
         var history, historyArray, historyCount, historyId;
 
-        if (recentId != 0) {
+        if (recentId !== 0) {
             chrome.contextMenus.remove(recentId);
             recentId = 0;
         }
@@ -92,7 +92,7 @@
         historyArray = [];
         historyIds = [];
 
-        if (history == null) {
+        if (history === null) {
             return false;
         }
 
@@ -131,13 +131,13 @@
 
     function manualOnClick(info, tab) {
         var imageUrl, manualCheck, alphabetCheck, url;
-        imageUrl = info.linkUrl != null ? info.linkUrl : info.srcUrl;
+        imageUrl = info.linkUrl !== null ? info.linkUrl : info.srcUrl;
         manualCheck = /\[\d+-\d+\]/;
         alphabetCheck = /\[\w-\w\]/;
         url = prompt(l18nify('Prompt_PleaseEnterTheUrl'), imageUrl);
 
         if (url) {
-            if (manualCheck.exec(url) == null && alphabetCheck.exec(url) == null) {
+            if (manualCheck.exec(url) === null && alphabetCheck.exec(url) === null) {
                 alert(l18nify('Prompt_NotAValidFusk'));
                 return false;
             }
@@ -151,7 +151,7 @@
         url = info.selectionText;
         manualCheck = /\[\d+-\d+\]/;
 
-        if (manualCheck.exec(url) == null) {
+        if (manualCheck.exec(url) === null) {
             alert(l18nify('Prompt_NotAValidFusk'));
             return false;
         }
@@ -161,7 +161,7 @@
 
     function recentOnClick(info, tab) {
         for (i = 0; i < historyIds.length; i++) {
-            if (historyIds[i][0] == info.menuItemId) {
+            if (historyIds[i][0] === info.menuItemId) {
                 createTab(historyIds[i][1], tab);
                 break;
             }
@@ -170,7 +170,7 @@
 
     function savedOnClick(info, tab) {
         for (i = 0; i < savedIds.length; i++) {
-            if (savedIds[i][0] == info.menuItemId) {
+            if (savedIds[i][0] === info.menuItemId) {
                 createTab(savedIds[i][1].url, tab);
                 break;
             }
@@ -186,7 +186,7 @@
     function addUrlToLocalStorage(url, tab) {
         var history, historyArray, tempHistory;
 
-        if (tab.incognito || getRecentFusksOption() == false) {
+        if (tab.incognito || getRecentFusksOption() === false) {
             //As a rule, do not store incognito data in localstorage.
             return false;
         }
@@ -197,7 +197,7 @@
 
         historyArray.push(url);
 
-        if (history != null) {
+        if (history !== null) {
             //Push the rest of the urls onto the pile onto the array
             tempHistory = history.split('||');
             for (i = 0; i < tempHistory.length; i++) {
@@ -222,7 +222,7 @@
     function getRecentFusksOption() {
         var keepRecentFusksVal = localStorage.getItem('keepRecentFusks');
 
-        if (keepRecentFusksVal == null) {
+        if (keepRecentFusksVal === null) {
             return true;
         }
 
@@ -233,7 +233,26 @@
             localStorage.setItem('keepRecentFusks', 1);
         }
 
-        return keepRecentFusks != 0;
+        return keepRecentFusks !== 0;
+    }
+
+    function getOpenInForeground() {
+        var openInForegroundVal, openInForeground;
+
+        openInForegroundVal = localStorage.getItem('openInForeground');
+
+        if (openInForegroundVal === null) {
+            return true;
+        }
+
+        openInForeground = parseInt(openInForegroundVal, 10);
+
+        if (openInForeground !== 0 && openInForeground !== 1) {
+            //Populate the local storage with the default value.
+            localStorage.setItem('openInForeground', 1);
+        }
+
+        return openInForeground !== 0;
     }
 
     function imageChoiceOnClick(info, tab) {
@@ -246,17 +265,24 @@
         choiceOnClick(2, info, tab);
     }
     function choiceOnClick(type, info, tab) {
-        var count = 0, direction = 0, imageUrl = '', response = '', findDigitsRegexp, digitsCheck;
+        var count = 0,
+        direction = 0,
+        imageUrl = '',
+        response = '',
+        url = '',
+        findDigitsRegexp,
+        digitsCheck;
+
         findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
 
         switch (type) {
-        case 0: //image
-        break;
-        case 1: //video
-        break;
-        case 2: //audio
-        break;
-    }
+            case 0: //image
+            break;
+            case 1: //video
+            break;
+            case 2: //audio
+            break;
+        }
 
         if (info.linkUrl !== null) {
             digitsCheck = findDigitsRegexp.exec(info.linkUrl);
@@ -277,14 +303,14 @@
         }
 
         for (i = 0; i < ids.length; i++) {
-            if (ids[i][0] == info.menuItemId) {
+            if (ids[i][0] === info.menuItemId) {
 
                 direction = parseInt(ids[i][1], 10);
 
-                if (ids[i][2] == l18nify('ContextMenu_Other')) {
+                if (ids[i][2] === l18nify('ContextMenu_Other')) {
                     response = prompt(l18nify('Prompt_HowMany'));
 
-                    if (parseInt(response, 10) == false) {
+                    if (isNaN(response) === true) {
                         alert(l18nify('Prompt_NotAValidNumber'));
                         break;
                     }
@@ -310,12 +336,12 @@
         firstNum = parseInt(number, 10);
         lastNum = firstNum;
 
-        if (direction == 0) {
+        if (direction === 0) {
             firstNum -= count;
             lastNum += count;
-        } else if (direction == -1) {
+        } else if (direction === -1) {
             firstNum -= count;
-        } else if (direction == 1) {
+        } else if (direction === 1) {
             lastNum += count;
         }
 
