@@ -4,6 +4,7 @@
     requireTrailingComma: false,
     validateIndentation: 4,
     maximumLineLength: 1000,
+    validateLineBreaks: false,
     disallowMultipleVarDecl: false,
     requirePaddingNewLinesAfterBlocks: false
 }
