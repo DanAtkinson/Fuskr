@@ -1,4 +1,4 @@
-/* globals chrome, alert, prompt, localStorage */
+/* globals chrome, alert, prompt, localStorage, Fuskr */
 (function () {
 
     var i = 0,
@@ -33,17 +33,9 @@
         decMenuId = createContextMenu({ Id: parentId, Title: '-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
 
         for (i = 0; i < numbers.length; i++) {
-            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['image', 'link'], OnclickCallback: imageChoiceOnClick }), 0, numbers[i]]);
-            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['video'], OnclickCallback: videoChoiceOnClick }), 0, numbers[i]]);
-            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['audio'], OnclickCallback: audioChoiceOnClick }), 0, numbers[i]]);
-
-            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['image', 'link'], OnclickCallback: imageChoiceOnClick }), 1, numbers[i]]);
-            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['video'], OnclickCallback: videoChoiceOnClick }), 1, numbers[i]]);
-            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['audio'], OnclickCallback: audioChoiceOnClick }), 1, numbers[i]]);
-
-            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['image', 'link'], OnclickCallback: imageChoiceOnClick }), -1, numbers[i]]);
-            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['video'], OnclickCallback: videoChoiceOnClick }), -1, numbers[i]]);
-            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['audio'], OnclickCallback: audioChoiceOnClick }), -1, numbers[i]]);
+            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 0, numbers[i]]);
+            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 1, numbers[i]]);
+            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), -1, numbers[i]]);
         }
 
         createContextMenu({ Id: parentId, Context: ['image', 'video', 'audio', 'link'], ItemType: 'separator' });
@@ -51,17 +43,7 @@
         createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Manual'), OnclickCallback: manualOnClick });
         createContextMenu({ Id: parentId, ItemType: 'separator' });
 
-        //createContextMenu({Id: parentId, Title: l18nify("ContextMenu_Help"), OnclickCallback: helpOnClick });
         createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Options'), OnclickCallback: optionsOnClick });
-
-        // This event is fired each time the user updates the text in the omnibox, as long as the extension's keyword mode is still active.
-        /*chrome.omnibox.onInputChanged.addListener(function(text, suggest) {
-         console.log('inputChanged: ' + text);
-         suggest([
-          {content: text + " one", description: "the first one"},
-          {content: text + " number two", description: "the second entry"}
-         ]);
-        });*/
 
         // This event is fired with the user accepts the input in the omnibox.
         chrome.omnibox.onInputEntered.addListener(function (text) {
@@ -123,10 +105,6 @@
 
     function optionsOnClick(info, tab) {
         chrome.runtime.openOptionsPage();
-    }
-
-    function helpOnClick(info, tab) {
-        chrome.tabs.create({ url: '/Html/help.htm', index: (tab.index + 1) });
     }
 
     function manualOnClick(info, tab) {
@@ -255,49 +233,38 @@
         return openInForeground !== 0;
     }
 
-    function imageChoiceOnClick(info, tab) {
-        choiceOnClick(0, info, tab);
-    }
-    function videoChoiceOnClick(info, tab) {
-        choiceOnClick(1, info, tab);
-    }
-    function audioChoiceOnClick(info, tab) {
-        choiceOnClick(2, info, tab);
-    }
-    function choiceOnClick(type, info, tab) {
+    function choiceOnClick(info, tab) {
         var count = 0,
         direction = 0,
-        imageUrl = '',
         response = '',
         url = '',
-        findDigitsRegexp,
-        digitsCheck;
-
+        digitsCheck,
         findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
 
-        switch (type) {
-            case 0: //image
+        switch (info.mediaType) {
+            case 'image':
             break;
-            case 1: //video
+            case 'video':
             break;
-            case 2: //audio
+            case 'audio':
             break;
         }
 
-        if (info.linkUrl !== null) {
-            digitsCheck = findDigitsRegexp.exec(info.linkUrl);
-            if (digitsCheck !== null) {
-                imageUrl = info.linkUrl;
-            }
-        }
-        if (digitsCheck === null && info.srcUrl !== null) {
+        if (info.srcUrl !== null) {
             digitsCheck = findDigitsRegexp.exec(info.srcUrl);
             if (digitsCheck !== null) {
-                imageUrl = info.srcUrl;
+                url = info.srcUrl;
             }
         }
 
-        if (imageUrl === '') {
+        if (url === '' && info.linkUrl !== null) {
+            digitsCheck = findDigitsRegexp.exec(info.linkUrl);
+            if (digitsCheck !== null) {
+                url = info.linkUrl;
+            }
+        }
+
+        if (url === null || typeof url === 'undefined' || url === '') {
             alert(l18nify('Prompt_NotAValidFusk'));
             return;
         }
@@ -318,45 +285,12 @@
                 } else {
                     count = parseInt(ids[i][2], 10);
                 }
-                url = createUrl(imageUrl, count, direction, digitsCheck);
 
-                createTab(url, tab);
+                var fuskUrl = Fuskr.CreateFuskUrl(url, count, direction);
+                createTab(fuskUrl, tab);
                 break;
             }
         }
-    }
-
-    function createUrl(currentUrl, count, direction, digitsCheck) {
-        var begin, number, end, firstNum, lastNum;
-
-        begin = digitsCheck[1];
-        number = digitsCheck[2];
-        end = digitsCheck[3];
-
-        firstNum = parseInt(number, 10);
-        lastNum = firstNum;
-
-        if (direction === 0) {
-            firstNum -= count;
-            lastNum += count;
-        } else if (direction === -1) {
-            firstNum -= count;
-        } else if (direction === 1) {
-            lastNum += count;
-        }
-
-        firstNum = (firstNum < 0 ? 0 : firstNum).toString();
-        lastNum = (lastNum < 0 ? 0 : lastNum).toString();
-
-        while (firstNum.length < number.length) {
-            firstNum = '0' + firstNum;
-        }
-
-        while (lastNum.length < firstNum.length) {
-            lastNum = '0' + lastNum;
-        }
-
-        return begin + '[' + firstNum + '-' + lastNum + ']' + end;
     }
 
     function createContextMenu(obj) {

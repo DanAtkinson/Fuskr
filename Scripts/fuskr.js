@@ -121,5 +121,41 @@ var Fuskr = (function (ret) {
         return links;
     };
 
+    ret.CreateFuskUrl = function (url, count, direction) {
+        var findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+
+        var begin, number, end, firstNum, lastNum;
+        var digitsCheck = findDigitsRegexp.exec(url);
+
+        begin = digitsCheck[1];
+        number = digitsCheck[2];
+        end = digitsCheck[3];
+
+        firstNum = parseInt(number, 10);
+        lastNum = firstNum;
+
+        if (direction === 0) {
+            firstNum -= count;
+            lastNum += count;
+        } else if (direction === -1) {
+            firstNum -= count;
+        } else if (direction === 1) {
+            lastNum += count;
+        }
+
+        firstNum = (firstNum < 0 ? 0 : firstNum).toString();
+        lastNum = (lastNum < 0 ? 0 : lastNum).toString();
+
+        while (firstNum.length < number.length) {
+            firstNum = '0' + firstNum;
+        }
+
+        while (lastNum.length < firstNum.length) {
+            lastNum = '0' + lastNum;
+        }
+
+        return begin + '[' + firstNum + '-' + lastNum + ']' + end;
+    };
+
     return ret;
 }(Fuskr || {}));

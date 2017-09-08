@@ -20,6 +20,7 @@ module.exports = function (grunt) {
             },
             background: {
                 src: [
+                    'Scripts/fuskr.js',
                     'Scripts/background.js'
                 ]
             },
@@ -36,10 +37,7 @@ module.exports = function (grunt) {
                 ]
             },
             styles: {
-                src: ['Styles/app/**/*.scss']
-            },
-            vendorStyles: {
-                src: ['Styles/vendor/**/*.scss']
+                src: ['Styles/styles.scss']
             },
             html: {
                 src: ['Html/**/*']
@@ -70,14 +68,6 @@ module.exports = function (grunt) {
                     dest: '<%= config.dist %>/Styles',
                     ext: '.css',
                     flatten: true
-                }]
-            },
-            vendor: {
-                files: [{
-                    expand: true,
-                    src: ['<%= config.vendorStyles.src %>'],
-                    dest: '<%= config.dist %>',
-                    ext: '.css'
                 }]
             }
         },
@@ -125,10 +115,6 @@ module.exports = function (grunt) {
             vendor: {
                 src: ['<%= config.vendor.src %>'],
                 dest: '<%= config.dist %>/Scripts/vendor.min.js'
-            },
-            vendorStyles: {
-                src: ['<%= config.dist %>/Styles/Vendor/**/*.css'],
-                dest: '<%= config.dist %>/Styles/vendor.min.css'
             }
         },
         uglify: {
@@ -275,14 +261,13 @@ module.exports = function (grunt) {
     grunt.registerTask('lint:styles', ['sasslint']);
     grunt.registerTask('lint:html', ['htmllint']);
 
-    grunt.registerTask('compile', ['compile:app', 'compile:background', 'compile:optionsjs', 'compile:vendor', 'compile:styles', 'compile:vendorStyles']);
+    grunt.registerTask('compile', ['compile:app', 'compile:background', 'compile:optionsjs', 'compile:vendor', 'compile:styles']);
     grunt.registerTask('compile:app', ['concat:app' /*, 'uglify:app'*/]);
     grunt.registerTask('compile:background', ['concat:background' /*, 'uglify:background' */]);
     grunt.registerTask('compile:optionsjs', ['concat:optionsjs' /*, 'uglify:background' */]);
     grunt.registerTask('compile:vendor', ['concat:vendor']);
     grunt.registerTask('compile:styles', ['sass:app']);
-    grunt.registerTask('compile:vendorStyles', ['sass:vendor', 'concat:vendorStyles', 'clean:vendorStyles']);
-
+   
     grunt.registerTask('default', ['concurrent:dev']);
     grunt.registerTask('build', ['lint', 'clean:dist', 'compile', 'copy', 'karma:release']);
     grunt.registerTask('release', ['build', 'clean:removeSourceMaps', 'compress:release']);
