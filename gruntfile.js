@@ -88,12 +88,6 @@ module.exports = function (grunt) {
         htmllint: {
             main: {
                 src: ['Html/**/*.html', 'Html/**/*.htm', '!Html/partials/**/*']
-            },
-            partials: {
-                options: {
-                    ignore: /Start tag seen without seeing a doctype first/
-                },
-                src: ['Html/partials/**/*.html', 'Html/partials/**/*.htm']
             }
         },
         concat: {
@@ -254,7 +248,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('lint', ['lint:app', 'lint:background', 'lint:optionsjs', 'lint:styles', 'lint:html']);
+    grunt.registerTask('lint', ['lint:app', 'lint:background', 'lint:optionsjs', 'lint:styles', /*'lint:html'*/]);
     grunt.registerTask('lint:app', ['jshint:app', 'jscs:app']);
     grunt.registerTask('lint:background', ['jshint:background', 'jscs:background']);
     grunt.registerTask('lint:optionsjs', ['jshint:optionsjs', 'jscs:optionsjs']);

@@ -1,4 +1,4 @@
-/* globals chrome, alert, prompt, localStorage, Fuskr */
+/* globals chrome, alert, prompt, Fuskr */
 (function () {
 
     var i = 0,
@@ -8,7 +8,12 @@
      savedIds = [],
      historyIds = [],
      targetUrls,
-     numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
+     numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')],
+     options = {
+        keepFusks: true,
+        openInForeground: true,
+        history: [],
+    };
 
     //Target urls tell Chrome what urls are acceptable.
     targetUrls = (function () {
@@ -51,40 +56,28 @@
                 createTab(text, tab);
             });
         });
-
-        if (getRecentFusksOption()) {
-            createRecentMenu();
-        }
     }());
 
     function l18nify(name) {
         return chrome.i18n.getMessage('Application_' + name);
     }
 
-    function createRecentMenu() {
-        var history, historyArray, historyCount, historyId;
+    function createRecentMenu(historyArray) {
 
         if (recentId !== 0) {
             chrome.contextMenus.remove(recentId);
             recentId = 0;
         }
 
-        //Get the history
-        history = localStorage.getItem('history');
-        historyArray = [];
         historyIds = [];
 
-        if (history === null) {
+        if (historyArray === null || historyArray.length === 0) {
             return false;
         }
 
         recentId = createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Recent') });
 
-        //Split out the history into an array
-        historyArray = history.split('||');
-        historyCount = historyArray.length > 10 ? 10 : historyArray.length;
-
-        for (i = 0; i < historyCount; i++) {
+        for (i = 0; i < historyArray.length; i++) {
             if (historyArray[i] !== '') {
                 //Add the menu
                 historyId = createContextMenu({ Id: recentId, Title: historyArray[i], OnclickCallback: recentOnClick });
@@ -99,8 +92,7 @@
     }
 
     function clearRecentOnClick() {
-        localStorage.removeItem('history');
-        createRecentMenu();
+        createRecentMenu([]);
     }
 
     function optionsOnClick(info, tab) {
@@ -156,81 +148,44 @@
     }
 
     function createTab(url, tab) {
-        addUrlToLocalStorage(url, tab);
 
-        chrome.tabs.create({ windowId: tab.windowId, url: '/Html/images.htm#' + url, index: (tab.index + 1), selected: getOpenInForeground() });
+        if (typeof url === 'undefined' || url === null || url.length === 0) {
+            return;
+        }
+
+        addUrlToHistory(url, tab);
+
+        chrome.tabs.create({
+            windowId: tab.windowId,
+            url: '/Html/images.htm#' + url,
+            index: (tab.index + 1),
+            selected: options.openInForeground
+        });
     }
 
-    function addUrlToLocalStorage(url, tab) {
-        var history, historyArray, tempHistory;
+    function addUrlToHistory(url, tab) {
+        var newHistory = [];
 
-        if (tab.incognito || getRecentFusksOption() === false) {
-            //As a rule, do not store incognito data in localstorage.
+        if (tab.incognito || options.keepRecentFusks === false) {
+            //As a rule, do not store incognito data in history.
             return false;
         }
 
-        //Get the history
-        history = localStorage.getItem('history');
-        historyArray = [];
+        // Add the url to the history
+        newHistory = options.history.slice();
+        newHistory.push(url);
 
-        historyArray.push(url);
+        // Trim to the recent 10
+        newHistory.slice(-10);
 
-        if (history !== null) {
-            //Push the rest of the urls onto the pile onto the array
-            tempHistory = history.split('||');
-            for (i = 0; i < tempHistory.length; i++) {
-                historyArray.push(tempHistory[i]);
-            }
-        }
-
-        while (historyArray.length > 100) {
-            //Ensure that we only maintain a list of 100 recent items
-            historyArray.pop();
-        }
-
-        //Save the urls
-        localStorage.setItem('history', historyArray.join('||'));
+        chrome.storage.sync.set({
+            history: newHistory
+        }, null);
 
         //now need to reset the 'Recent' context menus and add them again.
-        if (getRecentFusksOption()) {
-            createRecentMenu();
+        if (options.keepRecentFusks) {
+            createRecentMenu(newHistory);
         }
-    }
-
-    function getRecentFusksOption() {
-        var keepRecentFusksVal = localStorage.getItem('keepRecentFusks');
-
-        if (keepRecentFusksVal === null) {
-            return true;
-        }
-
-        var keepRecentFusks = parseInt(keepRecentFusksVal, 10);
-
-        if (keepRecentFusks !== 0 && keepRecentFusks !== 1) {
-            //Populate the local storage with the default value.
-            localStorage.setItem('keepRecentFusks', 1);
-        }
-
-        return keepRecentFusks !== 0;
-    }
-
-    function getOpenInForeground() {
-        var openInForegroundVal, openInForeground;
-
-        openInForegroundVal = localStorage.getItem('openInForeground');
-
-        if (openInForegroundVal === null) {
-            return true;
-        }
-
-        openInForeground = parseInt(openInForegroundVal, 10);
-
-        if (openInForeground !== 0 && openInForeground !== 1) {
-            //Populate the local storage with the default value.
-            localStorage.setItem('openInForeground', 1);
-        }
-
-        return openInForeground !== 0;
     }
 
     function choiceOnClick(info, tab) {
@@ -294,6 +249,88 @@
     }
 
     function createContextMenu(obj) {
-        return chrome.contextMenus.create({ parentId: obj.Id, title: obj.Title, contexts: obj.Context || ['all'], type: obj.ItemType || 'normal', onclick: obj.OnclickCallback || null, targetUrlPatterns: obj.TargetUrlPatterns || null });
+        return chrome.contextMenus.create({
+            parentId: obj.Id,
+            title: obj.Title,
+            contexts: obj.Context || ['all'],
+            type: obj.ItemType || 'normal',
+            onclick: obj.OnclickCallback || null,
+            targetUrlPatterns: obj.TargetUrlPatterns || null
+        });
     }
+
+    chrome.runtime.onInstalled.addListener(function (details) {
+        if (details.reason == 'install') {
+
+            // First install - set defaults
+            chrome.storage.sync.set({
+                history: [],
+                keepRecentFusks: true,
+                openInForeground: true
+            });
+
+            console.log('Installed');
+        } else if (details.reason == 'update') {
+            var thisVersion = chrome.runtime.getManifest().version;
+            var lastVersion = parseFloat(details.previousVersion);
+
+            if (lastVersion < 3.2) {
+                // 3.2 Introduced storage sync
+                var previousKeepFusks = localStorage.getItem('keepRecentFusks') || '1';
+                var previousOpenInForeground = localStorage.getItem('openInForeground') || '1';
+                var previousHistory = localStorage.getItem('history') || '';
+
+                console.log('Previous localstorage', {
+                    keepFusks: previousKeepFusks,
+                    openinForeground: previousOpenInForeground,
+                    history: previousHistory
+                });
+
+                // Was previously stored as 0/1
+                var keepFusksBool = parseInt(previousKeepFusks, 10) === 1;
+                var openForegroundBool = parseInt(previousOpenInForeground, 10) === 1;
+
+                // Was previously stored delimited by ||
+                var historyArray = previousHistory.split('||').filter(function (x) {
+                    return x !== null && typeof x !== 'undefined' && x.length > 0;
+                });
+
+                localStorage.clear();
+
+                chrome.storage.sync.set({
+                    history: historyArray,
+                    keepRecentFusks: keepFusksBool,
+                    openInForeground: openForegroundBool
+                });
+            }
+
+            console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion);
+        }
+    });
+
+    chrome.storage.onChanged.addListener(function (changes, areaName) {
+        if (changes === null || typeof changes === 'undefined') {
+            return;
+        }
+
+        Object.keys(changes).map(function (key) {
+            options[key] = changes[key].newValue;
+        });
+
+        // Hide or show the 'Recent Items' menu
+        if (changes.keepRecentFusks && changes.keepRecentFusks.newValue !== changes.keepRecentFusks.oldValue) {
+            if (changes.keepRecentFusks === true) {
+                createRecentMenu(options.history);
+            } else {
+                createRecentMenu(null);
+            }
+        }
+    });
+
+    // Fill the options
+    chrome.storage.sync.get(null, function (items) {
+        Object.keys(items).map(function (key) {
+            options[key] = items[key];
+        });
+    });
 }());
