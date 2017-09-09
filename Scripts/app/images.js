@@ -174,7 +174,7 @@
                     // Iterate through expected types
                     // to check if it matches any on the list
                     var hasMatch = expected.some(function (x) {
-                        return x.match(new RegExp('\.' + x + '$'));
+                        return filename.match(new RegExp('\\.' + x + '$'));
                     });
 
                     if (!hasMatch) {
@@ -189,7 +189,7 @@
             }
 
             function safeFileName(str) {
-                return str.replace(/[^a-zA-Z0-9_\-]/g, '_');
+                return str.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
             }
 
             // Add an extension for known file types and remove any trailing slash
