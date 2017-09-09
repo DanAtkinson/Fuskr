@@ -12,3 +12,6 @@ fuskr-*.zip
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+#Editors
+.vs/

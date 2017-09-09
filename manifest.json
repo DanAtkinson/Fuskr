@@ -22,7 +22,8 @@
 		"http://*/*",
 		"https://*/*",
 		"contextMenus",
-		"activeTab"
+		"activeTab",
+		"storage"
 	],
 	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
 	"homepage_url": "http://danatkinson.github.io/Fuskr/",

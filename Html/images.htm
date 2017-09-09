@@ -3,11 +3,10 @@
 <head>
 	<title>Fuskr</title>
 	<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
-	<link rel="stylesheet" href="/Styles/vendor.min.css" type="text/css">
 </head>
 <body data-ng-controller="ImageListController">
     <div id="top"></div>
-    <div id="content" data-ng-class="{'fullwidth': fullWidthImages}">
+    <div id="content" class="content" data-ng-class="{'fullwidth': fullWidthImages}">
     	<div class="info">
     		<p>{{ originalUrl }}</p>
     		<ul class="linklist totals">
@@ -64,16 +63,16 @@
     		</ul>
     	</div>
     </div>
-    <div id="bottom"></div>
-    <div id="viewer" data-ng-show="showViewer">
+    <div id="bottom" class="bottom"></div>
+    <div id="viewer" class="viewer" data-ng-show="showViewer">
     	<div class="viewer-item modal"></div>
     	<div class="viewer-item small">
     		<a class="previous-image" data-ng-style="{'background-image': 'url(' + filteredImages[selectedImageId-1].url + ')'}"></a>
     	</div>
-    	<div class="viewerItem current" data-ng-click="scrollToAnchor(null, selectedImageId+1)">
+    	<div class="viewer-item current" data-ng-click="scrollToAnchor(null, selectedImageId+1)">
     		<a data-ng-style="{'background-image': 'url(' + filteredImages[selectedImageId].url + ')'}"></a>
     	</div>
-    	<div class="viewerItem small">
+    	<div class="viewer-item small">
     		<a class="next-image" data-ng-style="{'background-image': 'url(' + filteredImages[selectedImageId+1].url + ')'}"></a>
     	</div>
     	<div class="close">

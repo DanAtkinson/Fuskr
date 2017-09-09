@@ -1,17 +1,19 @@
-/* globals localStorage, document, chrome, clearTimeout, setTimeout */
+/* globals document, chrome, clearTimeout, setTimeout */
 
 (function () {
     'use strict';
 
-    var hasLoadedFromLocalStorage = false;
-    var timeoutId = null;
+    var timeoutId = null,
+        options = {};
 
-    function loadOptions() {
+    function setCheckboxes() {
         var keepRecentFusks = document.getElementById('keepRecentFusks');
         var openInForeground = document.getElementById('openInForeground');
 
-        keepRecentFusks.checked = localStorage.keepRecentFusks === '1';
-        openInForeground.checked = localStorage.openInForeground === '1';
+        if (keepRecentFusks && openInForeground) {
+            keepRecentFusks.checked = options.keepRecentFusks;
+            openInForeground.checked = options.openInForeground;
+        }
     }
 
     function saveOptions() {
@@ -19,16 +21,49 @@
         var openInForeground = document.getElementById('openInForeground');
         var status = document.getElementById('status');
 
-        localStorage.keepRecentFusks = keepRecentFusks.checked ? '1' : '0';
-        localStorage.openInForeground = openInForeground.checked ? '1' : '0';
+        var optionsToSet = {
+            keepRecentFusks: keepRecentFusks.checked,
+            openInForeground: openInForeground.checked
+        };
 
-        status.innerHTML = 'Options saved!';
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(function () {
-            status.innerHTML = '';
-        }, 2000);
+        // If disabling recent fusks, clear history
+        if (keepRecentFusks.checked === false) {
+            optionsToSet.history = [];
+        }
+
+        chrome.storage.sync.set(optionsToSet, function () {
+            if (chrome.runtime.lastError) {
+                status.innerHTML = 'Could not save settings. Try again.';
+            } else {
+                status.innerHTML = 'Options saved!';
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(function () {
+                    status.innerHTML = '';
+                }, 2000);
+            }
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', loadOptions);
+    document.addEventListener('DOMContentLoaded', setCheckboxes);
     document.getElementById('save').addEventListener('click', saveOptions);
+
+    chrome.storage.sync.get(null, function (items) {
+        Object.keys(items).map(function (key) {
+            options[key] = items[key];
+        });
+
+        setCheckboxes();
+    });
+
+    chrome.storage.onChanged.addListener(function (changes, areaName) {
+        if (changes === null || typeof changes === 'undefined') {
+            return;
+        }
+
+        Object.keys(changes).map(function (key) {
+            options[key] = changes[key].newValue;
+        });
+
+        setCheckboxes();
+    });
 }());
