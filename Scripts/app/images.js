@@ -3,6 +3,7 @@
 (function () {
 
     var app = angular.module('fuskrApp');
+    var originalUrl = '';
 
     app.controller('ImageListController', function ($document, $rootScope, $scope, $location, $filter, anchorScrollService, fuskrService) {
 
@@ -14,6 +15,7 @@
         $scope.filteredImages = images;
         $scope.selectedImageId = 0;
         $scope.originalUrl = url;
+        originalUrl = url;
 
         // Page options
         $scope.showViewer = false;
@@ -107,14 +109,93 @@
 
         function downloadZip() {
             var zip = new JSZip();
-            zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk URL: ' + $rootScope.originalUrl);
+            zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk URL: ' + originalUrl);
 
             var validImages = $scope.images.filter(function (x) {
                         return x.loaded && x.success;
                     });
 
-            validImages.forEach(function (img) {
-                zip.file(img.url.split('/').pop(), img.data, { blob: true });
+            // Split each URL into path components
+            var explodedPaths = validImages.map(function (x) {
+                return {
+                    data: x.data,
+                    url: x.url.split('/').map(safeFileName)
+                };
+            });
+
+            // Check that all URL components at an index
+            // are the same, to determine the root folder
+            function checkIfAllItemsAtIndexEqual(x) {
+                var pass = explodedPaths.map(function (r) {
+                    return r.url.length > x ?
+                        r.url[index]
+                        : null;
+                });
+
+                var allSame = pass.every(function (r) {
+                    return r == pass[0];
+                });
+
+                return allSame;
+            }
+
+            var index = 0;
+            for (index = 0; index < validImages.length; index++) {
+                if (checkIfAllItemsAtIndexEqual(index) === false) {
+                    break;
+                }
+            }
+
+            // Trim the URL up until the common folder
+            var shortenedPathImages = explodedPaths.map(function (r) {
+                return {
+                    data: r.data,
+                    url: r.url.slice(index).join('/')
+                };
+            });
+
+            function addExtensionIfNeeded(filename, blobData) {
+                var types = {
+                    'image/gif': ['gif'],
+                    'image/jpeg': ['jpeg', 'jpg'],
+                    'image/png': ['png'],
+                    'image/tiff': ['tif', 'tiff'],
+                    'image/vnd.wap.wbmp': ['wbmp'],
+                    'image/x-icon': ['ico'],
+                    'image/x-jng': ['jng'],
+                    'image/x-ms-bmp': ['bmp'],
+                    'image/svg+xml': ['svg'],
+                    'image/webp': ['webp']
+                };
+
+                // Get expected extension
+                var expected = types[blobData.type];
+                if (expected) {
+                    // Iterate through expected types
+                    // to check if it matches any on the list
+                    var hasMatch = expected.some(function (x) {
+                        return x.match(new RegExp('\.' + x + '$'));
+                    });
+
+                    if (!hasMatch) {
+                        // If no extension matches, add one
+                        return filename + '.' + expected[0];
+                    }
+                }
+
+                // If an acceptable extension or no known
+                // mimetype, just return
+                return filename;
+            }
+
+            function safeFileName(str) {
+                return str.replace(/[^a-zA-Z0-9_\-]/g, '_');
+            }
+
+            // Add an extension for known file types and remove any trailing slash
+            shortenedPathImages.forEach(function (img) {
+                var fileName = addExtensionIfNeeded(img.url.replace(/\/$/, ''), img.data);
+                zip.file(fileName, img.data, { blob: true });
             });
 
             zip.generateAsync({ type: 'blob' })
