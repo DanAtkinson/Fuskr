@@ -17,6 +17,10 @@ How to use
 Version History
 ===============
 
+* 3.2 -
+ * Download images as a zip file and retain the structure if it's a nested fusk!
+ * Options page change to support Chrome's preferred options layout.
+ * Improvements to the way many urls are handled.
 * 3.1 -
  * Fixed an issue with the fusk option not showing on links.
 * 3.0 -
