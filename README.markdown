@@ -1,4 +1,5 @@
 [![Join the chat at https://gitter.im/DanAtkinson/Fuskr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DanAtkinson/Fuskr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/DanAtkinson/Fuskr.svg?branch=master)](https://travis-ci.org/DanAtkinson/Fuskr)
 
 How to use
 ==========
