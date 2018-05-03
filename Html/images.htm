@@ -6,7 +6,7 @@
 </head>
 <body>
 	<div id="top"></div>
-	<div id="content" class="content" data-ng-class="{'fullwidth': vm.model.fullWidthImages}">
+	<div id="content" class="content" data-ng-class="vm.model.imageDisplay">
 		<div class="info">
 			<p>{{ vm.model.originalUrl }}</p>
 			<ul class="linklist totals">
@@ -18,12 +18,15 @@
 			<ul class="linklist nav">
 				<li data-ng-show="vm.isFinishedLoading() && vm.totalSuccess() > 0"><a data-ng-click="vm.downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
 				<li data-ng-show="vm.totalFailed() > 0"><a data-ng-click="vm.model.showBrokenImages = !vm.model.showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
-				<li data-ng-show="vm.totalSuccess() > 0">
-					<a data-ng-click="vm.model.fullWidthImages = !vm.model.fullWidthImages">
-						{{ vm.model.fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
-					</a>
-				</li>
 				<li data-ng-show="vm.totalSuccess() > 0"><a data-ng-click="vm.model.showViewer = !vm.model.showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
+				<li data-ng-show="vm.totalSuccess() > 0">
+					<select data-ng-model="vm.model.imageDisplay">
+						<option value="imagesFitOnPage">{{ 'ResizeImagesToFitOnPage' | translate }}</option>
+						<option value="imagesAreFullWidth">{{ 'ResizeImagesToFullWidth' | translate }}</option>
+						<option value="imagesAreFullPage">{{ 'ResizeImagesToFillPage' | translate }}</option>
+						<option value="imagesAreThumbnails">{{ 'ResizeImagesToThumbnails' | translate }}</option>
+					</select>
+				</li>
 			</ul>
 		</div>
 
@@ -57,12 +60,15 @@
 			<ul class="linklist nav">
 				<li data-ng-show="vm.isFinishedLoading() && vm.totalSuccess() > 0"><a data-ng-click="vm.downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
 				<li data-ng-show="vm.totalFailed() > 0"><a data-ng-click="vm.model.showBrokenImages = !vm.model.showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
-				<li data-ng-show="vm.totalSuccess() > 0">
-					<a data-ng-click="vm.model.fullWidthImages = !vm.model.fullWidthImages">
-						{{ vm.model.fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
-					</a>
-				</li>
 				<li data-ng-show="vm.totalSuccess() > 0"><a data-ng-click="vm.model.showViewer = !vm.model.showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
+				<li data-ng-show="vm.totalSuccess() > 0">
+					<select data-ng-model="vm.model.imageDisplay">
+						<option value="imagesFitOnPage">{{ 'ResizeImagesToFitOnPage' | translate }}</option>
+						<option value="imagesAreFullWidth">{{ 'ResizeImagesToFullWidth' | translate }}</option>
+						<option value="imagesAreFullPage">{{ 'ResizeImagesToFillPage' | translate }}</option>
+						<option value="imagesAreThumbnails">{{ 'ResizeImagesToThumbnails' | translate }}</option>
+					</select>
+				</li>
 			</ul>
 		</div>
 	</div>

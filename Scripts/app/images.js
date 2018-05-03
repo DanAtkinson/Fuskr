@@ -15,6 +15,16 @@
 
         var vm = this;
 
+        //Functions
+        vm.totalSuccess = totalSuccess;
+        vm.totalFailed = totalFailed;
+        vm.isFinishedLoading = isFinishedLoading;
+        vm.scrollToAnchor = scrollToAnchor;
+        vm.shouldDisplayImage = shouldDisplayImage;
+        vm.pluraliseForImages = pluraliseForImages;
+        vm.downloadZip = downloadZip;
+
+        //Initialise
         (function () {
             var url, images;
             url = $location.hash();
@@ -24,21 +34,13 @@
                 filteredImages: images,
                 originalUrl: url,
                 showViewer: false,
-                fullWidthImages: false,
                 showBrokenImages: false,
-                selectedImageId: 0
+                selectedImageId: 0,
+                imageDisplay: 'imagesFitOnPage'
             };
 
             $document.bind('keydown', keyboardBinding);
         }());
-
-        vm.downloadZip = downloadZip;
-        vm.totalFailed = totalFailed;
-        vm.totalSuccess = totalSuccess;
-        vm.scrollToAnchor = scrollToAnchor;
-        vm.isFinishedLoading = isFinishedLoading;
-        vm.pluraliseForImages = pluraliseForImages;
-        vm.shouldDisplayImage = shouldDisplayImage;
 
         // Lambda functions
         function totalSuccess() {
@@ -212,8 +214,14 @@
 
             zip.generateAsync({ type: 'blob' })
             .then(function (content) {
-                saveAs(content, 'fuskr.zip');
+                var zipFilename = prompt('Please choose the name of the zip file you wish to save.', 'fuskr.zip');
+                if (!zipFilename.toLowerCase().endsWith('.zip')) {
+                    zipFilename += '.zip';
+                }
+                saveAs(content, zipFilename);
             });
         }
+
     }
+
 }());

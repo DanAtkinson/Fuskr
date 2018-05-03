@@ -40,7 +40,33 @@ button {
   }
 }
 
-.fullwidth {
+.imagesAreThumbnails {
+  .wrap {
+    width: min-content;
+  }
+  img {
+    width: auto;
+
+    &.fusk-image {
+      width: 100%;
+    }
+  }
+}
+
+.imagesAreFullPage {
+  .wrap {
+    width: -webkit-fill-available;
+  }
+  img {
+    width: auto;
+
+    &.fusk-image {
+      width: 100%;
+    }
+  }
+}
+
+.imagesAreFullWidth {
   img {
     width: auto;
 

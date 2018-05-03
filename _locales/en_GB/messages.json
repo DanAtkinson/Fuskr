@@ -104,6 +104,12 @@
     "Images_ResizeImagesToFitOnPage": {
         "message": "Resize images to fit on page"
     },
+    "Images_ResizeImagesToFillPage": {
+        "message": "Resize images to fill the page"
+    },
+    "Images_ResizeImagesToThumbnails": {
+        "message": "Resize images to thumbnails"
+    },
     "Images_GoToTop": {
         "message": "Go to the top of the page"
     },
