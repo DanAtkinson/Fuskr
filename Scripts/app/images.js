@@ -124,52 +124,54 @@
         }
 
         function downloadZip() {
-            var zip = new JSZip();
-            zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk URL: ' + vm.model.originalUrl);
+            var zip, validImages, explodedPaths, shortenedPathImages, imageUrlsForTxtFile = '', index = 0;
 
-            var validImages = vm.model.images.filter(function (x) {
+            validImages = vm.model.images.filter(function (x) {
                 return x.loaded && x.success;
             });
 
             // Split each URL into path components
-            var explodedPaths = validImages.map(function (x) {
+            explodedPaths = validImages.map(function (x) {
                 return {
+                    url: x.url,
                     data: x.data,
-                    url: x.url.split('/').map(safeFileName)
+                    urlArray: x.url.split('/').map(safeFileName)
                 };
             });
 
-            // Check that all URL components at an index
-            // are the same, to determine the root folder
+            // Check that all URL components at an index are the same, to determine the root folder
             function checkIfAllItemsAtIndexEqual(x) {
-                var pass = explodedPaths.map(function (r) {
-                    return r.url.length > x ? r.url[index] : null;
+                var pass, allSame;
+                pass = explodedPaths.map(function (r) {
+                    return r.urlArray.length > x ? r.urlArray[index] : null;
                 });
 
-                var allSame = pass.every(function (r) {
+                allSame = pass.every(function (r) {
                     return r == pass[0];
                 });
 
                 return allSame;
             }
 
-            var index = 0;
             for (index = 0; index < validImages.length; index++) {
                 if (checkIfAllItemsAtIndexEqual(index) === false) {
                     break;
                 }
             }
 
-            // Trim the URL up until the common folder
-            var shortenedPathImages = explodedPaths.map(function (r) {
+            // Trim the URL up until the common folder and add it to zip text file.
+            shortenedPathImages = explodedPaths.map(function (r) {
+                imageUrlsForTxtFile += r.url + '\r\n';
                 return {
                     data: r.data,
-                    url: r.url.slice(index).join('/')
+                    url: r.urlArray.slice(index).join('/')
                 };
             });
 
             function addExtensionIfNeeded(filename, blobData) {
-                var types = {
+                var expected, types;
+
+                types = {
                     'image/gif': ['gif'],
                     'image/jpeg': ['jpeg', 'jpg'],
                     'image/png': ['png'],
@@ -183,7 +185,7 @@
                 };
 
                 // Get expected extension
-                var expected = types[blobData.type];
+                expected = types[blobData.type];
                 if (expected) {
                     // Iterate through expected types
                     // to check if it matches any on the list
@@ -206,6 +208,9 @@
                 return str.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
             }
 
+            zip = new JSZip();
+            zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk Url: ' + vm.model.originalUrl + '\r\n\r\n\r\nUrls:\r\n' + imageUrlsForTxtFile);
+
             // Add an extension for known file types and remove any trailing slash
             shortenedPathImages.forEach(function (img) {
                 var fileName = addExtensionIfNeeded(img.url.replace(/\/$/, ''), img.data);
@@ -214,10 +219,18 @@
 
             zip.generateAsync({ type: 'blob' })
             .then(function (content) {
-                var zipFilename = prompt('Please choose the name of the zip file you wish to save.', 'fuskr.zip');
+                var zipFilename = prompt('Please enter the name of the generated zip file to download.\nChoosing cancel will abort the zip file download.', 'fuskr.zip');
+
+                if (zipFilename === '') {
+                    //User has cancelled out.
+                    return;
+                }
+
+                //Ensure correct extension.
                 if (!zipFilename.toLowerCase().endsWith('.zip')) {
                     zipFilename += '.zip';
                 }
+
                 saveAs(content, zipFilename);
             });
         }
