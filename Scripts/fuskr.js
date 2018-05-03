@@ -157,5 +157,13 @@ var Fuskr = (function (ret) {
         return begin + '[' + firstNum + '-' + lastNum + ']' + end;
     };
 
+    ret.GetImageFilename = function (url) {
+        if (typeof url === 'undefined' || url === '') {
+            return '';
+        }
+
+        return url.substring(url.lastIndexOf('/') + 1);
+    };
+
     return ret;
 }(Fuskr || {}));

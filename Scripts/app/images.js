@@ -1,6 +1,7 @@
 /* globals JSZip, saveAs */
 
 (function () {
+    'use strict';
 
     var originalUrl = '';
     var app = angular.module('fuskrApp');
@@ -10,61 +11,70 @@
         .controller('ImageListController', ['$document', '$rootScope', '$scope', '$location', '$filter', 'anchorScrollService', 'fuskrService', imageListController]);
 
     function imageListController($document, $rootScope, $scope, $location, $filter, anchorScrollService, fuskrService) {
+        /* jshint validthis: true */
 
-        var url = $location.hash();
-        var images = fuskrService.getLinks(url);
+        var vm = this;
 
-        // An array of image objects
-        $scope.images = images;
-        $scope.filteredImages = images;
-        $scope.selectedImageId = 0;
-        $scope.originalUrl = url;
-        originalUrl = url;
+        (function () {
+            var url, images;
+            url = $location.hash();
+            images = fuskrService.getLinks(url);
+            vm.model = {
+                images: images,
+                filteredImages: images,
+                originalUrl: url,
+                showViewer: false,
+                fullWidthImages: false,
+                showBrokenImages: false,
+                selectedImageId: 0
+            };
 
-        // Page options
-        $scope.showViewer = false;
-        $scope.showBrokenImages = false;
-        $scope.fullWidthImages = false;
+            $document.bind('keydown', keyboardBinding);
+        }());
+
+        vm.downloadZip = downloadZip;
+        vm.totalFailed = totalFailed;
+        vm.totalSuccess = totalSuccess;
+        vm.scrollToAnchor = scrollToAnchor;
+        vm.isFinishedLoading = isFinishedLoading;
+        vm.pluraliseForImages = pluraliseForImages;
+        vm.shouldDisplayImage = shouldDisplayImage;
 
         // Lambda functions
-        $scope.totalSuccess = function () {
-            return $scope.images.map(function (x) {
+        function totalSuccess() {
+            return vm.model.images.map(function (x) {
                 return x.loaded && x.success ? 1 : 0;
             }).reduce(function (a, b) {
                 return a + b;
             }, 0);
-        };
+        }
 
-        $scope.totalFailed = function () {
-            return $scope.images.map(function (x) {
+        function totalFailed() {
+            return vm.model.images.map(function (x) {
                 return x.loaded && !x.success ? 1 : 0;
             }).reduce(function (a, b) {
                 return a + b;
             }, 0);
-        };
+        }
 
-        $scope.isFinishedLoading = function () {
-            return $scope.images.every(function (x) { return x.loaded; });
-        };
+        function isFinishedLoading() {
+            return vm.model.images.every(function (x) { return x.loaded; });
+        }
 
-        // Scoped functions
-        $scope.pluraliseForImages = pluraliseForImages;
-        $scope.shouldDisplayImage = shouldDisplayImage;
-        $scope.scrollToAnchor = scrollToAnchor;
-        $scope.downloadZip = downloadZip;
+        function scrollToAnchor($event, htmlElementId, itemId) {
+            if (typeof $event.preventDefault !== 'undefined') {
+                $event.preventDefault();
+            }
 
-        $document.bind('keydown', keyboardBinding);
-
-        function scrollToAnchor(htmlElementId, itemId) {
             if (itemId < 0 || !itemId) {
                 itemId = 0;
             }
 
-            if (itemId > $scope.filteredImages.length - 1) {
-                itemId = $scope.filteredImages.length - 1;
+            if (itemId > vm.model.filteredImages.length - 1) {
+                itemId = vm.model.filteredImages.length - 1;
             }
 
-            $scope.selectedImageId = itemId;
+            vm.model.selectedImageId = itemId;
 
             if (htmlElementId) {
                 anchorScrollService.scrollTo(htmlElementId);
@@ -73,7 +83,7 @@
 
         function shouldDisplayImage() {
             return function (img) {
-                return !img.loaded || img.success || $scope.showBrokenImages;
+                return !img.loaded || img.success || vm.model.showBrokenImages;
             };
         }
 
@@ -91,21 +101,21 @@
                     /* Left */
                     e.preventDefault();
                     $scope.$apply(function () {
-                        scrollToAnchor(false ? null : 'image' + ($scope.selectedImageId - 1), $scope.selectedImageId - 1);
+                        scrollToAnchor(e, false ? null : 'image' + (vm.model.selectedImageId - 1), vm.model.selectedImageId - 1);
                     });
                 break;
                 case 39:
                     /* Right */
                     e.preventDefault();
                     $scope.$apply(function () {
-                        scrollToAnchor(false ? null : 'image' + ($scope.selectedImageId + 1), $scope.selectedImageId + 1);
+                        scrollToAnchor(e, false ? null : 'image' + (vm.model.selectedImageId + 1), vm.model.selectedImageId + 1);
                     });
                 break;
                 case 27:
                     /* Escape */
                     e.preventDefault();
                     $scope.$apply(function () {
-                        $scope.showViewer = !$scope.showViewer;
+                        vm.model.showViewer = !vm.model.showViewer;
                     });
                 break;
             }
@@ -113,9 +123,9 @@
 
         function downloadZip() {
             var zip = new JSZip();
-            zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk URL: ' + originalUrl);
+            zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk URL: ' + vm.model.originalUrl);
 
-            var validImages = $scope.images.filter(function (x) {
+            var validImages = vm.model.images.filter(function (x) {
                 return x.loaded && x.success;
             });
 

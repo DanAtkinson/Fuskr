@@ -1,85 +1,91 @@
 <!doctype html>
-<html data-ng-app="fuskrApp">
+<html data-ng-app="fuskrApp" data-ng-controller="ImageListController as vm">
 <head>
-	<title>Fuskr</title>
+	<title>Fuskr - {{ vm.model.originalUrl }}</title>
 	<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
 </head>
-<body data-ng-controller="ImageListController">
-    <div id="top"></div>
-    <div id="content" class="content" data-ng-class="{'fullwidth': fullWidthImages}">
-    	<div class="info">
-    		<p>{{ originalUrl }}</p>
-    		<ul class="linklist totals">
-    			<li><span data-ng-pluralize data-count="images.length" data-when="pluraliseForImages('Images')"></span></li>
-                <li><span data-ng-pluralize data-count="totalSuccess()" data-when="pluraliseForImages('Loaded')"></span></li>
-    			<li data-ng-show="totalFailed() > 0"><span data-ng-pluralize data-count="totalFailed()" data-when="pluraliseForImages('Failed')"></span></li>
-    			<li data-ng-show="isFinishedLoading()"><strong>{{ 'Done' | translate }}</strong></li>
-    		</ul>
-    		<ul class="linklist nav">
-    			<li data-ng-show="isFinishedLoading() && totalSuccess() > 0"><a data-ng-click="downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
-    			<li data-ng-show="totalFailed() > 0"><a data-ng-click="showBrokenImages=!showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
-    			<li data-ng-show="totalSuccess() > 0">
-    				<a data-ng-click="fullWidthImages=!fullWidthImages">
-    					{{  fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
-    				</a>
-    			</li>
-    			<li data-ng-show="totalSuccess() > 0"><a data-ng-click="showViewer=!showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
-    		</ul>
-    	</div>
-    	<div class="wrap" data-ng-repeat="image in (filteredImages = (images | filter: shouldDisplayImage(image)))" data-ng-show="image.loaded || image.success">
-    		<figure>
-    			<a data-ng-attr-id="image{{ $index }}" data-ng-click="scrollToAnchor('image' + ($index+1), $index+1)">
-    				<img src="/Images/1x1.png" class="fusk-image" data-ng-src="{{ image.src }}" data-ng-model="image">
-    			</a>
-    			<figcaption data-ng-hide="hideDetails">
-    				<a data-ng-href="{{ image.url }}" target="_blank" class="imageLink">{{ image.url }}</a>
+<body>
+	<div id="top"></div>
+	<div id="content" class="content" data-ng-class="{'fullwidth': vm.model.fullWidthImages}">
+		<div class="info">
+			<p>{{ vm.model.originalUrl }}</p>
+			<ul class="linklist totals">
+				<li><span data-ng-pluralize data-count="vm.model.images.length" data-when="vm.pluraliseForImages('Images')"></span></li>
+				<li><span data-ng-pluralize data-count="vm.totalSuccess()" data-when="vm.pluraliseForImages('Loaded')"></span></li>
+				<li data-ng-show="vm.totalFailed() > 0"><span data-ng-pluralize data-count="vm.totalFailed()" data-when="vm.pluraliseForImages('Failed')"></span></li>
+				<li data-ng-show="vm.isFinishedLoading()"><strong>{{ 'Done' | translate }}</strong></li>
+			</ul>
+			<ul class="linklist nav">
+				<li data-ng-show="vm.isFinishedLoading() && vm.totalSuccess() > 0"><a data-ng-click="vm.downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
+				<li data-ng-show="vm.totalFailed() > 0"><a data-ng-click="vm.model.showBrokenImages = !vm.model.showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
+				<li data-ng-show="vm.totalSuccess() > 0">
+					<a data-ng-click="vm.model.fullWidthImages = !vm.model.fullWidthImages">
+						{{ vm.model.fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
+					</a>
+				</li>
+				<li data-ng-show="vm.totalSuccess() > 0"><a data-ng-click="vm.model.showViewer = !vm.model.showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
+			</ul>
+		</div>
 
-    				<ul class="linklist" data-ng-hide="hideDetails">
-    					<li><a data-ng-click="scrollToAnchor('top')" title="{{ 'GoToTop' | translate }}">{{ 'Top' | translate }}</a></li>
-    					<li><a data-ng-click="scrollToAnchor('bottom')" title="{{ 'GoToBottom' | translate }}">{{ 'Bottom' | translate }}</a></li>
-    					<li data-ng-hide="$first"><a data-ng-click="scrollToAnchor('image' + ($index-1), $index-1)">&lt;</a></li>
-    					<li data-ng-hide="$last"><a data-ng-click="scrollToAnchor('image' + ($index+1), $index+1)">&gt;</a></li>
-    				</ul>
-    			</figcaption>
-    		</figure>
-    	</div>
-        <div class="info">
-    		<p>{{ originalUrl }}</p>
-    		<ul class="linklist totals">
-    			<li><span data-ng-pluralize data-count="images.length" data-when="pluraliseForImages('Images')"></span></li>
-                <li><span data-ng-pluralize data-count="totalSuccess()" data-when="pluraliseForImages('Loaded')"></span></li>
-    			<li data-ng-show="totalFailed() > 0"><span data-ng-pluralize data-count="totalFailed()" data-when="pluraliseForImages('Failed')"></span></li>
-    			<li data-ng-show="isFinishedLoading()"><strong>{{ 'Done' | translate }}</strong></li>
-    		</ul>
-    		<ul class="linklist nav">
-    			<li data-ng-show="isFinishedLoading() && totalSuccess() > 0"><a data-ng-click="downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
-    			<li data-ng-show="totalFailed() > 0"><a data-ng-click="showBrokenImages=!showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
-    			<li data-ng-show="totalSuccess() > 0">
-    				<a data-ng-click="fullWidthImages=!fullWidthImages">
-    					{{  fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
-    				</a>
-    			</li>
-    			<li data-ng-show="totalSuccess() > 0"><a data-ng-click="showViewer=!showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
-    		</ul>
-    	</div>
-    </div>
-    <div id="bottom" class="bottom"></div>
-    <div id="viewer" class="viewer" data-ng-show="showViewer">
-    	<div class="viewer-item modal"></div>
-    	<div class="viewer-item small">
-    		<a class="previous-image" data-ng-style="{'background-image': 'url(' + filteredImages[selectedImageId-1].url + ')'}"></a>
-    	</div>
-    	<div class="viewer-item current" data-ng-click="scrollToAnchor(null, selectedImageId+1)">
-    		<a data-ng-style="{'background-image': 'url(' + filteredImages[selectedImageId].url + ')'}"></a>
-    	</div>
-    	<div class="viewer-item small">
-    		<a class="next-image" data-ng-style="{'background-image': 'url(' + filteredImages[selectedImageId+1].url + ')'}"></a>
-    	</div>
-    	<div class="close">
-    		<span data-ng-click="showViewer=!showViewer">&#10006;</span>
-    	</div>
-    </div>
-    <script type="text/javascript" src="/Scripts/vendor.min.js"></script>
-    <script type="text/javascript" src="/Scripts/app.min.js"></script>
+		<div class="wrap" data-ng-repeat="image in (vm.model.filteredImages = (vm.model.images | filter: vm.shouldDisplayImage(image)))" data-ng-show="image.loaded || image.success">
+			<figure>
+				<a data-ng-attr-id="image{{ $index }}" data-ng-href="{{ image.url }}" data-ng-click="vm.scrollToAnchor($event, 'image' + ($index + 1), $index + 1)" target="_blank">
+					<img src="/Images/1x1.png" class="fusk-image" data-ng-src="{{ image.src }}" data-ng-model="image" alt="{{ image.filename }}">
+				</a>
+
+				<figcaption data-ng-hide="hideDetails">
+					<a data-ng-href="{{ image.url }}" target="_blank" class="imageLink">{{ image.url }}</a>
+
+					<ul class="linklist" data-ng-hide="hideDetails">
+						<li><a data-ng-click="vm.scrollToAnchor($event, 'top')" title="{{ 'GoToTop' | translate }}">{{ 'Top' | translate }}</a></li>
+						<li><a data-ng-click="vm.scrollToAnchor($event, 'bottom')" title="{{ 'GoToBottom' | translate }}">{{ 'Bottom' | translate }}</a></li>
+						<li data-ng-hide="$first"><a data-ng-click="vm.scrollToAnchor($event, 'image' + ($index - 1), $index - 1)">&lt;</a></li>
+						<li data-ng-hide="$last"><a data-ng-click="vm.scrollToAnchor($event, 'image' + ($index + 1), $index + 1)">&gt;</a></li>
+					</ul>
+				</figcaption>
+			</figure>
+		</div>
+
+		<div class="info">
+			<p>{{ vm.model.originalUrl }}</p>
+			<ul class="linklist totals">
+				<li><span data-ng-pluralize data-count="vm.model.images.length" data-when="vm.pluraliseForImages('Images')"></span></li>
+				<li><span data-ng-pluralize data-count="vm.totalSuccess()" data-when="vm.pluraliseForImages('Loaded')"></span></li>
+				<li data-ng-show="vm.totalFailed() > 0"><span data-ng-pluralize data-count="vm.totalFailed()" data-when="vm.pluraliseForImages('Failed')"></span></li>
+				<li data-ng-show="vm.isFinishedLoading()"><strong>{{ 'Done' | translate }}</strong></li>
+			</ul>
+			<ul class="linklist nav">
+				<li data-ng-show="vm.isFinishedLoading() && vm.totalSuccess() > 0"><a data-ng-click="vm.downloadZip()">{{ 'DownloadImages' | translate }} (zip)</a></li>
+				<li data-ng-show="vm.totalFailed() > 0"><a data-ng-click="vm.model.showBrokenImages = !vm.model.showBrokenImages">{{ 'ToggleBrokenImages' | translate }}</a></li>
+				<li data-ng-show="vm.totalSuccess() > 0">
+					<a data-ng-click="vm.model.fullWidthImages = !vm.model.fullWidthImages">
+						{{ vm.model.fullWidthImages ? 'ResizeImagesToFullWidth' : 'ResizeImagesToFitOnPage' | translate }}
+					</a>
+				</li>
+				<li data-ng-show="vm.totalSuccess() > 0"><a data-ng-click="vm.model.showViewer = !vm.model.showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div id="bottom" class="bottom"></div>
+
+	<div id="viewer" class="viewer" data-ng-show="vm.model.showViewer">
+		<div class="viewer-item modal"></div>
+		<div class="viewer-item small">
+			<a class="previous-image" data-ng-style="{'background-image': 'url(' + vm.model.filteredImages[vm.model.selectedImageId - 1].url + ')'}"></a>
+		</div>
+		<div class="viewer-item current" data-ng-click="vm.scrollToAnchor($event, null, vm.model.selectedImageId + 1)">
+			<a data-ng-style="{'background-image': 'url(' + vm.model.filteredImages[vm.model.selectedImageId].url + ')'}"></a>
+		</div>
+		<div class="viewer-item small">
+			<a class="next-image" data-ng-style="{'background-image': 'url(' + vm.model.filteredImages[vm.model.selectedImageId + 1].url + ')'}"></a>
+		</div>
+		<div class="close">
+			<span data-ng-click="vm.model.showViewer = !vm.model.showViewer">&#10006;</span>
+		</div>
+	</div>
+
+	<script type="text/javascript" src="/Scripts/vendor.min.js"></script>
+	<script type="text/javascript" src="/Scripts/app.min.js"></script>
 </body>
 </html>

@@ -21,9 +21,8 @@
         };
 
         function getLinks(url) {
-            var fuskLinks = Fuskr.GetLinks(url);
-
-            var mappedLinks = [];
+            var mappedLinks = [],
+                fuskLinks = Fuskr.GetLinks(url);
 
             mappedLinks.originalUrl = url;
             mappedLinks.totalLoaded = 0;
@@ -38,7 +37,8 @@
                     success: false,
                     active: (i === 0),
                     src: null,
-                    contentType: ''
+                    contentType: '',
+                    filename: Fuskr.GetImageFilename(url)
                 };
 
                 $http({
