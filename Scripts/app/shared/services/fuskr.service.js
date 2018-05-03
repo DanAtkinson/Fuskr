@@ -11,6 +11,11 @@
 
     function FuskrService($http) {
 
+        var disallowedTypes = {
+            'text/html': ['html'],
+            'text/plain': ['plain']
+        };
+
         return {
             getLinks: getLinks
         };
@@ -32,7 +37,8 @@
                     loaded: false,
                     success: false,
                     active: (i === 0),
-                    src: null
+                    src: null,
+                    contentType: ''
                 };
 
                 $http({
@@ -45,13 +51,22 @@
                     imageItem.loaded = true;
                     imageItem.src = (response.data) ? URL.createObjectURL(response.data) : null;
                     imageItem.data = response.data;
+                    imageItem.contentType = (response.data) ? response.data.type : '';
 
                     mappedLinks.totalLoaded = mappedLinks.totalLoaded + 1;
-                    mappedLinks.totalSuccess = mappedLinks.totalSuccess + 1;
                     mappedLinks.finishedLoading = mappedLinks.totalLoaded === fuskLinks.length;
+
+                    //Perform checks on successful images, such as its content type.
+                    if (disallowedTypes[imageItem.contentType]) {
+                        imageItem.success = false;
+                        mappedLinks.totalFailed = mappedLinks.totalFailed + 1;
+                    } else {
+                        mappedLinks.totalSuccess = mappedLinks.totalSuccess + 1;
+                    }
                 }, function () {
                     imageItem.success = false;
                     imageItem.loaded = true;
+                    imageItem.contentType = (response.data) ? response.data.type : '';
 
                     mappedLinks.totalLoaded = mappedLinks.totalLoaded + 1;
                     mappedLinks.totalFailed = mappedLinks.totalFailed + 1;

@@ -2,10 +2,14 @@
 
 (function () {
 
-    var app = angular.module('fuskrApp');
     var originalUrl = '';
+    var app = angular.module('fuskrApp');
 
-    app.controller('ImageListController', function ($document, $rootScope, $scope, $location, $filter, anchorScrollService, fuskrService) {
+    angular
+        .module('fuskrApp')
+        .controller('ImageListController', ['$document', '$rootScope', '$scope', '$location', '$filter', 'anchorScrollService', 'fuskrService', imageListController]);
+
+    function imageListController($document, $rootScope, $scope, $location, $filter, anchorScrollService, fuskrService) {
 
         var url = $location.hash();
         var images = fuskrService.getLinks(url);
@@ -24,24 +28,24 @@
 
         // Lambda functions
         $scope.totalSuccess = function () {
-                return $scope.images.map(function (x) {
-                    return x.loaded && x.success ? 1 : 0;
-                }).reduce(function (a, b) {
-                    return a + b;
-                }, 0);
-            };
+            return $scope.images.map(function (x) {
+                return x.loaded && x.success ? 1 : 0;
+            }).reduce(function (a, b) {
+                return a + b;
+            }, 0);
+        };
 
         $scope.totalFailed = function () {
-                return $scope.images.map(function (x) {
-                    return x.loaded && !x.success ? 1 : 0;
-                }).reduce(function (a, b) {
-                    return a + b;
-                }, 0);
-            };
+            return $scope.images.map(function (x) {
+                return x.loaded && !x.success ? 1 : 0;
+            }).reduce(function (a, b) {
+                return a + b;
+            }, 0);
+        };
 
         $scope.isFinishedLoading = function () {
-                return $scope.images.every(function (x) { return x.loaded; });
-            };
+            return $scope.images.every(function (x) { return x.loaded; });
+        };
 
         // Scoped functions
         $scope.pluraliseForImages = pluraliseForImages;
@@ -112,8 +116,8 @@
             zip.file('Fuskr.txt', 'These images were downloaded using Fuskr.\r\n\r\nFusk URL: ' + originalUrl);
 
             var validImages = $scope.images.filter(function (x) {
-                        return x.loaded && x.success;
-                    });
+                return x.loaded && x.success;
+            });
 
             // Split each URL into path components
             var explodedPaths = validImages.map(function (x) {
@@ -127,9 +131,7 @@
             // are the same, to determine the root folder
             function checkIfAllItemsAtIndexEqual(x) {
                 var pass = explodedPaths.map(function (r) {
-                    return r.url.length > x ?
-                        r.url[index]
-                        : null;
+                    return r.url.length > x ? r.url[index] : null;
                 });
 
                 var allSame = pass.every(function (r) {
@@ -203,5 +205,5 @@
                 saveAs(content, 'fuskr.zip');
             });
         }
-    });
+    }
 }());

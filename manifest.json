@@ -2,9 +2,8 @@
 	"manifest_version": 2,
 	"name": "__MSG_ManifestName__",
 	"description": "__MSG_ManifestDescription__",
-	"version": "3.2",
+	"version": "3.3",
 	"default_locale": "en_GB",
-	"omnibox": { "keyword" : "fuskr" },
 	"background": {
 		"scripts": [
 			"Scripts/background.min.js"
