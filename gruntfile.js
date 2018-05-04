@@ -76,12 +76,12 @@ module.exports = function (grunt) {
             background: ['<%= config.background.src %>'],
             optionsjs: ['<%= config.optionsjs.src %>']
         },
-        jscs: {
+        eslint: {
             app: ['<%= config.app.src %>'],
             background: ['<%= config.background.src %>'],
             optionsjs: ['<%= config.optionsjs.src %>'],
             options: {
-                config: '.jscsrc',
+                config: '.eslintrc.json',
                 requireCurlyBraces: ['if']
             }
         },
@@ -249,9 +249,9 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('lint', ['lint:app', 'lint:background', 'lint:optionsjs', 'lint:styles', /*'lint:html'*/]);
-    grunt.registerTask('lint:app', ['jshint:app', 'jscs:app']);
-    grunt.registerTask('lint:background', ['jshint:background', 'jscs:background']);
-    grunt.registerTask('lint:optionsjs', ['jshint:optionsjs', 'jscs:optionsjs']);
+    grunt.registerTask('lint:app', ['jshint:app', 'eslint:app']);
+    grunt.registerTask('lint:background', ['jshint:background', 'eslint:background']);
+    grunt.registerTask('lint:optionsjs', ['jshint:optionsjs', 'eslint:optionsjs']);
     grunt.registerTask('lint:styles', ['sasslint']);
     grunt.registerTask('lint:html', ['htmllint']);
 
