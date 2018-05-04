@@ -2,8 +2,8 @@ var Fuskr = (function (ret) {
     'use strict';
 
     var groupRegex = /\{\d+\}/,
-        numericRegex = /^(.*?)\[(\d+)\-(\d+)\](.*)$/,
-        alphabeticRegex = /^(.*?)\[(\w)\-(\w)\](.*)$/;
+        numericRegex = /^(.*?)\[(\d+)-(\d+)\](.*)$/,
+        alphabeticRegex = /^(.*?)\[(\w)-(\w)\](.*)$/;
 
     function padString(number, stringLength, padding) {
         var numStr = number.toString();
@@ -32,7 +32,7 @@ var Fuskr = (function (ret) {
             link = prefix + thisNumString + suffix;
 
             if (groupRegex.test(link)) {
-                link = link.replace(new RegExp('\\\{' + groupNumber + '\\\}', 'g'), thisNumString);
+                link = link.replace(new RegExp('\\{' + groupNumber + '\\}', 'g'), thisNumString);
             }
 
             if (ret.IsFuskable(link)) {
@@ -65,7 +65,7 @@ var Fuskr = (function (ret) {
             link = prefix + thisNumString + suffix;
 
             if (groupRegex.test(link)) {
-                link = link.replace(new RegExp('\\\{' + groupNumber + '\\\}', 'g'), thisNumString);
+                link = link.replace(new RegExp('\\{' + groupNumber + '\\}', 'g'), thisNumString);
             }
 
             if (ret.IsFuskable(link)) {

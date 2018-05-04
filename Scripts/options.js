@@ -55,7 +55,7 @@
         setCheckboxes();
     });
 
-    chrome.storage.onChanged.addListener(function (changes, areaName) {
+    chrome.storage.onChanged.addListener(function (changes) {
         if (changes === null || typeof changes === 'undefined') {
             return;
         }

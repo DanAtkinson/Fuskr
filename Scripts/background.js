@@ -2,18 +2,16 @@
 (function () {
 
     var i = 0,
-     ids = [],
-     recentId = 0,
-     parentId = -1,
-     savedIds = [],
-     historyIds = [],
-     targetUrls,
-     numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')],
-     options = {
-        keepFusks: true,
-        openInForeground: true,
-        history: [],
-    };
+        ids = [],
+        recentId = 0,
+        parentId = -1,
+        historyIds = [],
+        targetUrls,
+        options = {
+            keepFusks: true,
+            openInForeground: true,
+            history: [],
+        };
 
     //Target urls tell Chrome what urls are acceptable.
     targetUrls = (function () {
@@ -63,6 +61,7 @@
     }
 
     function createRecentMenu(historyArray) {
+        var historyId;
 
         if (recentId !== 0) {
             chrome.contextMenus.remove(recentId);
@@ -95,7 +94,7 @@
         createRecentMenu([]);
     }
 
-    function optionsOnClick(info, tab) {
+    function optionsOnClick() {
         chrome.runtime.openOptionsPage();
     }
 
@@ -133,15 +132,6 @@
         for (i = 0; i < historyIds.length; i++) {
             if (historyIds[i][0] === info.menuItemId) {
                 createTab(historyIds[i][1], tab);
-                break;
-            }
-        }
-    }
-
-    function savedOnClick(info, tab) {
-        for (i = 0; i < savedIds.length; i++) {
-            if (savedIds[i][0] === info.menuItemId) {
-                createTab(savedIds[i][1].url, tab);
                 break;
             }
         }
@@ -190,20 +180,11 @@
 
     function choiceOnClick(info, tab) {
         var count = 0,
-        direction = 0,
-        response = '',
-        url = '',
-        digitsCheck,
-        findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
-
-        switch (info.mediaType) {
-            case 'image':
-            break;
-            case 'video':
-            break;
-            case 'audio':
-            break;
-        }
+            direction = 0,
+            response = '',
+            url = '',
+            digitsCheck,
+            findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
 
         if (info.srcUrl !== null) {
             digitsCheck = findDigitsRegexp.exec(info.srcUrl);
@@ -268,10 +249,8 @@
                 keepRecentFusks: true,
                 openInForeground: true
             });
-
-            console.log('Installed');
         } else if (details.reason == 'update') {
-            var thisVersion = chrome.runtime.getManifest().version;
+            //var thisVersion = chrome.runtime.getManifest().version;
             var lastVersion = parseFloat(details.previousVersion);
 
             if (lastVersion < 3.2) {
@@ -279,12 +258,6 @@
                 var previousKeepFusks = localStorage.getItem('keepRecentFusks') || '1';
                 var previousOpenInForeground = localStorage.getItem('openInForeground') || '1';
                 var previousHistory = localStorage.getItem('history') || '';
-
-                console.log('Previous localstorage', {
-                    keepFusks: previousKeepFusks,
-                    openinForeground: previousOpenInForeground,
-                    history: previousHistory
-                });
 
                 // Was previously stored as 0/1
                 var keepFusksBool = parseInt(previousKeepFusks, 10) === 1;
@@ -303,12 +276,10 @@
                     openInForeground: openForegroundBool
                 });
             }
-
-            console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion);
         }
     });
 
-    chrome.storage.onChanged.addListener(function (changes, areaName) {
+    chrome.storage.onChanged.addListener(function (changes) {
         if (changes === null || typeof changes === 'undefined') {
             return;
         }

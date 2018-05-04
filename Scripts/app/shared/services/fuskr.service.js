@@ -1,4 +1,4 @@
-/* globals Fuskr, URL */
+/* globals Fuskr, URL, angular */
 
 (function () {
     'use strict';
@@ -45,8 +45,7 @@
                     url: imageItem.url,
                     responseType: 'blob',
                     method: 'GET',
-                })
-                .then(function (response) {
+                }).then(function (response) {
                     imageItem.success = (response.status >= 200 && response.status < 400);
                     imageItem.loaded = true;
                     imageItem.src = (response.data) ? URL.createObjectURL(response.data) : null;
@@ -63,7 +62,7 @@
                     } else {
                         mappedLinks.totalSuccess = mappedLinks.totalSuccess + 1;
                     }
-                }, function () {
+                }, function (response) {
                     imageItem.success = false;
                     imageItem.loaded = true;
                     imageItem.contentType = (response.data) ? response.data.type : '';

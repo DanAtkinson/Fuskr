@@ -1,4 +1,4 @@
-/* globals self, document, setTimeout */
+/* globals self, document, setTimeout, angular */
 
 (function () {
     'use strict';
@@ -7,16 +7,14 @@
         .module('fuskrApp')
         .factory('anchorScrollService', AnchorScrollService);
 
-    AnchorScrollService.$inject = ['$window', '$timeout'];
-
-    function AnchorScrollService($window, $timeout) {
+    function AnchorScrollService() {
         return {
             scrollTo: scrollTo
         };
 
         function scrollTo(elementId) {
             // This scrolling function is from http://www.itnewb.com/tutorial/Creating-the-Smooth-Scroll-Effect-with-JavaScript
-            var i, elm, startY, stopY, distance, speed, step, leapY, timer, scrollFunction;
+            var i, elm, startY, stopY, distance, speed, step, leapY, timer;
 
             //Check if the required element actually exists.
             elm = document.getElementById(elementId);
@@ -41,10 +39,6 @@
             step = Math.round(distance / 25);
             leapY = stopY > startY ? startY + step : startY - step;
             timer = 0;
-
-            scrollFunction = function () {
-                $window.scrollTo(0, leapY);
-            };
 
             if (stopY > startY) {
                 for (i = startY; i < stopY; i += step) {

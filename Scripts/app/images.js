@@ -1,10 +1,7 @@
-/* globals JSZip, saveAs */
+/* globals JSZip, saveAs, angular */
 
 (function () {
     'use strict';
-
-    var originalUrl = '';
-    var app = angular.module('fuskrApp');
 
     angular
         .module('fuskrApp')
@@ -103,23 +100,23 @@
                     /* Left */
                     e.preventDefault();
                     $scope.$apply(function () {
-                        scrollToAnchor(e, false ? null : 'image' + (vm.model.selectedImageId - 1), vm.model.selectedImageId - 1);
+                        scrollToAnchor(e, 'image' + (vm.model.selectedImageId - 1), vm.model.selectedImageId - 1);
                     });
-                break;
+                    break;
                 case 39:
                     /* Right */
                     e.preventDefault();
                     $scope.$apply(function () {
-                        scrollToAnchor(e, false ? null : 'image' + (vm.model.selectedImageId + 1), vm.model.selectedImageId + 1);
+                        scrollToAnchor(e, 'image' + (vm.model.selectedImageId + 1), vm.model.selectedImageId + 1);
                     });
-                break;
+                    break;
                 case 27:
                     /* Escape */
                     e.preventDefault();
                     $scope.$apply(function () {
                         vm.model.showViewer = !vm.model.showViewer;
                     });
-                break;
+                    break;
             }
         }
 
@@ -205,7 +202,7 @@
             }
 
             function safeFileName(str) {
-                return str.replace(/[^a-zA-Z0-9_\-\.]/g, '_');
+                return str.replace(/[^a-zA-Z0-9_\-.]/g, '_');
             }
 
             zip = new JSZip();
@@ -217,22 +214,23 @@
                 zip.file(fileName, img.data, { blob: true });
             });
 
-            zip.generateAsync({ type: 'blob' })
-            .then(function (content) {
-                var zipFilename = prompt('Please enter the name of the generated zip file to download.\nChoosing cancel will abort the zip file download.', 'fuskr.zip');
+            zip
+                .generateAsync({ type: 'blob' })
+                .then(function (content) {
+                    var zipFilename = prompt('Please enter the name of the generated zip file to download.\nChoosing cancel will abort the zip file download.', 'fuskr.zip');
 
-                if (zipFilename === '') {
-                    //User has cancelled out.
-                    return;
-                }
+                    if (zipFilename === '') {
+                        //User has cancelled out.
+                        return;
+                    }
 
-                //Ensure correct extension.
-                if (!zipFilename.toLowerCase().endsWith('.zip')) {
-                    zipFilename += '.zip';
-                }
+                    //Ensure correct extension.
+                    if (!zipFilename.toLowerCase().endsWith('.zip')) {
+                        zipFilename += '.zip';
+                    }
 
-                saveAs(content, zipFilename);
-            });
+                    saveAs(content, zipFilename);
+                });
         }
 
     }

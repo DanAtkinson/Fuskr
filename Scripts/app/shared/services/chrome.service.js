@@ -1,4 +1,4 @@
-/* globals chrome */
+/* globals chrome, angular */
 
 (function () {
     'use strict';
