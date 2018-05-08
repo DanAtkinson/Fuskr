@@ -74,7 +74,10 @@ module.exports = function (grunt) {
         jshint: {
             app: ['<%= config.app.src %>'],
             background: ['<%= config.background.src %>'],
-            optionsjs: ['<%= config.optionsjs.src %>']
+            optionsjs: ['<%= config.optionsjs.src %>'],
+            options: {
+                jshintrc: '.jshintrc'
+            }
         },
         eslint: {
             app: ['<%= config.app.src %>'],

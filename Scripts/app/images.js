@@ -1,4 +1,4 @@
-/* globals JSZip, saveAs, angular */
+/* globals angular, JSZip, saveAs, prompt */
 
 (function () {
     'use strict';
@@ -20,6 +20,8 @@
         vm.shouldDisplayImage = shouldDisplayImage;
         vm.pluraliseForImages = pluraliseForImages;
         vm.downloadZip = downloadZip;
+        vm.fuskUrlChanged = fuskUrlChanged;
+        vm.changeFuskUrl = changeFuskUrl;
 
         //Initialise
         (function () {
@@ -30,10 +32,12 @@
                 images: images,
                 filteredImages: images,
                 originalUrl: url,
+                fuskUrl: url,
                 showViewer: false,
                 showBrokenImages: false,
+                fuskUrlDifferent: false,
                 selectedImageId: 0,
-                imageDisplay: 'imagesFitOnPage'
+                imageDisplay: 'images-fit-on-page'
             };
 
             $document.bind('keydown', keyboardBinding);
@@ -95,6 +99,11 @@
         }
 
         function keyboardBinding(e) {
+            //If the focus is the textbox, do not do anything here.
+            if (document.activeElement.className.includes('fusk-url-textbox')) {
+                return true;
+            }
+
             switch (e.which) {
                 case 37:
                     /* Left */
@@ -144,7 +153,7 @@
                 });
 
                 allSame = pass.every(function (r) {
-                    return r == pass[0];
+                    return r === pass[0];
                 });
 
                 return allSame;
@@ -233,6 +242,37 @@
                 });
         }
 
+        function fuskUrlChanged() {
+            var manualCheck, alphabetCheck;
+
+            vm.model.fuskUrlDifferent = false;
+            manualCheck = /\[\d+(-\d+)?\]/;
+            alphabetCheck = /\[\w(-\w)?\]/;
+
+            //Check whether it's different. Don't try and be smart by doing case insensitivity.
+            if (vm.model.fuskUrl === vm.model.originalUrl) {
+                return false;
+            }
+
+            //We should validate the url.
+            if (manualCheck.exec(vm.model.fuskUrl) === null && alphabetCheck.exec(vm.model.fuskUrl) === null) {
+                return false;
+            }
+
+            //Only if the fusk is valid and is different to the original do we allow the user to resubmit the fusk.
+            vm.model.fuskUrlDifferent = true;
+        }
+
+        function changeFuskUrl() {
+            var images = fuskrService.getLinks(vm.model.fuskUrl);
+            vm.model.images = images;
+            vm.model.filteredImages = images;
+
+            //Reset vars.
+            vm.model.originalUrl = vm.model.fuskUrl;
+            vm.model.selectedImageId = 0;
+            vm.model.fuskUrlDifferent = false;
+        }
     }
 
 }());

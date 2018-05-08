@@ -35,6 +35,9 @@
     "Application_ContextMenu_Other": {
         "message": "Other"
     },
+    "Application_ContextMenu_Infinite": {
+        "message": "Infinite"
+    },
     "Application_ContextMenu_CreateFromSelection": {
         "message": "Create from selection"
     },
@@ -91,6 +94,9 @@
     },
     "Images_Bottom": {
         "message": "Bottom"
+    },
+    "Images_Resubmit": {
+        "message": "Resubmit"
     },
     "Images_ClickToOpenInNewTab": {
         "message": "Click to open this image in a new tab"

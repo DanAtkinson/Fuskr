@@ -3,8 +3,13 @@
   "eqnull": true,
   "eqeqeq": true,
   "undef": true,
+  "esversion": 6,
   "globals": {
     "jQuery": true,
-    "angular": true
+    "angular": true,
+    "localStorage": true,
+    "crypto": true,
+    "console": true,
+    "document": true
   }
 }

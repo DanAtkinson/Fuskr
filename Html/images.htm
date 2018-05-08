@@ -8,7 +8,12 @@
 	<div id="top"></div>
 	<div id="content" class="content" data-ng-class="vm.model.imageDisplay">
 		<div class="info">
-			<p>{{ vm.model.originalUrl }}</p>
+
+			<div class="fusk-url-container">
+				<input type="text" class="fusk-url-textbox" data-ng-model="vm.model.fuskUrl" data-ng-change="vm.fuskUrlChanged()" /><br>
+				<input type="button" data-ng-click="vm.changeFuskUrl()" data-ng-disabled="!vm.model.fuskUrlDifferent" value="{{ 'Resubmit' | translate }}" />
+			</div>
+
 			<ul class="linklist totals">
 				<li><span data-ng-pluralize data-count="vm.model.images.length" data-when="vm.pluraliseForImages('Images')"></span></li>
 				<li><span data-ng-pluralize data-count="vm.totalSuccess()" data-when="vm.pluraliseForImages('Loaded')"></span></li>
@@ -21,10 +26,10 @@
 				<li data-ng-show="vm.totalSuccess() > 0"><a data-ng-click="vm.model.showViewer = !vm.model.showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
 				<li data-ng-show="vm.totalSuccess() > 0">
 					<select data-ng-model="vm.model.imageDisplay">
-						<option value="imagesFitOnPage">{{ 'ResizeImagesToFitOnPage' | translate }}</option>
-						<option value="imagesAreFullWidth">{{ 'ResizeImagesToFullWidth' | translate }}</option>
-						<option value="imagesAreFullPage">{{ 'ResizeImagesToFillPage' | translate }}</option>
-						<option value="imagesAreThumbnails">{{ 'ResizeImagesToThumbnails' | translate }}</option>
+						<option value="images-fit-on-page">{{ 'ResizeImagesToFitOnPage' | translate }}</option>
+						<option value="images-are-full-width">{{ 'ResizeImagesToFullWidth' | translate }}</option>
+						<option value="images-are-full-page">{{ 'ResizeImagesToFillPage' | translate }}</option>
+						<option value="images-are-thumbnails">{{ 'ResizeImagesToThumbnails' | translate }}</option>
 					</select>
 				</li>
 			</ul>
@@ -63,10 +68,10 @@
 				<li data-ng-show="vm.totalSuccess() > 0"><a data-ng-click="vm.model.showViewer = !vm.model.showViewer">{{ 'ShowImagesInViewer' | translate }}</a></li>
 				<li data-ng-show="vm.totalSuccess() > 0">
 					<select data-ng-model="vm.model.imageDisplay">
-						<option value="imagesFitOnPage">{{ 'ResizeImagesToFitOnPage' | translate }}</option>
-						<option value="imagesAreFullWidth">{{ 'ResizeImagesToFullWidth' | translate }}</option>
-						<option value="imagesAreFullPage">{{ 'ResizeImagesToFillPage' | translate }}</option>
-						<option value="imagesAreThumbnails">{{ 'ResizeImagesToThumbnails' | translate }}</option>
+						<option value="images-fit-on-page">{{ 'ResizeImagesToFitOnPage' | translate }}</option>
+						<option value="images-are-full-width">{{ 'ResizeImagesToFullWidth' | translate }}</option>
+						<option value="images-are-full-page">{{ 'ResizeImagesToFillPage' | translate }}</option>
+						<option value="images-are-thumbnails">{{ 'ResizeImagesToThumbnails' | translate }}</option>
 					</select>
 				</li>
 			</ul>

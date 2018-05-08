@@ -40,10 +40,11 @@ button {
   }
 }
 
-.imagesAreThumbnails {
+.images-are-thumbnails {
   .wrap {
     width: min-content;
   }
+
   img {
     width: auto;
 
@@ -53,10 +54,11 @@ button {
   }
 }
 
-.imagesAreFullPage {
+.images-are-full-page {
   .wrap {
     width: -webkit-fill-available;
   }
+
   img {
     width: auto;
 
@@ -66,7 +68,7 @@ button {
   }
 }
 
-.imagesAreFullWidth {
+.images-are-full-width {
   img {
     width: auto;
 
@@ -90,6 +92,12 @@ button {
   padding-left: 130px;
   padding-top: 10px;
   text-align: left;
+
+  .fusk-url-textbox {
+    border: 0;
+    font-size: 20px;
+    width: 99%;
+  }
 }
 
 .bottom {

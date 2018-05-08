@@ -25,7 +25,9 @@
     })();
 
     (function () {
-        var incDecMenuId, incMenuId, decMenuId, numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
+        var incDecMenuId, incMenuId, decMenuId, numbers, i;
+
+        numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
 
         //First, empty all the context menus for this extension.
         chrome.contextMenus.removeAll();
@@ -44,6 +46,7 @@
         createContextMenu({ Id: parentId, Context: ['image', 'video', 'audio', 'link'], ItemType: 'separator' });
         createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_CreateFromSelection'), Context: ['selection'], OnclickCallback: createFromSelectionOnClick });
         createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Manual'), OnclickCallback: manualOnClick });
+        //createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Infinite'), OnclickCallback: infiniteOnClick });
         createContextMenu({ Id: parentId, ItemType: 'separator' });
 
         createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Options'), OnclickCallback: optionsOnClick });
@@ -114,6 +117,39 @@
             createTab(url, tab);
         }
     }
+
+    /*
+    function infiniteOnClick(info, tab) {
+        var url = '',
+            digitsCheck,
+            findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+
+        if (info.linkUrl !== null) {
+            digitsCheck = findDigitsRegexp.exec(info.linkUrl);
+            if (digitsCheck !== null) {
+                url = info.linkUrl;
+            }
+        }
+
+        if (url === '' && info.srcUrl !== null) {
+            digitsCheck = findDigitsRegexp.exec(info.srcUrl);
+            if (digitsCheck !== null) {
+                url = info.srcUrl;
+            }
+        }
+
+        if (url === null || typeof url === 'undefined' || url === '') {
+            alert(l18nify('Prompt_NotAValidFusk'));
+            return;
+        }
+
+        if (digitsCheck && digitsCheck.length === 4) {
+            //Should turn something like https://example.com/images/01/01.jpg into https://example.com/images/01/[01].jpg
+            url = digitsCheck[1] + '[' + digitsCheck[2] + ']' + digitsCheck[3];
+            createTab(url, tab);
+        }
+    }
+    */
 
     function createFromSelectionOnClick(info, tab) {
         var url, manualCheck;
@@ -186,17 +222,17 @@
             digitsCheck,
             findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
 
-        if (info.srcUrl !== null) {
-            digitsCheck = findDigitsRegexp.exec(info.srcUrl);
-            if (digitsCheck !== null) {
-                url = info.srcUrl;
-            }
-        }
-
-        if (url === '' && info.linkUrl !== null) {
+        if (info.linkUrl !== null) {
             digitsCheck = findDigitsRegexp.exec(info.linkUrl);
             if (digitsCheck !== null) {
                 url = info.linkUrl;
+            }
+        }
+
+        if (url === '' && info.srcUrl !== null) {
+            digitsCheck = findDigitsRegexp.exec(info.srcUrl);
+            if (digitsCheck !== null) {
+                url = info.srcUrl;
             }
         }
 
@@ -230,18 +266,28 @@
     }
 
     function createContextMenu(obj) {
-        return chrome.contextMenus.create({
+        //Generate a new context menu item with a dynamically generated guid.
+        var contextMenuId = chrome.contextMenus.create({
             parentId: obj.Id,
             title: obj.Title,
             contexts: obj.Context || ['all'],
             type: obj.ItemType || 'normal',
-            onclick: obj.OnclickCallback || null,
-            targetUrlPatterns: obj.TargetUrlPatterns || null
+            targetUrlPatterns: obj.TargetUrlPatterns || null,
+            id: ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
         });
+
+        //As we can't use onclick with contextMenus.create, create a new listener that is specific to this context menu Id.
+        chrome.contextMenus.onClicked.addListener(function (info, tab) {
+            if (info.menuItemId === contextMenuId)  {
+                obj.OnclickCallback(info, tab);
+            }
+        });
+
+        return contextMenuId;
     }
 
     chrome.runtime.onInstalled.addListener(function (details) {
-        if (details.reason == 'install') {
+        if (details.reason === 'install') {
 
             // First install - set defaults
             chrome.storage.sync.set({
@@ -249,33 +295,27 @@
                 keepRecentFusks: true,
                 openInForeground: true
             });
-        } else if (details.reason == 'update') {
-            //var thisVersion = chrome.runtime.getManifest().version;
-            var lastVersion = parseFloat(details.previousVersion);
+        } else if (details.reason === 'update') {
+            var previousKeepFusks = localStorage.getItem('keepRecentFusks') || '1';
+            var previousOpenInForeground = localStorage.getItem('openInForeground') || '1';
+            var previousHistory = localStorage.getItem('history') || '';
 
-            if (lastVersion < 3.2) {
-                // 3.2 Introduced storage sync
-                var previousKeepFusks = localStorage.getItem('keepRecentFusks') || '1';
-                var previousOpenInForeground = localStorage.getItem('openInForeground') || '1';
-                var previousHistory = localStorage.getItem('history') || '';
+            // Was previously stored as 0/1
+            var keepFusksBool = parseInt(previousKeepFusks, 10) === 1;
+            var openForegroundBool = parseInt(previousOpenInForeground, 10) === 1;
 
-                // Was previously stored as 0/1
-                var keepFusksBool = parseInt(previousKeepFusks, 10) === 1;
-                var openForegroundBool = parseInt(previousOpenInForeground, 10) === 1;
+            // Was previously stored delimited by ||
+            var historyArray = previousHistory.split('||').filter(function (x) {
+                return x !== null && typeof x !== 'undefined' && x.length > 0;
+            });
 
-                // Was previously stored delimited by ||
-                var historyArray = previousHistory.split('||').filter(function (x) {
-                    return x !== null && typeof x !== 'undefined' && x.length > 0;
-                });
+            localStorage.clear();
 
-                localStorage.clear();
-
-                chrome.storage.sync.set({
-                    history: historyArray,
-                    keepRecentFusks: keepFusksBool,
-                    openInForeground: openForegroundBool
-                });
-            }
+            chrome.storage.sync.set({
+                history: historyArray,
+                keepRecentFusks: keepFusksBool,
+                openInForeground: openForegroundBool
+            });
         }
     });
 
