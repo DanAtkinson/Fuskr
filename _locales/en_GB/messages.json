@@ -122,6 +122,9 @@
     "Images_GoToBottom": {
         "message": "Go to the bottom of the page"
     },
+    "Images_ShowImageUrls": {
+        "message": "Show generated urls"
+    },
     "Images_ShowImagesInViewer": {
         "message": "Show images in viewer"
     },

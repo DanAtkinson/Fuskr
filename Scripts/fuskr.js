@@ -104,28 +104,30 @@ var Fuskr = (function (ret) {
     };
 
     ret.GetLinks = function (url, groupNumber) {
-        var matches,
-            links = [];
+        var matches, links = [];
+
         groupNumber = groupNumber || 0;
 
-        if (ret.IsFuskable(url)) {
-            if (ret.IsNumeric(url)) {
-                matches = numericRegex.exec(url);
-                links = getNumericUrls(matches[1], matches[4], matches[2], matches[3], groupNumber);
-            } else if (ret.IsAlphabetical(url)) {
-                matches = alphabeticRegex.exec(url);
-                links = getAlphabeticalUrls(matches[1], matches[4], matches[2], matches[3], groupNumber);
-            }
+        if (!ret.IsFuskable(url)) {
+            return links;
+        }
+
+        if (ret.IsNumeric(url)) {
+            matches = numericRegex.exec(url);
+            links = getNumericUrls(matches[1], matches[4], matches[2], matches[3], groupNumber);
+        } else if (ret.IsAlphabetical(url)) {
+            matches = alphabeticRegex.exec(url);
+            links = getAlphabeticalUrls(matches[1], matches[4], matches[2], matches[3], groupNumber);
         }
 
         return links;
     };
 
     ret.CreateFuskUrl = function (url, count, direction) {
-        var findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+        var begin, number, end, firstNum, lastNum, findDigitsRegexp, digitsCheck;
 
-        var begin, number, end, firstNum, lastNum;
-        var digitsCheck = findDigitsRegexp.exec(url);
+        findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+        digitsCheck = findDigitsRegexp.exec(url);
 
         begin = digitsCheck[1];
         number = digitsCheck[2];

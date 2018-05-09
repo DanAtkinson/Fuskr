@@ -14,6 +14,10 @@ html {
   margin: 0;
   padding: 0;
   text-align: center;
+
+  &.ng-cloak {
+    display: none;
+  }
 }
 
 img {
@@ -93,10 +97,17 @@ button {
   padding-top: 10px;
   text-align: left;
 
-  .fusk-url-textbox {
-    border: 0;
-    font-size: 20px;
-    width: 99%;
+  .fusk-url-container {
+    .fusk-url-textbox {
+      border: 0;
+      font-size: 20px;
+      width: 99%;
+    }
+  }
+
+  .image-urls {
+    height: 300px;
+    width: 50%;
   }
 }
 

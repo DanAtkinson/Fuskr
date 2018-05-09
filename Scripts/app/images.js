@@ -21,24 +21,27 @@
         vm.pluraliseForImages = pluraliseForImages;
         vm.downloadZip = downloadZip;
         vm.fuskUrlChanged = fuskUrlChanged;
-        vm.changeFuskUrl = changeFuskUrl;
+        vm.changeFusk = changeFusk;
+        vm.buildFusk = buildFusk;
 
         //Initialise
         (function () {
-            var url, images;
-            url = $location.hash();
-            images = fuskrService.getLinks(url);
+            var url = $location.hash();
             vm.model = {
-                images: images,
-                filteredImages: images,
+                images: [],
+                imageUrls: '',
+                filteredImages: [],
                 originalUrl: url,
                 fuskUrl: url,
                 showViewer: false,
+                showImageUrls: false,
                 showBrokenImages: false,
                 fuskUrlDifferent: false,
                 selectedImageId: 0,
                 imageDisplay: 'images-fit-on-page'
             };
+
+            buildFusk();
 
             $document.bind('keydown', keyboardBinding);
         }());
@@ -263,15 +266,28 @@
             vm.model.fuskUrlDifferent = true;
         }
 
-        function changeFuskUrl() {
-            var images = fuskrService.getLinks(vm.model.fuskUrl);
+        function changeFusk() {
+            //Update the url hash.
+            $location.hash(vm.model.fuskUrl);
+
+            //Execute the new fusk.
+            buildFusk();
+        }
+
+        function buildFusk() {
+            var urls = '', images = fuskrService.getLinks(vm.model.fuskUrl);
             vm.model.images = images;
             vm.model.filteredImages = images;
 
             //Reset vars.
-            vm.model.originalUrl = vm.model.fuskUrl;
             vm.model.selectedImageId = 0;
             vm.model.fuskUrlDifferent = false;
+            vm.model.originalUrl = vm.model.fuskUrl;
+
+            vm.model.images.map(function(x) {
+                urls += x.url + '\n';
+            });
+            vm.model.imageUrls = urls;
         }
     }
 

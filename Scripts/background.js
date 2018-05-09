@@ -144,8 +144,9 @@
         }
 
         if (digitsCheck && digitsCheck.length === 4) {
-            //Should turn something like https://example.com/images/01/01.jpg into https://example.com/images/01/[01].jpg
-            url = digitsCheck[1] + '[' + digitsCheck[2] + ']' + digitsCheck[3];
+            //Should turn something like https://example.com/images/01/01.jpg into https://example.com/images/01/[01-01].jpg
+            //Then we need to perform a check to see whether the fusk url creates a single element array.
+            url = digitsCheck[1] + '[' + digitsCheck[2] + '-' + digitsCheck[2] + ']' + digitsCheck[3];
             createTab(url, tab);
         }
     }
