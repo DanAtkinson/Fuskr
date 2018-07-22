@@ -52,11 +52,11 @@ module.exports = function (grunt) {
                     'LICENCE',
                     '_locales/**/*'
                 ]
-            },
+            }
         },
         sasslint: {
             options: {
-                configFile: '.sass-lint.yml',
+                configFile: '.sass-lint.yml'
             },
             main: ['<%= config.styles.src %>']
         },
@@ -251,7 +251,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('lint', ['lint:app', 'lint:background', 'lint:optionsjs', 'lint:styles', /*'lint:html'*/]);
+    grunt.registerTask('lint', ['lint:app', 'lint:background', 'lint:optionsjs', 'lint:styles' /*, 'lint:html'*/]);
     grunt.registerTask('lint:app', ['jshint:app', 'eslint:app']);
     grunt.registerTask('lint:background', ['jshint:background', 'eslint:background']);
     grunt.registerTask('lint:optionsjs', ['jshint:optionsjs', 'eslint:optionsjs']);
