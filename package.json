@@ -1,6 +1,6 @@
 {
   "name": "fuskr",
-  "description": "[![Join the chat at https://gitter.im/DanAtkinson/Fuskr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DanAtkinson/Fuskr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)",
+  "description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
   "version": "3.2.0",
   "main": "index.htm",
   "dependencies": {},
