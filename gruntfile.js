@@ -1,10 +1,10 @@
 /*globals module:false, require */
-const sass = require('node-sass');
-
 module.exports = function (grunt) {
     'use strict';
 
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+
+    const sass = require('node-sass');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
