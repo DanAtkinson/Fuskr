@@ -1,4 +1,5 @@
 /*globals module:false, require */
+const sass = require('node-sass');
 
 module.exports = function (grunt) {
     'use strict';
@@ -61,6 +62,9 @@ module.exports = function (grunt) {
             main: ['<%= config.styles.src %>']
         },
         sass: {
+            options: {
+                implementation: sass
+            },
             app: {
                 files: [{
                     expand: true,
