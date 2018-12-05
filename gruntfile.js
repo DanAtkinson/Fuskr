@@ -32,9 +32,10 @@ module.exports = function (grunt) {
             },
             vendor: {
                 src: [
-                    'Scripts/vendor/angular.min.js',
-                    'Scripts/vendor/angular-sanitize.min.js',
-                    'Scripts/vendor/**/*.js'
+                    'node_modules/angular/angular.js',
+                    'node_modules/angular-sanitize/angular-sanitize.js',
+                    'node_modules/file-saver/dist/FileSaver.js',
+                    'node_modules/jszip/dist/jszip.js'
                 ]
             },
             styles: {
@@ -62,17 +63,17 @@ module.exports = function (grunt) {
             main: ['<%= config.styles.src %>']
         },
         sass: {
-            options: {
-                implementation: sass
-            },
             app: {
-                files: [{
+                    files: [{
                     expand: true,
                     src: ['<%= config.styles.src %>'],
                     dest: '<%= config.dist %>/Styles',
                     ext: '.css',
                     flatten: true
                 }]
+            },
+            options: {
+                implementation: sass
             }
         },
         jshint: {
@@ -103,37 +104,37 @@ module.exports = function (grunt) {
             },
             app: {
                 src: ['<%= config.app.src %>'],
-                dest: '<%= config.dist %>/Scripts/app.min.js'
+                dest: '<%= config.dist %>/Scripts/app.js'
             },
             background: {
                 src: ['<%= config.background.src %>'],
-                dest: '<%= config.dist %>/Scripts/background.min.js'
+                dest: '<%= config.dist %>/Scripts/background.js'
             },
             optionsjs: {
                 src: ['<%= config.optionsjs.src %>'],
-                dest: '<%= config.dist %>/Scripts/options.min.js'
+                dest: '<%= config.dist %>/Scripts/options.js'
             },
             vendor: {
                 src: ['<%= config.vendor.src %>'],
-                dest: '<%= config.dist %>/Scripts/vendor.min.js'
+                dest: '<%= config.dist %>/Scripts/vendor.js'
             }
         },
         uglify: {
             app: {
                 src: '<%= concat.app.dest %>',
-                dest: '<%= config.dist %>/Scripts/app.min.js'
+                dest: '<%= config.dist %>/Scripts/app.js'
             },
             background: {
                 src: '<%= concat.background.dest %>',
-                dest: '<%= config.dist %>/Scripts/background.min.js'
+                dest: '<%= config.dist %>/Scripts/background.js'
             },
             optionsjs: {
                 src: '<%= concat.optionsjs.dest %>',
-                dest: '<%= config.dist %>/Scripts/optionsjs.min.js'
+                dest: '<%= config.dist %>/Scripts/optionsjs.js'
             },
             vendor: {
                 src: '<%= concat.vendor.dest %>',
-                dest: '<%= config.dist %>/Scripts/vendor.min.js'
+                dest: '<%= config.dist %>/Scripts/vendor.js'
             }
         },
         copy: {
@@ -214,8 +215,8 @@ module.exports = function (grunt) {
                     browsers: ['PhantomJS'],
                     frameworks: ['jasmine'],
                     files: [
-                        '<%= config.dist %>/Scripts/vendor.min.js',
-                        '<%= config.dist %>/Scripts/app.min.js',
+                        '<%= config.dist %>/Scripts/vendor.js',
+                        '<%= config.dist %>/Scripts/app.js',
                         'Tests/lib/**/*.js',
                         'Tests/**/*.spec.js'
                     ]
@@ -227,9 +228,11 @@ module.exports = function (grunt) {
                     browsers: ['PhantomJS'],
                     frameworks: ['jasmine'],
                     files: [
-                        'Scripts/vendor/angular.min.js',
+                        'node_modules/angular/angular.js',
+                        'node_modules/angular-sanitize/angular-sanitize.js',
+                        'node_modules/file-saver/dist/FileSaver.js',
+                        'node_modules/jszip/dist/jszip.js',
                         'Scripts/Fuskr.js',
-                        'Scripts/vendor/**/*.js',
                         'Scripts/app/*.js',
                         'Tests/lib/**/*.js',
                         'Tests/**/*.spec.js'

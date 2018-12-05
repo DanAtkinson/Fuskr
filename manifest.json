@@ -7,7 +7,7 @@
 	"author": "Dan Atkinson and Jonathon Bolster",
     "background": {
         "scripts": [
-            "Scripts/background.min.js"
+            "Scripts/background.js"
         ],
         "persistent": false
     },
