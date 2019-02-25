@@ -5,9 +5,9 @@
   "main": "index.htm",
   "dependencies": {},
   "devDependencies": {
-    "angular": "^1.7.5",
-    "angular-sanitize": "^1.7.5",
-    "file-saver": "^2.0.0",
+    "angular": "^1.7.7",
+    "angular-sanitize": "^1.7.7",
+    "file-saver": "^2.0.1",
     "grunt": "^1.0.3",
     "grunt-concurrent": "~2.3.1",
     "grunt-contrib-clean": "~2.0.0",
@@ -23,12 +23,12 @@
     "grunt-sass": "~3.0.2",
     "grunt-sass-lint": "^0.2.4",
     "jasmine-core": "~3.3.0",
-    "jszip": "^3.1.5",
+    "jszip": "^3.2.0",
     "karma": "^4.0.0",
     "karma-jasmine": "~2.0.1",
     "karma-phantomjs-launcher": "~1.0.4",
     "matchdep": "~2.0.0",
-    "node-sass": "^4.10.0"
+    "node-sass": "^4.11.0"
   },
   "scripts": {
     "test": "grunt travis:test"
