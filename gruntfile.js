@@ -70,14 +70,6 @@ module.exports = function (grunt) {
                 implementation: sass
             }
         },
-        jshint: {
-            app: ['<%= config.app.src %>'],
-            background: ['<%= config.background.src %>'],
-            optionsjs: ['<%= config.optionsjs.src %>'],
-            options: {
-                jshintrc: '.jshintrc'
-            }
-        },
         concat: {
             options: {
                 sourceMap: true
