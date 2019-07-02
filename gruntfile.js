@@ -56,12 +56,6 @@ module.exports = function (grunt) {
                 ]
             }
         },
-        sasslint: {
-            options: {
-                configFile: '.sass-lint.yml'
-            },
-            main: ['<%= config.styles.src %>']
-        },
         sass: {
             app: {
                     files: [{
@@ -82,20 +76,6 @@ module.exports = function (grunt) {
             optionsjs: ['<%= config.optionsjs.src %>'],
             options: {
                 jshintrc: '.jshintrc'
-            }
-        },
-        eslint: {
-            app: ['<%= config.app.src %>'],
-            background: ['<%= config.background.src %>'],
-            optionsjs: ['<%= config.optionsjs.src %>'],
-            options: {
-                config: '.eslintrc.json',
-                requireCurlyBraces: ['if']
-            }
-        },
-        htmllint: {
-            main: {
-                src: ['Html/**/*.html', 'Html/**/*.htm', '!Html/partials/**/*']
             }
         },
         concat: {
@@ -157,7 +137,7 @@ module.exports = function (grunt) {
         watch: {
             styles: {
                 files: ['<%= config.styles.src %>'],
-                tasks: ['lint:styles', 'compile:styles']
+                tasks: ['compile:styles']
             },
             vendorStyles: {
                 files: ['<%= config.vendorStyles.src %>'],
@@ -165,15 +145,15 @@ module.exports = function (grunt) {
             },
             app: {
                 files: ['<%= concat.app.src %>'],
-                tasks: ['lint:app', 'compile:app', 'karma:release']
+                tasks: ['compile:app', 'karma:release']
             },
             background: {
                 files: ['<%= concat.background.src %>'],
-                tasks: ['lint:background', 'compile:background']
+                tasks: ['compile:background']
             },
             optionsjs: {
                 files: ['<%= concat.optionsjs.src %>'],
-                tasks: ['lint:optionsjs', 'compile:optionsjs']
+                tasks: ['compile:optionsjs']
             },
             vendor: {
                 files: ['<%= concat.vendor.src %>'],
@@ -181,7 +161,7 @@ module.exports = function (grunt) {
             },
             html: {
                 files: ['<%= config.html.src %>'],
-                tasks: ['lint:html', 'copy:html']
+                tasks: ['copy:html']
             },
             images: {
                 files: ['<%= config.images.src %>'],
@@ -258,13 +238,6 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.registerTask('lint', ['lint:app', 'lint:background', 'lint:optionsjs', 'lint:styles' /*, 'lint:html'*/]);
-    grunt.registerTask('lint:app', ['jshint:app', 'eslint:app']);
-    grunt.registerTask('lint:background', ['jshint:background', 'eslint:background']);
-    grunt.registerTask('lint:optionsjs', ['jshint:optionsjs', 'eslint:optionsjs']);
-    grunt.registerTask('lint:styles', ['sasslint']);
-    grunt.registerTask('lint:html', ['htmllint']);
-
     grunt.registerTask('compile', ['compile:app', 'compile:background', 'compile:optionsjs', 'compile:vendor', 'compile:styles']);
     grunt.registerTask('compile:app', ['concat:app' /*, 'uglify:app'*/]);
     grunt.registerTask('compile:background', ['concat:background' /*, 'uglify:background' */]);
@@ -273,10 +246,10 @@ module.exports = function (grunt) {
     grunt.registerTask('compile:styles', ['sass:app']);
    
     grunt.registerTask('default', ['concurrent:dev']);
-    grunt.registerTask('build', ['lint', 'clean:dist', 'compile', 'copy', 'karma:release']);
+    grunt.registerTask('build', ['clean:dist', 'compile', 'copy', 'karma:release']);
     grunt.registerTask('release', ['build', 'clean:removeSourceMaps', 'compress:release']);
     grunt.registerTask('test', ['karma:dev']);
 
-    grunt.registerTask('travis:build', ['lint', 'clean:dist', 'compile', 'copy']);
+    grunt.registerTask('travis:build', ['clean:dist', 'compile', 'copy']);
     grunt.registerTask('travis:test', ['karma:release']);
 };
