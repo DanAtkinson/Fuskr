@@ -91,24 +91,6 @@ module.exports = function (grunt) {
                 dest: '<%= config.dist %>/Scripts/vendor.js'
             }
         },
-        uglify: {
-            app: {
-                src: '<%= concat.app.dest %>',
-                dest: '<%= config.dist %>/Scripts/app.js'
-            },
-            background: {
-                src: '<%= concat.background.dest %>',
-                dest: '<%= config.dist %>/Scripts/background.js'
-            },
-            optionsjs: {
-                src: '<%= concat.optionsjs.dest %>',
-                dest: '<%= config.dist %>/Scripts/optionsjs.js'
-            },
-            vendor: {
-                src: '<%= concat.vendor.dest %>',
-                dest: '<%= config.dist %>/Scripts/vendor.js'
-            }
-        },
         copy: {
             html: {
                 expand: true,
@@ -231,9 +213,9 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask('compile', ['compile:app', 'compile:background', 'compile:optionsjs', 'compile:vendor', 'compile:styles']);
-    grunt.registerTask('compile:app', ['concat:app' /*, 'uglify:app'*/]);
-    grunt.registerTask('compile:background', ['concat:background' /*, 'uglify:background' */]);
-    grunt.registerTask('compile:optionsjs', ['concat:optionsjs' /*, 'uglify:background' */]);
+    grunt.registerTask('compile:app', ['concat:app']);
+    grunt.registerTask('compile:background', ['concat:background']);
+    grunt.registerTask('compile:optionsjs', ['concat:optionsjs']);
     grunt.registerTask('compile:vendor', ['concat:vendor']);
     grunt.registerTask('compile:styles', ['sass:app']);
    
