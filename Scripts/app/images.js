@@ -42,6 +42,7 @@
                 lightOrDark: 'lightMode'
             };
 
+
             chromeService.getDarkMode().then(function(response) {
                 if (response) {
                     vm.model.lightOrDark = 'darkMode';
