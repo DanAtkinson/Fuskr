@@ -4,7 +4,12 @@
     'use strict';
 
     var timeoutId = null,
-        options = {};
+        options = {
+            history: [],
+            darkMode: false,
+            keepRecentFusks: true,
+            openInForeground: true
+        };
 
     function setCheckboxes() {
         var darkMode = document.getElementById('darkMode');
@@ -31,7 +36,7 @@
         };
 
         // If disabling recent fusks, clear history
-        if (keepRecentFusks.checked === false) {
+        if (!keepRecentFusks.checked) {
             optionsToSet.history = [];
         }
 
@@ -48,21 +53,28 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', setCheckboxes);
-    document.getElementById('save').addEventListener('click', saveOptions);
+    (function () {
+        document.addEventListener('DOMContentLoaded', setCheckboxes);
+        document.getElementById('save').addEventListener('click', saveOptions);
 
-    chrome.storage.sync.get(null, function (items) {
-        if (typeof items === 'undefined') {
-            //We cannot get or set options.
-            return;
-        }
-
-        Object.keys(items).map(function (key) {
-            options[key] = items[key];
+        var storagePromise = new Promise(function (resolve) {
+            chrome.storage.sync.get(null, function (items) {
+                if (typeof items === 'undefined') {
+                    //We cannot get or set options.
+                    return;
+                }
+                resolve(items);
+            });
         });
 
-        setCheckboxes();
-    });
+        storagePromise.then(function(items) {
+            Object.keys(items).map(function (key) {
+                options[key] = items[key];
+            });
+
+            setCheckboxes();
+        });
+    }());
 
     chrome.storage.onChanged.addListener(function (changes) {
         if (changes === null || typeof changes === 'undefined') {

@@ -26,32 +26,6 @@
     })();
 
     (function () {
-        var incDecMenuId, incMenuId, decMenuId, numbers, i;
-
-        numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
-
-        //First, empty all the context menus for this extension.
-        chrome.contextMenus.removeAll();
-
-        parentId = createContextMenu({ Title: l18nify('ContextMenu_Fusk'), Context: ['all'] });
-        incDecMenuId = createContextMenu({ Id: parentId, Title: '+/-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
-        incMenuId = createContextMenu({ Id: parentId, Title: '+', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
-        decMenuId = createContextMenu({ Id: parentId, Title: '-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
-
-        for (i = 0; i < numbers.length; i++) {
-            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 0, numbers[i]]);
-            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 1, numbers[i]]);
-            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), -1, numbers[i]]);
-        }
-
-        createContextMenu({ Id: parentId, Context: ['image', 'video', 'audio', 'link'], ItemType: 'separator' });
-        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_CreateFromSelection'), Context: ['selection'], OnclickCallback: createFromSelectionOnClick });
-        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Manual'), OnclickCallback: manualOnClick });
-        //createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Infinite'), OnclickCallback: infiniteOnClick });
-        createContextMenu({ Id: parentId, ItemType: 'separator' });
-
-        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Options'), OnclickCallback: optionsOnClick });
-
         // This event is fired with the user accepts the input in the omnibox.
         chrome.omnibox.onInputEntered.addListener(function (text) {
             chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
@@ -275,7 +249,7 @@
             contexts: obj.Context || ['all'],
             type: obj.ItemType || 'normal',
             targetUrlPatterns: obj.TargetUrlPatterns || null,
-            id: ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
+            id: obj.ActiveId || ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
         });
 
         //As we can't use onclick with contextMenus.create, create a new listener that is specific to this context menu Id.
@@ -288,9 +262,36 @@
         return contextMenuId;
     }
 
+    function createContextMenus() {
+        var incDecMenuId, incMenuId, decMenuId, numbers, i;
+
+        numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
+
+        //First, empty all the context menus for this extension.
+        chrome.contextMenus.removeAll();
+
+        parentId = createContextMenu({ ActiveId: 'FuskrContextMenu', Title: l18nify('ContextMenu_Fusk'), Context: ['all'] });
+        incDecMenuId = createContextMenu({ Id: parentId, Title: '+/-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
+        incMenuId = createContextMenu({ Id: parentId, Title: '+', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
+        decMenuId = createContextMenu({ Id: parentId, Title: '-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
+
+        for (i = 0; i < numbers.length; i++) {
+            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 0, numbers[i]]);
+            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 1, numbers[i]]);
+            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), -1, numbers[i]]);
+        }
+
+        createContextMenu({ Id: parentId, Context: ['image', 'video', 'audio', 'link'], ItemType: 'separator' });
+        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_CreateFromSelection'), Context: ['selection'], OnclickCallback: createFromSelectionOnClick });
+        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Manual'), OnclickCallback: manualOnClick });
+        //createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Infinite'), OnclickCallback: infiniteOnClick });
+        createContextMenu({ Id: parentId, ItemType: 'separator' });
+
+        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Options'), OnclickCallback: optionsOnClick });
+    }
+
     chrome.runtime.onInstalled.addListener(function (details) {
         if (details.reason === 'install') {
-
             // First install - set defaults
             chrome.storage.sync.set({
                 history: [],
@@ -323,6 +324,8 @@
                 openInForeground: openForegroundBool
             });
         }
+
+        createContextMenus();
     });
 
     chrome.storage.onChanged.addListener(function (changes) {
@@ -355,4 +358,13 @@
             options[key] = items[key];
         });
     });
+
+    setTimeout(function() {
+        chrome.contextMenus.update('FuskrContextMenu', {}, function() {
+            if (chrome.runtime.lastError) {
+                // Assume that crbug.com/388231 occured, manually call the createContextMenus handler.
+                createContextMenus();
+            }
+        });
+    }, 500);
 }());

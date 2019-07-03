@@ -17,6 +17,10 @@ How to use
 Version History
 ===============
 
+* 4.0.x
+  * Create dark mode option.
+  * Tidy up code and improve some speed issues, specifically around context menu creation.
+  * New version numbering. Minor version is incremented and we also include a longer version name indicating the build date/time.
 * 3.2
   * Download images as a zip file and retain the structure if it's a nested fusk!
   * Options page change to support Chrome's preferred options layout.
