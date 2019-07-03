@@ -2,6 +2,7 @@
     "manifest_version": 2,
     "name": "__MSG_ManifestName__",
     "description": "__MSG_ManifestDescription__",
+    "version": "3.4",
     "default_locale": "en_GB",
     "author": "Dan Atkinson and Jonathon Bolster",
     "background": {

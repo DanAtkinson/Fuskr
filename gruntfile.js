@@ -214,6 +214,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('incrementVersion', function() {
         const manifestFilename = 'manifest.json';
+        const manifestVersionRegex = /(\d+\.)(\d+)/;
 
         //Read our manifest file in.
         var manifestJson = grunt.file.readJSON(manifestFilename);
@@ -226,6 +227,7 @@ module.exports = function (grunt) {
         var manifestBuildNumber = parseInt(manifestJson.version.match(manifestVersionRegex)[2], 10);
         manifestJson.version = manifestJson.version.match(manifestVersionRegex)[1] + ++manifestBuildNumber;
 
+        grunt.log.writeln('Manifest version is now', manifestJson.version);
 
         //Write the manifest back in and format it.
         grunt.file.write(manifestFilename, JSON.stringify(manifestJson, null, 4));
