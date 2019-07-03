@@ -214,7 +214,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('incrementVersion', function() {
         const manifestFilename = 'manifest.json';
-        const manifestVersionRegex = /(\d+\.)(\d+)/;
+        const manifestVersionRegex = /(\d+\.\d+\.)(\d+)/;
 
         //Read our manifest file in.
         var manifestJson = grunt.file.readJSON(manifestFilename);
@@ -223,11 +223,26 @@ module.exports = function (grunt) {
             return;
         }
 
-        //Grab the build number and increment it.
+        var getVersionName = function(versionNumber) {
+            var date = new Date();
+            var returnValue = "v" + versionNumber + " built at: ";
+
+            var day = date.getFullYear() + "-" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-" + (date.getDate() < 10 ? "0" : "") + date.getDate();
+            returnValue += day + " ";
+
+            var time = (date.getHours() < 10 ? "0" : "") + date.getHours() + ":" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + ":" + (date.getSeconds() < 10 ? "0" : "") + date.getSeconds()
+            returnValue += time;
+
+            return returnValue;
+        };
+
+        //Grab the build number and increment it. Then update the version name.
         var manifestBuildNumber = parseInt(manifestJson.version.match(manifestVersionRegex)[2], 10);
-        manifestJson.version = manifestJson.version.match(manifestVersionRegex)[1] + ++manifestBuildNumber;
+        manifestJson.version = manifestJson.version.match(manifestVersionRegex)[1] + (++manifestBuildNumber);
+        manifestJson.version_name = getVersionName(manifestJson.version);
 
         grunt.log.writeln('Manifest version is now', manifestJson.version);
+        grunt.log.writeln('Manifest version name is now', manifestJson.version_name);
 
         //Write the manifest back in and format it.
         grunt.file.write(manifestFilename, JSON.stringify(manifestJson, null, 4));
