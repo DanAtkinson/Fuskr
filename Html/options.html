@@ -7,21 +7,21 @@
 <body data-ng-app="fuskrApp">
 	<div class="option-group">
 		<label>
-			<input id="darkMode" type="checkbox" data-ng-model="opt.darkMode" data-ng-change="saveDarkMode()" />
+			<input id="darkMode" type="checkbox" data-ng-model="opt.darkMode" />
 			<span data-ng-bind-html="'DarkMode' | translate:'Options'"></span>
 		</label>
 		<p class="description" data-ng-bind-html="'DarkMode_Description' | translate:'Options'"></p>
 	</div>
 	<div class="option-group">
 		<label>
-			<input id="openInForeground" type="checkbox" data-ng-model="opt.openInForeground" data-ng-change="saveOpenInForeground()" />
+			<input id="openInForeground" type="checkbox" data-ng-model="opt.openInForeground" />
 			<span data-ng-bind-html="'OpenNewFusksInForeground' | translate:'Options'"></span>
 		</label>
 		<p class="description" data-ng-bind-html="'OpenNewFusksInForeground_Description' | translate:'Options'"></p>
 	</div>
 	<div class="option-group">
 		<label>
-			<input id="keepRecentFusks" type="checkbox" data-ng-model="opt.keepRecentFusks" data-ng-change="saveKeepRecentFusks()" />
+			<input id="keepRecentFusks" type="checkbox" data-ng-model="opt.keepRecentFusks" />
 			<span data-ng-bind-html="'History_Keep' | translate:'Options'"></span>
 		</label>
 		<p data-ng-bind-html="'History_Keep_Description' | translate:'Options'"></p>
