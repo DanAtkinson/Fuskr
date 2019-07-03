@@ -8,8 +8,7 @@
     "background": {
         "scripts": [
             "Scripts/background.js"
-        ],
-        "persistent": false
+        ]
     },
     "options_ui": {
         "page": "Html/options.html",
