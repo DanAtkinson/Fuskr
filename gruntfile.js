@@ -212,6 +212,25 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.registerTask('incrementVersion', function() {
+        const manifestFilename = 'manifest.json';
+
+        //Read our manifest file in.
+        var manifestJson = grunt.file.readJSON(manifestFilename);
+
+        if (!manifestJson || !manifestJson.version.match(manifestVersionRegex)) {
+            return;
+        }
+
+        //Grab the build number and increment it.
+        var manifestBuildNumber = parseInt(manifestJson.version.match(manifestVersionRegex)[2], 10);
+        manifestJson.version = manifestJson.version.match(manifestVersionRegex)[1] + ++manifestBuildNumber;
+
+
+        //Write the manifest back in and format it.
+        grunt.file.write(manifestFilename, JSON.stringify(manifestJson, null, 4));
+    });
+
     grunt.registerTask('compile', ['compile:app', 'compile:background', 'compile:optionsjs', 'compile:vendor', 'compile:styles']);
     grunt.registerTask('compile:app', ['concat:app']);
     grunt.registerTask('compile:background', ['concat:background']);
@@ -220,7 +239,7 @@ module.exports = function (grunt) {
     grunt.registerTask('compile:styles', ['sass:app']);
    
     grunt.registerTask('default', ['concurrent:dev']);
-    grunt.registerTask('build', ['clean:dist', 'compile', 'copy', 'karma:release']);
+    grunt.registerTask('build', ['clean:dist', 'compile', 'incrementVersion', 'copy', 'karma:release']);
     grunt.registerTask('release', ['build', 'compress:release']);
     grunt.registerTask('test', ['karma:dev']);
 
