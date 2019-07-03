@@ -221,7 +221,7 @@ module.exports = function (grunt) {
    
     grunt.registerTask('default', ['concurrent:dev']);
     grunt.registerTask('build', ['clean:dist', 'compile', 'copy', 'karma:release']);
-    grunt.registerTask('release', ['build', 'clean:removeSourceMaps', 'compress:release']);
+    grunt.registerTask('release', ['build', 'compress:release']);
     grunt.registerTask('test', ['karma:dev']);
 
     grunt.registerTask('travis:build', ['clean:dist', 'compile', 'copy']);
