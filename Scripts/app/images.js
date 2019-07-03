@@ -42,6 +42,7 @@
                 lightOrDark: 'lightMode'
             };
 
+            $document[0].title += ' - ' + vm.model.originalUrl;
 
             chromeService.getDarkMode().then(function(response) {
                 if (response) {
