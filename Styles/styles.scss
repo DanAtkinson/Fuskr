@@ -5,9 +5,7 @@ $dark: #222;
 $red: #b33c04;
 
 html {
-  background-color: $white;
   border: 0;
-  color: $dark;
   cursor: default;
   font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
   font-size: 14px;
@@ -17,6 +15,59 @@ html {
 
   &.ng-cloak {
     display: none;
+  }
+
+  &.lightMode {
+    background-color: $white;
+    color: $dark;
+
+    select {
+      border: 1px solid $black;
+    }
+
+    .info {
+      background: $white url('/Images/128x128.png') no-repeat left top;
+      .fusk-url-container {
+        .fusk-url-textbox {
+          background-color: $white;
+          color: $black;
+        }
+      }
+    }
+
+    .viewer {
+      .close {
+        color: $white;
+      }
+    }
+  }
+
+  &.darkMode {
+    background-color: $dark;
+    color: $off-white;
+
+    select {
+      background-color: $dark;
+      border: 1px solid $off-white;
+      color: $off-white;
+    }
+    .info {
+      background: $dark url('/Images/128x128.png') no-repeat left top;
+
+      .fusk-url-container {
+        .fusk-url-textbox {
+          background-color: $dark;
+          color: $off-white;
+        }
+      }
+    }
+
+    .viewer {
+      .close {
+        color: $dark;
+      }
+    }
+
   }
 }
 
@@ -90,7 +141,6 @@ button {
 }
 
 .info {
-  background: $white url('/Images/128x128.png') no-repeat left top;
   clear: both;
   min-height: 128px;
   padding-left: 130px;
@@ -134,7 +184,7 @@ button {
 
 .viewer {
   .close {
-    color: $white;
+    color: $dark;
     cursor: pointer;
     display: block;
     font-size: 30px;
@@ -181,7 +231,7 @@ button {
     }
 
     &.modal {
-      background-color: $black;
+      background-color: $dark;
       z-index: 98;
     }
   }
@@ -201,7 +251,7 @@ ul {
     }
 
     li~li {
-      border-left: 1px solid $black;
+      border-left: 1px solid $dark;
       padding-left: 5px;
     }
   }

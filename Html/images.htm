@@ -1,6 +1,7 @@
 <!doctype html>
-<html data-ng-app="fuskrApp" data-ng-controller="ImageListController as vm" class="ng-cloak">
+<html data-ng-app="fuskrApp" data-ng-controller="ImageListController as vm" class="ng-cloak" data-ng-class="vm.model.lightOrDark">
 <head>
+	<meta charset="UTF-8">
 	<title>Fuskr - {{ vm.model.originalUrl }}</title>
 	<link rel="stylesheet" href="/Styles/styles.css" type="text/css">
 </head>
@@ -40,8 +41,8 @@
 
 		<div class="wrap" data-ng-repeat="image in (vm.model.filteredImages = (vm.model.images | filter: vm.shouldDisplayImage(image)))" data-ng-show="image.loaded || image.success">
 			<figure>
-				<a data-ng-attr-id="image{{ $index }}" data-ng-href="{{ image.url }}" data-ng-click="vm.scrollToAnchor($event, 'image' + ($index + 1), $index + 1)" target="_blank">
-					<img src="/Images/1x1.png" class="fusk-image" data-ng-src="{{ image.src }}" data-ng-model="image" alt="{{ image.filename }}">
+				<a data-ng-attr-id="image{{ $index }}" data-ng-href="{{ image.url }}" data-ng-click="vm.scrollToAnchor($event, 'image' + ($index + 1), $index + 1)" target="_blank" download="{{ image.filename }}">
+					<img src="/Images/1x1.png" class="fusk-image" data-ng-src="{{ image.src }}" data-ng-model="image" alt="{{ image.filename }}" download="{{ image.filename }}">
 				</a>
 
 				<figcaption data-ng-hide="hideDetails">

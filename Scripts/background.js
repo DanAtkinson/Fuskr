@@ -8,6 +8,7 @@
         historyIds = [],
         targetUrls,
         options = {
+            darkMode: false,
             keepFusks: true,
             openInForeground: true,
             history: [],
@@ -53,7 +54,7 @@
 
         // This event is fired with the user accepts the input in the omnibox.
         chrome.omnibox.onInputEntered.addListener(function (text) {
-            chrome.tabs.getSelected(null, function (tab) {
+            chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
                 createTab(text, tab);
             });
         });
@@ -186,7 +187,7 @@
             windowId: tab.windowId,
             url: '/Html/images.htm#' + url,
             index: (tab.index + 1),
-            selected: options.openInForeground
+            active: options.openInForeground
         });
     }
 
@@ -293,15 +294,18 @@
             // First install - set defaults
             chrome.storage.sync.set({
                 history: [],
+                darkMode: false,
                 keepRecentFusks: true,
                 openInForeground: true
             });
         } else if (details.reason === 'update') {
+            var previousDarkMode = localStorage.getItem('darkMode') || '0';
             var previousKeepFusks = localStorage.getItem('keepRecentFusks') || '1';
             var previousOpenInForeground = localStorage.getItem('openInForeground') || '1';
             var previousHistory = localStorage.getItem('history') || '';
 
             // Was previously stored as 0/1
+            var darkModeBool = parseInt(previousDarkMode, 10) === 1;
             var keepFusksBool = parseInt(previousKeepFusks, 10) === 1;
             var openForegroundBool = parseInt(previousOpenInForeground, 10) === 1;
 
@@ -314,6 +318,7 @@
 
             chrome.storage.sync.set({
                 history: historyArray,
+                darkMode: darkModeBool,
                 keepRecentFusks: keepFusksBool,
                 openInForeground: openForegroundBool
             });
@@ -341,6 +346,11 @@
 
     // Fill the options
     chrome.storage.sync.get(null, function (items) {
+        if (typeof items === 'undefined') {
+            //We cannot get or set options.
+            return;
+        }
+
         Object.keys(items).map(function (key) {
             options[key] = items[key];
         });

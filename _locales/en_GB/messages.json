@@ -185,6 +185,12 @@
     "Options_Tab_About": {
         "message": "About Fuskr"
     },
+    "Options_DarkMode": {
+        "message": "Show Fuskr with a dark background"
+    },
+    "Options_DarkMode_Description": {
+        "message": "Changes the background of image sets to a darker colour. Will take effect once you refresh pages."
+    },
     "Options_OpenNewFusksInForeground": {
         "message": "Open new fusks in the foreground"
     },

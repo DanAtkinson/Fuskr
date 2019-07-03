@@ -7,21 +7,25 @@
         options = {};
 
     function setCheckboxes() {
+        var darkMode = document.getElementById('darkMode');
         var keepRecentFusks = document.getElementById('keepRecentFusks');
         var openInForeground = document.getElementById('openInForeground');
 
-        if (keepRecentFusks && openInForeground) {
+        if (darkMode && keepRecentFusks && openInForeground) {
+            darkMode.checked = options.darkMode;
             keepRecentFusks.checked = options.keepRecentFusks;
             openInForeground.checked = options.openInForeground;
         }
     }
 
     function saveOptions() {
+        var darkMode = document.getElementById('darkMode');
         var keepRecentFusks = document.getElementById('keepRecentFusks');
         var openInForeground = document.getElementById('openInForeground');
         var status = document.getElementById('status');
 
         var optionsToSet = {
+            darkMode: darkMode.checked,
             keepRecentFusks: keepRecentFusks.checked,
             openInForeground: openInForeground.checked
         };
@@ -48,6 +52,11 @@
     document.getElementById('save').addEventListener('click', saveOptions);
 
     chrome.storage.sync.get(null, function (items) {
+        if (typeof items === 'undefined') {
+            //We cannot get or set options.
+            return;
+        }
+
         Object.keys(items).map(function (key) {
             options[key] = items[key];
         });

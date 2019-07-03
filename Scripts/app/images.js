@@ -5,9 +5,9 @@
 
     angular
         .module('fuskrApp')
-        .controller('ImageListController', ['$document', '$rootScope', '$scope', '$location', '$filter', 'anchorScrollService', 'fuskrService', imageListController]);
+        .controller('ImageListController', ['$document', '$scope', '$location', '$timeout', '$filter', 'anchorScrollService', 'fuskrService', 'chromeService', imageListController]);
 
-    function imageListController($document, $rootScope, $scope, $location, $filter, anchorScrollService, fuskrService) {
+    function imageListController($document, $scope, $location, $timeout, $filter, anchorScrollService, fuskrService, chromeService) {
         /* jshint validthis: true */
 
         var vm = this;
@@ -25,7 +25,7 @@
         vm.buildFusk = buildFusk;
 
         //Initialise
-        (function () {
+        $timeout(function () {
             var url = $location.hash();
             vm.model = {
                 images: [],
@@ -38,8 +38,15 @@
                 showBrokenImages: false,
                 fuskUrlDifferent: false,
                 selectedImageId: 0,
-                imageDisplay: 'images-fit-on-page'
+                imageDisplay: 'images-fit-on-page',
+                lightOrDark: 'lightMode'
             };
+
+            chromeService.getDarkMode().then(function(response) {
+                if (response) {
+                    vm.model.lightOrDark = 'darkMode';
+                }
+            });
 
             buildFusk();
 
@@ -278,6 +285,15 @@
             var urls = '', images = fuskrService.getLinks(vm.model.fuskUrl);
             vm.model.images = images;
             vm.model.filteredImages = images;
+
+            if (images.length > 200) {
+                //We should warn the user about a fusk which could potentially kick their computer's arse.
+                //The user should be offered the chance to disable this warning.
+                //The user can either:
+                //  A: Cancel the fusk, which would then close the tab.
+                //  B: Continue running the fusk as normal.
+                //  C: Ask us to process the fusk in batches of 100 images at a time.
+            }
 
             //Reset vars.
             vm.model.selectedImageId = 0;
