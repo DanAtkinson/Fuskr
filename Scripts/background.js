@@ -2,7 +2,6 @@
 (function () {
 
     var i = 0,
-        ids = [],
         recentId = 0,
         parentId = -1,
         historyIds = [],
@@ -25,14 +24,41 @@
         return targetUrls;
     })();
 
-    (function () {
+    setTimeout(function() {
         // This event is fired with the user accepts the input in the omnibox.
         chrome.omnibox.onInputEntered.addListener(function (text) {
             chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
                 createTab(text, tab);
             });
         });
-    }());
+
+        chrome.contextMenus.onClicked.addListener(function (info, tab) {
+            switch(info.menuItemId) {
+                case 'FuskrContextMenu', 'FuskrIncrementDecrement', 'FuskrIncrement', 'FuskrDecrement', 'FuskrSeparator1', 'FuskrSeparator2', 'FuskrSeparator3', 'FuskrRecent', 'FuskrInfinite':
+                    return;
+                case 'FuskrCreateFromSelection':
+                    createFromSelectionOnClick(info, tab);
+                    return;
+                case 'FuskrManual':
+                    manualOnClick(info, tab);
+                    return;
+                case 'FuskrClearHistory':
+                    clearRecentOnClick(info, tab);
+                    return;
+                case 'FuskrOptions':
+                    optionsOnClick(info, tab);
+                    return;
+            }
+            if (info.menuItemId.includes('Fuskr_IncDec_')) {
+                choiceOnClick(info, tab);
+                return;
+            }
+            if (info.menuItemId.includes('FuskrHistory_')) {
+                recentOnClick(info, tab);
+                return;
+            }
+        });
+    }, 100);
 
     function l18nify(name) {
         return chrome.i18n.getMessage('Application_' + name);
@@ -52,19 +78,19 @@
             return false;
         }
 
-        recentId = createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Recent') });
+        recentId = createContextMenu({ Id: 'FuskrRecent', ParentId: 'FuskrContextMenu', Title: l18nify('ContextMenu_Recent') });
 
         for (i = 0; i < historyArray.length; i++) {
             if (historyArray[i] !== '') {
                 //Add the menu
-                historyId = createContextMenu({ Id: recentId, Title: historyArray[i], OnclickCallback: recentOnClick });
+                historyId = createContextMenu({ Id: ('FuskrHistory_' + i),  ParentId: recentId, Title: historyArray[i] });
                 historyIds.push([historyId, historyArray[i]]);
             }
         }
 
         if (historyArray.length > 0) {
-            createContextMenu({ Id: recentId, ItemType: 'separator' });
-            createContextMenu({ Id: recentId, Title: l18nify('ContextMenu_ClearRecentActivity'), OnclickCallback: clearRecentOnClick });
+            createContextMenu({ Id: 'FuskrSeparator3', ParentId: recentId, ItemType: 'separator' });
+            createContextMenu({ Id: 'FuskrClearHistory', ParentId: recentId, Title: l18nify('ContextMenu_ClearRecentActivity') });
         }
     }
 
@@ -141,12 +167,18 @@
     }
 
     function recentOnClick(info, tab) {
-        for (i = 0; i < historyIds.length; i++) {
-            if (historyIds[i][0] === info.menuItemId) {
-                createTab(historyIds[i][1], tab);
-                break;
-            }
+        var historyIndex = info.menuItemId.match(/^FuskrHistory_(\d+)$/);
+        if (!historyIds.length || historyIndex === null || historyIndex.length !== 2) {
+            alert(l18nify('Prompt_NotAValidFusk'));
+            return;
         }
+        historyIndex = parseInt(historyIndex, 10);
+        if (historyIds.length >= historyIndex) {
+            alert(l18nify('Prompt_NotAValidFusk'));
+            return;
+        }
+
+        createTab(historyIds[historyIndex][1], tab);
     }
 
     function createTab(url, tab) {
@@ -196,7 +228,9 @@
             response = '',
             url = '',
             digitsCheck,
-            findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
+            menuItemInfo,
+            findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/,
+            menuItemRegexp = /^Fuskr_IncDec_(10|20|50|100|200|500|Other)_(NegOne|Zero|One)$/;
 
         if (info.linkUrl !== null) {
             digitsCheck = findDigitsRegexp.exec(info.linkUrl);
@@ -217,46 +251,50 @@
             return;
         }
 
-        for (i = 0; i < ids.length; i++) {
-            if (ids[i][0] === info.menuItemId) {
+        menuItemInfo = info.menuItemId.match(menuItemRegexp);
 
-                direction = parseInt(ids[i][1], 10);
-
-                if (ids[i][2] === l18nify('ContextMenu_Other')) {
-                    response = prompt(l18nify('Prompt_HowMany'));
-
-                    if (isNaN(response) === true) {
-                        alert(l18nify('Prompt_NotAValidNumber'));
-                        break;
-                    }
-                    count = parseInt(response, 10);
-                } else {
-                    count = parseInt(ids[i][2], 10);
-                }
-
-                var fuskUrl = Fuskr.CreateFuskUrl(url, count, direction);
-                createTab(fuskUrl, tab);
-                break;
-            }
+        if (menuItemInfo === null || menuItemInfo.length !== 3) {
+            alert(l18nify('Prompt_NotAValidFusk'));
+            return;
         }
+
+        if (menuItemInfo[1] === l18nify('ContextMenu_Other')) {
+            response = prompt(l18nify('Prompt_HowMany'));
+
+            if (isNaN(response) === true) {
+                alert(l18nify('Prompt_NotAValidNumber'));
+                return;
+            }
+            count = parseInt(response, 10);
+        } else {
+            count = parseInt(menuItemInfo[1], 10);
+        }
+
+        switch (menuItemInfo[2]) {
+            case 'One':
+                direction = 1;
+                break;
+            case 'Zero':
+                direction = 0;
+                break;
+            case 'NegOne':
+                direction = -1;
+                break;
+        }
+
+        var fuskUrl = Fuskr.CreateFuskUrl(url, count, direction);
+        createTab(fuskUrl, tab);
     }
 
     function createContextMenu(obj) {
         //Generate a new context menu item with a dynamically generated guid.
         var contextMenuId = chrome.contextMenus.create({
-            parentId: obj.Id,
+            parentId: obj.ParentId,
             title: obj.Title,
             contexts: obj.Context || ['all'],
             type: obj.ItemType || 'normal',
             targetUrlPatterns: obj.TargetUrlPatterns || null,
-            id: obj.ActiveId || ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16))
-        });
-
-        //As we can't use onclick with contextMenus.create, create a new listener that is specific to this context menu Id.
-        chrome.contextMenus.onClicked.addListener(function (info, tab) {
-            if (info.menuItemId === contextMenuId)  {
-                obj.OnclickCallback(info, tab);
-            }
+            id: obj.Id
         });
 
         return contextMenuId;
@@ -265,29 +303,29 @@
     function createContextMenus() {
         var incDecMenuId, incMenuId, decMenuId, numbers, i;
 
-        numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
-
         //First, empty all the context menus for this extension.
         chrome.contextMenus.removeAll();
 
-        parentId = createContextMenu({ ActiveId: 'FuskrContextMenu', Title: l18nify('ContextMenu_Fusk'), Context: ['all'] });
-        incDecMenuId = createContextMenu({ Id: parentId, Title: '+/-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
-        incMenuId = createContextMenu({ Id: parentId, Title: '+', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
-        decMenuId = createContextMenu({ Id: parentId, Title: '-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
+        parentId = createContextMenu({ Id: 'FuskrContextMenu', Title: l18nify('ContextMenu_Fusk'), Context: ['all'] });
+        incDecMenuId = createContextMenu({ Id: 'FuskrIncrementDecrement', ParentId: parentId, Title: '+/-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
+        incMenuId = createContextMenu({ Id: 'FuskrIncrement', ParentId: parentId, Title: '+', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
+        decMenuId = createContextMenu({ Id: 'FuskrDecrement', ParentId: parentId, Title: '-', Context: ['image', 'video', 'audio', 'link'], TargetUrlPatterns: targetUrls });
 
+        numbers = [l18nify('ContextMenu_10'), l18nify('ContextMenu_20'), l18nify('ContextMenu_50'), l18nify('ContextMenu_100'), l18nify('ContextMenu_200'), l18nify('ContextMenu_500'), l18nify('ContextMenu_Other')];
         for (i = 0; i < numbers.length; i++) {
-            ids.push([createContextMenu({ Id: incDecMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 0, numbers[i]]);
-            ids.push([createContextMenu({ Id: incMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), 1, numbers[i]]);
-            ids.push([createContextMenu({ Id: decMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'], OnclickCallback: choiceOnClick }), -1, numbers[i]]);
+            createContextMenu({ Id: 'Fuskr_IncDec_' + numbers[i] + '_Zero', ParentId: incDecMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'] });
+            createContextMenu({ Id: 'Fuskr_IncDec_' + numbers[i] + '_One', ParentId: incMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link']  });
+            createContextMenu({ Id: 'Fuskr_IncDec_' + numbers[i] + '_NegOne', ParentId: decMenuId, Title: numbers[i], Context: ['image', 'video', 'audio', 'link'] });
         }
 
-        createContextMenu({ Id: parentId, Context: ['image', 'video', 'audio', 'link'], ItemType: 'separator' });
-        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_CreateFromSelection'), Context: ['selection'], OnclickCallback: createFromSelectionOnClick });
-        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Manual'), OnclickCallback: manualOnClick });
-        //createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Infinite'), OnclickCallback: infiniteOnClick });
-        createContextMenu({ Id: parentId, ItemType: 'separator' });
+        createContextMenu({ Id: 'FuskrSeparator1', ParentId: parentId, Context: ['image', 'video', 'audio', 'link'], ItemType: 'separator' });
+        createContextMenu({ Id: 'FuskrCreateFromSelection', ParentId: parentId, Title: l18nify('ContextMenu_CreateFromSelection'), Context: ['selection'] });
+        createContextMenu({ Id: 'FuskrManual', ParentId: parentId, Title: l18nify('ContextMenu_Manual') });
+        //createContextMenu({ Id: 'FuskrInfinite', ParentId: parentId, Title: l18nify('ContextMenu_Infinite') });
+        createContextMenu({ Id: 'FuskrSeparator2', ParentId: parentId, ItemType: 'separator' });
 
-        createContextMenu({ Id: parentId, Title: l18nify('ContextMenu_Options'), OnclickCallback: optionsOnClick });
+        createContextMenu({ Id: 'FuskrOptions', ParentId: parentId, Title: l18nify('ContextMenu_Options') });
+        iniitaliseComplete = true;
     }
 
     chrome.runtime.onInstalled.addListener(function (details) {
@@ -358,13 +396,4 @@
             options[key] = items[key];
         });
     });
-
-    setTimeout(function() {
-        chrome.contextMenus.update('FuskrContextMenu', {}, function() {
-            if (chrome.runtime.lastError) {
-                // Assume that crbug.com/388231 occured, manually call the createContextMenus handler.
-                createContextMenus();
-            }
-        });
-    }, 500);
 }());
