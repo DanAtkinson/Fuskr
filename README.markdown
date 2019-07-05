@@ -17,6 +17,8 @@ How to use
 Version History
 ===============
 
+* 4.0.75
+  * Omnibox and history should now be working correctly again.
 * 4.0.61
   * Fix issues with the context menus not working correctly in Chrome. Firefox was unaffected but the solution is cross-browser compatible.
 * 4.0.20

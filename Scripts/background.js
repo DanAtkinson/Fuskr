@@ -133,8 +133,14 @@
             alert(l18nify('Prompt_NotAValidFusk'));
             return;
         }
-        historyIndex = parseInt(historyIndex, 10);
-        if (historyIds.length >= historyIndex) {
+
+        historyIndex = parseInt(historyIndex[1], 10);
+        if (isNaN(historyIndex) || historyIndex < 0) {
+            alert(l18nify('Prompt_NotAValidFusk'));
+            return;
+        }
+
+        if (historyIds.length <= historyIndex) {
             alert(l18nify('Prompt_NotAValidFusk'));
             return;
         }
