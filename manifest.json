@@ -2,8 +2,8 @@
     "manifest_version": 2,
     "name": "__MSG_ManifestName__",
     "description": "__MSG_ManifestDescription__",
-    "version": "4.0.60",
-    "version_name": "v4.0.60 built at: 2019-07-05 05:07:21",
+    "version": "4.0.61",
+    "version_name": "v4.0.61 built at: 2019-07-05 05:11:11",
     "default_locale": "en_GB",
     "author": "Dan Atkinson and Jonathon Bolster",
     "background": {
