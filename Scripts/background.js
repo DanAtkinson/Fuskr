@@ -143,7 +143,6 @@
     }
 
     function createTab(url, tab) {
-
         if (typeof url === 'undefined' || url === null || url.length === 0) {
             return;
         }
@@ -389,7 +388,7 @@
     // This event is fired with the user accepts the input in the omnibox.
     chrome.omnibox.onInputEntered.addListener(function (text) {
         chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
-            createTab(text, tab);
+            createTab(text, tab[0]);
         });
     });
 }());
