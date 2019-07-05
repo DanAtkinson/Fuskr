@@ -52,7 +52,7 @@ Version History
 * 2.1
   * Updated Fuskr with new icon/image goodness kindly provided by Richard Stelmach of Creative Binge!
 * 2.0
-  * Alphabetical fusking is now possible! You can now do fusks such as http://example.com/path/file/[a-z].jpg or even http://domain.com/path/file/[a-z]and[c-g]and[j-m].jpg
+  * Alphabetical fusking is now possible! You can now do fusks such as https://example.com/path/file/[a-z].jpg or even https://domain.com/path/file/[a-z]and[c-g]and[j-m].jpg
   * Changes to the options page to make it much cleaner.
 * 1.9.1
   * Some changes to the application in order to take into account recent security update to Google Chrome which will be enforced shortly.
