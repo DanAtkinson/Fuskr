@@ -5,60 +5,21 @@
         recentId = 0,
         parentId = -1,
         historyIds = [],
-        targetUrls,
+        targetUrls = (function () {
+            var targetUrls = [];
+            //Target urls tell Chrome what urls are acceptable.
+            //Create regex patterns to match only urls that contain numbers
+            for (var i = 0; i <= 9; i++) {
+                targetUrls.push('*://*/*' + i + '*');
+            }
+            return targetUrls;
+        }()),
         options = {
             darkMode: false,
             keepFusks: true,
             openInForeground: true,
             history: [],
         };
-
-    //Target urls tell Chrome what urls are acceptable.
-    targetUrls = (function () {
-        var targetUrls = [];
-
-        //Create regex patterns to match only urls that contain numbers
-        for (var i = 0; i <= 9; i++) {
-            targetUrls.push('*://*/*' + i + '*');
-        }
-        return targetUrls;
-    })();
-
-    setTimeout(function() {
-        // This event is fired with the user accepts the input in the omnibox.
-        chrome.omnibox.onInputEntered.addListener(function (text) {
-            chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
-                createTab(text, tab);
-            });
-        });
-
-        chrome.contextMenus.onClicked.addListener(function (info, tab) {
-            switch(info.menuItemId) {
-                case 'FuskrContextMenu', 'FuskrIncrementDecrement', 'FuskrIncrement', 'FuskrDecrement', 'FuskrSeparator1', 'FuskrSeparator2', 'FuskrSeparator3', 'FuskrRecent', 'FuskrInfinite':
-                    return;
-                case 'FuskrCreateFromSelection':
-                    createFromSelectionOnClick(info, tab);
-                    return;
-                case 'FuskrManual':
-                    manualOnClick(info, tab);
-                    return;
-                case 'FuskrClearHistory':
-                    clearRecentOnClick(info, tab);
-                    return;
-                case 'FuskrOptions':
-                    optionsOnClick(info, tab);
-                    return;
-            }
-            if (info.menuItemId.includes('Fuskr_IncDec_')) {
-                choiceOnClick(info, tab);
-                return;
-            }
-            if (info.menuItemId.includes('FuskrHistory_')) {
-                recentOnClick(info, tab);
-                return;
-            }
-        });
-    }, 100);
 
     function l18nify(name) {
         return chrome.i18n.getMessage('Application_' + name);
@@ -325,7 +286,6 @@
         createContextMenu({ Id: 'FuskrSeparator2', ParentId: parentId, ItemType: 'separator' });
 
         createContextMenu({ Id: 'FuskrOptions', ParentId: parentId, Title: l18nify('ContextMenu_Options') });
-        iniitaliseComplete = true;
     }
 
     chrome.runtime.onInstalled.addListener(function (details) {
@@ -394,6 +354,42 @@
 
         Object.keys(items).map(function (key) {
             options[key] = items[key];
+        });
+    });
+
+    chrome.contextMenus.onClicked.addListener(function (info, tab) {
+        switch(info.menuItemId) {
+            case 'FuskrContextMenu', 'FuskrIncrementDecrement', 'FuskrIncrement', 'FuskrDecrement', 'FuskrSeparator1', 'FuskrSeparator2', 'FuskrSeparator3', 'FuskrRecent', 'FuskrInfinite':
+                return;
+            case 'FuskrCreateFromSelection':
+                createFromSelectionOnClick(info, tab);
+                return;
+            case 'FuskrManual':
+                manualOnClick(info, tab);
+                return;
+            case 'FuskrClearHistory':
+                clearRecentOnClick(info, tab);
+                return;
+            case 'FuskrOptions':
+                optionsOnClick(info, tab);
+                return;
+        }
+
+        if (info.menuItemId.includes('Fuskr_IncDec_')) {
+            choiceOnClick(info, tab);
+            return;
+        }
+
+        if (info.menuItemId.includes('FuskrHistory_')) {
+            recentOnClick(info, tab);
+            return;
+        }
+    });
+
+    // This event is fired with the user accepts the input in the omnibox.
+    chrome.omnibox.onInputEntered.addListener(function (text) {
+        chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
+            createTab(text, tab);
         });
     });
 }());
