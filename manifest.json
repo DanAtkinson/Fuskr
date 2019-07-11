@@ -2,8 +2,8 @@
     "manifest_version": 2,
     "name": "__MSG_ManifestName__",
     "description": "__MSG_ManifestDescription__",
-    "version": "4.0.75",
-    "version_name": "v4.0.75 built at: 2019-07-05 06:06:43",
+    "version": "4.0.83",
+    "version_name": "v4.0.83 built at: 2019-07-11 16:29:34",
     "default_locale": "en_GB",
     "author": "Dan Atkinson and Jonathon Bolster",
     "background": {
@@ -16,6 +16,7 @@
         "page": "Html/options.html",
         "open_in_tab": false
     },
+    "incognito": "split",
     "omnibox": {
         "keyword": "fuskr"
     },
@@ -28,6 +29,7 @@
         "activeTab",
         "storage"
     ],
+    "minimum_chrome_version": "73",
     "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
     "homepage_url": "https://danatkinson.github.io/Fuskr/",
     "icons": {
