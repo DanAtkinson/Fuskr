@@ -1,6 +1,23 @@
 [![Join the chat at https://gitter.im/DanAtkinson/Fuskr](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/DanAtkinson/Fuskr?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build Status](https://travis-ci.org/DanAtkinson/Fuskr.svg?branch=master)](https://travis-ci.org/DanAtkinson/Fuskr)
 
+> **IMPORTANT! PLEASE READ!**
+> ==========================
+> 
+> This extension was unpublished from the Google Chrome extensions webstore in February 2020 as Google decided that some of the permissions used (such as opening galleries in a tab and being able to download images as a zip) were not necessary.
+> 
+> I disagreed with their decision I therefore preemptively unpublished the extension. At this time I will not be re-publishing it without making major changes to it.
+> 
+> Please see a more detailed look comment here:
+> https://github.com/DanAtkinson/Fuskr/issues/44#issuecomment-644381586
+> 
+> If you wish to continue using the extension (not supported!) and feel that you are technically literate, you can follow the below steps, somewhat covered [here](https://developer.chrome.com/docs/extensions/mv2/getstarted/):
+> 1. Clone/download this repository to your local machine.
+> 1. Open the Extension Management page by navigating to chrome://extensions.<br/>
+>  _The Extension Management page can also be opened by clicking on the Chrome menu, hovering over More Tools then selecting Extensions._
+> 1. Enable Developer Mode by clicking the toggle switch next to Developer mode.
+> 1. Click the LOAD UNPACKED button and select the extension directory.
+
 How to use
 ==========
 
