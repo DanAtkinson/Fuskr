@@ -8,7 +8,7 @@
 > 
 > I disagreed with their decision I therefore preemptively unpublished the extension. At this time I will not be re-publishing it without making major changes to it.
 > 
-> Please see a more detailed look comment here:
+> Please see a more detailed explanation here:<br/>
 > https://github.com/DanAtkinson/Fuskr/issues/44#issuecomment-644381586
 > 
 > If you wish to continue using the extension (not supported!) and feel that you are technically literate, you can follow the below steps, somewhat covered [here](https://developer.chrome.com/docs/extensions/mv2/getstarted/):
