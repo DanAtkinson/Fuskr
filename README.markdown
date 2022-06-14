@@ -6,19 +6,17 @@
 > 
 > This extension was unpublished from the Google Chrome extensions webstore in February 2020 as Google decided that some of the permissions used in this extension (such as opening new tabs, and being able to download images as a zip) were not necessary for an image gallery extension that supported downloads.
 > 
-> I fundamentally disagreed with their decision and therefore preemptively unpublished the extension. At this time I will not be re-publishing it without having to make major changes to the underlying source code. For one, it was re-written for Angular.js which I no longer actively use (I have moved to Angular professionally.
+> I fundamentally disagreed with their decision and therefore preemptively unpublished the extension. At this time I will not be re-publishing it without having to make major changes to the underlying source code. For one, it was re-written for Angular.js which I no longer actively use (I have moved to Angular professionally).
 > 
 > Please see a more detailed explanation here:<br/>
 > https://github.com/DanAtkinson/Fuskr/issues/44#issuecomment-644381586
 > 
-> If you wish to continue using the extension (not supported!) and feel that you are technically literate, you can follow the below steps, somewhat covered [here](https://developer.chrome.com/docs/extensions/mv2/getstarted/):
+> If you wish to continue using the extension (**not supported!**) and feel that you are technically literate, you can follow the below steps, somewhat covered [here](https://developer.chrome.com/docs/extensions/mv2/getstarted/):
 > 1. Clone/download this repository to your local machine.
 > 1. Open the Extension Management page by navigating to chrome://extensions.<br/>
 >  _The Extension Management page can also be opened by clicking on the Chrome menu, hovering over More Tools then selecting Extensions._
 > 1. Enable Developer Mode by clicking the toggle switch next to Developer mode.
 > 1. Click the LOAD UNPACKED button and select the extension directory.
-> 
-> I am sorry but I cannot offer any support for your use of Fuskr.
 
 How to use
 ==========
