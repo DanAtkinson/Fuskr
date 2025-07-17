@@ -2,10 +2,10 @@
 	min-height: 100vh;
 	padding: 20px;
 	text-align: center;
-	background: #f5f5f5;
+	background: var(--bg-color);
 }
 
 h1 {
-	color: #4a90e2;
+	color: var(--primary-color);
 	margin-bottom: 20px;
 }

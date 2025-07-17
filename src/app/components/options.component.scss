@@ -1,20 +1,38 @@
 .options-container {
-	max-width: 600px;
+	max-width: 700px;
 	margin: 0 auto;
 	padding: 20px;
 	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 h1 {
-	color: var(--primary-color);
+	color: #2c3e50;
 	margin-bottom: 30px;
+	text-align: center;
+}
+
+h2 {
+	color: #34495e;
+	margin-bottom: 20px;
+	font-size: 1.3rem;
+	border-bottom: 2px solid #e0e0e0;
+	padding-bottom: 10px;
+}
+
+.options-section {
+	margin-bottom: 40px;
+	background-color: #f8f9fa;
+	border-radius: 8px;
+	padding: 20px;
+	border: 1px solid #e9ecef;
 }
 
 .option-group {
 	margin-bottom: 25px;
-	padding: 15px;
-	border: 1px solid var(--border-color);
-	border-radius: 5px;
+	
+	&:last-child {
+		margin-bottom: 0;
+	}
 }
 
 label {
@@ -22,31 +40,57 @@ label {
 	align-items: center;
 	cursor: pointer;
 	font-weight: 500;
+	color: #2c3e50;
+	
+	&:not(.radio-label) {
+		margin-bottom: 8px;
+	}
 }
 
-input[type="checkbox"] {
+.radio-group {
+	margin: 10px 0;
+	padding-left: 20px;
+	
+	.radio-label {
+		margin-bottom: 8px;
+		font-weight: normal;
+		
+		input[type="radio"] {
+			margin-right: 8px;
+			transform: scale(1.1);
+		}
+	}
+}
+
+input[type="checkbox"], input[type="radio"] {
 	margin-right: 10px;
 	transform: scale(1.2);
+	accent-color: #3498db;
 }
 
 .description {
 	margin: 8px 0 0 0;
-	color: var(--text-secondary);
+	color: #7f8c8d;
 	font-size: 0.9em;
+	line-height: 1.4;
+	padding-left: 5px;
 }
 
 .status {
 	position: fixed;
 	bottom: 20px;
 	right: 20px;
-	background: var(--success-color);
+	background: #27ae60;
 	color: white;
-	padding: 10px 15px;
-	border-radius: 5px;
+	padding: 12px 20px;
+	border-radius: 6px;
 	opacity: 0;
 	transition: opacity 0.3s ease;
-}
-
-.status.show {
-	opacity: 1;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	font-weight: 500;
+	z-index: 1000;
+	
+	&.show {
+		opacity: 1;
+	}
 }

@@ -5,6 +5,16 @@ export interface ChromeStorageData {
 	keepRecentFusks?: boolean;
 	openInForeground?: boolean;
 	recentFusks?: string[];
+	// Image resize options
+	resizeImagesToFitOnPage?: boolean;
+	resizeImagesToFullWidth?: boolean;
+	resizeImagesToFillPage?: boolean;
+	resizeImagesToThumbnails?: boolean;
+	// Image viewer options
+	showImagesInViewer?: boolean;
+	toggleBrokenImages?: boolean;
+	// Image display mode (fitOnPage, fullWidth, fillPage, thumbnails)
+	imageDisplayMode?: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails';
 }
 
 // Cross-browser compatibility

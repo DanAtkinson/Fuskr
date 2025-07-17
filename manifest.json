@@ -20,7 +20,7 @@
 	"omnibox": {
 		"keyword": "fuskr"
 	},
-	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage"],
+	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage", "scripting"],
 	"host_permissions": ["http://*/*", "https://*/*"],
 	"minimum_chrome_version": "88",
 	"homepage_url": "https://danatkinson.github.io/Fuskr/",

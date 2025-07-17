@@ -13,6 +13,21 @@ export class GalleryComponent implements OnInit {
 	imageUrls: string[] = [];
 	loading: boolean = false;
 	errorMessage: string = '';
+	
+	// Image tracking
+	loadedImages: number = 0;
+	brokenImages: number = 0;
+	totalImages: number = 0;
+	
+	// UI state
+	showBrokenImages: boolean = false;
+	showImageViewer: boolean = false;
+	currentViewerImage: string = '';
+	currentViewerIndex: number = 0;
+	
+	// Settings
+	darkMode: boolean = false;
+	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
 
 	constructor(
 		private route: ActivatedRoute,
@@ -21,13 +36,37 @@ export class GalleryComponent implements OnInit {
 		private chromeService: ChromeService
 	) {}
 
-	ngOnInit() {
+	async ngOnInit() {
+		await this.loadSettings();
+		
+		// Handle both initial load and refresh scenarios
 		this.route.queryParams.subscribe(params => {
 			if (params['url']) {
-			this.originalUrl = params['url'];
-			this.generateGallery();
+				this.originalUrl = params['url'];
+				this.generateGallery();
 			}
 		});
+		
+		// Also check on immediate initialization in case queryParams subscription is delayed
+		const currentParams = this.route.snapshot.queryParams;
+		if (currentParams['url'] && !this.originalUrl) {
+			this.originalUrl = currentParams['url'];
+			this.generateGallery();
+		}
+	}
+
+	async loadSettings() {
+		try {
+			const settings = await this.chromeService.getStorageData();
+			this.darkMode = settings.darkMode || false;
+			this.imageDisplayMode = settings.imageDisplayMode || 'fitOnPage';
+			this.showBrokenImages = settings.toggleBrokenImages || false;
+			
+			// Apply dark mode class to document
+			document.body.classList.toggle('dark-mode', this.darkMode);
+		} catch (error) {
+			console.error('Error loading settings:', error);
+		}
 	}
 
 	generateGallery() {
@@ -43,6 +82,9 @@ export class GalleryComponent implements OnInit {
 		try {
 			const result = this.fuskrService.generateImageGallery(this.originalUrl);
 			this.imageUrls = result.urls;
+			this.totalImages = this.imageUrls.length;
+			this.loadedImages = 0;
+			this.brokenImages = 0;
 		
 			// Update the URL in the browser to show the bracketed version
 			if (result.originalUrl !== this.originalUrl) {
@@ -108,6 +150,123 @@ export class GalleryComponent implements OnInit {
 	onImageError(event: Event) {
 		const img = event.target as HTMLImageElement;
 		img.classList.add('error');
-		img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIG5vdCBmb3VuZDwvdGV4dD4KPC9zdmc+';
+		this.brokenImages++;
+		
+		// Create a more visible broken image placeholder
+		const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+			<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+				<rect width="100%" height="100%" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+				<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">Image not found</text>
+				<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="#adb5bd" text-anchor="middle" dominant-baseline="middle">🚫</text>
+			</svg>
+		`)}`;
+		
+		if (!this.showBrokenImages) {
+			// Instead of hiding completely, reduce opacity
+			img.style.opacity = '0.3';
+			img.style.filter = 'grayscale(100%)';
+		}
+		
+		// Always show the broken image placeholder
+		img.src = brokenImageSvg;
+		img.alt = 'Image not found';
+	}
+
+	onImageLoad(event: Event) {
+		this.loadedImages++;
+	}
+
+	async toggleDarkMode() {
+		this.darkMode = !this.darkMode;
+		document.body.classList.toggle('dark-mode', this.darkMode);
+		
+		// Save to storage
+		try {
+			const settings = await this.chromeService.getStorageData();
+			settings.darkMode = this.darkMode;
+			await this.chromeService.setStorageData(settings);
+		} catch (error) {
+			console.error('Error saving dark mode setting:', error);
+		}
+	}
+
+	async setImageDisplayMode(mode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails') {
+		this.imageDisplayMode = mode;
+		
+		// Save to storage
+		try {
+			const settings = await this.chromeService.getStorageData();
+			settings.imageDisplayMode = mode;
+			await this.chromeService.setStorageData(settings);
+		} catch (error) {
+			console.error('Error saving display mode setting:', error);
+		}
+	}
+
+	async toggleBrokenImagesVisibility() {
+		this.showBrokenImages = !this.showBrokenImages;
+		
+		// Update visibility of broken images
+		const brokenImages = document.querySelectorAll('img.error');
+		brokenImages.forEach((img: Element) => {
+			const htmlImg = img as HTMLImageElement;
+			if (this.showBrokenImages) {
+				htmlImg.style.opacity = '1';
+				htmlImg.style.filter = 'none';
+			} else {
+				htmlImg.style.opacity = '0.3';
+				htmlImg.style.filter = 'grayscale(100%)';
+			}
+		});
+		
+		// Save to storage
+		try {
+			const settings = await this.chromeService.getStorageData();
+			settings.toggleBrokenImages = this.showBrokenImages;
+			await this.chromeService.setStorageData(settings);
+		} catch (error) {
+			console.error('Error saving broken images setting:', error);
+		}
+	}
+
+	openImageViewer(url: string, index: number) {
+		this.currentViewerImage = url;
+		this.currentViewerIndex = index;
+		this.showImageViewer = true;
+	}
+
+	closeImageViewer() {
+		this.showImageViewer = false;
+	}
+
+	nextImage() {
+		if (this.currentViewerIndex < this.imageUrls.length - 1) {
+			this.currentViewerIndex++;
+			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+		}
+	}
+
+	previousImage() {
+		if (this.currentViewerIndex > 0) {
+			this.currentViewerIndex--;
+			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+		}
+	}
+
+	removeBrokenImages() {
+		const brokenImages = document.querySelectorAll('img.error');
+		brokenImages.forEach((img: Element) => {
+			const container = img.closest('.image-item');
+			if (container) {
+				container.remove();
+			}
+		});
+		// Update the URLs array to reflect removed images
+		this.imageUrls = this.imageUrls.filter((_, index) => {
+			const img = document.querySelector(`img[alt="Image ${index + 1}"]`);
+			return img && !img.classList.contains('error');
+		});
+		this.totalImages = this.imageUrls.length;
+		this.brokenImages = 0;
 	}
 }

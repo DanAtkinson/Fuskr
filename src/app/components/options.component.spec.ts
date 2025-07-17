@@ -36,7 +36,17 @@ describe('OptionsComponent', () => {
 			expect(component.options).toEqual({
 				darkMode: false,
 				keepRecentFusks: true,
-				openInForeground: true
+				openInForeground: true,
+				// Image resize options
+				resizeImagesToFitOnPage: true,
+				resizeImagesToFullWidth: false,
+				resizeImagesToFillPage: false,
+				resizeImagesToThumbnails: false,
+				// Image viewer options
+				showImagesInViewer: false,
+				toggleBrokenImages: false,
+				// Default display mode
+				imageDisplayMode: 'fitOnPage'
 			});
 		});
 
@@ -44,7 +54,14 @@ describe('OptionsComponent', () => {
 			const testOptions: ChromeStorageData = {
 				darkMode: true,
 				keepRecentFusks: false,
-				openInForeground: false
+				openInForeground: false,
+				resizeImagesToFitOnPage: false,
+				resizeImagesToFullWidth: true,
+				resizeImagesToFillPage: false,
+				resizeImagesToThumbnails: false,
+				showImagesInViewer: true,
+				toggleBrokenImages: true,
+				imageDisplayMode: 'fullWidth'
 			};
 
 			mockChromeService.getStorageData.and.returnValue(Promise.resolve(testOptions));

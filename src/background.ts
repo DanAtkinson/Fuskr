@@ -367,13 +367,37 @@ class BackgroundScript {
 
 	private manualOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void {
 		const imageUrl = info.linkUrl || info.srcUrl || '';
-		const url = prompt(this.l18nify('Prompt_PleaseEnterTheUrl'), imageUrl);
+		
+		// Since prompt() doesn't work in service workers, we need to inject a content script
+		chrome.scripting.executeScript({
+			target: { tabId: tab.id! },
+			func: this.showManualPrompt,
+			args: [imageUrl, this.l18nify('Prompt_PleaseEnterTheUrl'), this.l18nify('Prompt_NotAValidFusk')]
+		}).then((result) => {
+			if (result && result[0] && result[0].result) {
+				const url = result[0].result;
+				if (this.fuskrService.isFuskable(url)) {
+					this.createTab(url, tab);
+				}
+			}
+		}).catch((error) => {
+			console.error('Error executing manual prompt script:', error);
+		});
+	}
 
-		if (url && this.fuskrService.isFuskable(url)) {
-			this.createTab(url, tab);
-		} else if (url) {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+	// This function will be injected into the page
+	private showManualPrompt(imageUrl: string, promptMessage: string, errorMessage: string): string | null {
+		const url = prompt(promptMessage, imageUrl);
+		if (url && url.trim()) {
+			// Basic check for fuskable pattern - will be validated in background script
+			if (url.includes('[') || /\d+/.test(url)) {
+				return url;
+			} else {
+				alert(errorMessage);
+				return null;
+			}
 		}
+		return null;
 	}
 
 	private clearRecentOnClick(): void {
