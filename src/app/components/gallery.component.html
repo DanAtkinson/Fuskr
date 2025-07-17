@@ -1,0 +1,70 @@
+<div class="gallery-container">
+	<div class="gallery-header">
+	<h1>Fuskr Gallery</h1>
+	<div class="url-info">
+		<label>Original URL:</label>
+		<input 
+		type="url" 
+		[(ngModel)]="originalUrl" 
+		(keyup.enter)="generateGallery()"
+		placeholder="Enter URL to fusk..."
+		class="url-input"
+		/>
+		<button class="btn btn-primary" (click)="generateGallery()">
+		Generate Gallery
+		</button>
+	</div>
+	
+	<div class="gallery-stats" *ngIf="imageUrls.length > 0">
+		<span>{{ imageUrls.length }} images found</span>
+		<button class="btn btn-secondary btn-sm" (click)="downloadAll()">
+		Download All
+		</button>
+	</div>
+	</div>
+	
+	<div class="loading" *ngIf="loading">
+	<div class="spinner"></div>
+	<p>Generating gallery...</p>
+	</div>
+	
+	<div class="error" *ngIf="errorMessage">
+	<p>{{ errorMessage }}</p>
+	</div>
+	
+	<div class="image-gallery" *ngIf="imageUrls.length > 0 && !loading">
+	<div 
+		class="image-item" 
+		*ngFor="let url of imageUrls; let i = index"
+		(click)="openImage(url)"
+	>
+		<img 
+		[src]="url" 
+		[alt]="'Image ' + (i + 1)"
+		(error)="onImageError($event)"
+		loading="lazy"
+		/>
+		<div class="image-overlay">
+		<span class="image-filename">{{ getFilename(url) }}</span>
+		<div class="image-actions">
+			<button class="btn-icon" (click)="downloadImage(url, $event)" title="Download">
+			📥
+			</button>
+			<button class="btn-icon" (click)="copyUrl(url, $event)" title="Copy URL">
+			📋
+			</button>
+		</div>
+		</div>
+	</div>
+	</div>
+	
+	<div class="empty-state" *ngIf="imageUrls.length === 0 && !loading && !errorMessage">
+	<h2>Welcome to Fuskr</h2>
+	<p>Enter a URL with numbers in the filename to generate an image gallery.</p>
+	<div class="examples">
+		<h3>Example URLs:</h3>
+		<code>https://example.com/image01.jpg</code>
+		<code>https://example.com/photo[01-10].png</code>
+	</div>
+	</div>
+</div>

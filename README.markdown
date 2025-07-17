@@ -56,7 +56,7 @@ Version History
 * 2.6
   * You can now download images directly from the gallery page!
   * You can now view the page in a slideshow!
-  * Beginning to internationalize (l18n). If you want to help, let us know!
+  * Beginning to internationalise (l18n). If you want to help, let us know!
   * Updated to jQuery and jQuery UI.
 * 2.5
   * Updated to jQuery v2.1.3 and jQuery UI 1.11.2.

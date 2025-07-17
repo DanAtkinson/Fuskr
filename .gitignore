@@ -2,6 +2,7 @@ node_modules
 dist
 .sass-cache
 fuskr-*.zip
+.angular
 
 # OS generated files #
 ######################
@@ -15,3 +16,15 @@ Thumbs.db
 
 #Editors
 .vs/
+
+# Angular
+.angular/
+coverage/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE
+.idea/
+.vscode/

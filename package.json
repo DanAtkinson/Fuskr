@@ -1,47 +1,70 @@
 {
-  "name": "fuskr",
-  "description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
-  "version": "3.2.0",
-  "main": "index.htm",
-  "dependencies": {},
-  "devDependencies": {
-    "angular": "^1.8.0",
-    "angular-sanitize": "^1.7.8",
-    "file-saver": "^2.0.2",
-    "grunt": "^1.5.3",
-    "grunt-concurrent": "~2.3.1",
-    "grunt-contrib-clean": "~2.0.0",
-    "grunt-contrib-compress": "~1.4.3",
-    "grunt-contrib-concat": "~1.0.1",
-    "grunt-contrib-copy": "~1.0.0",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-html": "~10.1.0",
-    "grunt-karma": "^3.0.2",
-    "grunt-sass": "~3.0.2",
-    "jasmine-core": "~3.3.0",
-    "jshint": "^2.13.6",
-    "jszip": "^3.8.0",
-    "karma": "^6.3.16",
-    "karma-jasmine": "~2.0.1",
-    "karma-phantomjs-launcher": "~1.0.4",
-    "matchdep": "~2.0.0",
-    "node-sass": "^7.0.3"
-  },
-  "scripts": {
-    "test": "grunt travis:test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/DanAtkinson/Fuskr.git"
-  },
-  "keywords": [
-    "image",
-    "slideshow"
-  ],
-  "author": "Dan Atkinson and Jonathon Bolster",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/DanAtkinson/Fuskr/issues"
-  },
-  "homepage": "https://github.com/DanAtkinson/Fuskr"
+	"name": "fuskr",
+	"description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
+	"version": "4.0.0",
+	"main": "src/main.ts",
+	"dependencies": {
+		"@angular/animations": "^17.0.0",
+		"@angular/common": "^17.0.0",
+		"@angular/compiler": "^17.0.0",
+		"@angular/core": "^17.0.0",
+		"@angular/forms": "^17.0.0",
+		"@angular/platform-browser": "^17.0.0",
+		"@angular/platform-browser-dynamic": "^17.0.0",
+		"@angular/router": "^17.0.0",
+		"file-saver": "^2.0.5",
+		"jszip": "^3.10.1",
+		"rxjs": "~7.8.0",
+		"tslib": "^2.3.0",
+		"zone.js": "~0.14.0"
+	},
+	"devDependencies": {
+		"@angular-devkit/build-angular": "^17.0.0",
+		"@angular/cli": "^17.0.0",
+		"@angular/compiler-cli": "^17.0.0",
+		"@types/chrome": "^0.0.258",
+		"@types/file-saver": "^2.0.7",
+		"@types/jasmine": "~5.1.0",
+		"@types/node": "^24.0.14",
+		"@types/webpack-env": "^1.18.8",
+		"jasmine-core": "~5.1.0",
+		"karma": "~6.4.0",
+		"karma-chrome-launcher": "~3.2.0",
+		"karma-coverage": "~2.2.0",
+		"karma-jasmine": "~5.1.0",
+		"karma-jasmine-html-reporter": "~2.1.0",
+		"typescript": "~5.2.0"
+	},
+	"scripts": {
+		"ng": "ng",
+		"start": "ng serve",
+		"build": "ng build",
+		"watch": "ng build --watch --configuration development",
+		"test": "ng test",
+		"test:ci": "ng test --watch=false --browsers=ChromeHeadless",
+		"build:chromium": "ng build --configuration production && npm run copy:chromium-files && npm run zip:chromium",
+		"build:firefox": "npm run build:firefox-dist && npm run copy:firefox-files && npm run zip:firefox",
+		"build:firefox-dist": "ng build --configuration production --output-path=dist/firefox",
+		"copy:chromium-files": "powershell \"Copy-Item 'src/background.js' -Destination 'dist/chromium/background.js'; Copy-Item 'src/fuskr-core.js' -Destination 'dist/chromium/fuskr-core.js'; Copy-Item 'src/_locales' -Destination 'dist/chromium/_locales' -Recurse -Force\"",
+		"copy:firefox-files": "powershell \"Copy-Item 'src/background.js' -Destination 'dist/firefox/background.js'; Copy-Item 'src/fuskr-core.js' -Destination 'dist/firefox/fuskr-core.js'; Copy-Item 'src/_locales' -Destination 'dist/firefox/_locales' -Recurse -Force; Copy-Item 'src/manifest-firefox.json' -Destination 'dist/firefox/manifest.json'\"",
+		"zip:chromium": "powershell \"Compress-Archive -Path 'dist/chromium/*' -DestinationPath 'dist/fuskr-chromium.zip' -Force\"",
+		"zip:firefox": "powershell \"Compress-Archive -Path 'dist/firefox/*' -DestinationPath 'dist/fuskr-firefox.zip' -Force\"",
+		"clean": "powershell \"Remove-Item 'dist' -Recurse -Force -ErrorAction SilentlyContinue\"",
+		"build:extension": "npm run build:chromium",
+		"copy:extension-files": "npm run copy:chromium-files"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DanAtkinson/Fuskr.git"
+	},
+	"keywords": [
+		"image",
+		"slideshow"
+	],
+	"author": "Dan Atkinson and Jonathon Bolster",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/DanAtkinson/Fuskr/issues"
+	},
+	"homepage": "https://github.com/DanAtkinson/Fuskr"
 }

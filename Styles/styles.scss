@@ -5,254 +5,254 @@ $dark: #222;
 $red: #b33c04;
 
 html {
-  border: 0;
-  cursor: default;
-  font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  margin: 0;
-  padding: 0;
-  text-align: center;
+	border: 0;
+	cursor: default;
+	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	margin: 0;
+	padding: 0;
+	text-align: center;
 
-  &.ng-cloak {
-    display: none;
-  }
+	&.ng-cloak {
+	display: none;
+	}
 
-  &.lightMode {
-    background-color: $white;
-    color: $dark;
+	&.lightMode {
+	background-color: $white;
+	color: $dark;
 
-    select {
-      border: 1px solid $black;
-    }
+	select {
+		border: 1px solid $black;
+	}
 
-    .info {
-      background: $white url('/Images/128x128.png') no-repeat left top;
-      .fusk-url-container {
-        .fusk-url-textbox {
-          background-color: $white;
-          color: $black;
-        }
-      }
-    }
+	.info {
+		background: $white url('/Images/128x128.png') no-repeat left top;
+		.fusk-url-container {
+		.fusk-url-textbox {
+			background-color: $white;
+			color: $black;
+		}
+		}
+	}
 
-    .viewer {
-      .close {
-        color: $white;
-      }
-    }
-  }
+	.viewer {
+		.close {
+		color: $white;
+		}
+	}
+	}
 
-  &.darkMode {
-    background-color: $dark;
-    color: $off-white;
+	&.darkMode {
+	background-color: $dark;
+	color: $off-white;
 
-    select {
-      background-color: $dark;
-      border: 1px solid $off-white;
-      color: $off-white;
-    }
-    .info {
-      background: $dark url('/Images/128x128.png') no-repeat left top;
+	select {
+		background-color: $dark;
+		border: 1px solid $off-white;
+		color: $off-white;
+	}
+	.info {
+		background: $dark url('/Images/128x128.png') no-repeat left top;
 
-      .fusk-url-container {
-        .fusk-url-textbox {
-          background-color: $dark;
-          color: $off-white;
-        }
-      }
-    }
+		.fusk-url-container {
+		.fusk-url-textbox {
+			background-color: $dark;
+			color: $off-white;
+		}
+		}
+	}
 
-    .viewer {
-      .close {
-        color: $dark;
-      }
-    }
+	.viewer {
+		.close {
+		color: $dark;
+		}
+	}
 
-  }
+	}
 }
 
 img {
-  border: 0;
-  margin: auto;
-  margin-bottom: 4px;
+	border: 0;
+	margin: auto;
+	margin-bottom: 4px;
 }
 
 a {
-  &,
-  &:hover,
-  &:visited {
-    color: $red;
-    cursor: pointer;
-    text-decoration: none;
-  }
+	&,
+	&:hover,
+	&:visited {
+	color: $red;
+	cursor: pointer;
+	text-decoration: none;
+	}
 }
 
 button {
-  &.download {
-    float: right;
-    margin: .5em .4em .5em 0;
-    padding: 5px;
-  }
+	&.download {
+	float: right;
+	margin: .5em .4em .5em 0;
+	padding: 5px;
+	}
 }
 
 .images-are-thumbnails {
-  .wrap {
-    width: min-content;
-  }
+	.wrap {
+	width: min-content;
+	}
 
-  img {
-    width: auto;
+	img {
+	width: auto;
 
-    &.fusk-image {
-      width: 100%;
-    }
-  }
+	&.fusk-image {
+		width: 100%;
+	}
+	}
 }
 
 .images-are-full-page {
-  .wrap {
-    width: -webkit-fill-available;
-  }
+	.wrap {
+	width: -webkit-fill-available;
+	}
 
-  img {
-    width: auto;
+	img {
+	width: auto;
 
-    &.fusk-image {
-      width: 100%;
-    }
-  }
+	&.fusk-image {
+		width: 100%;
+	}
+	}
 }
 
 .images-are-full-width {
-  img {
-    width: auto;
+	img {
+	width: auto;
 
-    &.fusk-image {
-      width: 100%;
-    }
-  }
+	&.fusk-image {
+		width: 100%;
+	}
+	}
 }
 
 .code {
-  background-color: $off-white;
-  font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif;
-  padding: 1px 5px;
-  white-space: pre-wrap;
+	background-color: $off-white;
+	font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, sans-serif;
+	padding: 1px 5px;
+	white-space: pre-wrap;
 }
 
 .info {
-  clear: both;
-  min-height: 128px;
-  padding-left: 130px;
-  padding-top: 10px;
-  text-align: left;
+	clear: both;
+	min-height: 128px;
+	padding-left: 130px;
+	padding-top: 10px;
+	text-align: left;
 
-  .fusk-url-container {
-    .fusk-url-textbox {
-      border: 0;
-      font-size: 20px;
-      width: 99%;
-    }
-  }
+	.fusk-url-container {
+	.fusk-url-textbox {
+		border: 0;
+		font-size: 20px;
+		width: 99%;
+	}
+	}
 
-  .image-urls {
-    height: 300px;
-    width: 50%;
-  }
+	.image-urls {
+	height: 300px;
+	width: 50%;
+	}
 }
 
 .bottom {
-  clear: both;
-  padding-top: 20px;
+	clear: both;
+	padding-top: 20px;
 }
 
 .rating {
-  border: 1px solid $off-white;
-  clear: both;
-  margin: 0 auto;
-  padding: 20px 0;
-  width: 500px;
+	border: 1px solid $off-white;
+	clear: both;
+	margin: 0 auto;
+	padding: 20px 0;
+	width: 500px;
 }
 
 .wrap {
-  border: 1px solid $off-white;
-  float: left;
-  margin: 7px;
-  padding: 3px;
-  text-align: center;
+	border: 1px solid $off-white;
+	float: left;
+	margin: 7px;
+	padding: 3px;
+	text-align: center;
 }
 
 .viewer {
-  .close {
-    color: $dark;
-    cursor: pointer;
-    display: block;
-    font-size: 30px;
-    position: fixed;
-    right: 20px;
-    top: 20px;
-    z-index: 101;
+	.close {
+	color: $dark;
+	cursor: pointer;
+	display: block;
+	font-size: 30px;
+	position: fixed;
+	right: 20px;
+	top: 20px;
+	z-index: 101;
 
-    &:hover {
-      color: $off-white;
-    }
-  }
+	&:hover {
+		color: $off-white;
+	}
+	}
 
-  .viewer-item {
-    bottom: 0;
-    left: 0;
-    position: fixed;
-    right: 0;
-    top: 0;
-    z-index: 100;
+	.viewer-item {
+	bottom: 0;
+	left: 0;
+	position: fixed;
+	right: 0;
+	top: 0;
+	z-index: 100;
 
-    a {
-      background-position: 50% 50%;
-      background-repeat: no-repeat;
-      background-size: contain;
-      display: block;
-      height: 100%;
-      width: 100%;
+	a {
+		background-position: 50% 50%;
+		background-repeat: no-repeat;
+		background-size: contain;
+		display: block;
+		height: 100%;
+		width: 100%;
 
-      &.previous-image {
-        background-position: 35% 50%;
-      }
+		&.previous-image {
+		background-position: 35% 50%;
+		}
 
-      &.next-image {
-        background-position: 65% 50%;
-      }
-    }
+		&.next-image {
+		background-position: 65% 50%;
+		}
+	}
 
-    &.small {
-      bottom: 10%;
-      opacity: .2;
-      top: 10%;
-      z-index: 99;
-    }
+	&.small {
+		bottom: 10%;
+		opacity: .2;
+		top: 10%;
+		z-index: 99;
+	}
 
-    &.modal {
-      background-color: $dark;
-      z-index: 98;
-    }
-  }
+	&.modal {
+		background-color: $dark;
+		z-index: 98;
+	}
+	}
 }
 
 ul {
-  &.totals {
-    font-weight: bold;
-  }
+	&.totals {
+	font-weight: bold;
+	}
 
-  &.linklist {
-    padding: 0;
+	&.linklist {
+	padding: 0;
 
-    li {
-      display: inline;
-      padding-right: 5px;
-    }
+	li {
+		display: inline;
+		padding-right: 5px;
+	}
 
-    li~li {
-      border-left: 1px solid $dark;
-      padding-left: 5px;
-    }
-  }
+	li~li {
+		border-left: 1px solid $dark;
+		padding-left: 5px;
+	}
+	}
 }

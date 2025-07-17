@@ -1,0 +1,43 @@
+<div class="options-container">
+	<h1>Fuskr Options</h1>
+	
+	<div class="option-group">
+	<label>
+		<input 
+		type="checkbox" 
+		[(ngModel)]="options.darkMode"
+		(change)="saveOptions()"
+		/>
+		<span>Dark Mode</span>
+	</label>
+	<p class="description">Enable dark theme for the extension interface</p>
+	</div>
+	
+	<div class="option-group">
+	<label>
+		<input 
+		type="checkbox" 
+		[(ngModel)]="options.openInForeground"
+		(change)="saveOptions()"
+		/>
+		<span>Open New Fusks in Foreground</span>
+	</label>
+	<p class="description">New tabs created from Fusk operations will be opened in the foreground</p>
+	</div>
+	
+	<div class="option-group">
+	<label>
+		<input 
+		type="checkbox" 
+		[(ngModel)]="options.keepRecentFusks"
+		(change)="saveOptions()"
+		/>
+		<span>Keep Recent Fusks</span>
+	</label>
+	<p class="description">Save recent Fusk URLs for quick access</p>
+	</div>
+	
+	<div class="status" [class.show]="statusMessage">
+	{{ statusMessage }}
+	</div>
+</div>

@@ -1,40 +1,40 @@
 {
-    "manifest_version": 2,
-    "name": "__MSG_ManifestName__",
-    "description": "__MSG_ManifestDescription__",
-    "version": "4.0.84",
-    "version_name": "v4.0.84 built at: 2019-07-11 16:36:15",
-    "default_locale": "en_GB",
-    "author": "Dan Atkinson and Jonathon Bolster",
-    "background": {
-        "scripts": [
-            "Scripts/background.js"
-        ],
-        "persistent": false
-    },
-    "options_ui": {
-        "page": "Html/options.html",
-        "open_in_tab": false
-    },
-    "incognito": "split",
-    "omnibox": {
-        "keyword": "fuskr"
-    },
-    "permissions": [
-        "tabs",
-        "downloads",
-        "http://*/*",
-        "https://*/*",
-        "contextMenus",
-        "activeTab",
-        "storage"
-    ],
-    "minimum_chrome_version": "73",
-    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
-    "homepage_url": "https://danatkinson.github.io/Fuskr/",
-    "icons": {
-        "16": "Images/16x16.png",
-        "48": "Images/48x48.png",
-        "128": "Images/128x128.png"
-    }
+	"manifest_version": 2,
+	"name": "__MSG_ManifestName__",
+	"description": "__MSG_ManifestDescription__",
+	"version": "4.0.84",
+	"version_name": "v4.0.84 built at: 2019-07-11 16:36:15",
+	"default_locale": "en_GB",
+	"author": "Dan Atkinson and Jonathon Bolster",
+	"background": {
+		"scripts": [
+			"Scripts/background.js"
+		],
+		"persistent": false
+	},
+	"options_ui": {
+		"page": "Html/options.html",
+		"open_in_tab": false
+	},
+	"incognito": "split",
+	"omnibox": {
+		"keyword": "fuskr"
+	},
+	"permissions": [
+		"tabs",
+		"downloads",
+		"http://*/*",
+		"https://*/*",
+		"contextMenus",
+		"activeTab",
+		"storage"
+	],
+	"minimum_chrome_version": "73",
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+	"homepage_url": "https://danatkinson.github.io/Fuskr/",
+	"icons": {
+		"16": "Images/16x16.png",
+		"48": "Images/48x48.png",
+		"128": "Images/128x128.png"
+	}
 }
