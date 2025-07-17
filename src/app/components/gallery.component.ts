@@ -43,7 +43,7 @@ export class GalleryComponent implements OnInit {
 		try {
 			const result = this.fuskrService.generateImageGallery(this.originalUrl);
 			this.imageUrls = result.urls;
-			
+		
 			// Update the URL in the browser to show the bracketed version
 			if (result.originalUrl !== this.originalUrl) {
 				this.originalUrl = result.originalUrl;
@@ -53,7 +53,7 @@ export class GalleryComponent implements OnInit {
 					queryParamsHandling: 'merge'
 				});
 			}
-			
+		
 			if (this.imageUrls.length === 0) {
 				this.errorMessage = 'No fuskable pattern found in the URL. Try a URL with numbers in the filename.';
 			}

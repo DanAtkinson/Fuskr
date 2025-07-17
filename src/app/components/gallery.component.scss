@@ -161,16 +161,16 @@
 	.url-info {
 	flex-direction: column;
 	}
-	
+
 	.url-input {
 	min-width: 100%;
 	}
-	
+
 	.image-gallery {
 	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 	gap: 10px;
 	}
-	
+
 	.image-item img {
 	height: 150px;
 	}

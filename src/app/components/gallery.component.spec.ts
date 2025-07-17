@@ -6,6 +6,9 @@ import { GalleryComponent } from './gallery.component';
 import { FuskrService } from '../services/fuskr.service';
 import { ChromeService } from '../services/chrome.service';
 
+// Type-only import for VS Code IntelliSense - won't be included in runtime bundle
+import type {} from 'jasmine';
+
 describe('GalleryComponent', () => {
 	let component: GalleryComponent;
 	let fixture: ComponentFixture<GalleryComponent>;

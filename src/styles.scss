@@ -5,13 +5,13 @@
 	--success-color: #4caf50;
 	--error-color: #f44336;
 	--warning-color: #ff9800;
-	
+
 	--bg-color: #ffffff;
 	--bg-secondary: #f5f5f5;
 	--text-color: #333333;
 	--text-secondary: #666666;
 	--border-color: #dddddd;
-	
+
 	--shadow: 0 2px 4px rgba(0,0,0,0.1);
 	--shadow-hover: 0 4px 8px rgba(0,0,0,0.15);
 }
@@ -22,7 +22,7 @@
 	--text-color: #e0e0e0;
 	--text-secondary: #a0a0a0;
 	--border-color: #404040;
-	
+
 	--shadow: 0 2px 4px rgba(0,0,0,0.3);
 	--shadow-hover: 0 4px 8px rgba(0,0,0,0.4);
 }
@@ -55,36 +55,36 @@ body {
 	cursor: pointer;
 	text-decoration: none;
 	transition: all 0.2s ease;
-	
+
 	&:disabled {
 	opacity: 0.6;
 	cursor: not-allowed;
 	}
-	
+
 	&.btn-primary {
 	background-color: var(--primary-color);
 	color: white;
-	
+
 	&:hover:not(:disabled) {
 		background-color: #357abd;
 	}
 	}
-	
+
 	&.btn-secondary {
 	background-color: transparent;
 	border: 1px solid var(--border-color);
 	color: var(--text-color);
-	
+
 	&:hover:not(:disabled) {
 		background-color: var(--bg-secondary);
 	}
 	}
-	
+
 	&.btn-sm {
 	padding: 6px 12px;
 	font-size: 12px;
 	}
-	
+
 	&.btn-lg {
 	padding: 14px 28px;
 	font-size: 16px;
@@ -117,13 +117,13 @@ select {
 	background-color: var(--bg-color);
 	color: var(--text-color);
 	transition: border-color 0.2s ease;
-	
+
 	&:focus {
 	outline: none;
 	border-color: var(--primary-color);
 	box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 	}
-	
+
 	&::placeholder {
 	color: var(--text-secondary);
 	}
@@ -140,7 +140,7 @@ input[type="checkbox"] {
 	border-radius: 8px;
 	padding: 20px;
 	box-shadow: var(--shadow);
-	
+
 	&:hover {
 	box-shadow: var(--shadow-hover);
 	}
@@ -232,18 +232,18 @@ input[type="checkbox"] {
 	border-radius: 8px;
 	overflow: hidden;
 	background-color: var(--bg-secondary);
-	
+
 	img {
 	width: 100%;
 	height: 120px;
 	object-fit: cover;
 	transition: transform 0.2s ease;
 	}
-	
+
 	&:hover img {
 	transform: scale(1.05);
 	}
-	
+
 	.image-overlay {
 	position: absolute;
 	bottom: 0;
@@ -256,7 +256,7 @@ input[type="checkbox"] {
 	opacity: 0;
 	transition: opacity 0.2s ease;
 	}
-	
+
 	&:hover .image-overlay {
 	opacity: 1;
 	}
@@ -267,13 +267,13 @@ input[type="checkbox"] {
 	.container {
 	padding: 0 12px;
 	}
-	
+
 	.image-gallery {
 	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 	gap: 8px;
 	padding: 12px;
 	}
-	
+
 	.btn {
 	padding: 8px 16px;
 	font-size: 13px;

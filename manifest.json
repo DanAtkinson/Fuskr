@@ -1,40 +1,32 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "__MSG_ManifestName__",
 	"description": "__MSG_ManifestDescription__",
-	"version": "4.0.84",
-	"version_name": "v4.0.84 built at: 2019-07-11 16:36:15",
+	"version": "4.0.0",
 	"default_locale": "en_GB",
 	"author": "Dan Atkinson and Jonathon Bolster",
+	"action": {
+		"default_popup": "index.html",
+		"default_title": "Fuskr - Image Gallery Generator"
+	},
 	"background": {
-		"scripts": [
-			"Scripts/background.js"
-		],
-		"persistent": false
+		"service_worker": "background.js"
 	},
 	"options_ui": {
-		"page": "Html/options.html",
+		"page": "index.html#/options",
 		"open_in_tab": false
 	},
 	"incognito": "split",
 	"omnibox": {
 		"keyword": "fuskr"
 	},
-	"permissions": [
-		"tabs",
-		"downloads",
-		"http://*/*",
-		"https://*/*",
-		"contextMenus",
-		"activeTab",
-		"storage"
-	],
-	"minimum_chrome_version": "73",
-	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self';",
+	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage"],
+	"host_permissions": ["http://*/*", "https://*/*"],
+	"minimum_chrome_version": "88",
 	"homepage_url": "https://danatkinson.github.io/Fuskr/",
 	"icons": {
-		"16": "Images/16x16.png",
-		"48": "Images/48x48.png",
-		"128": "Images/128x128.png"
+		"16": "assets/images/16x16.png",
+		"48": "assets/images/48x48.png",
+		"128": "assets/images/128x128.png"
 	}
 }

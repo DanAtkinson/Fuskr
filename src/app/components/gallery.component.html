@@ -14,7 +14,7 @@
 		Generate Gallery
 		</button>
 	</div>
-	
+
 	<div class="gallery-stats" *ngIf="imageUrls.length > 0">
 		<span>{{ imageUrls.length }} images found</span>
 		<button class="btn btn-secondary btn-sm" (click)="downloadAll()">
@@ -22,16 +22,16 @@
 		</button>
 	</div>
 	</div>
-	
+
 	<div class="loading" *ngIf="loading">
 	<div class="spinner"></div>
 	<p>Generating gallery...</p>
 	</div>
-	
+
 	<div class="error" *ngIf="errorMessage">
 	<p>{{ errorMessage }}</p>
 	</div>
-	
+
 	<div class="image-gallery" *ngIf="imageUrls.length > 0 && !loading">
 	<div 
 		class="image-item" 
@@ -57,7 +57,7 @@
 		</div>
 	</div>
 	</div>
-	
+
 	<div class="empty-state" *ngIf="imageUrls.length === 0 && !loading && !errorMessage">
 	<h2>Welcome to Fuskr</h2>
 	<p>Enter a URL with numbers in the filename to generate an image gallery.</p>

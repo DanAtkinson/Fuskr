@@ -3,6 +3,9 @@ import { FormsModule } from '@angular/forms';
 import { OptionsComponent } from './options.component';
 import { ChromeService, ChromeStorageData } from '../services/chrome.service';
 
+// Type-only import for VS Code IntelliSense - won't be included in runtime bundle
+import type {} from 'jasmine';
+
 describe('OptionsComponent', () => {
 	let component: OptionsComponent;
 	let fixture: ComponentFixture<OptionsComponent>;

@@ -33,7 +33,10 @@
 		"karma-coverage": "~2.2.0",
 		"karma-jasmine": "~5.1.0",
 		"karma-jasmine-html-reporter": "~2.1.0",
-		"typescript": "~5.2.0"
+		"ts-loader": "^9.5.2",
+		"typescript": "~5.2.0",
+		"webpack": "^5.100.2",
+		"webpack-cli": "^6.0.1"
 	},
 	"scripts": {
 		"ng": "ng",
@@ -42,11 +45,12 @@
 		"watch": "ng build --watch --configuration development",
 		"test": "ng test",
 		"test:ci": "ng test --watch=false --browsers=ChromeHeadless",
-		"build:chromium": "ng build --configuration production && npm run copy:chromium-files && npm run zip:chromium",
-		"build:firefox": "npm run build:firefox-dist && npm run copy:firefox-files && npm run zip:firefox",
+		"build:chromium": "ng build --configuration production && npm run build:background && npm run copy:chromium-files && npm run zip:chromium",
+		"build:firefox": "npm run build:firefox-dist && npm run build:background && npm run copy:firefox-files && npm run zip:firefox",
 		"build:firefox-dist": "ng build --configuration production --output-path=dist/firefox",
-		"copy:chromium-files": "powershell \"Copy-Item 'src/background.js' -Destination 'dist/chromium/background.js'; Copy-Item 'src/fuskr-core.js' -Destination 'dist/chromium/fuskr-core.js'; Copy-Item 'src/_locales' -Destination 'dist/chromium/_locales' -Recurse -Force\"",
-		"copy:firefox-files": "powershell \"Copy-Item 'src/background.js' -Destination 'dist/firefox/background.js'; Copy-Item 'src/fuskr-core.js' -Destination 'dist/firefox/fuskr-core.js'; Copy-Item 'src/_locales' -Destination 'dist/firefox/_locales' -Recurse -Force; Copy-Item 'src/manifest-firefox.json' -Destination 'dist/firefox/manifest.json'\"",
+		"build:background": "webpack --config webpack.background.js",
+		"copy:chromium-files": "powershell \"Copy-Item 'src/fuskr-core.js' -Destination 'dist/chromium/fuskr-core.js'; Copy-Item 'src/_locales' -Destination 'dist/chromium/_locales' -Recurse -Force\"",
+		"copy:firefox-files": "powershell \"Copy-Item 'src/fuskr-core.js' -Destination 'dist/firefox/fuskr-core.js'; Copy-Item 'src/_locales' -Destination 'dist/firefox/_locales' -Recurse -Force; Copy-Item 'src/manifest-firefox.json' -Destination 'dist/firefox/manifest.json'\"",
 		"zip:chromium": "powershell \"Compress-Archive -Path 'dist/chromium/*' -DestinationPath 'dist/fuskr-chromium.zip' -Force\"",
 		"zip:firefox": "powershell \"Compress-Archive -Path 'dist/firefox/*' -DestinationPath 'dist/fuskr-firefox.zip' -Force\"",
 		"clean": "powershell \"Remove-Item 'dist' -Recurse -Force -ErrorAction SilentlyContinue\"",

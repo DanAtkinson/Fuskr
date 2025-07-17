@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { ChromeService, ChromeStorageData } from './chrome.service';
 
+// Type-only import for VS Code IntelliSense - won't be included in runtime bundle
+import type {} from 'jasmine';
+
 // Mock chrome API
 const mockChrome = {
 	storage: {
@@ -118,7 +121,7 @@ describe('ChromeService', () => {
 			testService.browserAPI = {
 				runtime: { id: 'test-extension-id' }
 			};
-			
+		
 			const result = testService.isExtensionContext();
 			expect(result).toBeTruthy();
 		});
@@ -127,7 +130,7 @@ describe('ChromeService', () => {
 			// Create a service with no browserAPI
 			const testService = Object.create(ChromeService.prototype);
 			testService.browserAPI = null;
-			
+		
 			const result = testService.isExtensionContext();
 			expect(result).toBeFalsy();
 		});
