@@ -4,191 +4,178 @@
 			<h1>Fuskr Gallery</h1>
 			<div class="header-controls">
 				<button class="btn-icon theme-toggle" (click)="toggleDarkMode()" [title]="darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'">
-					{{ darkMode ? '☀️' : '🌙' }}
+				{{ darkMode ? '☀️' : '🌙' }}
 				</button>
 			</div>
 		</div>
-		
+
 		<div class="url-info">
 			<label>Original URL:</label>
-			<input 
-				type="url" 
-				[(ngModel)]="originalUrl" 
-				(keyup.enter)="generateGallery()"
-				placeholder="Enter URL to fusk..."
+			<input
 				class="url-input"
-			/>
-			<button class="btn btn-primary" (click)="generateGallery()">
-				Generate Gallery
-			</button>
+				placeholder="Enter URL to fusk..."
+				type="url"
+				(keyup.enter)="generateGallery()"
+				[(ngModel)]="originalUrl"
+				/>
+				<button class="btn btn-primary" (click)="generateGallery()">Generate Gallery</button>
 		</div>
 
-		<div class="gallery-stats" *ngIf="imageUrls.length > 0">
-			<div class="stats-info">
-				<span class="stat">{{ totalImages }} total</span>
-				<span class="stat">{{ loadedImages }} loaded</span>
-				<span class="stat" *ngIf="brokenImages > 0">{{ brokenImages }} broken</span>
+		@if (imageUrls.length > 0) {
+			<div class="gallery-stats">
+				<div class="stats-info">
+					<span class="stat">{{ totalImages }} total</span>
+					<span class="stat">{{ loadedImages }} loaded</span>
+					@if (brokenImages > 0) {
+						<span class="stat">{{ brokenImages }} broken</span>
+					}
+				</div>
+				<div class="stats-actions">
+					<button class="btn btn-secondary btn-sm" (click)="downloadAll()">Download All</button>
+				</div>
 			</div>
-			<div class="stats-actions">
-				<button class="btn btn-secondary btn-sm" (click)="downloadAll()">
-					Download All
-				</button>
-			</div>
-		</div>
+		}
 
 		<!-- Display Mode Controls -->
-		<div class="display-controls" *ngIf="imageUrls.length > 0">
-			<div class="control-group">
-				<label>Display Mode:</label>
-				<div class="button-group">
-					<button 
-						class="btn btn-sm" 
-						[class.active]="imageDisplayMode === 'fitOnPage'" 
-						(click)="setImageDisplayMode('fitOnPage')"
-						title="Resize images to fit on page">
-						Fit Page
-					</button>
-					<button 
-						class="btn btn-sm" 
-						[class.active]="imageDisplayMode === 'fullWidth'" 
-						(click)="setImageDisplayMode('fullWidth')"
-						title="Resize images to full width">
-						Full Width
-					</button>
-					<button 
-						class="btn btn-sm" 
-						[class.active]="imageDisplayMode === 'fillPage'" 
-						(click)="setImageDisplayMode('fillPage')"
-						title="Resize images to fill the page">
-						Fill Page
-					</button>
-					<button 
-						class="btn btn-sm" 
-						[class.active]="imageDisplayMode === 'thumbnails'" 
-						(click)="setImageDisplayMode('thumbnails')"
-						title="Resize images to thumbnails">
-						Thumbnails
-					</button>
+		@if (imageUrls.length > 0) {
+			<div class="display-controls">
+				<div class="control-group">
+					<label>Display Mode:</label>
+					<div class="button-group">
+						<button
+							(click)="setImageDisplayMode('fitOnPage')"
+							[class.active]="imageDisplayMode === 'fitOnPage'"
+							class="btn btn-sm"
+							title="Resize images to fit on page"
+							>Fit Page</button>
+						<button
+							(click)="setImageDisplayMode('fullWidth')"
+							[class.active]="imageDisplayMode === 'fullWidth'"
+							class="btn btn-sm"
+							title="Resize images to full width"
+							>Full Width</button>
+						<button
+							(click)="setImageDisplayMode('fillPage')"
+							[class.active]="imageDisplayMode === 'fillPage'"
+							class="btn btn-sm"
+							title="Resize images to fill the page"
+							>Fill Page</button>
+						<button
+							(click)="setImageDisplayMode('thumbnails')"
+							[class.active]="imageDisplayMode === 'thumbnails'"
+							class="btn btn-sm"
+							title="Resize images to thumbnails"
+							>Thumbnails</button>
+					</div>
 				</div>
-			</div>
-
-			<div class="control-group">
-				<label>Options:</label>
-				<div class="button-group">
-					@if (brokenImages > 0 || loading) {
-						<button 
-							class="btn btn-sm" 
-							[class.active]="showBrokenImages" 
+				<div class="control-group">
+					<label>Options:</label>
+					<div class="button-group">
+						@if (brokenImages > 0 || loading) {
+							<button
 							(click)="toggleBrokenImagesVisibility()"
-							title="Toggle broken images visibility">
-							{{ showBrokenImages ? 'Hide' : 'Show' }} Broken
-						</button>
-					}
-					@if (brokenImages > 0) {
-						<button 
-							class="btn btn-sm" 
+							[class.active]="showBrokenImages"
+							class="btn btn-sm"
+							title="Toggle broken images visibility"
+							>{{ showBrokenImages ? 'Hide Broken' : 'Show Broken' }}</button>
+						}
+						@if (brokenImages > 0) {
+							<button
 							(click)="removeBrokenImages()"
-							title="Remove broken images from gallery">
-							Remove Broken
-						</button>
-					}
+							class="btn btn-sm"
+							title="Remove broken images from gallery"
+							>Remove Broken</button>
+						}
+					</div>
 				</div>
 			</div>
+		}
+	</div>
+
+	@if (loading) {
+		<div class="loading">
+			<div class="spinner"></div>
+			<p>Generating gallery...</p>
 		</div>
-	</div>
+	}
 
-	<div class="loading" *ngIf="loading">
-	<div class="spinner"></div>
-	<p>Generating gallery...</p>
-	</div>
+	@if (errorMessage) {
+		<div class="error">
+			<p>{{ errorMessage }}</p>
+		</div>
+	}
 
-	<div class="error" *ngIf="errorMessage">
-	<p>{{ errorMessage }}</p>
-	</div>
-
-	<div class="image-gallery" 
-		 *ngIf="imageUrls.length > 0 && !loading" 
-		 [class.images-are-full-width]="imageDisplayMode === 'fullWidth'"
-		 [class.images-are-full-page]="imageDisplayMode === 'fillPage'"
-		 [class.images-are-thumbnails]="imageDisplayMode === 'thumbnails'">
-		<div 
-			class="image-item wrap" 
-			*ngFor="let url of imageUrls; let i = index"
-		>
-			<img 
-				[src]="url" 
-				[alt]="'Image ' + (i + 1)"
-				class="fusk-image"
-				(error)="onImageError($event)"
-				(load)="onImageLoad($event)"
-				(click)="openImageViewer(url, i)"
-				loading="lazy"
-			/>
-			<div class="image-overlay">
-				<span class="image-filename">{{ getFilename(url) }}</span>
-				<div class="image-actions">
-					<button class="btn-icon" (click)="downloadImage(url, $event)" title="Download">
-						📥
-					</button>
-					<button class="btn-icon" (click)="copyUrl(url, $event)" title="Copy URL">
-						📋
-					</button>
-					<button class="btn-icon" (click)="openImageViewer(url, i); $event.stopPropagation()" title="View Large">
-						🔍
-					</button>
+	@if (imageUrls.length > 0 && !loading) {
+		<div class="image-gallery"
+			[class.images-are-full-width]="imageDisplayMode === 'fullWidth'"
+			[class.images-are-full-page]="imageDisplayMode === 'fillPage'"
+			[class.images-are-thumbnails]="imageDisplayMode === 'thumbnails'">
+			@for (url of imageUrls; track url; let i = $index) {
+				<div class="image-item wrap">
+					<img
+						class="fusk-image"
+						loading="lazy"
+						(click)="openImageViewer(url, i)"
+						(error)="onImageError($event)"
+						(load)="onImageLoad($event)"
+						[alt]="'Image ' + (i + 1)"
+						[src]="url"
+						>
+					<div class="image-overlay">
+						<span class="image-filename">{{ getFilename(url) }}</span>
+						<div class="image-actions">
+							<button class="btn-icon" (click)="downloadImage(url, $event)" title="Download">📥</button>
+							<button class="btn-icon" (click)="copyUrl(url, $event)" title="Copy URL">📋</button>
+							<button class="btn-icon" (click)="openImageViewer(url, i); $event.stopPropagation()" title="View Large">🔍</button>
+						</div>
+					</div>
 				</div>
-			</div>
+			}
 		</div>
-	</div>
+	}
 
 	<!-- Image Viewer Modal -->
-	<div class="image-viewer-modal" *ngIf="showImageViewer" (click)="closeImageViewer()">
-		<div class="viewer-content" (click)="$event.stopPropagation()">
-			<div class="viewer-header">
-				<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
-				<span class="viewer-counter">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>
-				<button class="btn-icon close-btn" (click)="closeImageViewer()" title="Close">
-					✕
-				</button>
-			</div>
-			<div class="viewer-body">
-				<button 
-					class="nav-btn prev-btn" 
-					(click)="previousImage()" 
-					[disabled]="currentViewerIndex === 0"
-					title="Previous Image">
-					‹
-				</button>
-				<img [src]="currentViewerImage" [alt]="'Image ' + (currentViewerIndex + 1)" />
-				<button 
-					class="nav-btn next-btn" 
-					(click)="nextImage()" 
-					[disabled]="currentViewerIndex === imageUrls.length - 1"
-					title="Next Image">
-					›
-				</button>
-			</div>
-			<div class="viewer-footer">
-				<button class="btn btn-secondary btn-sm" (click)="downloadImage(currentViewerImage, $event)">
-					Download
-				</button>
-				<button class="btn btn-secondary btn-sm" (click)="copyUrl(currentViewerImage, $event)">
-					Copy URL
-				</button>
-				<button class="btn btn-secondary btn-sm" (click)="openImage(currentViewerImage)">
-					Open in Tab
-				</button>
+	@if (showImageViewer) {
+		<div class="image-viewer-modal" (click)="closeImageViewer()">
+			<div class="viewer-content" (click)="$event.stopPropagation()">
+				<div class="viewer-header">
+					<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
+					<span class="viewer-counter">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>
+					<button class="btn-icon close-btn" (click)="closeImageViewer()" title="Close">✕</button>
+				</div>
+				<div class="viewer-body">
+					<button
+						class="nav-btn prev-btn"
+						title="Previous Image"
+						(click)="previousImage()"
+						[disabled]="currentViewerIndex === 0"
+						>&laquo;</button>
+					<img [src]="currentViewerImage" [alt]="'Image ' + (currentViewerIndex + 1)">
+					<button
+						class="nav-btn next-btn"
+						title="Next Image"
+						(click)="nextImage()"
+						[disabled]="currentViewerIndex === imageUrls.length - 1"
+						>&raquo;</button>
+				</div>
+				<div class="viewer-footer">
+					<button class="btn btn-secondary btn-sm" (click)="downloadImage(currentViewerImage, $event)">Download</button>
+					<button class="btn btn-secondary btn-sm" (click)="copyUrl(currentViewerImage, $event)">Copy URL</button>
+					<button class="btn btn-secondary btn-sm" (click)="openImage(currentViewerImage)">Open in Tab</button>
+				</div>
 			</div>
 		</div>
-	</div>
+	}
 
-	<div class="empty-state" *ngIf="imageUrls.length === 0 && !loading && !errorMessage">
-	<h2>Welcome to Fuskr</h2>
-	<p>Enter a URL with numbers in the filename to generate an image gallery.</p>
-	<div class="examples">
-		<h3>Example URLs:</h3>
-		<code>https://example.com/image01.jpg</code>
-		<code>https://example.com/photo[01-10].png</code>
-	</div>
-	</div>
+	@if (imageUrls.length === 0 && !loading && !errorMessage) {
+		<div class="empty-state">
+			<h2>Welcome to Fuskr</h2>
+			<p>Enter a URL with numbers in the filename to generate an image gallery.</p>
+			<div class="examples">
+				<h3>Example URLs:</h3>
+				<code>https://example.com/image01.jpg</code>
+				<code>https://example.com/photo[01-10].png</code>
+			</div>
+		</div>
+	}
 </div>
