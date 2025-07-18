@@ -78,16 +78,15 @@ describe('GalleryComponent', () => {
 			expect(component.errorMessage).toBe('Please enter a valid URL');
 			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled();
 		});
-	});
 
-	describe('Image Actions', () => {
-		it('should open image in extension context', () => {
+		it('should open image in browser for non-extension context', () => {
 			const testUrl = 'https://example.com/test.jpg';
-			mockChromeService.isExtensionContext.and.returnValue(true);
+			mockChromeService.isExtensionContext.and.returnValue(false);
+			spyOn(window, 'open');
 
 			component.openImage(testUrl);
 
-			expect(mockChromeService.openTab).toHaveBeenCalledWith(testUrl);
+			expect(window.open).toHaveBeenCalledWith(testUrl, '_blank');
 		});
 
 		it('should download single image', () => {
@@ -100,6 +99,136 @@ describe('GalleryComponent', () => {
 
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
 			expect(mockChromeService.downloadFile).toHaveBeenCalledWith(testUrl, 'test.jpg');
+		});
+
+		it('should copy URL to clipboard', async () => {
+			const testUrl = 'https://example.com/test.jpg';
+			const mockEvent = new Event('click');
+			spyOn(mockEvent, 'stopPropagation');
+			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+			spyOn(console, 'log');
+
+			await component.copyUrl(testUrl, mockEvent);
+
+			expect(mockEvent.stopPropagation).toHaveBeenCalled();
+			expect(navigator.clipboard.writeText).toHaveBeenCalledWith(testUrl);
+		});
+	});
+
+	describe('Image Viewer', () => {
+		beforeEach(() => {
+			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
+		});
+
+		it('should open image viewer', () => {
+			const testUrl = 'url2.jpg';
+			const testIndex = 1;
+
+			component.openImageViewer(testUrl, testIndex);
+
+			expect(component.showImageViewer).toBe(true);
+			expect(component.currentViewerImage).toBe(testUrl);
+			expect(component.currentViewerIndex).toBe(testIndex);
+		});
+
+		it('should close image viewer', () => {
+			component.showImageViewer = true;
+
+			component.closeImageViewer();
+
+			expect(component.showImageViewer).toBe(false);
+		});
+
+		it('should navigate to next image', () => {
+			component.currentViewerIndex = 1;
+			component.currentViewerImage = 'url2.jpg';
+
+			component.nextImage();
+
+			expect(component.currentViewerIndex).toBe(2);
+			expect(component.currentViewerImage).toBe('url3.jpg');
+		});
+
+		it('should not navigate past last image', () => {
+			component.currentViewerIndex = 2;
+			component.currentViewerImage = 'url3.jpg';
+
+			component.nextImage();
+
+			expect(component.currentViewerIndex).toBe(2);
+			expect(component.currentViewerImage).toBe('url3.jpg');
+		});
+
+		it('should navigate to previous image', () => {
+			component.currentViewerIndex = 2;
+			component.currentViewerImage = 'url3.jpg';
+
+			component.previousImage();
+
+			expect(component.currentViewerIndex).toBe(1);
+			expect(component.currentViewerImage).toBe('url2.jpg');
+		});
+
+		it('should not navigate before first image', () => {
+			component.currentViewerIndex = 0;
+			component.currentViewerImage = 'url1.jpg';
+
+			component.previousImage();
+
+			expect(component.currentViewerIndex).toBe(0);
+			expect(component.currentViewerImage).toBe('url1.jpg');
+		});
+	});
+
+	describe('URL List Features', () => {
+		beforeEach(() => {
+			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
+		});
+
+		it('should toggle URL list visibility', () => {
+			expect(component.showUrlList).toBe(false);
+
+			component.toggleUrlList();
+
+			expect(component.showUrlList).toBe(true);
+
+			component.toggleUrlList();
+
+			expect(component.showUrlList).toBe(false);
+		});
+
+		it('should get all URLs as text', () => {
+			const result = component.getAllUrlsText();
+
+			expect(result).toBe('url1.jpg\nurl2.jpg\nurl3.jpg');
+		});
+
+		it('should copy all URLs to clipboard', async () => {
+			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
+			spyOn(console, 'log');
+
+			await component.copyAllUrls();
+
+			expect(navigator.clipboard.writeText).toHaveBeenCalledWith('url1.jpg\nurl2.jpg\nurl3.jpg');
+		});
+
+		it('should handle clipboard copy errors', async () => {
+			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject(new Error('Clipboard error')));
+			spyOn(console, 'error');
+
+			await component.copyAllUrls();
+
+			expect(console.error).toHaveBeenCalledWith('Failed to copy URLs:', jasmine.any(Error));
+		});
+	});
+
+	describe('Image Alt Text', () => {
+		it('should generate correct alt text', () => {
+			const result = component.getImageAltText(0);
+			expect(result).toBe('Image 1');
+
+			const result2 = component.getImageAltText(5);
+			expect(result2).toBe('Image 6');
 		});
 	});
 });

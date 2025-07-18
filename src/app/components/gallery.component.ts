@@ -55,6 +55,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			if (params['url']) {
 				this.originalUrl = params['url'];
 				this.generateGallery();
+			} else {
+				// If no URL provided (manual mode), focus on the input after a short delay
+				setTimeout(() => {
+					this.focusUrlInput();
+				}, 100);
 			}
 		});
 
@@ -63,6 +68,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		if (currentParams['url'] && !this.originalUrl) {
 			this.originalUrl = currentParams['url'];
 			this.generateGallery();
+		} else if (!currentParams['url'] && !this.originalUrl) {
+			// Manual mode - focus on input
+			setTimeout(() => {
+				this.focusUrlInput();
+			}, 100);
 		}
 	}
 
@@ -105,12 +115,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			// Update the URL in the browser to show the bracketed version
 			if (result.originalUrl !== this.originalUrl) {
 				this.originalUrl = result.originalUrl;
-				this.router.navigate([], {
-					relativeTo: this.route,
-					queryParams: { url: result.originalUrl },
-					queryParamsHandling: 'merge'
-				});
 			}
+
+			// Update the browser URL to reflect the generated gallery
+			this.updateBrowserUrl(this.originalUrl);
 
 			if (this.imageUrls.length === 0) {
 				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
@@ -289,7 +297,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	onImageError(event: Event) {
 		const img = event.target as HTMLImageElement;
 		const originalUrl = img.getAttribute('data-original-url') || img.src;
-		
+
 		// Only process if this image hasn't been marked as error yet
 		if (!img.classList.contains('error')) {
 			img.classList.add('error');
@@ -318,7 +326,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	onImageLoad(event: Event) {
 		const img = event.target as HTMLImageElement;
-		
+
 		// Only count successful loads (not our error placeholders)
 		if (!img.src.startsWith('data:') && !img.classList.contains('error')) {
 			this.updateImageCounts();
@@ -510,5 +518,28 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			textarea.select();
 			textarea.setSelectionRange(0, 99999); // For mobile devices
 		}
+	}
+
+	/**
+	 * Focus on the URL input field (used for manual mode)
+	 */
+	private focusUrlInput() {
+		const urlInput = document.querySelector('input[type="url"]') as HTMLInputElement;
+		if (urlInput) {
+			urlInput.focus();
+			urlInput.select(); // Select any existing text
+		}
+	}
+
+	/**
+	 * Update the browser URL to reflect the current gallery URL
+	 * This ensures that refreshing the page will return to the same gallery
+	 */
+	private updateBrowserUrl(url: string) {
+		this.router.navigate([], {
+			relativeTo: this.route,
+			queryParams: { url: url },
+			queryParamsHandling: 'merge'
+		});
 	}
 }

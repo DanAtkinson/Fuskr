@@ -363,38 +363,45 @@ class BackgroundScript {
 	}
 
 	private manualOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void {
-		const imageUrl = info.linkUrl || info.srcUrl || '';
+		// For manual mode, use the URL from context (if available) or the current tab URL
+		// This allows users to manually enter a URL or use the current page URL as a starting point
+		let targetUrl = '';
 
-		// Since prompt() doesn't work in service workers, we need to inject a content script
-		chrome.scripting.executeScript({
-			target: { tabId: tab.id! },
-			func: this.showManualPrompt,
-			args: [imageUrl, this.l18nify('Prompt_PleaseEnterTheUrl'), this.l18nify('Prompt_NotAValidFusk')]
-		}).then((result) => {
-			if (result && result[0] && result[0].result) {
-				const url = result[0].result;
-				if (this.fuskrService.isFuskable(url)) {
-					this.createTab(url, tab);
-				}
-			}
-		}).catch((error) => {
-			console.error('Error executing manual prompt script:', error);
-		});
+		// Try to get URL from context first (if clicked on a link or image)
+		if (info.linkUrl && this.isValidWebUrl(info.linkUrl)) {
+			targetUrl = info.linkUrl;
+		} else if (info.srcUrl && this.isValidWebUrl(info.srcUrl)) {
+			targetUrl = info.srcUrl;
+		} else if (tab.url && this.isValidWebUrl(tab.url)) {
+			// Use the current tab URL if it's a valid web URL
+			targetUrl = tab.url;
+		}
+
+		if (targetUrl && targetUrl.trim()) {
+			// Pass the target URL to createTab which will handle the extension URL construction
+			this.createTab(targetUrl, tab);
+		} else {
+			// If no valid URL available, open gallery in manual mode without pre-filling
+			chrome.tabs.create({
+				active: this.options.openInForeground,
+				index: (tab.index || 0) + 1,
+				url: chrome.runtime.getURL('index.html'),
+				windowId: tab.windowId,
+			});
+		}
 	}
 
-	// This function will be injected into the page
-	private showManualPrompt(imageUrl: string, promptMessage: string, errorMessage: string): string | null {
-		const url = prompt(promptMessage, imageUrl);
-		if (url && url.trim()) {
-			// Basic check for fuskable pattern - will be validated in background script
-			if (url.includes('[') || /\d+/.test(url)) {
-				return url;
-			} else {
-				alert(errorMessage);
-				return null;
-			}
+	/**
+	 * Check if a URL is a valid web URL (HTTP/HTTPS/FILE)
+	 * Filters out browser-specific protocols like chrome://, edge://, firefox://, etc.
+	 */
+	private isValidWebUrl(url: string): boolean {
+		if (!url || typeof url !== 'string') {
+			return false;
 		}
-		return null;
+
+		// Allow HTTP, HTTPS, and FILE protocols
+		return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://');
 	}
 
 	private clearRecentOnClick(): void {

@@ -5,6 +5,7 @@ module.exports = function (config) {
 		plugins: [
 			require('karma-jasmine'),
 			require('karma-chrome-launcher'),
+			require('karma-coverage'),
 			require('@angular-devkit/build-angular/plugins/karma')
 		],
 		client: {
@@ -13,7 +14,16 @@ module.exports = function (config) {
 			},
 			clearContext: false
 		},
-		reporters: ['progress'],
+		reporters: ['progress', 'coverage'],
+		coverageReporter: {
+			dir: require('path').join(__dirname, './coverage/fuskr'),
+			subdir: '.',
+			reporters: [
+				{ type: 'html' },
+				{ type: 'text-summary' },
+				{ type: 'lcovonly' }
+			]
+		},
 		port: 9876,
 		colors: true,
 		logLevel: config.LOG_INFO,
