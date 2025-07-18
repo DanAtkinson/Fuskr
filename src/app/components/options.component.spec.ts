@@ -139,7 +139,7 @@ describe('OptionsComponent', () => {
 			component.statusMessage = 'Test message';
 			fixture.detectChanges();
 
-			const statusElement = fixture.nativeElement.querySelector('.status');
+			const statusElement = fixture.nativeElement.querySelector('.alert');
 			expect(statusElement.textContent.trim()).toContain('Test message');
 		});
 
@@ -147,8 +147,8 @@ describe('OptionsComponent', () => {
 			component.statusMessage = '';
 			fixture.detectChanges();
 
-			const statusElement = fixture.nativeElement.querySelector('.status');
-			expect(statusElement.textContent.trim()).toBe('');
+			const statusElement = fixture.nativeElement.querySelector('.alert');
+			expect(statusElement).toBeNull(); // Alert should not be present when statusMessage is empty
 		});
 	});
 });

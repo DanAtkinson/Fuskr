@@ -14,7 +14,7 @@ export class BaseComponentTestHelper {
 				'Options_Title': 'Fuskr Options',
 				'Options_Appearance': 'Appearance',
 				'Options_ImageDisplay': 'Image Display',
-				'Options_Behavior': 'Behavior',
+				'Options_Behaviour': 'Behaviour',
 				'Options_DarkMode': 'Show Fuskr with a dark background',
 				'Options_DarkMode_Description': 'Changes the background of image sets to a darker colour. Will take effect once you refresh pages.',
 				'Options_DefaultImageDisplayMode': 'Default Image Display Mode:',

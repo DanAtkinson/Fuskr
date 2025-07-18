@@ -3,22 +3,26 @@
 		<div class="header-top">
 			<h1>{{ translate('Gallery_Title') }}</h1>
 			<div class="header-controls">
-				<button class="btn-icon theme-toggle" (click)="toggleDarkMode()" [title]="darkMode ? translate('Gallery_SwitchToLightMode') : translate('Gallery_SwitchToDarkMode')">
-				{{ darkMode ? '☀️' : '🌙' }}
+				<button class="btn btn-sm btn-outline-secondary theme-toggle" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
+					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
 				</button>
 			</div>
 		</div>
 
 		<div class="url-info">
-			<label>{{ translate('Gallery_OriginalUrl') }}</label>
-			<input
-				class="url-input"
-				[placeholder]="translate('Gallery_UrlPlaceholder')"
-				type="url"
-				(keyup.enter)="generateGallery()"
-				[(ngModel)]="originalUrl"
-				/>
-				<button class="btn btn-primary" (click)="generateGallery()">{{ translate('Gallery_GenerateGallery') }}</button>
+			<label class="form-label">{{ translate('Gallery_OriginalUrl') }}</label>
+			<div class="input-group mb-3">
+				<input
+					class="form-control"
+					[placeholder]="translate('Gallery_UrlPlaceholder')"
+					type="url"
+					(keyup.enter)="generateGallery()"
+					[(ngModel)]="originalUrl"
+					/>
+				<button class="btn btn-primary" (click)="generateGallery()">
+					<i class="fas fa-images me-1"></i>{{ translate('Gallery_GenerateGallery') }}
+				</button>
+			</div>
 		</div>
 
 		@if (imageUrls.length > 0) {
@@ -31,7 +35,9 @@
 					}
 				</div>
 				<div class="stats-actions">
-					<button class="btn btn-secondary btn-sm" (click)="downloadAll()">{{ translate('Gallery_DownloadAll') }}</button>
+					<button class="btn btn-secondary btn-sm" (click)="downloadAll()">
+						<i class="fas fa-download me-1"></i>{{ translate('Gallery_DownloadAll') }}
+					</button>
 				</div>
 			</div>
 		}
@@ -44,50 +50,45 @@
 					<div class="button-group">
 						<button
 							(click)="setImageDisplayMode('fitOnPage')"
-							[class.active]="imageDisplayMode === 'fitOnPage'"
-							class="btn btn-sm"
+							[class]="imageDisplayMode === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
 							[title]="translate('Images_ResizeImagesToFitOnPage')"
 							>{{ translate('Gallery_FitPage') }}</button>
 						<button
 							(click)="setImageDisplayMode('fullWidth')"
-							[class.active]="imageDisplayMode === 'fullWidth'"
-							class="btn btn-sm"
+							[class]="imageDisplayMode === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
 							[title]="translate('Images_ResizeImagesToFullWidth')"
 							>{{ translate('Gallery_FullWidth') }}</button>
 						<button
 							(click)="setImageDisplayMode('fillPage')"
-							[class.active]="imageDisplayMode === 'fillPage'"
-							class="btn btn-sm"
+							[class]="imageDisplayMode === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
 							[title]="translate('Images_ResizeImagesToFillPage')"
 							>{{ translate('Gallery_FillPage') }}</button>
 						<button
 							(click)="setImageDisplayMode('thumbnails')"
-							[class.active]="imageDisplayMode === 'thumbnails'"
-							class="btn btn-sm"
+							[class]="imageDisplayMode === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
 							[title]="translate('Images_ResizeImagesToThumbnails')"
 							>{{ translate('Gallery_Thumbnails') }}</button>
 					</div>
 				</div>
-				<div class="control-group">
-					<label>{{ translate('Gallery_Options') }}</label>
-					<div class="button-group">
-						@if (brokenImages > 0 || loading) {
+				@if (brokenImages > 0 || loading) {
+					<div class="control-group">
+						<label>{{ translate('Gallery_Options') }}</label>
+						<div class="button-group">
 							<button
 							(click)="toggleBrokenImagesVisibility()"
-							[class.active]="showBrokenImages"
-							class="btn btn-sm"
+							[class]="showBrokenImages ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
 							[title]="translate('Images_ToggleBrokenImages')"
-							>{{ showBrokenImages ? translate('Gallery_HideBroken') : translate('Gallery_ShowBroken') }}</button>
-						}
-						@if (brokenImages > 0) {
-							<button
-							(click)="removeBrokenImages()"
-							class="btn btn-sm"
-							[title]="translate('Images_RemoveBrokenImages')"
-							>{{ translate('Images_RemoveBrokenImages') }}</button>
-						}
+							>{{ translate(showBrokenImages ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}</button>
+							@if (brokenImages > 0) {
+								<button
+								(click)="removeBrokenImages()"
+								class="btn btn-sm btn-outline-danger"
+								[title]="translate('Images_RemoveBrokenImages')"
+								>{{ translate('Images_RemoveBrokenImages') }}</button>
+							}
+						</div>
 					</div>
-				</div>
+				}
 			</div>
 		}
 	</div>
@@ -126,9 +127,15 @@
 					<div class="image-overlay">
 						<span class="image-filename">{{ getFilename(url) }}</span>
 						<div class="image-actions">
-							<button class="btn-icon" (click)="downloadImage(url, $event)" [title]="translate('Images_DownloadImages')">📥</button>
-							<button class="btn-icon" (click)="copyUrl(url, $event)" [title]="translate('Gallery_CopyUrl')">📋</button>
-							<button class="btn-icon" (click)="openImageViewer(url, i); $event.stopPropagation()" [title]="translate('Images_ShowImagesInViewer')">🔍</button>
+							<button class="btn btn-sm btn-outline-primary" (click)="downloadImage(url, $event)" [title]="translate('Images_DownloadImages')">
+								<i class="fas fa-download"></i>
+							</button>
+							<button class="btn btn-sm btn-outline-secondary" (click)="copyUrl(url, $event)" [title]="translate('Gallery_CopyUrl')">
+								<i class="fas fa-clipboard"></i>
+							</button>
+							<button class="btn btn-sm btn-outline-info" (click)="openImageViewer(url, i); $event.stopPropagation()" [title]="translate('Images_ShowImagesInViewer')">
+								<i class="fas fa-search-plus"></i>
+							</button>
 						</div>
 					</div>
 				</div>
@@ -143,27 +150,35 @@
 				<div class="viewer-header">
 					<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
 					<span class="viewer-counter">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>
-					<button class="btn-icon close-btn" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">✕</button>
+					<button class="btn btn-sm btn-outline-secondary close-btn" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
+						<i class="fas fa-times"></i>
+					</button>
 				</div>
 				<div class="viewer-body">
 					<button
-						class="nav-btn prev-btn"
+						class="btn btn-lg btn-outline-secondary nav-btn prev-btn"
 						[title]="translate('Gallery_PreviousImage')"
 						(click)="previousImage()"
 						[disabled]="currentViewerIndex === 0"
-						>&laquo;</button>
+						><i class="fas fa-chevron-left"></i></button>
 					<img [src]="currentViewerImage" [alt]="getImageAltText(currentViewerIndex)">
 					<button
-						class="nav-btn next-btn"
+						class="btn btn-lg btn-outline-secondary nav-btn next-btn"
 						[title]="translate('Gallery_NextImage')"
 						(click)="nextImage()"
 						[disabled]="currentViewerIndex === imageUrls.length - 1"
-						>&raquo;</button>
+						><i class="fas fa-chevron-right"></i></button>
 				</div>
 				<div class="viewer-footer">
-					<button class="btn btn-secondary btn-sm" (click)="downloadImage(currentViewerImage, $event)">{{ translate('Images_DownloadImages') }}</button>
-					<button class="btn btn-secondary btn-sm" (click)="copyUrl(currentViewerImage, $event)">{{ translate('Gallery_CopyUrl') }}</button>
-					<button class="btn btn-secondary btn-sm" (click)="openImage(currentViewerImage)">{{ translate('Gallery_OpenInTab') }}</button>
+					<button class="btn btn-secondary btn-sm" (click)="downloadImage(currentViewerImage, $event)">
+						<i class="fas fa-download me-1"></i>{{ translate('Images_DownloadImages') }}
+					</button>
+					<button class="btn btn-secondary btn-sm" (click)="copyUrl(currentViewerImage, $event)">
+						<i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrl') }}
+					</button>
+					<button class="btn btn-secondary btn-sm" (click)="openImage(currentViewerImage)">
+						<i class="fas fa-external-link-alt me-1"></i>{{ translate('Gallery_OpenInTab') }}
+					</button>
 				</div>
 			</div>
 		</div>

@@ -1,126 +1,186 @@
-<div class="options-container">
-	<h1>{{ translate('Options_Title') }}</h1>
-
-	<div class="options-section">
-		<h2>{{ translate('Options_Appearance') }}</h2>
-
-		<div class="option-group">
-			<label>
-				<input
-					type="checkbox"
-					[(ngModel)]="options.darkMode"
-					(change)="saveOptions()"
-				/>
-				<span>{{ translate('Options_DarkMode') }}</span>
-			</label>
-			<p class="description">{{ translate('Options_DarkMode_Description') }}</p>
+<div class="container-fluid options-container">
+	<div class="row">
+		<div class="col-12">
+			<h1 class="mb-4">
+				<i class="fas fa-cog me-2"></i>{{ translate('Options_Title') }}
+			</h1>
 		</div>
 	</div>
 
-	<div class="options-section">
-		<h2>{{ translate('Options_ImageDisplay') }}</h2>
-
-		<div class="option-group">
-			<label>{{ translate('Options_DefaultImageDisplayMode') }}</label>
-			<div class="radio-group">
-				<label class="radio-label">
-					<input
-						type="radio"
-						name="imageDisplayMode"
-						value="fitOnPage"
-						[(ngModel)]="options.imageDisplayMode"
-						(change)="saveOptions()"
-					/>
-					<span>{{ translate('Options_ResizeImagesFitOnPage') }}</span>
-				</label>
-				<label class="radio-label">
-					<input
-						type="radio"
-						name="imageDisplayMode"
-						value="fullWidth"
-						[(ngModel)]="options.imageDisplayMode"
-						(change)="saveOptions()"
-					/>
-					<span>{{ translate('Options_ResizeImagesFullWidth') }}</span>
-				</label>
-				<label class="radio-label">
-					<input
-						type="radio"
-						name="imageDisplayMode"
-						value="fillPage"
-						[(ngModel)]="options.imageDisplayMode"
-						(change)="saveOptions()"
-					/>
-					<span>{{ translate('Options_ResizeImagesFillPage') }}</span>
-				</label>
-				<label class="radio-label">
-					<input
-						type="radio"
-						name="imageDisplayMode"
-						value="thumbnails"
-						[(ngModel)]="options.imageDisplayMode"
-						(change)="saveOptions()"
-					/>
-					<span>{{ translate('Options_ResizeImagesThumbnails') }}</span>
-				</label>
+	<div class="row">
+		<div class="col-12">
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<i class="fas fa-palette me-2"></i>{{ translate('Options_Appearance') }}
+					</h5>
+				</div>
+				<div class="card-body">
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="darkMode"
+							[(ngModel)]="options.darkMode"
+							(change)="saveOptions()"
+						/>
+						<label class="form-check-label" for="darkMode">
+							<i class="fas fa-moon me-1"></i>{{ translate('Options_DarkMode') }}
+						</label>
+						<div class="form-text">{{ translate('Options_DarkMode_Description') }}</div>
+					</div>
+				</div>
 			</div>
-			<p class="description">{{ translate('Options_DisplayModeDescription') }}</p>
-		</div>
-
-		<div class="option-group">
-			<label>
-				<input
-					type="checkbox"
-					[(ngModel)]="options.showImagesInViewer"
-					(change)="saveOptions()"
-				/>
-				<span>{{ translate('Options_ShowImagesInViewerDefault') }}</span>
-			</label>
-			<p class="description">{{ translate('Options_ShowImagesInViewerDescription') }}</p>
-		</div>
-
-		<div class="option-group">
-			<label>
-				<input
-					type="checkbox"
-					[(ngModel)]="options.toggleBrokenImages"
-					(change)="saveOptions()"
-				/>
-				<span>{{ translate('Options_ShowBrokenImagesDefault') }}</span>
-			</label>
-			<p class="description">{{ translate('Options_ShowBrokenImagesDescription') }}</p>
 		</div>
 	</div>
 
-	<div class="options-section">
-		<h2>{{ translate('Options_Behaviour') }}</h2>
+	<div class="row">
+		<div class="col-12">
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<i class="fas fa-image me-2"></i>{{ translate('Options_ImageDisplay') }}
+					</h5>
+				</div>
+				<div class="card-body">
+					<div class="mb-3">
+						<label class="form-label fw-bold">{{ translate('Options_DefaultImageDisplayMode') }}</label>
+						<div class="form-text mb-2">{{ translate('Options_DisplayModeDescription') }}</div>
+						
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="radio"
+								name="imageDisplayMode"
+								value="fitOnPage"
+								id="fitOnPage"
+								[(ngModel)]="options.imageDisplayMode"
+								(change)="saveOptions()"
+							/>
+							<label class="form-check-label" for="fitOnPage">
+								<i class="fas fa-compress-alt me-1"></i>{{ translate('Options_ResizeImagesFitOnPage') }}
+							</label>
+						</div>
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="radio"
+								name="imageDisplayMode"
+								value="fullWidth"
+								id="fullWidth"
+								[(ngModel)]="options.imageDisplayMode"
+								(change)="saveOptions()"
+							/>
+							<label class="form-check-label" for="fullWidth">
+								<i class="fas fa-arrows-alt-h me-1"></i>{{ translate('Options_ResizeImagesFullWidth') }}
+							</label>
+						</div>
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="radio"
+								name="imageDisplayMode"
+								value="fillPage"
+								id="fillPage"
+								[(ngModel)]="options.imageDisplayMode"
+								(change)="saveOptions()"
+							/>
+							<label class="form-check-label" for="fillPage">
+								<i class="fas fa-expand-alt me-1"></i>{{ translate('Options_ResizeImagesFillPage') }}
+							</label>
+						</div>
+						<div class="form-check">
+							<input
+								class="form-check-input"
+								type="radio"
+								name="imageDisplayMode"
+								value="thumbnails"
+								id="thumbnails"
+								[(ngModel)]="options.imageDisplayMode"
+								(change)="saveOptions()"
+							/>
+							<label class="form-check-label" for="thumbnails">
+								<i class="fas fa-th me-1"></i>{{ translate('Options_ResizeImagesThumbnails') }}
+							</label>
+						</div>
+					</div>
 
-		<div class="option-group">
-			<label>
-				<input
-					type="checkbox"
-					[(ngModel)]="options.openInForeground"
-					(change)="saveOptions()"
-				/>
-				<span>{{ translate('Options_OpenNewFusksInForeground') }}</span>
-			</label>
-			<p class="description">{{ translate('Options_OpenNewFusksInForeground_Description') }}</p>
-		</div>
+					<div class="form-check mb-3">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="showImagesInViewer"
+							[(ngModel)]="options.showImagesInViewer"
+							(change)="saveOptions()"
+						/>
+						<label class="form-check-label" for="showImagesInViewer">
+							<i class="fas fa-search-plus me-1"></i>{{ translate('Options_ShowImagesInViewerDefault') }}
+						</label>
+						<div class="form-text">{{ translate('Options_ShowImagesInViewerDescription') }}</div>
+					</div>
 
-		<div class="option-group">
-			<label>
-				<input
-					type="checkbox"
-					[(ngModel)]="options.keepRecentFusks"
-					(change)="saveOptions()"
-				/>
-				<span>{{ translate('Options_History_Keep') }}</span>
-			</label>
-			<p class="description">{{ translate('Options_History_Keep_Description') }}</p>
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="toggleBrokenImages"
+							[(ngModel)]="options.toggleBrokenImages"
+							(change)="saveOptions()"
+						/>
+						<label class="form-check-label" for="toggleBrokenImages">
+							<i class="fas fa-exclamation-triangle me-1"></i>{{ translate('Options_ShowBrokenImagesDefault') }}
+						</label>
+						<div class="form-text">{{ translate('Options_ShowBrokenImagesDescription') }}</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 
-	<div class="status" [class.show]="statusMessage">
-		{{ statusMessage }}
+	<div class="row">
+		<div class="col-12">
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<i class="fas fa-cogs me-2"></i>{{ translate('Options_Behaviour') }}
+					</h5>
+				</div>
+				<div class="card-body">
+					<div class="form-check mb-3">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="openInForeground"
+							[(ngModel)]="options.openInForeground"
+							(change)="saveOptions()"
+						/>
+						<label class="form-check-label" for="openInForeground">
+							<i class="fas fa-window-restore me-1"></i>{{ translate('Options_OpenNewFusksInForeground') }}
+						</label>
+						<div class="form-text">{{ translate('Options_OpenNewFusksInForeground_Description') }}</div>
+					</div>
+
+					<div class="form-check">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="keepRecentFusks"
+							[(ngModel)]="options.keepRecentFusks"
+							(change)="saveOptions()"
+						/>
+						<label class="form-check-label" for="keepRecentFusks">
+							<i class="fas fa-history me-1"></i>{{ translate('Options_History_Keep') }}
+						</label>
+						<div class="form-text">{{ translate('Options_History_Keep_Description') }}</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
+
+	@if (statusMessage) {
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<i class="fas fa-check-circle me-1"></i>{{ statusMessage }}
+		</div>
+	}
 </div>

@@ -12,6 +12,8 @@
 		"@angular/platform-browser": "^20.1.2",
 		"@angular/platform-browser-dynamic": "^20.1.2",
 		"@angular/router": "^20.1.2",
+		"@fortawesome/fontawesome-free": "^6.7.2",
+		"bootstrap": "^5.3.7",
 		"file-saver": "^2.0.5",
 		"jszip": "^3.10.1",
 		"rxjs": "~7.8.0",
