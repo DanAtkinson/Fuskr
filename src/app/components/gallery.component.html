@@ -35,9 +35,31 @@
 					}
 				</div>
 				<div class="stats-actions">
-					<button class="btn btn-secondary btn-sm" (click)="downloadAll()">
-						<i class="fas fa-download me-1"></i>{{ translate('Gallery_DownloadAll') }}
+					<button
+						class="btn btn-secondary btn-sm"
+						(click)="downloadAll()"
+						[disabled]="isDownloading">
+						@if (isDownloading) {
+							<div class="spinner-border spinner-border-sm me-2" role="status">
+								<span class="visually-hidden">Loading...</span>
+							</div>
+						} @else {
+							<i class="fas fa-download me-1"></i>
+						}
+						{{ isDownloading ? downloadStatus : translate('Gallery_DownloadAll') }}
 					</button>
+					@if (isDownloading && downloadProgress > 0) {
+						<div class="progress mt-2" style="height: 4px;">
+							<div
+								class="progress-bar"
+								role="progressbar"
+								[style.width.%]="downloadProgress"
+								[attr.aria-valuenow]="downloadProgress"
+								aria-valuemin="0"
+								aria-valuemax="100">
+							</div>
+						</div>
+					}
 				</div>
 			</div>
 		}

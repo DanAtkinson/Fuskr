@@ -7,7 +7,7 @@ import { ChromeService } from '../services/chrome.service';
 export class BaseComponentTestHelper {
 	static setupChromeServiceMock(): jasmine.SpyObj<ChromeService> {
 		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', ['getStorageData', 'setStorageData', 'getMessage']);
-		
+
 		// Setup getMessage mock to return translated text
 		chromeServiceSpy.getMessage.and.callFake((key: string) => {
 			const translations: { [key: string]: string } = {

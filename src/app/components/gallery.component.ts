@@ -3,6 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FuskrService } from '../services/fuskr.service';
 import { ChromeService } from '../services/chrome.service';
 import { BaseComponent } from './base.component';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
 
 @Component({
     selector: 'app-gallery',
@@ -20,6 +22,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	loadedImages: number = 0;
 	brokenImages: number = 0;
 	totalImages: number = 0;
+
+	// Download tracking
+	isDownloading: boolean = false;
+	downloadProgress: number = 0;
+	downloadStatus: string = '';
 
 	// UI state
 	showBrokenImages: boolean = false;
@@ -126,16 +133,139 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	async downloadAll() {
 		if (this.imageUrls.length === 0) return;
 
+		this.isDownloading = true;
+		this.downloadProgress = 0;
+		this.downloadStatus = 'Preparing download...';
+
 		try {
-			for (const url of this.imageUrls) {
-			const filename = this.getFilename(url);
-			await this.chromeService.downloadFile(url, filename);
-			// Small delay to avoid overwhelming the browser
-			await new Promise(resolve => setTimeout(resolve, 100));
+			const zip = new JSZip();
+			const validImages = this.getValidImageUrls();
+
+			if (validImages.length === 0) {
+				this.downloadStatus = 'No valid images to download';
+				this.isDownloading = false;
+				return;
 			}
+
+			this.downloadStatus = `Downloading ${validImages.length} images...`;
+
+			// Download all images and add to ZIP
+			for (let i = 0; i < validImages.length; i++) {
+				const url = validImages[i];
+				const filename = this.getFilename(url);
+
+				try {
+					this.downloadStatus = `Downloading ${filename} (${i + 1}/${validImages.length})...`;
+					this.downloadProgress = Math.round((i / validImages.length) * 70); // Reserve 30% for ZIP generation and metadata
+
+					const imageBlob = await this.fetchImageAsBlob(url);
+					zip.file(filename, imageBlob);
+
+				} catch (error) {
+					console.warn(`Failed to download ${filename}:`, error);
+					// Continue with other images
+				}
+			}
+
+			this.downloadStatus = 'Adding metadata...';
+			this.downloadProgress = 75;
+
+			// Add Fuskr.txt metadata file
+			const metadataContent = this.generateMetadataContent(validImages);
+			zip.file('Fuskr.txt', metadataContent);
+
+			this.downloadStatus = 'Creating ZIP file...';
+			this.downloadProgress = 85;
+
+			// Generate ZIP file
+			const zipBlob = await zip.generateAsync({
+				type: 'blob',
+				compression: 'DEFLATE',
+				compressionOptions: { level: 6 }
+			});
+
+			this.downloadStatus = 'Saving file...';
+			this.downloadProgress = 95;
+
+			// Save the ZIP file
+			const zipFilename = this.generateZipFilename();
+			saveAs(zipBlob, zipFilename);
+
+			this.downloadStatus = 'Download complete!';
+			this.downloadProgress = 100;
+
+			// Reset status after 3 seconds
+			setTimeout(() => {
+				this.isDownloading = false;
+				this.downloadStatus = '';
+				this.downloadProgress = 0;
+			}, 3000);
+
 		} catch (error) {
-			console.error('Error downloading images:', error);
+			console.error('Error creating ZIP download:', error);
+			this.downloadStatus = 'Download failed. Please try again.';
+			setTimeout(() => {
+				this.isDownloading = false;
+				this.downloadStatus = '';
+				this.downloadProgress = 0;
+			}, 3000);
 		}
+	}
+
+	private async fetchImageAsBlob(url: string): Promise<Blob> {
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch image: ${response.statusText}`);
+		}
+		return response.blob();
+	}
+
+	private getValidImageUrls(): string[] {
+		// Get all images that are not broken and are actual image URLs (not data URLs or placeholders)
+		const images = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
+		const validUrls: string[] = [];
+
+		images.forEach(img => {
+			// Check if image has loaded successfully (not broken)
+			if (img.complete && img.naturalHeight !== 0) {
+				const url = img.src;
+				// Filter out data URLs, placeholder images, and invalid URLs
+				if (this.isValidImageUrl(url)) {
+					validUrls.push(url);
+				}
+			}
+		});
+
+		return validUrls;
+	}
+
+	private isValidImageUrl(url: string): boolean {
+		// Reject data URLs (like the SVG placeholder)
+		if (url.startsWith('data:')) {
+			return false;
+		}
+
+		// Reject blob URLs (temporary URLs)
+		if (url.startsWith('blob:')) {
+			return false;
+		}
+
+		// Must be HTTP/HTTPS
+		if (!url.startsWith('http://') && !url.startsWith('https://')) {
+			return false;
+		}
+
+		// Check for common image extensions
+		const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
+		const urlWithoutQuery = url.split('?')[0].toLowerCase();
+		const hasImageExtension = imageExtensions.some(ext => urlWithoutQuery.endsWith(ext));
+
+		return hasImageExtension;
+	}
+
+	private generateZipFilename(): string {
+		// Generate a filename based on the original URL or current date
+		return `fuskr-gallery-${new Date().toISOString()}.zip`;
 	}
 
 	copyUrl(url: string, event: Event) {
@@ -260,7 +390,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		// Create a list of URLs that correspond to broken images
 		const brokenImages = document.querySelectorAll('img.error');
 		const brokenUrls = new Set<string>();
-		
+
 		brokenImages.forEach((img: Element) => {
 			const htmlImg = img as HTMLImageElement;
 			// Get the original URL from the data attribute
@@ -268,7 +398,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			if (originalUrl) {
 				brokenUrls.add(originalUrl);
 			}
-			
+
 			// Remove the container from DOM
 			const container = htmlImg.closest('.image-item');
 			if (container) {
@@ -287,5 +417,27 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	 */
 	getImageAltText(index: number): string {
 		return `${this.translate('Gallery_ImageAlt')} ${index + 1}`;
+	}
+
+	private generateMetadataContent(imageUrls: string[]): string {
+		const lines: string[] = [
+			'These images were downloaded using Fuskr.',
+			'',
+			`Fusk Url: ${this.originalUrl || 'Unknown'}`,
+			'',
+			'Urls:'
+		];
+
+		// Add each image URL on a separate line
+		imageUrls.forEach(url => {
+			lines.push(url);
+		});
+
+		// Add download timestamp
+		lines.push('');
+		lines.push(`Downloaded: ${new Date().toISOString()}`);
+		lines.push(`Total Images: ${imageUrls.length}`);
+
+		return lines.join('\n');
 	}
 }

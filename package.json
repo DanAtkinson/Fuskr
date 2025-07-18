@@ -27,6 +27,7 @@
 		"@types/chrome": "^0.0.258",
 		"@types/file-saver": "^2.0.7",
 		"@types/jasmine": "~5.1.0",
+		"@types/jszip": "^3.4.0",
 		"@types/node": "^24.0.14",
 		"@types/webpack-env": "^1.18.8",
 		"jasmine-core": "~5.1.0",
