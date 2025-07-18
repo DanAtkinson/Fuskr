@@ -46,7 +46,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 			this.showStatus(this.translate('Options_SettingsSaved'));
 		} catch (error) {
 			console.error('Error saving options:', error);
-			this.showStatus('Error saving options');
+			this.showStatus(this.translate('Options_ErrorSaving'));
 		}
 	}
 

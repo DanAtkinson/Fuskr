@@ -31,6 +31,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// UI state
 	showBrokenImages: boolean = false;
 	showImageViewer: boolean = false;
+	showUrlList: boolean = false;
 	currentViewerImage: string = '';
 	currentViewerIndex: number = 0;
 
@@ -81,7 +82,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	generateGallery() {
 		if (!this.originalUrl.trim()) {
-			this.errorMessage = 'Please enter a valid URL';
+			this.errorMessage = this.translate('Gallery_ErrorValidUrl');
 			return;
 		}
 
@@ -96,6 +97,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.loadedImages = 0;
 			this.brokenImages = 0;
 
+			// Do a final count after images have had time to load
+			setTimeout(() => {
+				this.updateImageCounts();
+			}, 2000);
+
 			// Update the URL in the browser to show the bracketed version
 			if (result.originalUrl !== this.originalUrl) {
 				this.originalUrl = result.originalUrl;
@@ -107,10 +113,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}
 
 			if (this.imageUrls.length === 0) {
-				this.errorMessage = 'No fuskable pattern found in the URL. Try a URL with numbers in the filename.';
+				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
 			}
 		} catch (error) {
-			this.errorMessage = 'Error generating gallery: ' + (error as Error).message;
+			this.errorMessage = this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message;
 		} finally {
 			this.loading = false;
 		}
@@ -135,19 +141,19 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		this.isDownloading = true;
 		this.downloadProgress = 0;
-		this.downloadStatus = 'Preparing download...';
+		this.downloadStatus = this.translate('Gallery_DownloadPreparing');
 
 		try {
 			const zip = new JSZip();
 			const validImages = this.getValidImageUrls();
 
 			if (validImages.length === 0) {
-				this.downloadStatus = 'No valid images to download';
+				this.downloadStatus = this.translate('Gallery_DownloadNoImages');
 				this.isDownloading = false;
 				return;
 			}
 
-			this.downloadStatus = `Downloading ${validImages.length} images...`;
+			this.downloadStatus = this.translate('Gallery_DownloadingImages', [validImages.length.toString()]);
 
 			// Download all images and add to ZIP
 			for (let i = 0; i < validImages.length; i++) {
@@ -155,7 +161,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				const filename = this.getFilename(url);
 
 				try {
-					this.downloadStatus = `Downloading ${filename} (${i + 1}/${validImages.length})...`;
+					this.downloadStatus = this.translate('Gallery_DownloadingImage', [filename, (i + 1).toString(), validImages.length.toString()]);
 					this.downloadProgress = Math.round((i / validImages.length) * 70); // Reserve 30% for ZIP generation and metadata
 
 					const imageBlob = await this.fetchImageAsBlob(url);
@@ -167,14 +173,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				}
 			}
 
-			this.downloadStatus = 'Adding metadata...';
+			this.downloadStatus = this.translate('Gallery_DownloadAddingMetadata');
 			this.downloadProgress = 75;
 
 			// Add Fuskr.txt metadata file
 			const metadataContent = this.generateMetadataContent(validImages);
 			zip.file('Fuskr.txt', metadataContent);
 
-			this.downloadStatus = 'Creating ZIP file...';
+			this.downloadStatus = this.translate('Gallery_DownloadCreatingZip');
 			this.downloadProgress = 85;
 
 			// Generate ZIP file
@@ -184,14 +190,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				compressionOptions: { level: 6 }
 			});
 
-			this.downloadStatus = 'Saving file...';
+			this.downloadStatus = this.translate('Gallery_DownloadSaving');
 			this.downloadProgress = 95;
 
 			// Save the ZIP file
 			const zipFilename = this.generateZipFilename();
 			saveAs(zipBlob, zipFilename);
 
-			this.downloadStatus = 'Download complete!';
+			this.downloadStatus = this.translate('Gallery_DownloadComplete');
 			this.downloadProgress = 100;
 
 			// Reset status after 3 seconds
@@ -203,7 +209,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		} catch (error) {
 			console.error('Error creating ZIP download:', error);
-			this.downloadStatus = 'Download failed. Please try again.';
+			this.downloadStatus = this.translate('Gallery_DownloadFailed');
 			setTimeout(() => {
 				this.isDownloading = false;
 				this.downloadStatus = '';
@@ -282,34 +288,60 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	onImageError(event: Event) {
 		const img = event.target as HTMLImageElement;
-		img.classList.add('error');
-		this.brokenImages++;
+		const originalUrl = img.getAttribute('data-original-url') || img.src;
+		
+		// Only process if this image hasn't been marked as error yet
+		if (!img.classList.contains('error')) {
+			img.classList.add('error');
+			this.updateImageCounts();
 
-		// Create a more visible broken image placeholder
-		const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
-			<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-				<rect width="100%" height="100%" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
-				<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">Image not found</text>
-				<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="#adb5bd" text-anchor="middle" dominant-baseline="middle">🚫</text>
-			</svg>
-		`)}`;
+			// Create a more visible broken image placeholder
+			const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+				<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+					<rect width="100%" height="100%" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+					<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
+					<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="#adb5bd" text-anchor="middle" dominant-baseline="middle">🚫</text>
+				</svg>
+			`)}`;
 
-		if (!this.showBrokenImages) {
-			// Instead of hiding completely, reduce opacity
-			img.style.opacity = '0.3';
-			img.style.filter = 'grayscale(100%)';
+			if (!this.showBrokenImages) {
+				// Instead of hiding completely, reduce opacity
+				img.style.opacity = '0.3';
+				img.style.filter = 'grayscale(100%)';
+			}
+
+			// Always show the broken image placeholder
+			img.src = brokenImageSvg;
+			img.alt = this.translate('Gallery_ImageNotFound');
 		}
-
-		// Always show the broken image placeholder
-		img.src = brokenImageSvg;
-		img.alt = 'Image not found';
 	}
 
 	onImageLoad(event: Event) {
-		this.loadedImages++;
+		const img = event.target as HTMLImageElement;
+		
+		// Only count successful loads (not our error placeholders)
+		if (!img.src.startsWith('data:') && !img.classList.contains('error')) {
+			this.updateImageCounts();
+		}
 	}
 
-	async toggleDarkMode() {
+	private updateImageCounts() {
+		// Count images directly from DOM
+		const allImages = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
+		let loaded = 0;
+		let broken = 0;
+
+		allImages.forEach(img => {
+			if (img.classList.contains('error')) {
+				broken++;
+			} else if (img.complete && img.naturalHeight !== 0 && !img.src.startsWith('data:')) {
+				loaded++;
+			}
+		});
+
+		this.loadedImages = loaded;
+		this.brokenImages = broken;
+	}	async toggleDarkMode() {
 		this.darkMode = !this.darkMode;
 		document.body.classList.toggle('dark-mode', this.darkMode);
 
@@ -439,5 +471,44 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		lines.push(`Total Images: ${imageUrls.length}`);
 
 		return lines.join('\n');
+	}
+
+	/**
+	 * Toggle the visibility of the URL list section
+	 */
+	toggleUrlList() {
+		this.showUrlList = !this.showUrlList;
+	}
+
+	/**
+	 * Get all image URLs as formatted text
+	 */
+	getAllUrlsText(): string {
+		return this.imageUrls.join('\n');
+	}
+
+	/**
+	 * Copy all URLs to clipboard
+	 */
+	async copyAllUrls() {
+		try {
+			const urlText = this.getAllUrlsText();
+			await navigator.clipboard.writeText(urlText);
+			console.log('All URLs copied to clipboard');
+			// Could show a toast notification here
+		} catch (error) {
+			console.error('Failed to copy URLs:', error);
+		}
+	}
+
+	/**
+	 * Select all text in the URL textarea
+	 */
+	selectAllUrls() {
+		const textarea = document.querySelector('.url-textarea') as HTMLTextAreaElement;
+		if (textarea) {
+			textarea.select();
+			textarea.setSelectionRange(0, 99999); // For mobile devices
+		}
 	}
 }

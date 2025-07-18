@@ -83,8 +83,8 @@
 	"Images_Failed": {
 		"message": "{} Failed"
 	},
-	"Images_DownloadImages": {
-		"message": "Download Images"
+	"Images_DownloadImage": {
+		"message": "Download Image"
 	},
 	"Images_SaveFusk": {
 		"message": "Save Fusk"

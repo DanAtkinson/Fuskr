@@ -3,7 +3,12 @@
 		<div class="header-top">
 			<h1>{{ translate('Gallery_Title') }}</h1>
 			<div class="header-controls">
-				<button class="btn btn-sm btn-outline-secondary theme-toggle" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
+				<button
+					class="btn btn-sm btn-outline-secondary theme-toggle"
+					type="button"
+					(click)="toggleDarkMode()"
+					[title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')"
+					>
 					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
 				</button>
 			</div>
@@ -14,10 +19,10 @@
 			<div class="input-group mb-3">
 				<input
 					class="form-control"
-					[placeholder]="translate('Gallery_UrlPlaceholder')"
 					type="url"
 					(keyup.enter)="generateGallery()"
 					[(ngModel)]="originalUrl"
+					[placeholder]="translate('Gallery_UrlPlaceholder')"
 					/>
 				<button class="btn btn-primary" (click)="generateGallery()">
 					<i class="fas fa-images me-1"></i>{{ translate('Gallery_GenerateGallery') }}
@@ -25,94 +30,8 @@
 			</div>
 		</div>
 
-		@if (imageUrls.length > 0) {
-			<div class="gallery-stats">
-				<div class="stats-info">
-					<span class="stat">{{ totalImages }} {{ translate('Gallery_Stats_Total') }}</span>
-					<span class="stat">{{ loadedImages }} {{ translate('Gallery_Stats_Loaded') }}</span>
-					@if (brokenImages > 0) {
-						<span class="stat">{{ brokenImages }} {{ translate('Gallery_Stats_Broken') }}</span>
-					}
-				</div>
-				<div class="stats-actions">
-					<button
-						class="btn btn-secondary btn-sm"
-						(click)="downloadAll()"
-						[disabled]="isDownloading">
-						@if (isDownloading) {
-							<div class="spinner-border spinner-border-sm me-2" role="status">
-								<span class="visually-hidden">Loading...</span>
-							</div>
-						} @else {
-							<i class="fas fa-download me-1"></i>
-						}
-						{{ isDownloading ? downloadStatus : translate('Gallery_DownloadAll') }}
-					</button>
-					@if (isDownloading && downloadProgress > 0) {
-						<div class="progress mt-2" style="height: 4px;">
-							<div
-								class="progress-bar"
-								role="progressbar"
-								[style.width.%]="downloadProgress"
-								[attr.aria-valuenow]="downloadProgress"
-								aria-valuemin="0"
-								aria-valuemax="100">
-							</div>
-						</div>
-					}
-				</div>
-			</div>
-		}
-
-		<!-- Display Mode Controls -->
-		@if (imageUrls.length > 0) {
-			<div class="display-controls">
-				<div class="control-group">
-					<label>{{ translate('Gallery_DisplayMode') }}</label>
-					<div class="button-group">
-						<button
-							(click)="setImageDisplayMode('fitOnPage')"
-							[class]="imageDisplayMode === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
-							[title]="translate('Images_ResizeImagesToFitOnPage')"
-							>{{ translate('Gallery_FitPage') }}</button>
-						<button
-							(click)="setImageDisplayMode('fullWidth')"
-							[class]="imageDisplayMode === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
-							[title]="translate('Images_ResizeImagesToFullWidth')"
-							>{{ translate('Gallery_FullWidth') }}</button>
-						<button
-							(click)="setImageDisplayMode('fillPage')"
-							[class]="imageDisplayMode === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
-							[title]="translate('Images_ResizeImagesToFillPage')"
-							>{{ translate('Gallery_FillPage') }}</button>
-						<button
-							(click)="setImageDisplayMode('thumbnails')"
-							[class]="imageDisplayMode === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
-							[title]="translate('Images_ResizeImagesToThumbnails')"
-							>{{ translate('Gallery_Thumbnails') }}</button>
-					</div>
-				</div>
-				@if (brokenImages > 0 || loading) {
-					<div class="control-group">
-						<label>{{ translate('Gallery_Options') }}</label>
-						<div class="button-group">
-							<button
-							(click)="toggleBrokenImagesVisibility()"
-							[class]="showBrokenImages ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
-							[title]="translate('Images_ToggleBrokenImages')"
-							>{{ translate(showBrokenImages ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}</button>
-							@if (brokenImages > 0) {
-								<button
-								(click)="removeBrokenImages()"
-								class="btn btn-sm btn-outline-danger"
-								[title]="translate('Images_RemoveBrokenImages')"
-								>{{ translate('Images_RemoveBrokenImages') }}</button>
-							}
-						</div>
-					</div>
-				}
-			</div>
-		}
+		<!-- Top Controls -->
+		<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
 	</div>
 
 	@if (loading) {
@@ -137,7 +56,6 @@
 				<div class="image-item wrap">
 					<img
 						class="fusk-image"
-						loading="lazy"
 						(click)="openImageViewer(url, i)"
 						(error)="onImageError($event)"
 						(load)="onImageLoad($event)"
@@ -149,17 +67,61 @@
 					<div class="image-overlay">
 						<span class="image-filename">{{ getFilename(url) }}</span>
 						<div class="image-actions">
-							<button class="btn btn-sm btn-outline-primary" (click)="downloadImage(url, $event)" [title]="translate('Images_DownloadImages')">
+							<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(url, $event)" [title]="translate('Images_DownloadImage')">
 								<i class="fas fa-download"></i>
 							</button>
-							<button class="btn btn-sm btn-outline-secondary" (click)="copyUrl(url, $event)" [title]="translate('Gallery_CopyUrl')">
+							<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(url, $event)" [title]="translate('Gallery_CopyUrl')">
 								<i class="fas fa-clipboard"></i>
 							</button>
-							<button class="btn btn-sm btn-outline-info" (click)="openImageViewer(url, i); $event.stopPropagation()" [title]="translate('Images_ShowImagesInViewer')">
+							<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(url, i); $event.stopPropagation()" [title]="translate('Images_ShowImagesInViewer')">
 								<i class="fas fa-search-plus"></i>
 							</button>
 						</div>
 					</div>
+				</div>
+			}
+		</div>
+	}
+
+	<!-- Bottom Controls -->
+	@if (imageUrls.length > 0 && !loading) {
+		<div class="gallery-footer">
+			<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
+		</div>
+	}
+
+	<!-- URL List Section -->
+	@if (imageUrls.length > 0 && !loading) {
+		<div class="url-list-section">
+			<div class="url-list-header">
+				<button
+					class="btn btn-outline-secondary btn-sm"
+					type="button"
+					(click)="toggleUrlList()"
+					[attr.aria-expanded]="showUrlList">
+					<i [class]="showUrlList ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+					<span class="ms-1">{{ translate('Images_ShowImageUrls') }}</span>
+				</button>
+			</div>
+			@if (showUrlList) {
+				<div class="url-list-content">
+					<div class="url-list-controls mb-2">
+						<button class="btn btn-secondary btn-sm me-2" type="button" (click)="copyAllUrls()">
+							<i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrls') }}
+						</button>
+						<button class="btn btn-outline-secondary btn-sm" type="button" (click)="selectAllUrls()">
+							<i class="fas fa-check-square me-1"></i>{{ translate('Gallery_SelectAllUrls') }}
+						</button>
+					</div>
+					<textarea
+						class="form-control url-textarea"
+						placeholder="{{ translate('Gallery_UrlListPlaceholder') }}"
+						readonly
+						rows="10"
+						[value]="getAllUrlsText()"
+						#urlTextarea
+						>
+					</textarea>
 				</div>
 			}
 		</div>
@@ -172,13 +134,14 @@
 				<div class="viewer-header">
 					<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
 					<span class="viewer-counter">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>
-					<button class="btn btn-sm btn-outline-secondary close-btn" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
+					<button class="btn btn-sm btn-outline-secondary close-btn" type="button" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
 						<i class="fas fa-times"></i>
 					</button>
 				</div>
 				<div class="viewer-body">
 					<button
 						class="btn btn-lg btn-outline-secondary nav-btn prev-btn"
+						type="button"
 						[title]="translate('Gallery_PreviousImage')"
 						(click)="previousImage()"
 						[disabled]="currentViewerIndex === 0"
@@ -186,19 +149,20 @@
 					<img [src]="currentViewerImage" [alt]="getImageAltText(currentViewerIndex)">
 					<button
 						class="btn btn-lg btn-outline-secondary nav-btn next-btn"
+						type="button"
 						[title]="translate('Gallery_NextImage')"
 						(click)="nextImage()"
 						[disabled]="currentViewerIndex === imageUrls.length - 1"
 						><i class="fas fa-chevron-right"></i></button>
 				</div>
 				<div class="viewer-footer">
-					<button class="btn btn-secondary btn-sm" (click)="downloadImage(currentViewerImage, $event)">
-						<i class="fas fa-download me-1"></i>{{ translate('Images_DownloadImages') }}
+					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage, $event)">
+						<i class="fas fa-download me-1"></i>{{ translate('Images_DownloadImage') }}
 					</button>
-					<button class="btn btn-secondary btn-sm" (click)="copyUrl(currentViewerImage, $event)">
+					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage, $event)">
 						<i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrl') }}
 					</button>
-					<button class="btn btn-secondary btn-sm" (click)="openImage(currentViewerImage)">
+					<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage)">
 						<i class="fas fa-external-link-alt me-1"></i>{{ translate('Gallery_OpenInTab') }}
 					</button>
 				</div>
@@ -212,9 +176,107 @@
 			<p>{{ translate('Gallery_WelcomeText') }}</p>
 			<div class="examples">
 				<h3>{{ translate('Gallery_ExampleUrls') }}</h3>
-				<code>https://example.com/image01.jpg</code>
-				<code>https://example.com/photo[01-10].png</code>
+				<code>{{ translate('Gallery_ExampleUrl1') }}</code>
+				<code>{{ translate('Gallery_ExampleUrl2') }}</code>
 			</div>
 		</div>
 	}
 </div>
+
+<!-- Gallery Stats and Controls Template -->
+<ng-template #galleryControls>
+	@if (imageUrls.length > 0) {
+		<div class="gallery-stats">
+			<div class="stats-info">
+				<span class="stat">{{ totalImages }} {{ translate('Gallery_Stats_Total') }}</span>
+				<span class="stat">{{ loadedImages }} {{ translate('Gallery_Stats_Loaded') }}</span>
+				@if (brokenImages > 0) {
+					<span class="stat">{{ brokenImages }} {{ translate('Gallery_Stats_Broken') }}</span>
+				}
+			</div>
+			<div class="stats-actions">
+				<button
+					class="btn btn-secondary btn-sm"
+					type="button"
+					(click)="downloadAll()"
+					[disabled]="isDownloading">
+					@if (isDownloading) {
+						<div class="spinner-border spinner-border-sm me-2" role="status">
+							<span class="visually-hidden">{{ translate('Gallery_Loading') }}</span>
+						</div>
+					} @else {
+						<i class="fas fa-download me-1"></i>
+					}
+					{{ isDownloading ? downloadStatus : translate('Gallery_DownloadAll') }}
+				</button>
+				@if (isDownloading && downloadProgress > 0) {
+					<div class="progress mt-2" style="height: 4px;">
+						<div
+							aria-valuemax="100"
+							aria-valuemin="0"
+							class="progress-bar"
+							role="progressbar"
+							[attr.aria-valuenow]="downloadProgress"
+							[style.width.%]="downloadProgress"
+							>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<!-- Display Mode Controls -->
+		<div class="display-controls">
+			<div class="control-group">
+				<label>{{ translate('Gallery_DisplayMode') }}</label>
+				<div class="button-group">
+					<button
+						type="button"
+						(click)="setImageDisplayMode('fitOnPage')"
+						[class]="imageDisplayMode === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
+						[title]="translate('Images_ResizeImagesToFitOnPage')"
+						>{{ translate('Gallery_FitPage') }}</button>
+					<button
+						type="button"
+						(click)="setImageDisplayMode('fullWidth')"
+						[class]="imageDisplayMode === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
+						[title]="translate('Images_ResizeImagesToFullWidth')"
+						>{{ translate('Gallery_FullWidth') }}</button>
+					<button
+						type="button"
+						(click)="setImageDisplayMode('fillPage')"
+						[class]="imageDisplayMode === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
+						[title]="translate('Images_ResizeImagesToFillPage')"
+						>{{ translate('Gallery_FillPage') }}</button>
+					<button
+						type="button"
+						(click)="setImageDisplayMode('thumbnails')"
+						[class]="imageDisplayMode === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
+						[title]="translate('Images_ResizeImagesToThumbnails')"
+						>{{ translate('Gallery_Thumbnails') }}</button>
+				</div>
+			</div>
+			@if (brokenImages > 0 || loading) {
+				<div class="control-group">
+					<label>{{ translate('Gallery_Options') }}</label>
+					<div class="button-group">
+						<button
+						type="button"
+						(click)="toggleBrokenImagesVisibility()"
+						[class]="showBrokenImages ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'"
+						[title]="translate('Images_ToggleBrokenImages')"
+						>{{ translate(showBrokenImages ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}</button>
+						@if (brokenImages > 0) {
+							<button
+							type="button"
+							(click)="removeBrokenImages()"
+							class="btn btn-sm btn-outline-danger"
+							[title]="translate('Images_RemoveBrokenImages')"
+							>{{ translate('Images_RemoveBrokenImages') }}</button>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	}
+</ng-template>

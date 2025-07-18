@@ -434,9 +434,72 @@
 	}
 }
 
-@keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
+// Gallery Footer
+.gallery-footer {
+	margin-top: 30px;
+	padding-top: 20px;
+	border-top: 2px solid var(--border-color);
+}
+
+// URL List Section
+.url-list-section {
+	margin-top: 30px;
+	padding: 20px;
+	background-color: var(--card-bg);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+}
+
+.url-list-header {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 15px;
+
+	button {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+	}
+}
+
+.url-list-content {
+	margin-top: 15px;
+}
+
+.url-list-controls {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.url-textarea {
+	font-family: 'Courier New', monospace;
+	font-size: 12px;
+	line-height: 1.4;
+	resize: vertical;
+	min-height: 200px;
+	background-color: var(--input-bg);
+	border: 1px solid var(--border-color);
+	color: var(--text-color);
+
+	&:focus {
+		border-color: var(--primary-color);
+		box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+	}
+}
+
+// Dark mode adjustments for new components
+:host-context(.dark-mode) {
+	.url-list-section {
+		background-color: var(--card-bg-dark);
+		border-color: var(--border-color-dark);
+	}
+
+	.url-textarea {
+		background-color: var(--input-bg-dark);
+		border-color: var(--border-color-dark);
+		color: var(--text-color-dark);
+	}
 }
 
 // Responsive Design

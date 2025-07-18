@@ -83,8 +83,8 @@
 	"Images_Failed": {
 		"message": "{} Failed"
 	},
-	"Images_DownloadImages": {
-		"message": "Download Images"
+	"Images_DownloadImage": {
+		"message": "Download Image"
 	},
 	"Images_SaveFusk": {
 		"message": "Save Fusk"
@@ -378,6 +378,10 @@
 		"message": "Settings saved!",
 		"description": "Status message when settings are saved successfully"
 	},
+	"Options_ErrorSaving": {
+		"message": "Error saving options",
+		"description": "Error message when settings fail to save"
+	},
 	"Options_ResizeImagesFitOnPage": {
 		"message": "Resize images to fit on page",
 		"description": "Radio button option for fit on page display mode"
@@ -397,5 +401,93 @@
 	"Options_OpenNewFusksDescription": {
 		"message": "New tabs created from Fusk operations will be opened in the foreground",
 		"description": "Description for opening new fusks in foreground setting"
+	},
+	"Gallery_CopyUrls": {
+		"message": "Copy URLs",
+		"description": "Button text to copy all image URLs to clipboard"
+	},
+	"Gallery_SelectAllUrls": {
+		"message": "Select All",
+		"description": "Button text to select all URLs in the textarea"
+	},
+	"Gallery_UrlListPlaceholder": {
+		"message": "Image URLs will appear here...",
+		"description": "Placeholder text for the URL list textarea"
+	},
+	"Gallery_UrlList": {
+		"message": "URL List",
+		"description": "Header for the URL list section"
+	},
+	"Gallery_ShowUrlList": {
+		"message": "Show URL List",
+		"description": "Button text to show the list of image URLs"
+	},
+	"Gallery_HideUrlList": {
+		"message": "Hide URL List",
+		"description": "Button text to hide the list of image URLs"
+	},
+	"Gallery_Loading": {
+		"message": "Loading...",
+		"description": "Generic loading text for accessibility"
+	},
+	"Gallery_ErrorValidUrl": {
+		"message": "Please enter a valid URL",
+		"description": "Error message when no URL is provided"
+	},
+	"Gallery_ErrorNoPattern": {
+		"message": "No fuskable pattern found in the URL. Try a URL with numbers in the filename.",
+		"description": "Error message when URL has no fuskable pattern"
+	},
+	"Gallery_ErrorGenerating": {
+		"message": "Error generating gallery:",
+		"description": "Error message prefix when gallery generation fails"
+	},
+	"Gallery_DownloadPreparing": {
+		"message": "Preparing download...",
+		"description": "Status message when preparing ZIP download"
+	},
+	"Gallery_DownloadNoImages": {
+		"message": "No valid images to download",
+		"description": "Status message when no valid images found for download"
+	},
+	"Gallery_DownloadingImages": {
+		"message": "Downloading $1 images...",
+		"description": "Status message when downloading multiple images"
+	},
+	"Gallery_DownloadingImage": {
+		"message": "Downloading $1 ($2/$3)...",
+		"description": "Status message when downloading individual image with progress"
+	},
+	"Gallery_DownloadAddingMetadata": {
+		"message": "Adding metadata...",
+		"description": "Status message when adding metadata to ZIP"
+	},
+	"Gallery_DownloadCreatingZip": {
+		"message": "Creating ZIP file...",
+		"description": "Status message when creating ZIP file"
+	},
+	"Gallery_DownloadSaving": {
+		"message": "Saving file...",
+		"description": "Status message when saving ZIP file"
+	},
+	"Gallery_DownloadComplete": {
+		"message": "Download complete!",
+		"description": "Status message when download is finished"
+	},
+	"Gallery_DownloadFailed": {
+		"message": "Download failed. Please try again.",
+		"description": "Error message when download fails"
+	},
+	"Gallery_ImageNotFound": {
+		"message": "Image not found",
+		"description": "Alt text and placeholder text for broken images"
+	},
+	"Gallery_ExampleUrl1": {
+		"message": "https://example.com/image01.jpg",
+		"description": "First example URL showing numbered filename pattern"
+	},
+	"Gallery_ExampleUrl2": {
+		"message": "https://example.com/photo[01-10].png",
+		"description": "Second example URL showing bracket range pattern"
 	}
 }

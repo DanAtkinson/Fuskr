@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { GalleryComponent } from './gallery.component';
 import { FuskrService } from '../services/fuskr.service';
 import { ChromeService } from '../services/chrome.service';
+import { BaseComponentTestHelper } from './base-component-test.helper';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type {} from 'jasmine';
@@ -19,11 +20,14 @@ describe('GalleryComponent', () => {
 
 	beforeEach(async () => {
 		mockFuskrService = jasmine.createSpyObj('FuskrService', ['generateImageGallery', 'getImageFilename']);
-		mockChromeService = jasmine.createSpyObj('ChromeService', ['isExtensionContext', 'openTab', 'downloadFile']);
 		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 		mockActivatedRoute = {
-			queryParams: of({ url: 'https://example.com/test.jpg' })
+			queryParams: of({ url: 'https://example.com/test.jpg' }),
+			snapshot: { queryParams: {} }
 		};
+
+		// Setup the ChromeService mock using BaseComponentTestHelper
+		mockChromeService = BaseComponentTestHelper.setupChromeServiceMock();
 
 		await TestBed.configureTestingModule({
 			declarations: [GalleryComponent],

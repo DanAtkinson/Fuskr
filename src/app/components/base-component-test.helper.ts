@@ -6,7 +6,14 @@ import { ChromeService } from '../services/chrome.service';
  */
 export class BaseComponentTestHelper {
 	static setupChromeServiceMock(): jasmine.SpyObj<ChromeService> {
-		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', ['getStorageData', 'setStorageData', 'getMessage']);
+		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', [
+			'getStorageData',
+			'setStorageData',
+			'getMessage',
+			'isExtensionContext',
+			'openTab',
+			'downloadFile'
+		]);
 
 		// Setup getMessage mock to return translated text
 		chromeServiceSpy.getMessage.and.callFake((key: string) => {
@@ -32,6 +39,7 @@ export class BaseComponentTestHelper {
 				'Options_History_Keep': 'Keep a recent history of fusks',
 				'Options_History_Keep_Description': 'Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery.',
 				'Options_SettingsSaved': 'Options saved!',
+				'Options_ErrorSaving': 'Error saving options',
 				'Gallery_Title': 'Fuskr Gallery',
 				'Gallery_SwitchToLightMode': 'Switch to Light Mode',
 				'Gallery_SwitchToDarkMode': 'Switch to Dark Mode',
@@ -46,10 +54,30 @@ export class BaseComponentTestHelper {
 				'Gallery_RemoveBrokenImages': 'Remove broken images',
 				'Gallery_ViewImage': 'View image',
 				'Gallery_DownloadImage': 'Download image',
-				'Gallery_ImageAlt': 'Image'
+				'Gallery_ImageAlt': 'Image',
+				'Gallery_ErrorValidUrl': 'Please enter a valid URL',
+				'Gallery_ErrorNoPattern': 'No fuskable pattern found in the URL. Try a URL with numbers in the filename.',
+				'Gallery_ErrorGenerating': 'Error generating gallery:',
+				'Gallery_DownloadPreparing': 'Preparing download...',
+				'Gallery_DownloadNoImages': 'No images to download',
+				'Gallery_DownloadingImages': 'Downloading $1 images...',
+				'Gallery_DownloadingImage': 'Downloading $1 ($2 of $3)...',
+				'Gallery_DownloadAddingMetadata': 'Adding metadata...',
+				'Gallery_DownloadCreatingZip': 'Creating ZIP file...',
+				'Gallery_DownloadSaving': 'Saving ZIP file...',
+				'Gallery_DownloadComplete': 'Download complete!',
+				'Gallery_DownloadFailed': 'Download failed',
+				'Gallery_ImageNotFound': 'Image not found'
 			};
 			return translations[key] || key;
 		});
+
+		// Setup other method defaults
+		chromeServiceSpy.getStorageData.and.returnValue(Promise.resolve({}));
+		chromeServiceSpy.setStorageData.and.returnValue(Promise.resolve());
+		chromeServiceSpy.isExtensionContext.and.returnValue(false);
+		chromeServiceSpy.openTab.and.stub();
+		chromeServiceSpy.downloadFile.and.stub();
 
 		return chromeServiceSpy;
 	}
