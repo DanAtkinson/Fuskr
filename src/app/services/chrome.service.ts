@@ -115,4 +115,13 @@ export class ChromeService {
 	isExtensionContext(): boolean {
 		return !!(this.browserAPI && this.browserAPI.runtime && this.browserAPI.runtime.id);
 	}
+
+	getMessage(key: string, substitutions?: string[]): string {
+		if (this.browserAPI && this.browserAPI.i18n) {
+			return this.browserAPI.i18n.getMessage(key, substitutions) || key;
+		} else {
+			// Fallback for development - return the key
+			return key;
+		}
+	}
 }

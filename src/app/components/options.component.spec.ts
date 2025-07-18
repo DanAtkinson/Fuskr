@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { OptionsComponent } from './options.component';
 import { ChromeService, ChromeStorageData } from '../services/chrome.service';
+import { BaseComponentTestHelper } from './base-component-test.helper';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type {} from 'jasmine';
@@ -12,7 +13,7 @@ describe('OptionsComponent', () => {
 	let mockChromeService: jasmine.SpyObj<ChromeService>;
 
 	beforeEach(async () => {
-		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', ['getStorageData', 'setStorageData']);
+		const chromeServiceSpy = BaseComponentTestHelper.setupChromeServiceMock();
 
 		await TestBed.configureTestingModule({
 			declarations: [OptionsComponent],
@@ -35,33 +36,30 @@ describe('OptionsComponent', () => {
 		it('should initialise with default options', () => {
 			expect(component.options).toEqual({
 				darkMode: false,
+				imageDisplayMode: 'fitOnPage',
 				keepRecentFusks: true,
 				openInForeground: true,
-				// Image resize options
+				resizeImagesToFillPage: false,
 				resizeImagesToFitOnPage: true,
 				resizeImagesToFullWidth: false,
-				resizeImagesToFillPage: false,
 				resizeImagesToThumbnails: false,
-				// Image viewer options
 				showImagesInViewer: false,
 				toggleBrokenImages: false,
-				// Default display mode
-				imageDisplayMode: 'fitOnPage'
 			});
 		});
 
 		it('should load options on init', async () => {
 			const testOptions: ChromeStorageData = {
 				darkMode: true,
+				imageDisplayMode: 'fullWidth',
 				keepRecentFusks: false,
 				openInForeground: false,
+				resizeImagesToFillPage: false,
 				resizeImagesToFitOnPage: false,
 				resizeImagesToFullWidth: true,
-				resizeImagesToFillPage: false,
 				resizeImagesToThumbnails: false,
 				showImagesInViewer: true,
 				toggleBrokenImages: true,
-				imageDisplayMode: 'fullWidth'
 			};
 
 			mockChromeService.getStorageData.and.returnValue(Promise.resolve(testOptions));

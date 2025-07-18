@@ -130,7 +130,7 @@ The project now includes:
 
 ```bash
 npm start                # Development server
-npm run build            # Build for production  
+npm run build            # Build for production
 npm run build:chromium   # Build complete Chrome extension
 npm run build:firefox    # Build complete Firefox extension + zip
 npm test                 # Run unit tests

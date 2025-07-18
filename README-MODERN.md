@@ -42,7 +42,7 @@ Fuskr is a browser extension for Chrome and Firefox that generates image galleri
    ```bash
    # For Chrome (Manifest V3)
    npm run build:chromium
-   
+
    # For Firefox (Manifest V2 + zip file)
    npm run build:firefox
    ```
@@ -104,13 +104,13 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 
 **Input → Generated Pattern:**
 - `https://test.com/files/3141.webp` → `https://test.com/files/31[31-51].webp` (±10 range)
-- `image01.jpg` → `image[00-11].jpg` (±10 range) 
+- `image01.jpg` → `image[00-11].jpg` (±10 range)
 - `photo001.png` → `photo[000-011].png` (±10 range)
 - `imagea.jpg` → `image[a-k].jpg` (±10 range)
 
 **Existing patterns are preserved:**
 - `image[01-10].jpg` → `image[01-10].jpg` (no change)
-- `photo[001-999].png` → `photo[001-999].png` (no change)  
+- `photo[001-999].png` → `photo[001-999].png` (no change)
 - `file[05-20].gif` → `file[05-20].gif` (no change)
 
 ## 🏗️ Architecture

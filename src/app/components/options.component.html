@@ -1,122 +1,122 @@
 <div class="options-container">
-	<h1>Fuskr Options</h1>
+	<h1>{{ translate('Options_Title') }}</h1>
 
 	<div class="options-section">
-		<h2>Appearance</h2>
-		
+		<h2>{{ translate('Options_Appearance') }}</h2>
+
 		<div class="option-group">
 			<label>
-				<input 
-					type="checkbox" 
+				<input
+					type="checkbox"
 					[(ngModel)]="options.darkMode"
 					(change)="saveOptions()"
 				/>
-				<span>Dark Mode</span>
+				<span>{{ translate('Options_DarkMode') }}</span>
 			</label>
-			<p class="description">Enable dark theme for the extension interface</p>
+			<p class="description">{{ translate('Options_DarkMode_Description') }}</p>
 		</div>
 	</div>
 
 	<div class="options-section">
-		<h2>Image Display</h2>
-		
+		<h2>{{ translate('Options_ImageDisplay') }}</h2>
+
 		<div class="option-group">
-			<label>Default Image Display Mode:</label>
+			<label>{{ translate('Options_DefaultImageDisplayMode') }}</label>
 			<div class="radio-group">
 				<label class="radio-label">
-					<input 
-						type="radio" 
+					<input
+						type="radio"
 						name="imageDisplayMode"
 						value="fitOnPage"
 						[(ngModel)]="options.imageDisplayMode"
 						(change)="saveOptions()"
 					/>
-					<span>Resize images to fit on page</span>
+					<span>{{ translate('Options_ResizeImagesFitOnPage') }}</span>
 				</label>
 				<label class="radio-label">
-					<input 
-						type="radio" 
+					<input
+						type="radio"
 						name="imageDisplayMode"
 						value="fullWidth"
 						[(ngModel)]="options.imageDisplayMode"
 						(change)="saveOptions()"
 					/>
-					<span>Resize images to full width</span>
+					<span>{{ translate('Options_ResizeImagesFullWidth') }}</span>
 				</label>
 				<label class="radio-label">
-					<input 
-						type="radio" 
+					<input
+						type="radio"
 						name="imageDisplayMode"
 						value="fillPage"
 						[(ngModel)]="options.imageDisplayMode"
 						(change)="saveOptions()"
 					/>
-					<span>Resize images to fill the page</span>
+					<span>{{ translate('Options_ResizeImagesFillPage') }}</span>
 				</label>
 				<label class="radio-label">
-					<input 
-						type="radio" 
+					<input
+						type="radio"
 						name="imageDisplayMode"
 						value="thumbnails"
 						[(ngModel)]="options.imageDisplayMode"
 						(change)="saveOptions()"
 					/>
-					<span>Resize images to thumbnails</span>
+					<span>{{ translate('Options_ResizeImagesThumbnails') }}</span>
 				</label>
 			</div>
-			<p class="description">Choose how images are displayed by default in the gallery</p>
+			<p class="description">{{ translate('Options_DisplayModeDescription') }}</p>
 		</div>
 
 		<div class="option-group">
 			<label>
-				<input 
-					type="checkbox" 
+				<input
+					type="checkbox"
 					[(ngModel)]="options.showImagesInViewer"
 					(change)="saveOptions()"
 				/>
-				<span>Show images in viewer by default</span>
+				<span>{{ translate('Options_ShowImagesInViewerDefault') }}</span>
 			</label>
-			<p class="description">Open images in a full-screen viewer when clicked</p>
+			<p class="description">{{ translate('Options_ShowImagesInViewerDescription') }}</p>
 		</div>
 
 		<div class="option-group">
 			<label>
-				<input 
-					type="checkbox" 
+				<input
+					type="checkbox"
 					[(ngModel)]="options.toggleBrokenImages"
 					(change)="saveOptions()"
 				/>
-				<span>Show broken images by default</span>
+				<span>{{ translate('Options_ShowBrokenImagesDefault') }}</span>
 			</label>
-			<p class="description">Display placeholder images for missing/broken images</p>
+			<p class="description">{{ translate('Options_ShowBrokenImagesDescription') }}</p>
 		</div>
 	</div>
 
 	<div class="options-section">
-		<h2>Behavior</h2>
-		
+		<h2>{{ translate('Options_Behaviour') }}</h2>
+
 		<div class="option-group">
 			<label>
-				<input 
-					type="checkbox" 
+				<input
+					type="checkbox"
 					[(ngModel)]="options.openInForeground"
 					(change)="saveOptions()"
 				/>
-				<span>Open New Fusks in Foreground</span>
+				<span>{{ translate('Options_OpenNewFusksInForeground') }}</span>
 			</label>
-			<p class="description">New tabs created from Fusk operations will be opened in the foreground</p>
+			<p class="description">{{ translate('Options_OpenNewFusksInForeground_Description') }}</p>
 		</div>
 
 		<div class="option-group">
 			<label>
-				<input 
-					type="checkbox" 
+				<input
+					type="checkbox"
 					[(ngModel)]="options.keepRecentFusks"
 					(change)="saveOptions()"
 				/>
-				<span>Keep Recent Fusks</span>
+				<span>{{ translate('Options_History_Keep') }}</span>
 			</label>
-			<p class="description">Save recent Fusk URLs for quick access</p>
+			<p class="description">{{ translate('Options_History_Keep_Description') }}</p>
 		</div>
 	</div>
 

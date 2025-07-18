@@ -110,13 +110,13 @@ export class FuskrService {
 
 	generateImageGallery(url: string, count: number = 10): FuskrResult {
 		let processedUrl = url;
-	
+
 		// If the URL doesn't already contain brackets, convert it to a bracketed pattern
 		if (!this.isFuskable(url)) {
 			// Try to create a fusk URL with a default count
 			processedUrl = this.createFuskUrl(url, count, 0);
 		}
-	
+
 		const urls = this.getLinks(processedUrl);
 		return {
 			urls,

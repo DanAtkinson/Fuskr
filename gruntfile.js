@@ -254,7 +254,7 @@ module.exports = function (grunt) {
 	grunt.registerTask('compile:optionsjs', ['concat:optionsjs']);
 	grunt.registerTask('compile:vendor', ['concat:vendor']);
 	grunt.registerTask('compile:styles', ['sass:app']);
-	 
+
 	grunt.registerTask('default', ['concurrent:dev']);
 	grunt.registerTask('build', ['clean:dist', 'compile', 'incrementVersion', 'copy', 'karma:release']);
 	grunt.registerTask('release', ['build', 'compress:release']);

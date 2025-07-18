@@ -217,5 +217,185 @@
 	},
 	"Options_About_Description": {
 		"message": "<p>Fuskr was borne of a frustation that my favourite Firefox plugin <a href='https://addons.mozilla.org/en-US/firefox/addon/2087/' title='Firefusk on Mozilla Addons'>Firefusk</a> (dead link) created by <a href='http://jonathansoma.com/' title='Jonathan Soma'>Jonathan Soma</a> was not available for Chrome.</p><p>Once I had stopped crying, I remembered that I was a developer and could do almost anything if I put my mind to it.</p><p><i>Then</i>, I remembered that I was actually a pretty rubbish developer and asked for help from <a href='https://bolsterweb.com' title='Jonathon Bolster'>Jonathon Bolster</a>.</p><p>Jonathon gratefully helped and actually rewrote pretty much all of the code for Fuskr to make it so damned extensible and also provided lots of unit tests for it.</p>"
+	},
+	"Gallery_Title": {
+		"message": "Fuskr Gallery",
+		"description": "Main title of the gallery page"
+	},
+	"Gallery_SwitchToLightMode": {
+		"message": "Switch to Light Mode",
+		"description": "Theme toggle tooltip for switching to light mode"
+	},
+	"Gallery_SwitchToDarkMode": {
+		"message": "Switch to Dark Mode",
+		"description": "Theme toggle tooltip for switching to dark mode"
+	},
+	"Gallery_OriginalUrl": {
+		"message": "Original URL:",
+		"description": "Label for the URL input field"
+	},
+	"Gallery_UrlPlaceholder": {
+		"message": "Enter URL to fusk...",
+		"description": "Placeholder text for the URL input field"
+	},
+	"Gallery_GenerateGallery": {
+		"message": "Generate Gallery",
+		"description": "Button text to generate a new gallery"
+	},
+	"Gallery_Stats_Total": {
+		"message": "total",
+		"description": "Statistics label for total images"
+	},
+	"Gallery_Stats_Loaded": {
+		"message": "loaded",
+		"description": "Statistics label for loaded images"
+	},
+	"Gallery_Stats_Broken": {
+		"message": "broken",
+		"description": "Statistics label for broken images"
+	},
+	"Gallery_DownloadAll": {
+		"message": "Download All",
+		"description": "Button text to download all images"
+	},
+	"Gallery_DisplayMode": {
+		"message": "Display Mode:",
+		"description": "Label for display mode controls"
+	},
+	"Gallery_Options": {
+		"message": "Options:",
+		"description": "Label for gallery options controls"
+	},
+	"Gallery_HideBroken": {
+		"message": "Hide Broken",
+		"description": "Button text to hide broken images"
+	},
+	"Gallery_ShowBroken": {
+		"message": "Show Broken",
+		"description": "Button text to show broken images"
+	},
+	"Gallery_GeneratingGallery": {
+		"message": "Generating gallery...",
+		"description": "Loading text while generating gallery"
+	},
+	"Gallery_CopyUrl": {
+		"message": "Copy URL",
+		"description": "Button text to copy image URL"
+	},
+	"Gallery_OpenInTab": {
+		"message": "Open in Tab",
+		"description": "Button text to open image in new tab"
+	},
+	"Gallery_Close": {
+		"message": "Close",
+		"description": "Button text to close image viewer"
+	},
+	"Gallery_PreviousImage": {
+		"message": "Previous Image",
+		"description": "Tooltip for previous image button"
+	},
+	"Gallery_NextImage": {
+		"message": "Next Image",
+		"description": "Tooltip for next image button"
+	},
+	"Gallery_Welcome": {
+		"message": "Welcome to Fuskr",
+		"description": "Welcome message title"
+	},
+	"Gallery_WelcomeText": {
+		"message": "Enter a URL with numbers in the filename to generate an image gallery.",
+		"description": "Welcome message description"
+	},
+	"Gallery_ExampleUrls": {
+		"message": "Example URLs:",
+		"description": "Header for example URLs section"
+	},
+	"Gallery_FitPage": {
+		"message": "Fit Page",
+		"description": "Short label for fit page display mode"
+	},
+	"Gallery_FullWidth": {
+		"message": "Full Width",
+		"description": "Short label for full width display mode"
+	},
+	"Gallery_FillPage": {
+		"message": "Fill Page",
+		"description": "Short label for fill page display mode"
+	},
+	"Gallery_Thumbnails": {
+		"message": "Thumbnails",
+		"description": "Short label for thumbnails display mode"
+	},
+	"Gallery_ImageAlt": {
+		"message": "Image",
+		"description": "Alt text prefix for gallery images (e.g., 'Image 1', 'Image 2')"
+	},
+	"Options_Appearance": {
+		"message": "Appearance",
+		"description": "Options section header for appearance settings"
+	},
+	"Options_ImageDisplay": {
+		"message": "Image Display",
+		"description": "Options section header for image display settings"
+	},
+	"Options_Behaviour": {
+		"message": "Behaviour",
+		"description": "Options section header for behaviour settings"
+	},
+	"Options_DefaultImageDisplayMode": {
+		"message": "Default Image Display Mode:",
+		"description": "Label for default image display mode options"
+	},
+	"Options_DisplayModeDescription": {
+		"message": "Choose how images are displayed by default in the gallery",
+		"description": "Description for image display mode setting"
+	},
+	"Options_ShowImagesInViewerDefault": {
+		"message": "Show images in viewer by default",
+		"description": "Checkbox label for default image viewer setting"
+	},
+	"Options_ShowImagesInViewerDescription": {
+		"message": "Open images in a full-screen viewer when clicked",
+		"description": "Description for image viewer setting"
+	},
+	"Options_ShowBrokenImagesDefault": {
+		"message": "Show broken images by default",
+		"description": "Checkbox label for broken images setting"
+	},
+	"Options_ShowBrokenImagesDescription": {
+		"message": "Display placeholder images for missing/broken images",
+		"description": "Description for broken images setting"
+	},
+	"Options_KeepRecentFusks": {
+		"message": "Keep Recent Fusks",
+		"description": "Checkbox label for keeping recent fusks"
+	},
+	"Options_KeepRecentFusksDescription": {
+		"message": "Save recent Fusk URLs for quick access",
+		"description": "Description for recent fusks setting"
+	},
+	"Options_SettingsSaved": {
+		"message": "Settings saved!",
+		"description": "Status message when settings are saved successfully"
+	},
+	"Options_ResizeImagesFitOnPage": {
+		"message": "Resize images to fit on page",
+		"description": "Radio button option for fit on page display mode"
+	},
+	"Options_ResizeImagesFullWidth": {
+		"message": "Resize images to full width",
+		"description": "Radio button option for full width display mode"
+	},
+	"Options_ResizeImagesFillPage": {
+		"message": "Resize images to fill the page",
+		"description": "Radio button option for fill page display mode"
+	},
+	"Options_ResizeImagesThumbnails": {
+		"message": "Resize images to thumbnails",
+		"description": "Radio button option for thumbnails display mode"
+	},
+	"Options_OpenNewFusksDescription": {
+		"message": "New tabs created from Fusk operations will be opened in the foreground",
+		"description": "Description for opening new fusks in foreground setting"
 	}
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuskrService } from '../services/fuskr.service';
 import { ChromeService } from '../services/chrome.service';
+import { BaseComponent } from './base.component';
 
 @Component({
     selector: 'app-gallery',
@@ -9,23 +10,23 @@ import { ChromeService } from '../services/chrome.service';
     styleUrls: ['./gallery.component.scss'],
     standalone: false
 })
-export class GalleryComponent implements OnInit {
+export class GalleryComponent extends BaseComponent implements OnInit {
 	originalUrl: string = '';
 	imageUrls: string[] = [];
 	loading: boolean = false;
 	errorMessage: string = '';
-	
+
 	// Image tracking
 	loadedImages: number = 0;
 	brokenImages: number = 0;
 	totalImages: number = 0;
-	
+
 	// UI state
 	showBrokenImages: boolean = false;
 	showImageViewer: boolean = false;
 	currentViewerImage: string = '';
 	currentViewerIndex: number = 0;
-	
+
 	// Settings
 	darkMode: boolean = false;
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
@@ -33,13 +34,14 @@ export class GalleryComponent implements OnInit {
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,
-		private fuskrService: FuskrService,
-		private chromeService: ChromeService
-	) {}
+		private fuskrService: FuskrService
+	) {
+		super();
+	}
 
 	async ngOnInit() {
 		await this.loadSettings();
-		
+
 		// Handle both initial load and refresh scenarios
 		this.route.queryParams.subscribe(params => {
 			if (params['url']) {
@@ -47,7 +49,7 @@ export class GalleryComponent implements OnInit {
 				this.generateGallery();
 			}
 		});
-		
+
 		// Also check on immediate initialization in case queryParams subscription is delayed
 		const currentParams = this.route.snapshot.queryParams;
 		if (currentParams['url'] && !this.originalUrl) {
@@ -62,7 +64,7 @@ export class GalleryComponent implements OnInit {
 			this.darkMode = settings.darkMode || false;
 			this.imageDisplayMode = settings.imageDisplayMode || 'fitOnPage';
 			this.showBrokenImages = settings.toggleBrokenImages || false;
-			
+
 			// Apply dark mode class to document
 			document.body.classList.toggle('dark-mode', this.darkMode);
 		} catch (error) {
@@ -86,7 +88,7 @@ export class GalleryComponent implements OnInit {
 			this.totalImages = this.imageUrls.length;
 			this.loadedImages = 0;
 			this.brokenImages = 0;
-		
+
 			// Update the URL in the browser to show the bracketed version
 			if (result.originalUrl !== this.originalUrl) {
 				this.originalUrl = result.originalUrl;
@@ -96,7 +98,7 @@ export class GalleryComponent implements OnInit {
 					queryParamsHandling: 'merge'
 				});
 			}
-		
+
 			if (this.imageUrls.length === 0) {
 				this.errorMessage = 'No fuskable pattern found in the URL. Try a URL with numbers in the filename.';
 			}
@@ -152,7 +154,7 @@ export class GalleryComponent implements OnInit {
 		const img = event.target as HTMLImageElement;
 		img.classList.add('error');
 		this.brokenImages++;
-		
+
 		// Create a more visible broken image placeholder
 		const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
 			<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
@@ -161,13 +163,13 @@ export class GalleryComponent implements OnInit {
 				<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="#adb5bd" text-anchor="middle" dominant-baseline="middle">🚫</text>
 			</svg>
 		`)}`;
-		
+
 		if (!this.showBrokenImages) {
 			// Instead of hiding completely, reduce opacity
 			img.style.opacity = '0.3';
 			img.style.filter = 'grayscale(100%)';
 		}
-		
+
 		// Always show the broken image placeholder
 		img.src = brokenImageSvg;
 		img.alt = 'Image not found';
@@ -180,7 +182,7 @@ export class GalleryComponent implements OnInit {
 	async toggleDarkMode() {
 		this.darkMode = !this.darkMode;
 		document.body.classList.toggle('dark-mode', this.darkMode);
-		
+
 		// Save to storage
 		try {
 			const settings = await this.chromeService.getStorageData();
@@ -193,7 +195,7 @@ export class GalleryComponent implements OnInit {
 
 	async setImageDisplayMode(mode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails') {
 		this.imageDisplayMode = mode;
-		
+
 		// Save to storage
 		try {
 			const settings = await this.chromeService.getStorageData();
@@ -206,7 +208,7 @@ export class GalleryComponent implements OnInit {
 
 	async toggleBrokenImagesVisibility() {
 		this.showBrokenImages = !this.showBrokenImages;
-		
+
 		// Update visibility of broken images
 		const brokenImages = document.querySelectorAll('img.error');
 		brokenImages.forEach((img: Element) => {
@@ -219,7 +221,7 @@ export class GalleryComponent implements OnInit {
 				htmlImg.style.filter = 'grayscale(100%)';
 			}
 		});
-		
+
 		// Save to storage
 		try {
 			const settings = await this.chromeService.getStorageData();
@@ -255,19 +257,35 @@ export class GalleryComponent implements OnInit {
 	}
 
 	removeBrokenImages() {
+		// Create a list of URLs that correspond to broken images
 		const brokenImages = document.querySelectorAll('img.error');
+		const brokenUrls = new Set<string>();
+		
 		brokenImages.forEach((img: Element) => {
-			const container = img.closest('.image-item');
+			const htmlImg = img as HTMLImageElement;
+			// Get the original URL from the data attribute
+			const originalUrl = htmlImg.getAttribute('data-original-url');
+			if (originalUrl) {
+				brokenUrls.add(originalUrl);
+			}
+			
+			// Remove the container from DOM
+			const container = htmlImg.closest('.image-item');
 			if (container) {
 				container.remove();
 			}
 		});
-		// Update the URLs array to reflect removed images
-		this.imageUrls = this.imageUrls.filter((_, index) => {
-			const img = document.querySelector(`img[alt="Image ${index + 1}"]`);
-			return img && !img.classList.contains('error');
-		});
+
+		// Update the URLs array to remove broken URLs
+		this.imageUrls = this.imageUrls.filter(url => !brokenUrls.has(url));
 		this.totalImages = this.imageUrls.length;
 		this.brokenImages = 0;
+	}
+
+	/**
+	 * Generate localized alt text for images
+	 */
+	getImageAltText(index: number): string {
+		return `${this.translate('Gallery_ImageAlt')} ${index + 1}`;
 	}
 }

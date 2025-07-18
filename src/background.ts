@@ -290,7 +290,7 @@ class BackgroundScript {
 			(this.options as any)[key] = changes[key].newValue;
 		});
 
-		if (changes['keepRecentFusks'] && 
+		if (changes['keepRecentFusks'] &&
 			changes['keepRecentFusks'].newValue !== changes['keepRecentFusks'].oldValue) {
 			if (changes['keepRecentFusks'].newValue) {
 				this.createRecentMenu(this.options.history);
@@ -310,10 +310,7 @@ class BackgroundScript {
 		});
 	}
 
-	private handleContextMenuClick(
-		info: chrome.contextMenus.OnClickData, 
-		tab?: chrome.tabs.Tab
-	): void {
+	private handleContextMenuClick(info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab): void {
 		if (!tab) return;
 
 		switch (info.menuItemId) {
@@ -367,7 +364,7 @@ class BackgroundScript {
 
 	private manualOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void {
 		const imageUrl = info.linkUrl || info.srcUrl || '';
-		
+
 		// Since prompt() doesn't work in service workers, we need to inject a content script
 		chrome.scripting.executeScript({
 			target: { tabId: tab.id! },
