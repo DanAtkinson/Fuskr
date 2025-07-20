@@ -5,8 +5,8 @@ import { LocationStrategy, HashLocationStrategy } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { GalleryComponent } from './components/gallery.component';
-import { OptionsComponent } from './components/options.component';
+import { GalleryComponent } from '@components/gallery.component';
+import { OptionsComponent } from '@components/options.component';
 
 @NgModule({
 	declarations: [

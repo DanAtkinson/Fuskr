@@ -489,5 +489,23 @@
 	"Gallery_ExampleUrl2": {
 		"message": "https://example.com/photo[01-10].png",
 		"description": "Second example URL showing bracket range pattern"
+	},
+	"Options_OverloadProtection": {
+		"message": "Overload Protection"
+	},
+	"Options_EnableOverloadProtection": {
+		"message": "Enable overload protection"
+	},
+	"Options_EnableOverloadProtection_Description": {
+		"message": "When enabled, Fuskr will warn you before generating galleries with a large number of images to prevent browser slowdown or crashes."
+	},
+	"Options_OverloadProtectionLimit": {
+		"message": "Image limit"
+	},
+	"Options_OverloadProtectionLimit_Description": {
+		"message": "Maximum number of images to generate before showing a warning. Recommended: 500 images."
+	},
+	"Gallery_OverloadWarning": {
+		"message": "This URL pattern would generate $1 images, which exceeds the safety limit of $2 images.\n\nGenerating this many images may slow down or crash your browser.\n\nDo you want to continue anyway?"
 	}
 }

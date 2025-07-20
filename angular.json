@@ -15,8 +15,11 @@
 			"prefix": "app",
 			"architect": {
 				"build": {
-					"builder": "@angular-devkit/build-angular:browser",
+					"builder": "@angular-builders/custom-webpack:browser",
 					"options": {
+						"customWebpackConfig": {
+							"path": "./webpack.config.js"
+						},
 						"outputPath": "dist/chromium",
 						"index": "src/index.html",
 						"main": "src/main.ts",
@@ -26,8 +29,9 @@
 						"tsConfig": "tsconfig.app.json",
 						"inlineStyleLanguage": "scss",
 						"assets": [
-							"src/favicon.ico",
 							"src/assets",
+							"src/favicon.ico",
+							"src/_locales",
 							"src/manifest.json"
 						],
 						"styles": [
@@ -65,7 +69,11 @@
 									"inlineCritical": false
 								},
 								"fonts": true
-							}
+							},
+							"namedChunks": false,
+							"extractLicenses": true,
+							"vendorChunk": false,
+							"buildOptimizer": true
 						},
 						"development": {
 							"optimization": false,

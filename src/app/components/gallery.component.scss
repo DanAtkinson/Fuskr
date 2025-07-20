@@ -322,9 +322,16 @@
 			object-fit: contain;
 			cursor: pointer;
 			transition: transform 0.3s ease;
+			border: none; // Remove browser default border on broken images
 
 			&:hover {
 				transform: scale(1.02);
+			}
+
+			// Style for broken/error images
+			&.error {
+				border: none !important; // Remove hardcoded border
+				background-color: transparent !important; // Remove hardcoded background
 			}
 		}
 	}

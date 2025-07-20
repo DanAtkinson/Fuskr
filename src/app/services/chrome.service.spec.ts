@@ -45,14 +45,40 @@ describe('ChromeService', () => {
 
 			const result = await service.getStorageData();
 
-			expect(result).toEqual({});
+			// Should return all defaults when storage is empty
+			expect(result).toEqual({
+				display: {
+					darkMode: false,
+					imageDisplayMode: 'fitOnPage',
+					resizeImagesToFitOnPage: true,
+					resizeImagesToFullWidth: false,
+					resizeImagesToFillPage: false,
+					resizeImagesToThumbnails: false,
+					showImagesInViewer: true,
+					toggleBrokenImages: true
+				},
+				behavior: {
+					openInForeground: true,
+					keepRecentFusks: true,
+					recentFusks: []
+				},
+				safety: {
+					enableOverloadProtection: true,
+					overloadProtectionLimit: 500
+				},
+				version: 1
+			});
 		});
 
-		it('should return stored data when available', async () => {
-			const storedData: ChromeStorageData = {
-				darkMode: true,
-				keepRecentFusks: false,
-				openInForeground: false
+		it('should return stored data merged with defaults when available', async () => {
+			const storedData = {
+				display: {
+					darkMode: true
+				},
+				behavior: {
+					keepRecentFusks: false,
+					openInForeground: false
+				}
 			};
 
 			mockChrome.storage.sync.get.and.callFake((_keys: any, callback: any) => {
@@ -61,7 +87,29 @@ describe('ChromeService', () => {
 
 			const result = await service.getStorageData();
 
-			expect(result).toEqual(storedData);
+			// Should merge stored data with defaults
+			expect(result).toEqual({
+				display: {
+					darkMode: true, // from stored data
+					imageDisplayMode: 'fitOnPage', // from defaults
+					resizeImagesToFitOnPage: true, // from defaults
+					resizeImagesToFullWidth: false, // from defaults
+					resizeImagesToFillPage: false, // from defaults
+					resizeImagesToThumbnails: false, // from defaults
+					showImagesInViewer: true, // from defaults
+					toggleBrokenImages: true // from defaults
+				},
+				behavior: {
+					keepRecentFusks: false, // from stored data
+					openInForeground: false, // from stored data
+					recentFusks: [] // from defaults
+				},
+				safety: {
+					enableOverloadProtection: true, // from defaults
+					overloadProtectionLimit: 500 // from defaults
+				},
+				version: 1
+			});
 		});
 
 		it('should handle chrome storage errors gracefully', async () => {
@@ -81,9 +129,26 @@ describe('ChromeService', () => {
 	describe('setStorageData', () => {
 		it('should save data to chrome storage', async () => {
 			const testData: ChromeStorageData = {
-				darkMode: true,
-				keepRecentFusks: false,
-				openInForeground: true
+				display: {
+					darkMode: true,
+					imageDisplayMode: 'fitOnPage',
+					resizeImagesToFitOnPage: true,
+					resizeImagesToFullWidth: false,
+					resizeImagesToFillPage: false,
+					resizeImagesToThumbnails: false,
+					showImagesInViewer: true,
+					toggleBrokenImages: true
+				},
+				behavior: {
+					keepRecentFusks: false,
+					openInForeground: true,
+					recentFusks: []
+				},
+				safety: {
+					enableOverloadProtection: true,
+					overloadProtectionLimit: 500
+				},
+				version: 1
 			};
 
 			mockChrome.storage.sync.set.and.callFake((_data: any, callback: any) => {
@@ -97,9 +162,26 @@ describe('ChromeService', () => {
 
 		it('should handle storage errors when saving', async () => {
 			const testData: ChromeStorageData = {
-				darkMode: true,
-				keepRecentFusks: false,
-				openInForeground: true
+				display: {
+					darkMode: true,
+					imageDisplayMode: 'fitOnPage',
+					resizeImagesToFitOnPage: true,
+					resizeImagesToFullWidth: false,
+					resizeImagesToFillPage: false,
+					resizeImagesToThumbnails: false,
+					showImagesInViewer: true,
+					toggleBrokenImages: true
+				},
+				behavior: {
+					keepRecentFusks: false,
+					openInForeground: true,
+					recentFusks: []
+				},
+				safety: {
+					enableOverloadProtection: true,
+					overloadProtectionLimit: 500
+				},
+				version: 1
 			};
 
 			mockChrome.storage.sync.set.and.callFake((_data: any, _callback: any) => {

@@ -21,8 +21,8 @@
 							class="form-check-input"
 							type="checkbox"
 							id="darkMode"
-							[(ngModel)]="options.darkMode"
-							(change)="saveOptions()"
+							[(ngModel)]="options.display.darkMode"
+							(change)="onDarkModeChange(); saveOptions()"
 						/>
 						<label class="form-check-label" for="darkMode">
 							<i class="fas fa-moon me-1"></i>{{ translate('Options_DarkMode') }}
@@ -54,7 +54,7 @@
 								name="imageDisplayMode"
 								value="fitOnPage"
 								id="fitOnPage"
-								[(ngModel)]="options.imageDisplayMode"
+								[(ngModel)]="options.display.imageDisplayMode"
 								(change)="saveOptions()"
 							/>
 							<label class="form-check-label" for="fitOnPage">
@@ -68,7 +68,7 @@
 								name="imageDisplayMode"
 								value="fullWidth"
 								id="fullWidth"
-								[(ngModel)]="options.imageDisplayMode"
+								[(ngModel)]="options.display.imageDisplayMode"
 								(change)="saveOptions()"
 							/>
 							<label class="form-check-label" for="fullWidth">
@@ -82,7 +82,7 @@
 								name="imageDisplayMode"
 								value="fillPage"
 								id="fillPage"
-								[(ngModel)]="options.imageDisplayMode"
+								[(ngModel)]="options.display.imageDisplayMode"
 								(change)="saveOptions()"
 							/>
 							<label class="form-check-label" for="fillPage">
@@ -96,7 +96,7 @@
 								name="imageDisplayMode"
 								value="thumbnails"
 								id="thumbnails"
-								[(ngModel)]="options.imageDisplayMode"
+								[(ngModel)]="options.display.imageDisplayMode"
 								(change)="saveOptions()"
 							/>
 							<label class="form-check-label" for="thumbnails">
@@ -110,7 +110,7 @@
 							class="form-check-input"
 							type="checkbox"
 							id="showImagesInViewer"
-							[(ngModel)]="options.showImagesInViewer"
+							[(ngModel)]="options.display.showImagesInViewer"
 							(change)="saveOptions()"
 						/>
 						<label class="form-check-label" for="showImagesInViewer">
@@ -124,7 +124,7 @@
 							class="form-check-input"
 							type="checkbox"
 							id="toggleBrokenImages"
-							[(ngModel)]="options.toggleBrokenImages"
+							[(ngModel)]="options.display.toggleBrokenImages"
 							(change)="saveOptions()"
 						/>
 						<label class="form-check-label" for="toggleBrokenImages">
@@ -151,7 +151,7 @@
 							class="form-check-input"
 							type="checkbox"
 							id="openInForeground"
-							[(ngModel)]="options.openInForeground"
+							[(ngModel)]="options.behavior.openInForeground"
 							(change)="saveOptions()"
 						/>
 						<label class="form-check-label" for="openInForeground">
@@ -165,7 +165,7 @@
 							class="form-check-input"
 							type="checkbox"
 							id="keepRecentFusks"
-							[(ngModel)]="options.keepRecentFusks"
+							[(ngModel)]="options.behavior.keepRecentFusks"
 							(change)="saveOptions()"
 						/>
 						<label class="form-check-label" for="keepRecentFusks">
@@ -174,6 +174,106 @@
 						<div class="form-text">{{ translate('Options_History_Keep_Description') }}</div>
 					</div>
 				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<i class="fas fa-shield-alt me-2"></i>{{ translate('Options_OverloadProtection') }}
+					</h5>
+				</div>
+				<div class="card-body">
+					<div class="form-check mb-3">
+						<input
+							class="form-check-input"
+							type="checkbox"
+							id="enableOverloadProtection"
+							[(ngModel)]="options.safety.enableOverloadProtection"
+							(change)="saveOptions()"
+						/>
+						<label class="form-check-label" for="enableOverloadProtection">
+							<i class="fas fa-exclamation-triangle me-1"></i>{{ translate('Options_EnableOverloadProtection') }}
+						</label>
+						<div class="form-text">{{ translate('Options_EnableOverloadProtection_Description') }}</div>
+					</div>
+
+					@if (options.safety.enableOverloadProtection) {
+						<div class="mb-3">
+							<label class="form-label" for="overloadProtectionLimit">{{ translate('Options_OverloadProtectionLimit') }}</label>
+							<input
+								class="form-control"
+								type="number"
+								id="overloadProtectionLimit"
+								min="50"
+								max="10000"
+								step="50"
+									[(ngModel)]="options.safety.overloadProtectionLimit"
+								(change)="saveOptions()"
+							/>
+							<div class="form-text">{{ translate('Options_OverloadProtectionLimit_Description') }}</div>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Debug Panel -->
+	<div class="row">
+		<div class="col-12">
+			<div class="card mb-4">
+				<div class="card-header">
+					<h5 class="mb-0">
+						<button 
+							class="btn btn-link text-decoration-none p-0 text-start w-100"
+							type="button"
+							(click)="toggleDebugPanel()"
+							[attr.aria-expanded]="showDebugPanel">
+							<i class="fas fa-bug me-2"></i>{{ translate('Options_Debug') || 'Debug & Diagnostics' }}
+							<i [class]="showDebugPanel ? 'fas fa-chevron-up float-end' : 'fas fa-chevron-down float-end'"></i>
+						</button>
+					</h5>
+				</div>
+				@if (showDebugPanel) {
+					<div class="card-body">
+						<div class="alert alert-info">
+							<i class="fas fa-info-circle me-1"></i>
+							Use this panel to export debug logs when reporting issues. Logs help diagnose problems and improve the extension.
+						</div>
+						
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<h6>Logger Status</h6>
+								<ul class="list-unstyled">
+									<li><strong>Enabled:</strong> {{ loggerConfig.enabled ? 'Yes' : 'No' }}</li>
+									<li><strong>Log Level:</strong> {{ getLogLevelName(loggerConfig.logLevel) }}</li>
+									<li><strong>Stored Logs:</strong> {{ loggerConfig.logCount }}/{{ loggerConfig.maxLogs }}</li>
+								</ul>
+							</div>
+							<div class="col-md-6">
+								<h6>Actions</h6>
+								<div class="btn-group-vertical d-grid gap-2">
+									<button class="btn btn-primary" type="button" (click)="exportLogs()">
+										<i class="fas fa-download me-1"></i>Export Debug Logs
+									</button>
+									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()">
+										<i class="fas fa-trash me-1"></i>Clear Logs
+									</button>
+								</div>
+							</div>
+						</div>
+
+						<div class="alert alert-warning">
+							<i class="fas fa-exclamation-triangle me-1"></i>
+							<strong>Privacy Note:</strong> Debug logs may contain URLs and settings data. 
+							Review exported logs before sharing them for support.
+						</div>
+					</div>
+				}
 			</div>
 		</div>
 	</div>

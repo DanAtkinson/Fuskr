@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { FuskrService } from '../services/fuskr.service';
-import { ChromeService } from '../services/chrome.service';
+import { FuskrService } from '@services/fuskr.service';
+import { LoggerService } from '@services/logger.service';
 import { BaseComponent } from './base.component';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -38,11 +38,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Settings
 	darkMode: boolean = false;
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
+	enableOverloadProtection: boolean = true;
+	overloadProtectionLimit: number = 50;
+
+	// Prevent duplicate initialization
+	private hasInitialized: boolean = false;
 
 	constructor(
 		private route: ActivatedRoute,
 		private router: Router,
-		private fuskrService: FuskrService
+		private fuskrService: FuskrService,
+		private logger: LoggerService
 	) {
 		super();
 	}
@@ -50,13 +56,29 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	async ngOnInit() {
 		await this.loadSettings();
 
+		this.logger.debug('GalleryComponent', 'ngOnInit started', { hasInitialized: this.hasInitialized });
+
+		// Ensure dark mode is applied immediately before any dialogs
+		this.applyDarkModeStyles();
+
 		// Handle both initial load and refresh scenarios
 		this.route.queryParams.subscribe(params => {
-			if (params['url']) {
+			this.logger.debug('GalleryComponent', 'queryParams subscription triggered', { 
+				params, 
+				hasInitialized: this.hasInitialized 
+			});
+			if (params['url'] && !this.hasInitialized) {
 				this.originalUrl = params['url'];
-				this.generateGallery();
-			} else {
+				this.hasInitialized = true;
+				this.logger.info('GalleryComponent', 'Starting gallery generation from queryParams', { url: this.originalUrl });
+				// Small delay to ensure dark mode styles are fully applied
+				setTimeout(() => {
+					this.generateGallery();
+				}, 10);
+			} else if (!params['url'] && !this.hasInitialized) {
 				// If no URL provided (manual mode), focus on the input after a short delay
+				this.hasInitialized = true;
+				this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in queryParams)');
 				setTimeout(() => {
 					this.focusUrlInput();
 				}, 100);
@@ -65,11 +87,23 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Also check on immediate initialization in case queryParams subscription is delayed
 		const currentParams = this.route.snapshot.queryParams;
-		if (currentParams['url'] && !this.originalUrl) {
+		this.logger.debug('GalleryComponent', 'Checking snapshot params', { 
+			currentParams, 
+			hasInitialized: this.hasInitialized,
+			originalUrl: this.originalUrl
+		});
+		if (currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
 			this.originalUrl = currentParams['url'];
-			this.generateGallery();
-		} else if (!currentParams['url'] && !this.originalUrl) {
+			this.hasInitialized = true;
+			this.logger.info('GalleryComponent', 'Starting gallery generation from snapshot', { url: this.originalUrl });
+			// Small delay to ensure dark mode styles are fully applied
+			setTimeout(() => {
+				this.generateGallery();
+			}, 10);
+		} else if (!currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
 			// Manual mode - focus on input
+			this.hasInitialized = true;
+			this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in snapshot)');
 			setTimeout(() => {
 				this.focusUrlInput();
 			}, 100);
@@ -79,23 +113,84 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	async loadSettings() {
 		try {
 			const settings = await this.chromeService.getStorageData();
-			this.darkMode = settings.darkMode || false;
-			this.imageDisplayMode = settings.imageDisplayMode || 'fitOnPage';
-			this.showBrokenImages = settings.toggleBrokenImages || false;
+			this.logger.debug('GalleryComponent', 'Settings loaded successfully', settings);
+			this.darkMode = settings.display.darkMode;
+			this.imageDisplayMode = settings.display.imageDisplayMode;
+			this.showBrokenImages = settings.display.toggleBrokenImages;
+			this.enableOverloadProtection = settings.safety.enableOverloadProtection;
+			this.overloadProtectionLimit = settings.safety.overloadProtectionLimit;
+			this.logger.info('GalleryComponent', 'Overload protection configured', {
+				enabled: this.enableOverloadProtection,
+				limit: this.overloadProtectionLimit
+			});
 
-			// Apply dark mode class to document
-			document.body.classList.toggle('dark-mode', this.darkMode);
+			// Dark mode will be applied by applyDarkModeStyles() after settings are loaded
 		} catch (error) {
-			console.error('Error loading settings:', error);
+			this.logger.error('GalleryComponent', 'Error loading settings', error);
 		}
 	}
 
+	/**
+	 * Apply dark mode styles to the document body
+	 * This is called after settings are loaded to ensure styles are applied before any dialogs
+	 */
+	private applyDarkModeStyles() {
+		document.body.classList.toggle('dark-mode', this.darkMode);
+		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode });
+	}
+
 	generateGallery() {
+		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl });
 		if (!this.originalUrl.trim()) {
 			this.errorMessage = this.translate('Gallery_ErrorValidUrl');
+			this.logger.warn('GalleryComponent', 'Gallery generation failed: empty URL');
 			return;
 		}
 
+		// Check for overload protection before generating
+		if (this.enableOverloadProtection) {
+			const urlCount = this.fuskrService.countPotentialUrls(this.originalUrl);
+			this.logger.info('GalleryComponent', 'Overload protection check', {
+				urlCount,
+				limit: this.overloadProtectionLimit,
+				willTrigger: urlCount > this.overloadProtectionLimit
+			});
+			if (urlCount > this.overloadProtectionLimit) {
+				this.showOverloadWarning(urlCount);
+				return;
+			}
+		} else {
+			this.logger.debug('GalleryComponent', 'Overload protection is disabled');
+		}
+
+		this.performGalleryGeneration();
+	}
+
+	private showOverloadWarning(urlCount: number) {
+		const message = this.translate('Gallery_OverloadWarning', [
+			urlCount.toString(),
+			this.overloadProtectionLimit.toString()
+		]);
+		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', { 
+			urlCount, 
+			limit: this.overloadProtectionLimit,
+			message
+		});
+		const proceed = confirm(message);
+		this.logger.info('GalleryComponent', 'User response to overload warning', { 
+			proceed,
+			action: proceed ? 'continue' : 'cancel'
+		});
+
+		if (proceed) {
+			this.logger.info('GalleryComponent', 'User chose to proceed with gallery generation despite warning');
+			this.performGalleryGeneration();
+		} else {
+			this.logger.info('GalleryComponent', 'User chose to cancel gallery generation');
+		}
+	}
+
+	private performGalleryGeneration() {
 		this.loading = true;
 		this.errorMessage = '';
 		this.imageUrls = [];
@@ -128,9 +223,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		} finally {
 			this.loading = false;
 		}
-	}
-
-	openImage(url: string) {
+	}	openImage(url: string) {
 		if (this.chromeService.isExtensionContext()) {
 			this.chromeService.openTab(url);
 		} else {
@@ -176,7 +269,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 					zip.file(filename, imageBlob);
 
 				} catch (error) {
-					console.warn(`Failed to download ${filename}:`, error);
+					this.logger.warn('gallery.download.failed', `Failed to download ${filename}`, error);
 					// Continue with other images
 				}
 			}
@@ -216,7 +309,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}, 3000);
 
 		} catch (error) {
-			console.error('Error creating ZIP download:', error);
+			this.logger.error('gallery.download.zipFailed', 'Error creating ZIP download', error);
 			this.downloadStatus = this.translate('Gallery_DownloadFailed');
 			setTimeout(() => {
 				this.isDownloading = false;
@@ -286,7 +379,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		event.stopPropagation();
 		navigator.clipboard.writeText(url).then(() => {
 			// Could show a toast notification here
-			console.log('URL copied to clipboard');
+			this.logger.info('gallery.urlCopied', 'URL copied to clipboard');
 		});
 	}
 
@@ -303,12 +396,18 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			img.classList.add('error');
 			this.updateImageCounts();
 
-			// Create a more visible broken image placeholder
+			// Create a theme-aware broken image placeholder
+			const isDark = document.body.classList.contains('dark-mode');
+			const bgColor = isDark ? '#212529' : '#f8f9fa';
+			const borderColor = isDark ? '#495057' : '#dee2e6';
+			const textColor = isDark ? '#adb5bd' : '#6c757d';
+			const subtextColor = isDark ? '#6c757d' : '#adb5bd';
+
 			const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
 				<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-					<rect width="100%" height="100%" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
-					<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="#6c757d" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
-					<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="#adb5bd" text-anchor="middle" dominant-baseline="middle">🚫</text>
+					<rect width="100%" height="100%" fill="${bgColor}" stroke="${borderColor}" stroke-width="2"/>
+					<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
+					<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="${subtextColor}" text-anchor="middle" dominant-baseline="middle">🚫</text>
 				</svg>
 			`)}`;
 
@@ -355,11 +454,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Save to storage
 		try {
-			const settings = await this.chromeService.getStorageData();
-			settings.darkMode = this.darkMode;
-			await this.chromeService.setStorageData(settings);
+			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode });
 		} catch (error) {
-			console.error('Error saving dark mode setting:', error);
+			this.logger.error('gallery.darkMode.saveFailed', 'Error saving dark mode setting', error);
 		}
 	}
 
@@ -368,11 +465,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Save to storage
 		try {
-			const settings = await this.chromeService.getStorageData();
-			settings.imageDisplayMode = mode;
-			await this.chromeService.setStorageData(settings);
+			await this.chromeService.updateDisplaySettings({ imageDisplayMode: mode });
 		} catch (error) {
-			console.error('Error saving display mode setting:', error);
+			this.logger.error('gallery.displayMode.saveFailed', 'Error saving display mode setting', error);
 		}
 	}
 
@@ -394,11 +489,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Save to storage
 		try {
-			const settings = await this.chromeService.getStorageData();
-			settings.toggleBrokenImages = this.showBrokenImages;
-			await this.chromeService.setStorageData(settings);
+			await this.chromeService.updateDisplaySettings({ toggleBrokenImages: this.showBrokenImages });
 		} catch (error) {
-			console.error('Error saving broken images setting:', error);
+			this.logger.error('gallery.brokenImages.saveFailed', 'Error saving broken images setting', error);
 		}
 	}
 
@@ -502,10 +595,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		try {
 			const urlText = this.getAllUrlsText();
 			await navigator.clipboard.writeText(urlText);
-			console.log('All URLs copied to clipboard');
+			this.logger.info('gallery.allUrlsCopied', 'All URLs copied to clipboard');
 			// Could show a toast notification here
 		} catch (error) {
-			console.error('Failed to copy URLs:', error);
+			this.logger.error('gallery.copyUrls.failed', 'Failed to copy URLs', error);
 		}
 	}
 

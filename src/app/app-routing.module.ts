@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { GalleryComponent } from './components/gallery.component';
-import { OptionsComponent } from './components/options.component';
+import { GalleryComponent } from '@components/gallery.component';
+import { OptionsComponent } from '@components/options.component';
 
 const routes: Routes = [
 	{ path: 'gallery', component: GalleryComponent },
@@ -11,11 +11,16 @@ const routes: Routes = [
 ];
 
 @NgModule({
-	imports: [RouterModule.forRoot(routes, {
-		useHash: true,
-		enableTracing: false,
-		onSameUrlNavigation: 'reload'
-	})],
+	imports: [
+		RouterModule.forRoot(
+			routes,
+			{
+				useHash: true,
+				enableTracing: false,
+				onSameUrlNavigation: 'reload'
+			}
+		)
+	],
 	exports: [RouterModule]
 })
 export class AppRoutingModule { }

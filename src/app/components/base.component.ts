@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ChromeService } from '../services/chrome.service';
+import { ChromeService } from '@services/chrome.service';
 
 /**
  * Base component that provides common functionality like translation

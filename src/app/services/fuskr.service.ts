@@ -13,21 +13,10 @@ export class FuskrService {
 	private readonly numericRegex = /^(.*?)\[(\d+)-(\d+)\](.*)$/;
 	private readonly alphabeticRegex = /^(.*?)\[(\w)-(\w)\](.*)$/;
 
-	convertIntToChar(i: number): string {
-		return String.fromCharCode(i);
-	}
-
-	convertCharToInt(a: string): number {
-		return a.charCodeAt(0);
-	}
-
-	isAlphabetical(url: string): boolean {
-		return this.alphabeticRegex.test(url);
-	}
-
-	isNumeric(url: string): boolean {
-		return this.numericRegex.test(url);
-	}
+	convertCharToInt = (a: string): number => a.charCodeAt(0);
+	convertIntToChar = (i: number): string => String.fromCharCode(i);
+	isAlphabetical = (url: string): boolean => this.alphabeticRegex.test(url);
+	isNumeric = (url: string): boolean => this.numericRegex.test(url);
 
 	isFuskable(url: string): boolean {
 		if (!url || typeof url !== 'string') {
@@ -122,6 +111,61 @@ export class FuskrService {
 			urls,
 			originalUrl: processedUrl // Return the bracketed version
 		};
+	}
+
+	/**
+	 * Count how many URLs would be generated from a given URL pattern
+	 * without actually generating them. Useful for overload protection.
+	 */
+	countPotentialUrls(url: string, count: number = 10): number {
+		let processedUrl = url;
+
+		// If the URL doesn't already contain brackets, convert it to a bracketed pattern
+		if (!this.isFuskable(url)) {
+			// Try to create a fusk URL with a default count
+			processedUrl = this.createFuskUrl(url, count, 0);
+		}
+
+		if (!this.isFuskable(processedUrl)) {
+			return 0;
+		}
+
+		// Count all bracket patterns in the URL, not just the first one
+		let totalCount = 1; // Start with 1 as we'll multiply
+		let remainingUrl = processedUrl;
+
+		// Keep finding bracket patterns until none remain
+		while (this.isFuskable(remainingUrl)) {
+			let patternCount = 0;
+
+			if (this.isNumeric(remainingUrl)) {
+				const matches = this.numericRegex.exec(remainingUrl);
+				if (matches) {
+					const start = parseInt(matches[2], 10);
+					const end = parseInt(matches[3], 10);
+					patternCount = Math.abs(end - start) + 1;
+					// Remove this pattern and continue checking for more
+					remainingUrl = matches[1] + 'X' + matches[4]; // Replace with X to avoid re-matching
+				}
+			} else if (this.isAlphabetical(remainingUrl)) {
+				const matches = this.alphabeticRegex.exec(remainingUrl);
+				if (matches) {
+					const start = this.convertCharToInt(matches[2]);
+					const end = this.convertCharToInt(matches[3]);
+					patternCount = Math.abs(end - start) + 1;
+					// Remove this pattern and continue checking for more
+					remainingUrl = matches[1] + 'X' + matches[4]; // Replace with X to avoid re-matching
+				}
+			}
+
+			if (patternCount > 0) {
+				totalCount *= patternCount;
+			} else {
+				break; // No more patterns found
+			}
+		}
+
+		return totalCount;
 	}
 
 	private padString(number: number, stringLength: number, padding: string): string {

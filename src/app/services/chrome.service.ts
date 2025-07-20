@@ -1,20 +1,33 @@
 import { Injectable } from '@angular/core';
+import { LoggerService } from './logger.service';
+
+export interface DisplaySettings {
+	darkMode: boolean;
+	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails';
+	resizeImagesToFillPage: boolean;
+	resizeImagesToFitOnPage: boolean;
+	resizeImagesToFullWidth: boolean;
+	resizeImagesToThumbnails: boolean;
+	showImagesInViewer: boolean;
+	toggleBrokenImages: boolean;
+}
+
+export interface BehaviorSettings {
+	openInForeground: boolean;
+	keepRecentFusks: boolean;
+	recentFusks: string[];
+}
+
+export interface SafetySettings {
+	enableOverloadProtection: boolean;
+	overloadProtectionLimit: number;
+}
 
 export interface ChromeStorageData {
-	darkMode?: boolean;
-	keepRecentFusks?: boolean;
-	openInForeground?: boolean;
-	recentFusks?: string[];
-	// Image resize options
-	resizeImagesToFitOnPage?: boolean;
-	resizeImagesToFullWidth?: boolean;
-	resizeImagesToFillPage?: boolean;
-	resizeImagesToThumbnails?: boolean;
-	// Image viewer options
-	showImagesInViewer?: boolean;
-	toggleBrokenImages?: boolean;
-	// Image display mode (fitOnPage, fullWidth, fillPage, thumbnails)
-	imageDisplayMode?: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails';
+	behavior: BehaviorSettings;
+	display: DisplaySettings;
+	safety: SafetySettings;
+	version: number;
 }
 
 // Cross-browser compatibility
@@ -27,7 +40,7 @@ declare var chrome: any;
 export class ChromeService {
 	private browserAPI: any;
 
-	constructor() {
+	constructor(private logger: LoggerService) {
 		// Prefer browser API for Firefox, fallback to chrome for Chrome
 		this.browserAPI = (typeof browser !== 'undefined') ? browser : (typeof chrome !== 'undefined' ? chrome : null);
 	}
@@ -36,18 +49,51 @@ export class ChromeService {
 		return new Promise((resolve) => {
 			if (this.browserAPI && this.browserAPI.storage) {
 				this.browserAPI.storage.sync.get(null, (data: ChromeStorageData) => {
-					resolve(data);
+					// Apply defaults to stored data
+					const structuredData = this.applyDefaults(data);
+					resolve(structuredData);
 				});
 			} else {
 				// Fallback for development
-				resolve({
-					darkMode: false,
-					openInForeground: true,
-					keepRecentFusks: true,
-					recentFusks: []
-				});
+				resolve(this.getDefaultData());
 			}
 		});
+	}
+
+	private applyDefaults(data: Partial<ChromeStorageData>): ChromeStorageData {
+		const defaults = this.getDefaultData();
+
+		return {
+			version: data.version ?? defaults.version,
+			display: { ...defaults.display, ...data.display },
+			behavior: { ...defaults.behavior, ...data.behavior },
+			safety: { ...defaults.safety, ...data.safety }
+		};
+	}
+
+	private getDefaultData(): ChromeStorageData {
+		return {
+			version: 1,
+			display: {
+				darkMode: false,
+				imageDisplayMode: 'fitOnPage',
+				resizeImagesToFillPage: false,
+				resizeImagesToFitOnPage: true,
+				resizeImagesToFullWidth: false,
+				resizeImagesToThumbnails: false,
+				showImagesInViewer: true,
+				toggleBrokenImages: true,
+			},
+			behavior: {
+				keepRecentFusks: true,
+				openInForeground: true,
+				recentFusks: [],
+			},
+			safety: {
+				enableOverloadProtection: true,
+				overloadProtectionLimit: 500,
+			}
+		};
 	}
 
 	async setStorageData(data: Partial<ChromeStorageData>): Promise<void> {
@@ -58,7 +104,7 @@ export class ChromeService {
 				});
 			} else {
 				// Fallback for development
-				console.log('Setting storage data:', data);
+				this.logger.debug('chrome.storage.fallback', 'Setting storage data in development mode');
 				resolve();
 			}
 		});
@@ -123,5 +169,53 @@ export class ChromeService {
 			// Fallback for development - return the key
 			return key;
 		}
+	}
+
+	// Helper methods for easier access to nested settings
+	async getDarkMode(): Promise<boolean> {
+		const data = await this.getStorageData();
+		return data.display.darkMode;
+	}
+
+	async getEnableOverloadProtection(): Promise<boolean> {
+		const data = await this.getStorageData();
+		return data.safety.enableOverloadProtection;
+	}
+
+	async getOverloadProtectionLimit(): Promise<number> {
+		const data = await this.getStorageData();
+		return data.safety.overloadProtectionLimit;
+	}
+
+	async getOpenInForeground(): Promise<boolean> {
+		const data = await this.getStorageData();
+		return data.behavior.openInForeground;
+	}
+
+	async updateDisplaySettings(updates: Partial<DisplaySettings>): Promise<void> {
+		const currentData = await this.getStorageData();
+		const updatedData = {
+			...currentData,
+			display: { ...currentData.display, ...updates }
+		};
+		await this.setStorageData(updatedData);
+	}
+
+	async updateBehaviorSettings(updates: Partial<BehaviorSettings>): Promise<void> {
+		const currentData = await this.getStorageData();
+		const updatedData = {
+			...currentData,
+			behavior: { ...currentData.behavior, ...updates }
+		};
+		await this.setStorageData(updatedData);
+	}
+
+	async updateSafetySettings(updates: Partial<SafetySettings>): Promise<void> {
+		const currentData = await this.getStorageData();
+		const updatedData = {
+			...currentData,
+			safety: { ...currentData.safety, ...updates }
+		};
+		await this.setStorageData(updatedData);
 	}
 }

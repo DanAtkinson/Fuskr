@@ -1,16 +1,10 @@
 /// <reference types="chrome"/>
 
 import { FuskrService } from './app/services/fuskr.service';
+import { ChromeStorageData } from './app/services/chrome.service';
 
 // Background script for Chrome extension
 // This runs as a service worker in Manifest V3
-
-interface FuskrOptions {
-	darkMode: boolean;
-	history: string[];
-	keepRecentFusks: boolean;
-	openInForeground: boolean;
-}
 
 class BackgroundScript {
 	private fuskrService = new FuskrService();
@@ -18,11 +12,27 @@ class BackgroundScript {
 	private recentId: string | null = null;
 	private parentId: string | null = null;
 
-	private options: FuskrOptions = {
-		darkMode: false,
-		history: [],
-		keepRecentFusks: true,
-		openInForeground: true
+	private options: ChromeStorageData = {
+		version: 1,
+		display: {
+			darkMode: false,
+			imageDisplayMode: 'fitOnPage',
+			resizeImagesToFitOnPage: true,
+			resizeImagesToFullWidth: false,
+			resizeImagesToFillPage: false,
+			resizeImagesToThumbnails: false,
+			showImagesInViewer: true,
+			toggleBrokenImages: true
+		},
+		behavior: {
+			openInForeground: true,
+			keepRecentFusks: true,
+			recentFusks: []
+		},
+		safety: {
+			enableOverloadProtection: true,
+			overloadProtectionLimit: 500
+		}
 	};
 
 	constructor() {
@@ -245,7 +255,7 @@ class BackgroundScript {
 		this.addUrlToHistory(url, tab);
 
 		chrome.tabs.create({
-			active: this.options.openInForeground,
+			active: this.options.behavior.openInForeground,
 			index: (tab.index || 0) + 1,
 			url: `index.html#gallery?url=${encodeURIComponent(url)}`,
 			windowId: tab.windowId,
@@ -253,15 +263,15 @@ class BackgroundScript {
 	}
 
 	private addUrlToHistory(url: string, tab: chrome.tabs.Tab): void {
-		if (tab.incognito || !this.options.keepRecentFusks) {
+		if (tab.incognito || !this.options.behavior.keepRecentFusks) {
 			return;
 		}
 
-		const newHistory = [...this.options.history, url].slice(-10);
+		const newHistory = [...this.options.behavior.recentFusks, url].slice(-10);
 
-		chrome.storage.sync.set({ history: newHistory });
+		chrome.storage.sync.set({ behavior: { ...this.options.behavior, recentFusks: newHistory } });
 
-		if (this.options.keepRecentFusks) {
+		if (this.options.behavior.keepRecentFusks) {
 			this.createRecentMenu(newHistory);
 		}
 	}
@@ -269,10 +279,26 @@ class BackgroundScript {
 	private handleInstallation(details: chrome.runtime.InstalledDetails): void {
 		if (details.reason === 'install') {
 			chrome.storage.sync.set({
-				darkMode: false,
-				history: [],
-				keepRecentFusks: true,
-				openInForeground: true,
+				version: 1,
+				display: {
+					darkMode: false,
+					imageDisplayMode: 'fitOnPage',
+					resizeImagesToFitOnPage: true,
+					resizeImagesToFullWidth: false,
+					resizeImagesToFillPage: false,
+					resizeImagesToThumbnails: false,
+					showImagesInViewer: true,
+					toggleBrokenImages: true
+				},
+				behavior: {
+					openInForeground: true,
+					keepRecentFusks: true,
+					recentFusks: []
+				},
+				safety: {
+					enableOverloadProtection: true,
+					overloadProtectionLimit: 500
+				}
 			});
 		} else if (details.reason === 'update') {
 			// Note: localStorage is not available in service workers (Manifest V3)
@@ -286,14 +312,25 @@ class BackgroundScript {
 	private handleStorageChanges(changes: { [key: string]: chrome.storage.StorageChange }): void {
 		if (!changes) return;
 
-		Object.keys(changes).forEach(key => {
-			(this.options as any)[key] = changes[key].newValue;
-		});
+		// Update the entire options object with new data
+		if (changes['display']) {
+			this.options.display = { ...this.options.display, ...changes['display'].newValue };
+		}
+		if (changes['behavior']) {
+			this.options.behavior = { ...this.options.behavior, ...changes['behavior'].newValue };
+		}
+		if (changes['safety']) {
+			this.options.safety = { ...this.options.safety, ...changes['safety'].newValue };
+		}
+		if (changes['version']) {
+			this.options.version = changes['version'].newValue;
+		}
 
-		if (changes['keepRecentFusks'] &&
-			changes['keepRecentFusks'].newValue !== changes['keepRecentFusks'].oldValue) {
-			if (changes['keepRecentFusks'].newValue) {
-				this.createRecentMenu(this.options.history);
+		// Handle recent menu updates
+		if (changes['behavior'] && 
+			changes['behavior'].newValue?.keepRecentFusks !== changes['behavior'].oldValue?.keepRecentFusks) {
+			if (changes['behavior'].newValue?.keepRecentFusks) {
+				this.createRecentMenu(this.options.behavior.recentFusks);
 			} else {
 				this.createRecentMenu([]);
 			}
@@ -303,9 +340,19 @@ class BackgroundScript {
 	private loadOptions(): void {
 		chrome.storage.sync.get(null, (items) => {
 			if (items) {
-				Object.keys(items).forEach(key => {
-					(this.options as any)[key] = items[key];
-				});
+				// Update with the new nested structure
+				if (items['display']) {
+					this.options.display = { ...this.options.display, ...items['display'] };
+				}
+				if (items['behavior']) {
+					this.options.behavior = { ...this.options.behavior, ...items['behavior'] };
+				}
+				if (items['safety']) {
+					this.options.safety = { ...this.options.safety, ...items['safety'] };
+				}
+				if (items['version']) {
+					this.options.version = items['version'];
+				}
 			}
 		});
 	}
@@ -383,7 +430,7 @@ class BackgroundScript {
 		} else {
 			// If no valid URL available, open gallery in manual mode without pre-filling
 			chrome.tabs.create({
-				active: this.options.openInForeground,
+				active: this.options.behavior.openInForeground,
 				index: (tab.index || 0) + 1,
 				url: chrome.runtime.getURL('index.html'),
 				windowId: tab.windowId,

@@ -14,7 +14,7 @@ getTestBed().initTestEnvironment(
 );
 
 // Import all spec files directly
-import './app/services/fuskr.service.spec';
-import './app/services/chrome.service.spec';
-import './app/components/gallery.component.spec';
-import './app/components/options.component.spec';
+import '@services/fuskr.service.spec';
+import '@services/chrome.service.spec';
+import '@components/gallery.component.spec';
+import '@components/options.component.spec';

@@ -3,8 +3,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 
 import { GalleryComponent } from './gallery.component';
-import { FuskrService } from '../services/fuskr.service';
-import { ChromeService } from '../services/chrome.service';
+import { FuskrService } from '@services/fuskr.service';
+import { ChromeService } from '@services/chrome.service';
 import { BaseComponentTestHelper } from './base-component-test.helper';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
@@ -19,7 +19,7 @@ describe('GalleryComponent', () => {
 	let mockActivatedRoute: any;
 
 	beforeEach(async () => {
-		mockFuskrService = jasmine.createSpyObj('FuskrService', ['generateImageGallery', 'getImageFilename']);
+		mockFuskrService = jasmine.createSpyObj('FuskrService', ['generateImageGallery', 'getImageFilename', 'countPotentialUrls']);
 		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 		mockActivatedRoute = {
 			queryParams: of({ url: 'https://example.com/test.jpg' }),
@@ -62,10 +62,12 @@ describe('GalleryComponent', () => {
 				urls: ['https://example.com/image01.jpg', 'https://example.com/image02.jpg']
 			};
 			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
+			mockFuskrService.countPotentialUrls.and.returnValue(2); // Below limit
 
 			component.originalUrl = 'https://example.com/image05.jpg';
 			component.generateGallery();
 
+			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(component.imageUrls).toEqual(mockResult.urls);
 			expect(component.originalUrl).toBe(mockResult.originalUrl);
@@ -77,6 +79,56 @@ describe('GalleryComponent', () => {
 
 			expect(component.errorMessage).toBe('Please enter a valid URL');
 			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled();
+		});
+
+		it('should trigger overload protection when URL count exceeds limit', () => {
+			spyOn(window, 'confirm').and.returnValue(false); // User chooses not to proceed
+			mockFuskrService.countPotentialUrls.and.returnValue(1000); // Above default limit of 500
+
+			component.originalUrl = 'https://example.com/image[001-1000].jpg';
+			component.enableOverloadProtection = true;
+			component.overloadProtectionLimit = 500;
+			component.generateGallery();
+
+			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
+			expect(window.confirm).toHaveBeenCalled();
+			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled(); // Should not proceed
+		});
+
+		it('should proceed when user confirms overload protection warning', () => {
+			const mockResult = {
+				originalUrl: 'https://example.com/image[001-1000].jpg',
+				urls: Array.from({length: 1000}, (_, i) => `https://example.com/image${String(i+1).padStart(3, '0')}.jpg`)
+			};
+
+			spyOn(window, 'confirm').and.returnValue(true); // User chooses to proceed
+			mockFuskrService.countPotentialUrls.and.returnValue(1000);
+			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
+
+			component.originalUrl = 'https://example.com/image[001-1000].jpg';
+			component.enableOverloadProtection = true;
+			component.overloadProtectionLimit = 500;
+			component.generateGallery();
+
+			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
+			expect(window.confirm).toHaveBeenCalled();
+			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
+		});
+
+		it('should bypass overload protection when disabled', () => {
+			const mockResult = {
+				originalUrl: 'https://example.com/image[001-1000].jpg',
+				urls: Array.from({length: 1000}, (_, i) => `https://example.com/image${String(i+1).padStart(3, '0')}.jpg`)
+			};
+
+			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
+
+			component.originalUrl = 'https://example.com/image[001-1000].jpg';
+			component.enableOverloadProtection = false; // Disabled
+			component.generateGallery();
+
+			expect(mockFuskrService.countPotentialUrls).not.toHaveBeenCalled(); // Should skip count check
+			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
 		});
 
 		it('should open image in browser for non-extension context', () => {
@@ -214,11 +266,11 @@ describe('GalleryComponent', () => {
 
 		it('should handle clipboard copy errors', async () => {
 			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject(new Error('Clipboard error')));
-			spyOn(console, 'error');
+			const loggerSpy = spyOn(component['logger'], 'error');
 
 			await component.copyAllUrls();
 
-			expect(console.error).toHaveBeenCalledWith('Failed to copy URLs:', jasmine.any(Error));
+			expect(loggerSpy).toHaveBeenCalledWith('gallery.copyUrls.failed', 'Failed to copy URLs', jasmine.any(Error));
 		});
 	});
 

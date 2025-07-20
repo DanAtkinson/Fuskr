@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ChromeService } from '../services/chrome.service';
+import { ChromeService } from '@services/chrome.service';
 
 /**
  * Base test setup for components that extend BaseComponent

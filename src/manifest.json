@@ -14,7 +14,7 @@
 	},
 	"options_ui": {
 		"page": "index.html#/options",
-		"open_in_tab": false
+		"open_in_tab": true
 	},
 	"omnibox": {
 		"keyword": "fuskr"
