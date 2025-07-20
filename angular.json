@@ -29,10 +29,31 @@
 						"tsConfig": "tsconfig.app.json",
 						"inlineStyleLanguage": "scss",
 						"assets": [
-							"src/assets",
-							"src/favicon.ico",
-							"src/_locales",
-							"src/manifest.json"
+							{
+								"glob": "**/*",
+								"input": "src/assets",
+								"output": "assets"
+							},
+							{
+								"glob": "favicon.ico",
+								"input": "src",
+								"output": "."
+							},
+							{
+								"glob": "**/*",
+								"input": "src/_locales",
+								"output": "_locales"
+							},
+							{
+								"glob": "manifest.json",
+								"input": "src",
+								"output": "."
+							},
+							{
+								"glob": "**/*.{woff,woff2,ttf,eot}",
+								"input": "node_modules/@fortawesome/fontawesome-free/webfonts",
+								"output": "assets/fonts"
+							}
 						],
 						"styles": [
 							"node_modules/bootstrap/dist/css/bootstrap.min.css",
@@ -61,7 +82,7 @@
 									"with": "src/environments/environment.prod.ts"
 								}
 							],
-							"outputHashing": "all",
+							"outputHashing": "bundles",
 							"optimization": {
 								"scripts": true,
 								"styles": {
