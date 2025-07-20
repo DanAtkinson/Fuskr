@@ -63,9 +63,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Handle both initial load and refresh scenarios
 		this.route.queryParams.subscribe(params => {
-			this.logger.debug('GalleryComponent', 'queryParams subscription triggered', { 
-				params, 
-				hasInitialized: this.hasInitialized 
+			this.logger.debug('GalleryComponent', 'queryParams subscription triggered', {
+				params,
+				hasInitialized: this.hasInitialized
 			});
 			if (params['url'] && !this.hasInitialized) {
 				this.originalUrl = params['url'];
@@ -87,8 +87,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Also check on immediate initialization in case queryParams subscription is delayed
 		const currentParams = this.route.snapshot.queryParams;
-		this.logger.debug('GalleryComponent', 'Checking snapshot params', { 
-			currentParams, 
+		this.logger.debug('GalleryComponent', 'Checking snapshot params', {
+			currentParams,
 			hasInitialized: this.hasInitialized,
 			originalUrl: this.originalUrl
 		});
@@ -171,13 +171,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			urlCount.toString(),
 			this.overloadProtectionLimit.toString()
 		]);
-		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', { 
-			urlCount, 
+		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', {
+			urlCount,
 			limit: this.overloadProtectionLimit,
 			message
 		});
 		const proceed = confirm(message);
-		this.logger.info('GalleryComponent', 'User response to overload warning', { 
+		this.logger.info('GalleryComponent', 'User response to overload warning', {
 			proceed,
 			action: proceed ? 'continue' : 'cancel'
 		});

@@ -88,7 +88,7 @@ describe('OptionsComponent', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behavior: {
+				behaviour: {
 					keepRecentFusks: true,
 					openInForeground: true,
 					recentFusks: []
@@ -113,7 +113,7 @@ describe('OptionsComponent', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behavior: {
+				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: false,
 					recentFusks: []
@@ -191,11 +191,11 @@ describe('OptionsComponent', () => {
 		it('should update options when form values change', () => {
 			// Update the component properties directly since ngModel handles the binding
 			component.options.display.darkMode = true;
-			component.options.behavior.keepRecentFusks = false;
+			component.options.behaviour.keepRecentFusks = false;
 			fixture.detectChanges();
 
 			expect(component.options.display.darkMode).toBeTruthy();
-			expect(component.options.behavior.keepRecentFusks).toBeFalsy();
+			expect(component.options.behaviour.keepRecentFusks).toBeFalsy();
 		});
 
 		it('should display status message when present', () => {

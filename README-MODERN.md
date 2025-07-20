@@ -119,19 +119,19 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 ```
 src/
 ├── app/
-│   ├── components/          # Angular components
+│   ├── components/            # Angular components
 │   │   ├── gallery.component.ts
 │   │   └── options.component.ts
-│   ├── services/           # Business logic services
+│   ├── services/              # Business logic services
 │   │   ├── fuskr.service.ts
 │   │   └── chrome.service.ts
-│   ├── app.component.ts    # Root component
-│   └── app.module.ts       # App module
-├── assets/                 # Static assets
-├── environments/           # Environment configs
-├── background.js          # Service worker
-├── fuskr-core.js         # Core logic for service worker
-└── manifest.json         # Extension manifest
+│   ├── app.component.ts       # Root component
+│   └── app.module.ts          # App module
+├── assets/                    # Static assets
+├── environments/              # Environment configs
+├── background.js              # Service worker
+├── fuskr-core.js              # Core logic for service worker
+└── manifest.json              # Extension manifest
 ```
 
 ### Services

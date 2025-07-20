@@ -57,7 +57,7 @@ describe('ChromeService', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behavior: {
+				behaviour: {
 					openInForeground: true,
 					keepRecentFusks: true,
 					recentFusks: []
@@ -75,7 +75,7 @@ describe('ChromeService', () => {
 				display: {
 					darkMode: true
 				},
-				behavior: {
+				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: false
 				}
@@ -99,7 +99,7 @@ describe('ChromeService', () => {
 					showImagesInViewer: true, // from defaults
 					toggleBrokenImages: true // from defaults
 				},
-				behavior: {
+				behaviour: {
 					keepRecentFusks: false, // from stored data
 					openInForeground: false, // from stored data
 					recentFusks: [] // from defaults
@@ -139,7 +139,7 @@ describe('ChromeService', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behavior: {
+				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: true,
 					recentFusks: []
@@ -172,7 +172,7 @@ describe('ChromeService', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behavior: {
+				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: true,
 					recentFusks: []

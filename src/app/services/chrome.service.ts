@@ -12,7 +12,7 @@ export interface DisplaySettings {
 	toggleBrokenImages: boolean;
 }
 
-export interface BehaviorSettings {
+export interface BehaviourSettings {
 	openInForeground: boolean;
 	keepRecentFusks: boolean;
 	recentFusks: string[];
@@ -24,7 +24,7 @@ export interface SafetySettings {
 }
 
 export interface ChromeStorageData {
-	behavior: BehaviorSettings;
+	behaviour: BehaviourSettings;
 	display: DisplaySettings;
 	safety: SafetySettings;
 	version: number;
@@ -66,7 +66,7 @@ export class ChromeService {
 		return {
 			version: data.version ?? defaults.version,
 			display: { ...defaults.display, ...data.display },
-			behavior: { ...defaults.behavior, ...data.behavior },
+			behaviour: { ...defaults.behaviour, ...data.behaviour },
 			safety: { ...defaults.safety, ...data.safety }
 		};
 	}
@@ -84,7 +84,7 @@ export class ChromeService {
 				showImagesInViewer: true,
 				toggleBrokenImages: true,
 			},
-			behavior: {
+			behaviour: {
 				keepRecentFusks: true,
 				openInForeground: true,
 				recentFusks: [],
@@ -189,7 +189,7 @@ export class ChromeService {
 
 	async getOpenInForeground(): Promise<boolean> {
 		const data = await this.getStorageData();
-		return data.behavior.openInForeground;
+		return data.behaviour.openInForeground;
 	}
 
 	async updateDisplaySettings(updates: Partial<DisplaySettings>): Promise<void> {
@@ -201,11 +201,11 @@ export class ChromeService {
 		await this.setStorageData(updatedData);
 	}
 
-	async updateBehaviorSettings(updates: Partial<BehaviorSettings>): Promise<void> {
+	async updateBehaviourSettings(updates: Partial<BehaviourSettings>): Promise<void> {
 		const currentData = await this.getStorageData();
 		const updatedData = {
 			...currentData,
-			behavior: { ...currentData.behavior, ...updates }
+			behaviour: { ...currentData.behaviour, ...updates }
 		};
 		await this.setStorageData(updatedData);
 	}

@@ -1,14 +1,5 @@
 # TODO
 
-## ✅ Completed (Migration to Angular 20.1.2)
-* **Fixed Manual button functionality** - Now opens gallery page instead of deprecated prompt()
-* **Fixed refresh issues** - Removed problematic base href, implemented proper hash-based routing
-* **Enhanced test coverage** - Added comprehensive test suite with karma-coverage reporting
-* **Protocol filtering** - Manual button only allows HTTP/HTTPS/FILE URLs, filters out browser protocols
-* **URL update behavior** - Browser URL updates only on gallery generation, persists on refresh
-* **Chrome extension compatibility** - Full feature parity with pre-migration AngularJS version
-* **Implement overload protection** - Configurable warning system (default: 500 images) with user confirmation dialog to prevent browser crashes from large galleries
-
 ## 🎯 High Priority Features
 * **Create a history page** - Contains previous results along with the number of urls generated, loaded, and broken. The current data structure doesn't have those numbers currently however. The user should be able to click a button which will open that gallery in a new tab.
 * **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.

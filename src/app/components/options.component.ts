@@ -22,7 +22,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 			showImagesInViewer: true,
 			toggleBrokenImages: true,
 		},
-		behavior: {
+		behaviour: {
 			keepRecentFusks: true,
 			openInForeground: true,
 			recentFusks: [],

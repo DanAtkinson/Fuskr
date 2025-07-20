@@ -24,7 +24,7 @@ class BackgroundScript {
 			showImagesInViewer: true,
 			toggleBrokenImages: true
 		},
-		behavior: {
+		behaviour: {
 			openInForeground: true,
 			keepRecentFusks: true,
 			recentFusks: []
@@ -255,7 +255,7 @@ class BackgroundScript {
 		this.addUrlToHistory(url, tab);
 
 		chrome.tabs.create({
-			active: this.options.behavior.openInForeground,
+			active: this.options.behaviour.openInForeground,
 			index: (tab.index || 0) + 1,
 			url: `index.html#gallery?url=${encodeURIComponent(url)}`,
 			windowId: tab.windowId,
@@ -263,15 +263,15 @@ class BackgroundScript {
 	}
 
 	private addUrlToHistory(url: string, tab: chrome.tabs.Tab): void {
-		if (tab.incognito || !this.options.behavior.keepRecentFusks) {
+		if (tab.incognito || !this.options.behaviour.keepRecentFusks) {
 			return;
 		}
 
-		const newHistory = [...this.options.behavior.recentFusks, url].slice(-10);
+		const newHistory = [...this.options.behaviour.recentFusks, url].slice(-10);
 
-		chrome.storage.sync.set({ behavior: { ...this.options.behavior, recentFusks: newHistory } });
+		chrome.storage.sync.set({ behaviour: { ...this.options.behaviour, recentFusks: newHistory } });
 
-		if (this.options.behavior.keepRecentFusks) {
+		if (this.options.behaviour.keepRecentFusks) {
 			this.createRecentMenu(newHistory);
 		}
 	}
@@ -290,7 +290,7 @@ class BackgroundScript {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behavior: {
+				behaviour: {
 					openInForeground: true,
 					keepRecentFusks: true,
 					recentFusks: []
@@ -316,8 +316,8 @@ class BackgroundScript {
 		if (changes['display']) {
 			this.options.display = { ...this.options.display, ...changes['display'].newValue };
 		}
-		if (changes['behavior']) {
-			this.options.behavior = { ...this.options.behavior, ...changes['behavior'].newValue };
+		if (changes['behaviour']) {
+			this.options.behaviour = { ...this.options.behaviour, ...changes['behaviour'].newValue };
 		}
 		if (changes['safety']) {
 			this.options.safety = { ...this.options.safety, ...changes['safety'].newValue };
@@ -327,10 +327,10 @@ class BackgroundScript {
 		}
 
 		// Handle recent menu updates
-		if (changes['behavior'] && 
-			changes['behavior'].newValue?.keepRecentFusks !== changes['behavior'].oldValue?.keepRecentFusks) {
-			if (changes['behavior'].newValue?.keepRecentFusks) {
-				this.createRecentMenu(this.options.behavior.recentFusks);
+		if (changes['behaviour'] &&
+			changes['behaviour'].newValue?.keepRecentFusks !== changes['behaviour'].oldValue?.keepRecentFusks) {
+			if (changes['behaviour'].newValue?.keepRecentFusks) {
+				this.createRecentMenu(this.options.behaviour.recentFusks);
 			} else {
 				this.createRecentMenu([]);
 			}
@@ -344,8 +344,8 @@ class BackgroundScript {
 				if (items['display']) {
 					this.options.display = { ...this.options.display, ...items['display'] };
 				}
-				if (items['behavior']) {
-					this.options.behavior = { ...this.options.behavior, ...items['behavior'] };
+				if (items['behaviour']) {
+					this.options.behaviour = { ...this.options.behaviour, ...items['behaviour'] };
 				}
 				if (items['safety']) {
 					this.options.safety = { ...this.options.safety, ...items['safety'] };
@@ -430,7 +430,7 @@ class BackgroundScript {
 		} else {
 			// If no valid URL available, open gallery in manual mode without pre-filling
 			chrome.tabs.create({
-				active: this.options.behavior.openInForeground,
+				active: this.options.behaviour.openInForeground,
 				index: (tab.index || 0) + 1,
 				url: chrome.runtime.getURL('index.html'),
 				windowId: tab.windowId,

@@ -55,7 +55,7 @@ export class LoggerService {
 
 		// Add to memory store
 		this.logs.push(entry);
-		
+
 		// Trim old logs
 		if (this.logs.length > this.maxLogs) {
 			this.logs = this.logs.slice(-this.maxLogs);
@@ -140,10 +140,10 @@ export class LoggerService {
 	/**
 	 * Configure logging settings
 	 */
-	configure(settings: { 
-		enabled?: boolean; 
-		logLevel?: LogLevel; 
-		maxLogs?: number; 
+	configure(settings: {
+		enabled?: boolean;
+		logLevel?: LogLevel;
+		maxLogs?: number;
 	}): void {
 		if (settings.enabled !== undefined) {
 			this.isEnabled = settings.enabled;
@@ -154,7 +154,7 @@ export class LoggerService {
 		if (settings.maxLogs !== undefined) {
 			this.maxLogs = settings.maxLogs;
 		}
-		
+
 		this.info('LoggerService', 'Logger configuration updated', settings);
 	}
 
