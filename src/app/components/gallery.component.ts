@@ -7,41 +7,34 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 @Component({
-    selector: 'app-gallery',
-    templateUrl: './gallery.component.html',
-    styleUrls: ['./gallery.component.scss'],
-    standalone: false
+	selector: 'app-gallery',
+	standalone: false,
+	styleUrls: ['./gallery.component.scss'],
+	templateUrl: './gallery.component.html',
 })
 export class GalleryComponent extends BaseComponent implements OnInit {
-	originalUrl: string = '';
-	imageUrls: string[] = [];
-	loading: boolean = false;
-	errorMessage: string = '';
-
-	// Image tracking
-	loadedImages: number = 0;
+	// Public properties (alphabetically)
 	brokenImages: number = 0;
-	totalImages: number = 0;
-
-	// Download tracking
-	isDownloading: boolean = false;
+	currentViewerImage: string = '';
+	currentViewerIndex: number = 0;
+	darkMode: boolean = false;
 	downloadProgress: number = 0;
 	downloadStatus: string = '';
-
-	// UI state
+	enableOverloadProtection: boolean = true;
+	errorMessage: string = '';
+	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
+	imageUrls: string[] = [];
+	isDownloading: boolean = false;
+	loadedImages: number = 0;
+	loading: boolean = false;
+	originalUrl: string = '';
+	overloadProtectionLimit: number = 50;
 	showBrokenImages: boolean = false;
 	showImageViewer: boolean = false;
 	showUrlList: boolean = false;
-	currentViewerImage: string = '';
-	currentViewerIndex: number = 0;
+	totalImages: number = 0;
 
-	// Settings
-	darkMode: boolean = false;
-	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
-	enableOverloadProtection: boolean = true;
-	overloadProtectionLimit: number = 50;
-
-	// Prevent duplicate initialization
+	// Private properties (alphabetically)
 	private hasInitialized: boolean = false;
 
 	constructor(
@@ -53,188 +46,28 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		super();
 	}
 
-	async ngOnInit() {
-		await this.loadSettings();
-
-		this.logger.debug('GalleryComponent', 'ngOnInit started', { hasInitialized: this.hasInitialized });
-
-		// Ensure dark mode is applied immediately before any dialogs
-		this.applyDarkModeStyles();
-
-		// Handle both initial load and refresh scenarios
-		this.route.queryParams.subscribe(params => {
-			this.logger.debug('GalleryComponent', 'queryParams subscription triggered', {
-				params,
-				hasInitialized: this.hasInitialized
-			});
-			if (params['url'] && !this.hasInitialized) {
-				this.originalUrl = params['url'];
-				this.hasInitialized = true;
-				this.logger.info('GalleryComponent', 'Starting gallery generation from queryParams', { url: this.originalUrl });
-				// Small delay to ensure dark mode styles are fully applied
-				setTimeout(() => {
-					this.generateGallery();
-				}, 10);
-			} else if (!params['url'] && !this.hasInitialized) {
-				// If no URL provided (manual mode), focus on the input after a short delay
-				this.hasInitialized = true;
-				this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in queryParams)');
-				setTimeout(() => {
-					this.focusUrlInput();
-				}, 100);
-			}
-		});
-
-		// Also check on immediate initialization in case queryParams subscription is delayed
-		const currentParams = this.route.snapshot.queryParams;
-		this.logger.debug('GalleryComponent', 'Checking snapshot params', {
-			currentParams,
-			hasInitialized: this.hasInitialized,
-			originalUrl: this.originalUrl
-		});
-		if (currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
-			this.originalUrl = currentParams['url'];
-			this.hasInitialized = true;
-			this.logger.info('GalleryComponent', 'Starting gallery generation from snapshot', { url: this.originalUrl });
-			// Small delay to ensure dark mode styles are fully applied
-			setTimeout(() => {
-				this.generateGallery();
-			}, 10);
-		} else if (!currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
-			// Manual mode - focus on input
-			this.hasInitialized = true;
-			this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in snapshot)');
-			setTimeout(() => {
-				this.focusUrlInput();
-			}, 100);
-		}
+	// Public methods (alphabetically)
+	closeImageViewer() {
+		this.showImageViewer = false;
 	}
 
-	async loadSettings() {
+	async copyAllUrls() {
 		try {
-			const settings = await this.chromeService.getStorageData();
-			this.logger.debug('GalleryComponent', 'Settings loaded successfully', settings);
-			this.darkMode = settings.display.darkMode;
-			this.imageDisplayMode = settings.display.imageDisplayMode;
-			this.showBrokenImages = settings.display.toggleBrokenImages;
-			this.enableOverloadProtection = settings.safety.enableOverloadProtection;
-			this.overloadProtectionLimit = settings.safety.overloadProtectionLimit;
-			this.logger.info('GalleryComponent', 'Overload protection configured', {
-				enabled: this.enableOverloadProtection,
-				limit: this.overloadProtectionLimit
-			});
-
-			// Dark mode will be applied by applyDarkModeStyles() after settings are loaded
+			const urlText = this.getAllUrlsText();
+			await navigator.clipboard.writeText(urlText);
+			this.logger.info('gallery.allUrlsCopied', 'All URLs copied to clipboard');
+			// Could show a toast notification here
 		} catch (error) {
-			this.logger.error('GalleryComponent', 'Error loading settings', error);
+			this.logger.error('gallery.copyUrls.failed', 'Failed to copy URLs', error);
 		}
 	}
 
-	/**
-	 * Apply dark mode styles to the document body
-	 * This is called after settings are loaded to ensure styles are applied before any dialogs
-	 */
-	private applyDarkModeStyles() {
-		document.body.classList.toggle('dark-mode', this.darkMode);
-		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode });
-	}
-
-	generateGallery() {
-		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl });
-		if (!this.originalUrl.trim()) {
-			this.errorMessage = this.translate('Gallery_ErrorValidUrl');
-			this.logger.warn('GalleryComponent', 'Gallery generation failed: empty URL');
-			return;
-		}
-
-		// Check for overload protection before generating
-		if (this.enableOverloadProtection) {
-			const urlCount = this.fuskrService.countPotentialUrls(this.originalUrl);
-			this.logger.info('GalleryComponent', 'Overload protection check', {
-				urlCount,
-				limit: this.overloadProtectionLimit,
-				willTrigger: urlCount > this.overloadProtectionLimit
-			});
-			if (urlCount > this.overloadProtectionLimit) {
-				this.showOverloadWarning(urlCount);
-				return;
-			}
-		} else {
-			this.logger.debug('GalleryComponent', 'Overload protection is disabled');
-		}
-
-		this.performGalleryGeneration();
-	}
-
-	private showOverloadWarning(urlCount: number) {
-		const message = this.translate('Gallery_OverloadWarning', [
-			urlCount.toString(),
-			this.overloadProtectionLimit.toString()
-		]);
-		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', {
-			urlCount,
-			limit: this.overloadProtectionLimit,
-			message
-		});
-		const proceed = confirm(message);
-		this.logger.info('GalleryComponent', 'User response to overload warning', {
-			proceed,
-			action: proceed ? 'continue' : 'cancel'
-		});
-
-		if (proceed) {
-			this.logger.info('GalleryComponent', 'User chose to proceed with gallery generation despite warning');
-			this.performGalleryGeneration();
-		} else {
-			this.logger.info('GalleryComponent', 'User chose to cancel gallery generation');
-		}
-	}
-
-	private performGalleryGeneration() {
-		this.loading = true;
-		this.errorMessage = '';
-		this.imageUrls = [];
-
-		try {
-			const result = this.fuskrService.generateImageGallery(this.originalUrl);
-			this.imageUrls = result.urls;
-			this.totalImages = this.imageUrls.length;
-			this.loadedImages = 0;
-			this.brokenImages = 0;
-
-			// Do a final count after images have had time to load
-			setTimeout(() => {
-				this.updateImageCounts();
-			}, 2000);
-
-			// Update the URL in the browser to show the bracketed version
-			if (result.originalUrl !== this.originalUrl) {
-				this.originalUrl = result.originalUrl;
-			}
-
-			// Update the browser URL to reflect the generated gallery
-			this.updateBrowserUrl(this.originalUrl);
-
-			if (this.imageUrls.length === 0) {
-				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
-			}
-		} catch (error) {
-			this.errorMessage = this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message;
-		} finally {
-			this.loading = false;
-		}
-	}	openImage(url: string) {
-		if (this.chromeService.isExtensionContext()) {
-			this.chromeService.openTab(url);
-		} else {
-			window.open(url, '_blank');
-		}
-	}
-
-	downloadImage(url: string, event: Event) {
+	copyUrl(url: string, event: Event) {
 		event.stopPropagation();
-		const filename = this.getFilename(url);
-		this.chromeService.downloadFile(url, filename);
+		navigator.clipboard.writeText(url).then(() => {
+			// Could show a toast notification here
+			this.logger.info('gallery.urlCopied', 'URL copied to clipboard');
+		});
 	}
 
 	async downloadAll() {
@@ -319,72 +152,137 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 	}
 
-	private async fetchImageAsBlob(url: string): Promise<Blob> {
-		const response = await fetch(url);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch image: ${response.statusText}`);
-		}
-		return response.blob();
-	}
-
-	private getValidImageUrls(): string[] {
-		// Get all images that are not broken and are actual image URLs (not data URLs or placeholders)
-		const images = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
-		const validUrls: string[] = [];
-
-		images.forEach(img => {
-			// Check if image has loaded successfully (not broken)
-			if (img.complete && img.naturalHeight !== 0) {
-				const url = img.src;
-				// Filter out data URLs, placeholder images, and invalid URLs
-				if (this.isValidImageUrl(url)) {
-					validUrls.push(url);
-				}
-			}
-		});
-
-		return validUrls;
-	}
-
-	private isValidImageUrl(url: string): boolean {
-		// Reject data URLs (like the SVG placeholder)
-		if (url.startsWith('data:')) {
-			return false;
-		}
-
-		// Reject blob URLs (temporary URLs)
-		if (url.startsWith('blob:')) {
-			return false;
-		}
-
-		// Must be HTTP/HTTPS
-		if (!url.startsWith('http://') && !url.startsWith('https://')) {
-			return false;
-		}
-
-		// Check for common image extensions
-		const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
-		const urlWithoutQuery = url.split('?')[0].toLowerCase();
-		const hasImageExtension = imageExtensions.some(ext => urlWithoutQuery.endsWith(ext));
-
-		return hasImageExtension;
-	}
-
-	private generateZipFilename(): string {
-		// Generate a filename based on the original URL or current date
-		return `fuskr-gallery-${new Date().toISOString()}.zip`;
-	}
-
-	copyUrl(url: string, event: Event) {
+	downloadImage(url: string, event: Event) {
 		event.stopPropagation();
-		navigator.clipboard.writeText(url).then(() => {
-			// Could show a toast notification here
-			this.logger.info('gallery.urlCopied', 'URL copied to clipboard');
-		});
+		const filename = this.getFilename(url);
+		this.chromeService.downloadFile(url, filename);
+	}
+
+	generateGallery() {
+		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl });
+		if (!this.originalUrl.trim()) {
+			this.errorMessage = this.translate('Gallery_ErrorValidUrl');
+			this.logger.warn('GalleryComponent', 'Gallery generation failed: empty URL');
+			return;
+		}
+
+		// Check for overload protection before generating
+		if (this.enableOverloadProtection) {
+			const urlCount = this.fuskrService.countPotentialUrls(this.originalUrl);
+			this.logger.info('GalleryComponent', 'Overload protection check', {
+				urlCount,
+				limit: this.overloadProtectionLimit,
+				willTrigger: urlCount > this.overloadProtectionLimit
+			});
+			if (urlCount > this.overloadProtectionLimit) {
+				this.showOverloadWarning(urlCount);
+				return;
+			}
+		} else {
+			this.logger.debug('GalleryComponent', 'Overload protection is disabled');
+		}
+
+		this.performGalleryGeneration();
+	}
+
+	getAllUrlsText(): string {
+		return this.imageUrls.join('\n');
 	}
 
 	getFilename(url: string): string {
 		return this.fuskrService.getImageFilename(url);
+	}
+
+	getImageAltText(index: number): string {
+		return `${this.translate('Gallery_ImageAlt')} ${index + 1}`;
+	}
+
+	async loadSettings() {
+		try {
+			const settings = await this.chromeService.getStorageData();
+			this.logger.debug('GalleryComponent', 'Settings loaded successfully', settings);
+			this.darkMode = settings.display.darkMode;
+			this.imageDisplayMode = settings.display.imageDisplayMode;
+			this.showBrokenImages = settings.display.toggleBrokenImages;
+			this.enableOverloadProtection = settings.safety.enableOverloadProtection;
+			this.overloadProtectionLimit = settings.safety.overloadProtectionLimit;
+			this.logger.info('GalleryComponent', 'Overload protection configured', {
+				enabled: this.enableOverloadProtection,
+				limit: this.overloadProtectionLimit
+			});
+
+			// Dark mode will be applied by applyDarkModeStyles() after settings are loaded
+		} catch (error) {
+			this.logger.error('GalleryComponent', 'Error loading settings', error);
+		}
+	}
+
+	navigateToHistory() {
+		this.router.navigate(['/history']);
+	}
+
+	nextImage() {
+		if (this.currentViewerIndex < this.imageUrls.length - 1) {
+			this.currentViewerIndex++;
+			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+		}
+	}
+
+	async ngOnInit() {
+		await this.loadSettings();
+
+		this.logger.debug('GalleryComponent', 'ngOnInit started', { hasInitialized: this.hasInitialized });
+
+		// Ensure dark mode is applied immediately before any dialogs
+		this.applyDarkModeStyles();
+
+		// Handle both initial load and refresh scenarios
+		this.route.queryParams.subscribe(params => {
+			this.logger.debug('GalleryComponent', 'queryParams subscription triggered', {
+				params,
+				hasInitialized: this.hasInitialized
+			});
+			if (params['url'] && !this.hasInitialized) {
+				this.originalUrl = params['url'];
+				this.hasInitialized = true;
+				this.logger.info('GalleryComponent', 'Starting gallery generation from queryParams', { url: this.originalUrl });
+				// Small delay to ensure dark mode styles are fully applied
+				setTimeout(() => {
+					this.generateGallery();
+				}, 10);
+			} else if (!params['url'] && !this.hasInitialized) {
+				// If no URL provided (manual mode), focus on the input after a short delay
+				this.hasInitialized = true;
+				this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in queryParams)');
+				setTimeout(() => {
+					this.focusUrlInput();
+				}, 100);
+			}
+		});
+
+		// Also check on immediate initialization in case queryParams subscription is delayed
+		const currentParams = this.route.snapshot.queryParams;
+		this.logger.debug('GalleryComponent', 'Checking snapshot params', {
+			currentParams,
+			hasInitialized: this.hasInitialized,
+			originalUrl: this.originalUrl
+		});
+		if (currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
+			this.originalUrl = currentParams['url'];
+			this.hasInitialized = true;
+			this.logger.info('GalleryComponent', 'Starting gallery generation from snapshot', { url: this.originalUrl });
+			// Small delay to ensure dark mode styles are fully applied
+			setTimeout(() => {
+				this.generateGallery();
+			}, 10);
+		} else if (!currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
+			// Manual mode - focus on input
+			this.hasInitialized = true;
+			this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in snapshot)');
+			setTimeout(() => {
+				this.focusUrlInput();
+			}, 100);
+		}
 	}
 
 	onImageError(event: Event) {
@@ -432,31 +330,58 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 	}
 
-	private updateImageCounts() {
-		// Count images directly from DOM
-		const allImages = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
-		let loaded = 0;
-		let broken = 0;
+	openImage(url: string) {
+		if (this.chromeService.isExtensionContext()) {
+			this.chromeService.openTab(url);
+		} else {
+			window.open(url, '_blank');
+		}
+	}
 
-		allImages.forEach(img => {
-			if (img.classList.contains('error')) {
-				broken++;
-			} else if (img.complete && img.naturalHeight !== 0 && !img.src.startsWith('data:')) {
-				loaded++;
+	openImageViewer(url: string, index: number) {
+		this.currentViewerImage = url;
+		this.currentViewerIndex = index;
+		this.showImageViewer = true;
+	}
+
+	previousImage() {
+		if (this.currentViewerIndex > 0) {
+			this.currentViewerIndex--;
+			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+		}
+	}
+
+	removeBrokenImages() {
+		// Create a list of URLs that correspond to broken images
+		const brokenImages = document.querySelectorAll('img.error');
+		const brokenUrls = new Set<string>();
+
+		brokenImages.forEach((img: Element) => {
+			const htmlImg = img as HTMLImageElement;
+			// Get the original URL from the data attribute
+			const originalUrl = htmlImg.getAttribute('data-original-url');
+			if (originalUrl) {
+				brokenUrls.add(originalUrl);
+			}
+
+			// Remove the container from DOM
+			const container = htmlImg.closest('.image-item');
+			if (container) {
+				container.remove();
 			}
 		});
 
-		this.loadedImages = loaded;
-		this.brokenImages = broken;
-	}	async toggleDarkMode() {
-		this.darkMode = !this.darkMode;
-		document.body.classList.toggle('dark-mode', this.darkMode);
+		// Update the URLs array to remove broken URLs
+		this.imageUrls = this.imageUrls.filter(url => !brokenUrls.has(url));
+		this.totalImages = this.imageUrls.length;
+		this.brokenImages = 0;
+	}
 
-		// Save to storage
-		try {
-			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode });
-		} catch (error) {
-			this.logger.error('gallery.darkMode.saveFailed', 'Error saving dark mode setting', error);
+	selectAllUrls() {
+		const textarea = document.querySelector('.url-textarea') as HTMLTextAreaElement;
+		if (textarea) {
+			textarea.select();
+			textarea.setSelectionRange(0, 99999); // For mobile devices
 		}
 	}
 
@@ -495,61 +420,66 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 	}
 
-	openImageViewer(url: string, index: number) {
-		this.currentViewerImage = url;
-		this.currentViewerIndex = index;
-		this.showImageViewer = true;
-	}
+	async toggleDarkMode() {
+		this.darkMode = !this.darkMode;
+		document.body.classList.toggle('dark-mode', this.darkMode);
 
-	closeImageViewer() {
-		this.showImageViewer = false;
-	}
-
-	nextImage() {
-		if (this.currentViewerIndex < this.imageUrls.length - 1) {
-			this.currentViewerIndex++;
-			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+		// Save to storage
+		try {
+			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode });
+		} catch (error) {
+			this.logger.error('gallery.darkMode.saveFailed', 'Error saving dark mode setting', error);
 		}
 	}
 
-	previousImage() {
-		if (this.currentViewerIndex > 0) {
-			this.currentViewerIndex--;
-			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+	toggleUrlList() {
+		this.showUrlList = !this.showUrlList;
+	}
+
+	// Private methods (alphabetically)
+	private addToHistory() {
+		// Add gallery to history after images have had time to load
+		setTimeout(async () => {
+			const entry = {
+				originalUrl: this.originalUrl,
+				totalImages: this.totalImages,
+				loadedImages: this.loadedImages,
+				brokenImages: this.brokenImages,
+				imageUrls: this.imageUrls,
+				displayMode: this.imageDisplayMode
+			};
+
+			try {
+				await this.chromeService.addGalleryToHistory(entry);
+				this.logger.info('GalleryComponent', 'Gallery added to history successfully', {
+					url: this.originalUrl,
+					totalImages: this.totalImages
+				});
+			} catch (error) {
+				this.logger.error('GalleryComponent', 'Failed to add gallery to history', error);
+			}
+		}, 2500); // Wait a bit longer than the updateImageCounts timeout to get accurate counts
+	}
+
+	private applyDarkModeStyles() {
+		document.body.classList.toggle('dark-mode', this.darkMode);
+		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode });
+	}
+
+	private async fetchImageAsBlob(url: string): Promise<Blob> {
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch image: ${response.statusText}`);
 		}
+		return response.blob();
 	}
 
-	removeBrokenImages() {
-		// Create a list of URLs that correspond to broken images
-		const brokenImages = document.querySelectorAll('img.error');
-		const brokenUrls = new Set<string>();
-
-		brokenImages.forEach((img: Element) => {
-			const htmlImg = img as HTMLImageElement;
-			// Get the original URL from the data attribute
-			const originalUrl = htmlImg.getAttribute('data-original-url');
-			if (originalUrl) {
-				brokenUrls.add(originalUrl);
-			}
-
-			// Remove the container from DOM
-			const container = htmlImg.closest('.image-item');
-			if (container) {
-				container.remove();
-			}
-		});
-
-		// Update the URLs array to remove broken URLs
-		this.imageUrls = this.imageUrls.filter(url => !brokenUrls.has(url));
-		this.totalImages = this.imageUrls.length;
-		this.brokenImages = 0;
-	}
-
-	/**
-	 * Generate localized alt text for images
-	 */
-	getImageAltText(index: number): string {
-		return `${this.translate('Gallery_ImageAlt')} ${index + 1}`;
+	private focusUrlInput() {
+		const urlInput = document.querySelector('input[type="url"]') as HTMLInputElement;
+		if (urlInput) {
+			urlInput.focus();
+			urlInput.select(); // Select any existing text
+		}
 	}
 
 	private generateMetadataContent(imageUrls: string[]): string {
@@ -574,65 +504,141 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		return lines.join('\n');
 	}
 
-	/**
-	 * Toggle the visibility of the URL list section
-	 */
-	toggleUrlList() {
-		this.showUrlList = !this.showUrlList;
+	private generateZipFilename(): string {
+		// Generate a filename based on the original URL or current date
+		return `fuskr-gallery-${new Date().toISOString()}.zip`;
 	}
 
-	/**
-	 * Get all image URLs as formatted text
-	 */
-	getAllUrlsText(): string {
-		return this.imageUrls.join('\n');
+	private getValidImageUrls(): string[] {
+		// Get all images that are not broken and are actual image URLs (not data URLs or placeholders)
+		const images = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
+		const validUrls: string[] = [];
+
+		images.forEach(img => {
+			// Check if image has loaded successfully (not broken)
+			if (img.complete && img.naturalHeight !== 0) {
+				const url = img.src;
+				// Filter out data URLs, placeholder images, and invalid URLs
+				if (this.isValidImageUrl(url)) {
+					validUrls.push(url);
+				}
+			}
+		});
+
+		return validUrls;
 	}
 
-	/**
-	 * Copy all URLs to clipboard
-	 */
-	async copyAllUrls() {
+	private isValidImageUrl(url: string): boolean {
+		// Reject data URLs (like the SVG placeholder)
+		if (url.startsWith('data:')) {
+			return false;
+		}
+
+		// Reject blob URLs (temporary URLs)
+		if (url.startsWith('blob:')) {
+			return false;
+		}
+
+		// Must be HTTP/HTTPS
+		if (!url.startsWith('http://') && !url.startsWith('https://')) {
+			return false;
+		}
+
+		// Check for common image extensions
+		const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
+		const urlWithoutQuery = url.split('?')[0].toLowerCase();
+		const hasImageExtension = imageExtensions.some(ext => urlWithoutQuery.endsWith(ext));
+
+		return hasImageExtension;
+	}
+
+	private performGalleryGeneration() {
+		this.loading = true;
+		this.errorMessage = '';
+		this.imageUrls = [];
+
 		try {
-			const urlText = this.getAllUrlsText();
-			await navigator.clipboard.writeText(urlText);
-			this.logger.info('gallery.allUrlsCopied', 'All URLs copied to clipboard');
-			// Could show a toast notification here
+			const result = this.fuskrService.generateImageGallery(this.originalUrl);
+			this.imageUrls = result.urls;
+			this.totalImages = this.imageUrls.length;
+			this.loadedImages = 0;
+			this.brokenImages = 0;
+
+			// Do a final count after images have had time to load
+			setTimeout(() => {
+				this.updateImageCounts();
+			}, 2000);
+
+			// Update the URL in the browser to show the bracketed version
+			if (result.originalUrl !== this.originalUrl) {
+				this.originalUrl = result.originalUrl;
+			}
+
+			// Update the browser URL to reflect the generated gallery
+			this.updateBrowserUrl(this.originalUrl);
+
+			// Add the gallery to history if it was successfully generated
+			if (this.imageUrls.length > 0) {
+				this.addToHistory();
+			}
+
+			if (this.imageUrls.length === 0) {
+				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
+			}
 		} catch (error) {
-			this.logger.error('gallery.copyUrls.failed', 'Failed to copy URLs', error);
+			this.errorMessage = this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message;
+		} finally {
+			this.loading = false;
 		}
 	}
 
-	/**
-	 * Select all text in the URL textarea
-	 */
-	selectAllUrls() {
-		const textarea = document.querySelector('.url-textarea') as HTMLTextAreaElement;
-		if (textarea) {
-			textarea.select();
-			textarea.setSelectionRange(0, 99999); // For mobile devices
+	private showOverloadWarning(urlCount: number) {
+		const message = this.translate('Gallery_OverloadWarning', [
+			urlCount.toString(),
+			this.overloadProtectionLimit.toString()
+		]);
+		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', {
+			urlCount,
+			limit: this.overloadProtectionLimit,
+			message
+		});
+		const proceed = confirm(message);
+		this.logger.info('GalleryComponent', 'User response to overload warning', {
+			proceed,
+			action: proceed ? 'continue' : 'cancel'
+		});
+
+		if (proceed) {
+			this.logger.info('GalleryComponent', 'User chose to proceed with gallery generation despite warning');
+			this.performGalleryGeneration();
+		} else {
+			this.logger.info('GalleryComponent', 'User chose to cancel gallery generation');
 		}
 	}
 
-	/**
-	 * Focus on the URL input field (used for manual mode)
-	 */
-	private focusUrlInput() {
-		const urlInput = document.querySelector('input[type="url"]') as HTMLInputElement;
-		if (urlInput) {
-			urlInput.focus();
-			urlInput.select(); // Select any existing text
-		}
-	}
-
-	/**
-	 * Update the browser URL to reflect the current gallery URL
-	 * This ensures that refreshing the page will return to the same gallery
-	 */
 	private updateBrowserUrl(url: string) {
 		this.router.navigate([], {
 			relativeTo: this.route,
 			queryParams: { url: url },
 			queryParamsHandling: 'merge'
 		});
+	}
+
+	private updateImageCounts() {
+		// Count images directly from DOM
+		const allImages = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
+		let loaded = 0;
+		let broken = 0;
+
+		allImages.forEach(img => {
+			if (img.classList.contains('error')) {
+				broken++;
+			} else if (img.complete && img.naturalHeight !== 0 && !img.src.startsWith('data:')) {
+				loaded++;
+			}
+		});
+
+		this.loadedImages = loaded;
+		this.brokenImages = broken;
 	}
 }

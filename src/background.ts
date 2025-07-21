@@ -1,7 +1,7 @@
 /// <reference types="chrome"/>
 
 import { FuskrService } from './app/services/fuskr.service';
-import { ChromeStorageData } from './app/services/chrome.service';
+import { ChromeStorageData } from './app/models/chrome-storage.model';
 
 // Background script for Chrome extension
 // This runs as a service worker in Manifest V3
@@ -12,28 +12,7 @@ class BackgroundScript {
 	private recentId: string | null = null;
 	private parentId: string | null = null;
 
-	private options: ChromeStorageData = {
-		version: 1,
-		display: {
-			darkMode: false,
-			imageDisplayMode: 'fitOnPage',
-			resizeImagesToFitOnPage: true,
-			resizeImagesToFullWidth: false,
-			resizeImagesToFillPage: false,
-			resizeImagesToThumbnails: false,
-			showImagesInViewer: true,
-			toggleBrokenImages: true
-		},
-		behaviour: {
-			openInForeground: true,
-			keepRecentFusks: true,
-			recentFusks: []
-		},
-		safety: {
-			enableOverloadProtection: true,
-			overloadProtectionLimit: 500
-		}
-	};
+	private options: ChromeStorageData = new ChromeStorageData();
 
 	constructor() {
 		this.initialize();
@@ -237,6 +216,12 @@ class BackgroundScript {
 				});
 
 				this.createContextMenu({
+					Id: 'FuskrHistory',
+					ParentId: this.parentId,
+					Title: this.l18nify('ContextMenu_History'),
+				});
+
+				this.createContextMenu({
 					Id: 'FuskrOptions',
 					ParentId: this.parentId,
 					Title: this.l18nify('ContextMenu_Options'),
@@ -278,28 +263,8 @@ class BackgroundScript {
 
 	private handleInstallation(details: chrome.runtime.InstalledDetails): void {
 		if (details.reason === 'install') {
-			chrome.storage.sync.set({
-				version: 1,
-				display: {
-					darkMode: false,
-					imageDisplayMode: 'fitOnPage',
-					resizeImagesToFitOnPage: true,
-					resizeImagesToFullWidth: false,
-					resizeImagesToFillPage: false,
-					resizeImagesToThumbnails: false,
-					showImagesInViewer: true,
-					toggleBrokenImages: true
-				},
-				behaviour: {
-					openInForeground: true,
-					keepRecentFusks: true,
-					recentFusks: []
-				},
-				safety: {
-					enableOverloadProtection: true,
-					overloadProtectionLimit: 500
-				}
-			});
+			const defaultData = new ChromeStorageData();
+			chrome.storage.sync.set(defaultData);
 		} else if (details.reason === 'update') {
 			// Note: localStorage is not available in service workers (Manifest V3)
 			// Legacy migration is no longer needed for new installs
@@ -378,6 +343,9 @@ class BackgroundScript {
 				return;
 			case 'FuskrClearHistory':
 				this.clearRecentOnClick();
+				return;
+			case 'FuskrHistory':
+				this.historyOnClick();
 				return;
 			case 'FuskrOptions':
 				this.optionsOnClick();
@@ -458,6 +426,12 @@ class BackgroundScript {
 
 	private optionsOnClick(): void {
 		chrome.runtime.openOptionsPage();
+	}
+
+	private historyOnClick(): void {
+		chrome.tabs.create({
+			url: chrome.runtime.getURL('index.html#/history'),
+		});
 	}
 
 	private choiceOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void {

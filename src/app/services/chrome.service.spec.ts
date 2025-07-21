@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
-import { ChromeService, ChromeStorageData } from './chrome.service';
+import { ChromeService } from './chrome.service';
+import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
+import { ChromeStorageData } from '../models/chrome-storage.model';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type {} from 'jasmine';
@@ -46,28 +48,23 @@ describe('ChromeService', () => {
 			const result = await service.getStorageData();
 
 			// Should return all defaults when storage is empty
-			expect(result).toEqual({
-				display: {
-					darkMode: false,
-					imageDisplayMode: 'fitOnPage',
-					resizeImagesToFitOnPage: true,
-					resizeImagesToFullWidth: false,
-					resizeImagesToFillPage: false,
-					resizeImagesToThumbnails: false,
-					showImagesInViewer: true,
-					toggleBrokenImages: true
-				},
-				behaviour: {
-					openInForeground: true,
-					keepRecentFusks: true,
-					recentFusks: []
-				},
-				safety: {
-					enableOverloadProtection: true,
-					overloadProtectionLimit: 500
-				},
-				version: 1
-			});
+			expect(result).toBeDefined();
+			expect(result.display.darkMode).toBe(false);
+			expect(result.display.imageDisplayMode).toBe('fitOnPage');
+			expect(result.display.resizeImagesToFitOnPage).toBe(true);
+			expect(result.display.resizeImagesToFullWidth).toBe(false);
+			expect(result.display.resizeImagesToFillPage).toBe(false);
+			expect(result.display.resizeImagesToThumbnails).toBe(false);
+			expect(result.display.showImagesInViewer).toBe(true);
+			expect(result.display.toggleBrokenImages).toBe(true);
+			expect(result.behaviour.openInForeground).toBe(true);
+			expect(result.behaviour.keepRecentFusks).toBe(true);
+			expect(result.behaviour.recentFusks).toEqual([]);
+			expect(result.behaviour.galleryHistory.entries).toEqual([]);
+			expect(result.behaviour.galleryHistory.maxEntries).toBe(10);
+			expect(result.safety.enableOverloadProtection).toBe(true);
+			expect(result.safety.overloadProtectionLimit).toBe(50);
+			expect(result.version).toBe(1);
 		});
 
 		it('should return stored data merged with defaults when available', async () => {
@@ -88,28 +85,24 @@ describe('ChromeService', () => {
 			const result = await service.getStorageData();
 
 			// Should merge stored data with defaults
-			expect(result).toEqual({
-				display: {
-					darkMode: true, // from stored data
-					imageDisplayMode: 'fitOnPage', // from defaults
-					resizeImagesToFitOnPage: true, // from defaults
-					resizeImagesToFullWidth: false, // from defaults
-					resizeImagesToFillPage: false, // from defaults
-					resizeImagesToThumbnails: false, // from defaults
-					showImagesInViewer: true, // from defaults
-					toggleBrokenImages: true // from defaults
-				},
-				behaviour: {
-					keepRecentFusks: false, // from stored data
-					openInForeground: false, // from stored data
-					recentFusks: [] // from defaults
-				},
-				safety: {
-					enableOverloadProtection: true, // from defaults
-					overloadProtectionLimit: 500 // from defaults
-				},
-				version: 1
-			});
+			expect(result.display.darkMode).toBe(true); // from stored data
+			expect(result.display.imageDisplayMode).toBe('fitOnPage'); // from defaults
+			expect(result.display.resizeImagesToFitOnPage).toBe(true); // from defaults
+			expect(result.display.resizeImagesToFullWidth).toBe(false); // from defaults
+			expect(result.display.resizeImagesToFillPage).toBe(false); // from defaults
+			expect(result.display.resizeImagesToThumbnails).toBe(false); // from defaults
+			expect(result.display.showImagesInViewer).toBe(true); // from defaults
+			expect(result.display.toggleBrokenImages).toBe(true); // from defaults
+
+			expect(result.behaviour.keepRecentFusks).toBe(false); // from stored data
+			expect(result.behaviour.openInForeground).toBe(false); // from stored data
+			expect(result.behaviour.recentFusks).toEqual([]); // from defaults
+			expect(result.behaviour.galleryHistory.entries).toEqual([]);
+			expect(result.behaviour.galleryHistory.maxEntries).toBe(10);
+
+			expect(result.safety.enableOverloadProtection).toBe(true); // from defaults
+			expect(result.safety.overloadProtectionLimit).toBe(50); // from defaults
+			expect(result.version).toBe(1);
 		});
 
 		it('should handle chrome storage errors gracefully', async () => {
@@ -128,7 +121,7 @@ describe('ChromeService', () => {
 
 	describe('setStorageData', () => {
 		it('should save data to chrome storage', async () => {
-			const testData: ChromeStorageData = {
+			const testData = new ChromeStorageData({
 				display: {
 					darkMode: true,
 					imageDisplayMode: 'fitOnPage',
@@ -142,14 +135,18 @@ describe('ChromeService', () => {
 				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: true,
-					recentFusks: []
+					recentFusks: [],
+					galleryHistory: {
+						entries: [],
+						maxEntries: 10
+					}
 				},
 				safety: {
 					enableOverloadProtection: true,
 					overloadProtectionLimit: 500
 				},
 				version: 1
-			};
+			});
 
 			mockChrome.storage.sync.set.and.callFake((_data: any, callback: any) => {
 				callback();
@@ -161,7 +158,7 @@ describe('ChromeService', () => {
 		});
 
 		it('should handle storage errors when saving', async () => {
-			const testData: ChromeStorageData = {
+			const testData = new ChromeStorageData({
 				display: {
 					darkMode: true,
 					imageDisplayMode: 'fitOnPage',
@@ -175,14 +172,18 @@ describe('ChromeService', () => {
 				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: true,
-					recentFusks: []
+					recentFusks: [],
+					galleryHistory: {
+						entries: [],
+						maxEntries: 10
+					}
 				},
 				safety: {
 					enableOverloadProtection: true,
 					overloadProtectionLimit: 500
 				},
 				version: 1
-			};
+			});
 
 			mockChrome.storage.sync.set.and.callFake((_data: any, _callback: any) => {
 				throw new Error('Storage save error');

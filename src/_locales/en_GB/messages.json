@@ -56,8 +56,71 @@
 	"Application_ContextMenu_Options": {
 		"message": "Options"
 	},
+	"Application_ContextMenu_History": {
+		"message": "History"
+	},
 	"Application_ContextMenu_Saved": {
 		"message": "Saved"
+	},
+	"History_Loading": {
+		"message": "Loading history...",
+		"description": "Loading message displayed while history is being fetched"
+	},
+	"History_NoEntries": {
+		"message": "No History Entries",
+		"description": "Title displayed when history is empty"
+	},
+	"History_NoEntriesText": {
+		"message": "You haven't created any galleries yet. Click the 'New Gallery' button above to get started!",
+		"description": "Explanatory text displayed when history is empty"
+	},
+	"History_CreateFirst": {
+		"message": "Create Your First Gallery",
+		"description": "Button text for creating first gallery when history is empty"
+	},
+	"History_TotalEntries": {
+		"message": "entries",
+		"description": "Label for total number of history entries"
+	},
+	"History_Title": {
+		"message": "Gallery History",
+		"description": "Page title for history page"
+	},
+	"History_NewGallery": {
+		"message": "New Gallery",
+		"description": "Button text for creating a new gallery"
+	},
+	"History_ClearAll": {
+		"message": "Clear All",
+		"description": "Button text for clearing all history"
+	},
+	"History_OpenInNewTab": {
+		"message": "Open in New Tab",
+		"description": "Button title for opening gallery in new tab"
+	},
+	"History_RemoveEntry": {
+		"message": "Remove from History",
+		"description": "Button title for removing entry from history"
+	},
+	"History_TotalImages": {
+		"message": "Total Images",
+		"description": "Label for total number of images in gallery"
+	},
+	"History_LoadedImages": {
+		"message": "Loaded Successfully",
+		"description": "Label for successfully loaded images"
+	},
+	"History_BrokenImages": {
+		"message": "Failed to Load",
+		"description": "Label for images that failed to load"
+	},
+	"History_SuccessRate": {
+		"message": "Success Rate",
+		"description": "Label for image loading success rate"
+	},
+	"History_DisplayMode": {
+		"message": "Display Mode",
+		"description": "Label for gallery display mode"
 	},
 	"Application_Prompt_PleaseEnterTheUrl": {
 		"message": "Please enter the url:"
@@ -221,6 +284,10 @@
 	"Gallery_Title": {
 		"message": "Fuskr Gallery",
 		"description": "Main title of the gallery page"
+	},
+	"Gallery_ViewHistory": {
+		"message": "View Gallery History",
+		"description": "Button text to view gallery history"
 	},
 	"Gallery_SwitchToLightMode": {
 		"message": "Switch to Light Mode",

@@ -32,6 +32,12 @@
 			"@components/*": [
 				"src/app/components/*"
 			],
+			"@interfaces/*": [
+				"src/app/interfaces/*"
+			],
+			"@models/*": [
+				"src/app/models/*"
+			],
 			"@services/*": [
 				"src/app/services/*"
 			],

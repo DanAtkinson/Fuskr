@@ -2,10 +2,12 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { GalleryComponent } from '@components/gallery.component';
 import { OptionsComponent } from '@components/options.component';
+import { HistoryComponent } from '@components/history.component';
 
 const routes: Routes = [
 	{ path: 'gallery', component: GalleryComponent },
 	{ path: 'options', component: OptionsComponent },
+	{ path: 'history', component: HistoryComponent },
 	{ path: '', redirectTo: '/gallery', pathMatch: 'full' },
 	{ path: '**', redirectTo: '/gallery' }
 ];

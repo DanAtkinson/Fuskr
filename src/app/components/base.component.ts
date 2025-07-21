@@ -9,12 +9,12 @@ import { ChromeService } from '@services/chrome.service';
 	standalone: false
 })
 export abstract class BaseComponent {
-	protected chromeService = inject(ChromeService);
-
 	/**
 	 * Get translated message from chrome.i18n
 	 */
 	translate(key: string, substitutions?: string[]): string {
 		return this.chromeService.getMessage(key, substitutions);
 	}
+
+	protected chromeService = inject(ChromeService);
 }

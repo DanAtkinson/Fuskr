@@ -67,7 +67,25 @@ export class BaseComponentTestHelper {
 				'Gallery_DownloadSaving': 'Saving ZIP file...',
 				'Gallery_DownloadComplete': 'Download complete!',
 				'Gallery_DownloadFailed': 'Download failed',
-				'Gallery_ImageNotFound': 'Image not found'
+				'Gallery_ImageNotFound': 'Image not found',
+				'Gallery_ViewHistory': 'View Gallery History',
+				'History_Title': 'Gallery History',
+				'History_Description': 'Quick access to your previously generated galleries',
+				'History_NewGallery': 'New Gallery',
+				'History_ClearAll': 'Clear All',
+				'History_ConfirmClearAll': 'Are you sure you want to clear all gallery history? This action cannot be undone.',
+				'History_Empty': 'No galleries in history',
+				'History_EmptyDescription': 'Generated galleries will appear here for quick access',
+				'History_OpenGallery': 'Open Gallery',
+				'History_OpenInNewTab': 'Open in New Tab',
+				'History_RemoveEntry': 'Remove from History',
+				'History_TotalImages': 'Total Images',
+				'History_LoadedImages': 'Loaded Successfully',
+				'History_BrokenImages': 'Failed to Load',
+				'History_SuccessRate': 'Success Rate',
+				'History_DisplayMode': 'Display Mode',
+				'History_CreatedOn': 'Created',
+				'ContextMenu_History': 'History'
 			};
 			return translations[key] || key;
 		});

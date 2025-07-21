@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ChromeStorageData } from '@services/chrome.service';
+import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
+import { ChromeStorageData } from '../models/chrome-storage.model';
 import { LoggerService, LogLevel } from '@services/logger.service';
 import { BaseComponent } from './base.component';
 
@@ -10,42 +11,32 @@ import { BaseComponent } from './base.component';
 	templateUrl: './options.component.html',
 })
 export class OptionsComponent extends BaseComponent implements OnInit {
-	options: ChromeStorageData = {
-		version: 1,
-		display: {
-			darkMode: false,
-			imageDisplayMode: 'fitOnPage',
-			resizeImagesToFitOnPage: true,
-			resizeImagesToFullWidth: false,
-			resizeImagesToFillPage: false,
-			resizeImagesToThumbnails: false,
-			showImagesInViewer: true,
-			toggleBrokenImages: true,
-		},
-		behaviour: {
-			keepRecentFusks: true,
-			openInForeground: true,
-			recentFusks: [],
-		},
-		safety: {
-			enableOverloadProtection: true,
-			overloadProtectionLimit: 50,
-		}
-	};
-
-	statusMessage = '';
-
-	// Debug/logging properties
-	showDebugPanel = false;
+	// Public properties (alphabetically)
 	loggerConfig: any = {};
+	options: ChromeStorageData = new ChromeStorageData();
+	showDebugPanel: boolean = false;
+	statusMessage: string = '';
 
 	constructor(private logger: LoggerService) {
 		super();
 	}
 
-	async ngOnInit() {
-		await this.loadOptions();
+	// Public methods (alphabetically)
+	clearLogs() {
+		this.logger.clearLogs();
 		this.loggerConfig = this.logger.getConfig();
+		this.logger.info('options.debugPanel.cleared', 'User cleared debug logs');
+		this.showStatus('Debug logs cleared!');
+	}
+
+	exportLogs() {
+		this.logger.exportLogs();
+		this.logger.info('options.debugPanel.exported', 'User exported debug logs');
+		this.showStatus('Debug logs exported!');
+	}
+
+	getLogLevelName(level: number): string {
+		return LogLevel[level] || 'Unknown';
 	}
 
 	async loadOptions() {
@@ -59,6 +50,16 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		}
 	}
 
+	async ngOnInit() {
+		await this.loadOptions();
+		this.loggerConfig = this.logger.getConfig();
+	}
+
+	onDarkModeChange() {
+		// Apply dark mode change immediately
+		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
+	}
+
 	async saveOptions() {
 		try {
 			await this.chromeService.setStorageData(this.options);
@@ -70,19 +71,6 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		}
 	}
 
-	private showStatus(message: string) {
-		this.statusMessage = message;
-		setTimeout(() => {
-			this.statusMessage = '';
-		}, 2000);
-	}
-
-	onDarkModeChange() {
-		// Apply dark mode change immediately
-		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
-	}
-
-	// Debug/logging methods
 	toggleDebugPanel() {
 		this.showDebugPanel = !this.showDebugPanel;
 		this.logger.debug('options.debugPanel.toggled', `Panel visibility: ${this.showDebugPanel}`);
@@ -91,20 +79,11 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		}
 	}
 
-	exportLogs() {
-		this.logger.exportLogs();
-		this.logger.info('options.debugPanel.exported', 'User exported debug logs');
-		this.showStatus('Debug logs exported!');
-	}
-
-	clearLogs() {
-		this.logger.clearLogs();
-		this.loggerConfig = this.logger.getConfig();
-		this.logger.info('options.debugPanel.cleared', 'User cleared debug logs');
-		this.showStatus('Debug logs cleared!');
-	}
-
-	getLogLevelName(level: number): string {
-		return LogLevel[level] || 'Unknown';
+	// Private methods (alphabetically)
+	private showStatus(message: string) {
+		this.statusMessage = message;
+		setTimeout(() => {
+			this.statusMessage = '';
+		}, 2000);
 	}
 }

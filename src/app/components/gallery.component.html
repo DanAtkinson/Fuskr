@@ -4,6 +4,14 @@
 			<h1>{{ translate('Gallery_Title') }}</h1>
 			<div class="header-controls">
 				<button
+					class="btn btn-lg btn-outline-secondary"
+					type="button"
+					(click)="navigateToHistory()"
+					[title]="translate('Gallery_ViewHistory')"
+					>
+					<i class="fas fa-history"></i>
+				</button>
+				<button
 					class="btn btn-lg btn-outline-secondary theme-toggle"
 					type="button"
 					(click)="toggleDarkMode()"

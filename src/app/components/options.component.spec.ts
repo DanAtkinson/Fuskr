@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { OptionsComponent } from './options.component';
-import { ChromeService, ChromeStorageData } from '@services/chrome.service';
+import { ChromeService } from '@services/chrome.service';
+import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
+import { ChromeStorageData } from '../models/chrome-storage.model';
 import { BaseComponentTestHelper } from './base-component-test.helper';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
@@ -77,32 +79,28 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should initialise with default options', () => {
-			expect(component.options).toEqual({
-				display: {
-					darkMode: false,
-					imageDisplayMode: 'fitOnPage',
-					resizeImagesToFillPage: false,
-					resizeImagesToFitOnPage: true,
-					resizeImagesToFullWidth: false,
-					resizeImagesToThumbnails: false,
-					showImagesInViewer: true,
-					toggleBrokenImages: true
-				},
-				behaviour: {
-					keepRecentFusks: true,
-					openInForeground: true,
-					recentFusks: []
-				},
-				safety: {
-					enableOverloadProtection: true,
-					overloadProtectionLimit: 50
-				},
-				version: 1
-			});
+			expect(component.options.display.darkMode).toBe(false);
+			expect(component.options.display.imageDisplayMode).toBe('fitOnPage');
+			expect(component.options.display.resizeImagesToFillPage).toBe(false);
+			expect(component.options.display.resizeImagesToFitOnPage).toBe(true);
+			expect(component.options.display.resizeImagesToFullWidth).toBe(false);
+			expect(component.options.display.resizeImagesToThumbnails).toBe(false);
+			expect(component.options.display.showImagesInViewer).toBe(true);
+			expect(component.options.display.toggleBrokenImages).toBe(true);
+
+			expect(component.options.behaviour.keepRecentFusks).toBe(true);
+			expect(component.options.behaviour.openInForeground).toBe(true);
+			expect(component.options.behaviour.recentFusks).toEqual([]);
+			expect(component.options.behaviour.galleryHistory.entries).toEqual([]);
+			expect(component.options.behaviour.galleryHistory.maxEntries).toBe(10);
+
+			expect(component.options.safety.enableOverloadProtection).toBe(true);
+			expect(component.options.safety.overloadProtectionLimit).toBe(50);
+			expect(component.options.version).toBe(1);
 		});
 
 		it('should load options on init', async () => {
-			const testOptions: ChromeStorageData = {
+			const testOptions = new ChromeStorageData({
 				display: {
 					darkMode: true,
 					imageDisplayMode: 'fullWidth',
@@ -116,21 +114,42 @@ describe('OptionsComponent', () => {
 				behaviour: {
 					keepRecentFusks: false,
 					openInForeground: false,
-					recentFusks: []
+					recentFusks: [],
+					galleryHistory: {
+						entries: [],
+						maxEntries: 10
+					}
 				},
 				safety: {
 					enableOverloadProtection: true,
 					overloadProtectionLimit: 50
 				},
 				version: 1
-			};
+			});
 
 			mockChromeService.getStorageData.and.returnValue(Promise.resolve(testOptions));
 
 			await component.ngOnInit();
 
 			expect(mockChromeService.getStorageData).toHaveBeenCalled();
-			expect(component.options).toEqual(testOptions);
+			expect(component.options.display.darkMode).toBe(testOptions.display.darkMode);
+			expect(component.options.display.imageDisplayMode).toBe(testOptions.display.imageDisplayMode);
+			expect(component.options.display.resizeImagesToFillPage).toBe(testOptions.display.resizeImagesToFillPage);
+			expect(component.options.display.resizeImagesToFitOnPage).toBe(testOptions.display.resizeImagesToFitOnPage);
+			expect(component.options.display.resizeImagesToFullWidth).toBe(testOptions.display.resizeImagesToFullWidth);
+			expect(component.options.display.resizeImagesToThumbnails).toBe(testOptions.display.resizeImagesToThumbnails);
+			expect(component.options.display.showImagesInViewer).toBe(testOptions.display.showImagesInViewer);
+			expect(component.options.display.toggleBrokenImages).toBe(testOptions.display.toggleBrokenImages);
+
+			expect(component.options.behaviour.keepRecentFusks).toBe(testOptions.behaviour.keepRecentFusks);
+			expect(component.options.behaviour.openInForeground).toBe(testOptions.behaviour.openInForeground);
+			expect(component.options.behaviour.recentFusks).toEqual(testOptions.behaviour.recentFusks);
+			expect(component.options.behaviour.galleryHistory.entries).toEqual(testOptions.behaviour.galleryHistory.entries);
+			expect(component.options.behaviour.galleryHistory.maxEntries).toBe(testOptions.behaviour.galleryHistory.maxEntries);
+
+			expect(component.options.safety.enableOverloadProtection).toBe(testOptions.safety.enableOverloadProtection);
+			expect(component.options.safety.overloadProtectionLimit).toBe(testOptions.safety.overloadProtectionLimit);
+			expect(component.options.version).toBe(testOptions.version);
 		});
 
 		it('should handle errors when loading options', async () => {
