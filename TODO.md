@@ -1,7 +1,6 @@
 # TODO
 
 ## 🎯 High Priority Features
-* **Create a history page** - Contains previous results along with the number of urls generated, loaded, and broken. The current data structure doesn't have those numbers currently however. The user should be able to click a button which will open that gallery in a new tab.
 * **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
 
 ## 🚀 Enhanced Features
