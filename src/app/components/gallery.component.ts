@@ -80,7 +80,25 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	async downloadAll() {
-		if (this.imageUrls.length === 0) return;
+		// Use mediaItems if available, otherwise fall back to imageUrls for backward compatibility
+		const totalItems = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
+		if (totalItems === 0) return;
+
+		// Prompt user for zip filename with timestamp default
+		const defaultFilename = this.generateZipFilename();
+		const zipFilename = prompt(
+			this.translate('Gallery_DownloadPromptFilename'),
+			defaultFilename
+		);
+
+		// User cancelled the prompt
+		if (zipFilename === null) {
+			this.logger.info('gallery.download.cancelled', 'User cancelled download');
+			return;
+		}
+
+		// Ensure filename has .zip extension
+		const finalFilename = zipFilename.endsWith('.zip') ? zipFilename : `${zipFilename}.zip`;
 
 		this.isDownloading = true;
 		this.downloadProgress = 0;
@@ -88,31 +106,43 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		try {
 			const zip = new JSZip();
-			const validImages = this.getValidImageUrls();
+			const validMediaItems = this.getValidMediaItems();
 
-			if (validImages.length === 0) {
+			if (validMediaItems.length === 0) {
 				this.downloadStatus = this.translate('Gallery_DownloadNoImages');
 				this.isDownloading = false;
 				return;
 			}
 
-			this.downloadStatus = this.translate('Gallery_DownloadingImages', [validImages.length.toString()]);
+			const imageCount = validMediaItems.filter(item => item.type === 'image').length;
+			const videoCount = validMediaItems.filter(item => item.type === 'video').length;
+			
+			this.downloadStatus = this.translate('Gallery_DownloadingMedia', [
+				validMediaItems.length.toString(),
+				imageCount.toString(),
+				videoCount.toString()
+			]);
 
-			// Download all images and add to ZIP
-			for (let i = 0; i < validImages.length; i++) {
-				const url = validImages[i];
-				const filename = this.getFilename(url);
+			// Download all media items and add to ZIP
+			for (let i = 0; i < validMediaItems.length; i++) {
+				const mediaItem = validMediaItems[i];
+				const filename = this.getFilename(mediaItem.url);
 
 				try {
-					this.downloadStatus = this.translate('Gallery_DownloadingImage', [filename, (i + 1).toString(), validImages.length.toString()]);
-					this.downloadProgress = Math.round((i / validImages.length) * 70); // Reserve 30% for ZIP generation and metadata
+					this.downloadStatus = this.translate('Gallery_DownloadingItem', [
+						filename, 
+						(i + 1).toString(), 
+						validMediaItems.length.toString(),
+						mediaItem.type
+					]);
+					this.downloadProgress = Math.round((i / validMediaItems.length) * 70); // Reserve 30% for ZIP generation and metadata
 
-					const imageBlob = await this.fetchImageAsBlob(url);
-					zip.file(filename, imageBlob);
+					const mediaBlob = await this.fetchMediaAsBlob(mediaItem.url);
+					zip.file(filename, mediaBlob);
 
 				} catch (error) {
 					this.logger.warn('gallery.download.failed', `Failed to download ${filename}`, error);
-					// Continue with other images
+					// Continue with other media items
 				}
 			}
 
@@ -120,7 +150,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.downloadProgress = 75;
 
 			// Add Fuskr.txt metadata file
-			const metadataContent = this.generateMetadataContent(validImages);
+			const metadataContent = this.generateMetadataContent(validMediaItems);
 			zip.file('Fuskr.txt', metadataContent);
 
 			this.downloadStatus = this.translate('Gallery_DownloadCreatingZip');
@@ -137,11 +167,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.downloadProgress = 95;
 
 			// Save the ZIP file
-			const zipFilename = this.generateZipFilename();
-			saveAs(zipBlob, zipFilename);
+			saveAs(zipBlob, finalFilename);
 
 			this.downloadStatus = this.translate('Gallery_DownloadComplete');
 			this.downloadProgress = 100;
+
+			this.logger.info('gallery.download.success', 'ZIP download completed successfully', {
+				filename: finalFilename,
+				totalItems: validMediaItems.length,
+				imageCount,
+				videoCount
+			});
 
 			// Reset status after 3 seconds
 			setTimeout(() => {
@@ -516,10 +552,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode });
 	}
 
-	private async fetchImageAsBlob(url: string): Promise<Blob> {
+	private async fetchMediaAsBlob(url: string): Promise<Blob> {
 		const response = await fetch(url);
 		if (!response.ok) {
-			throw new Error(`Failed to fetch image: ${response.statusText}`);
+			throw new Error(`Failed to fetch media: ${response.statusText}`);
 		}
 		return response.blob();
 	}
@@ -532,24 +568,27 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 	}
 
-	private generateMetadataContent(imageUrls: string[]): string {
+	private generateMetadataContent(mediaItems: MediaItem[]): string {
 		const lines: string[] = [
-			'These images were downloaded using Fuskr.',
+			'These media files were downloaded using Fuskr.',
 			'',
 			`Fusk Url: ${this.originalUrl || 'Unknown'}`,
 			'',
-			'Urls:'
+			'Media Files:'
 		];
 
-		// Add each image URL on a separate line
-		imageUrls.forEach(url => {
-			lines.push(url);
+		// Add each media item with type information
+		mediaItems.forEach(item => {
+			lines.push(`${item.type.toUpperCase()}: ${item.url}`);
 		});
 
-		// Add download timestamp
+		// Add download timestamp and statistics
 		lines.push('');
 		lines.push(`Downloaded: ${new Date().toISOString()}`);
-		lines.push(`Total Images: ${imageUrls.length}`);
+		lines.push(`Total Media Files: ${mediaItems.length}`);
+		lines.push(`Images: ${mediaItems.filter((item: MediaItem) => item.type === 'image').length}`);
+		lines.push(`Videos: ${mediaItems.filter((item: MediaItem) => item.type === 'video').length}`);
+		lines.push(`Unknown: ${mediaItems.filter((item: MediaItem) => item.type === 'unknown').length}`);
 
 		return lines.join('\n');
 	}
@@ -557,6 +596,46 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private generateZipFilename(): string {
 		// Generate a filename based on the original URL or current date
 		return `fuskr-gallery-${new Date().toISOString()}.zip`;
+	}
+
+	private getValidMediaItems(): MediaItem[] {
+		// If we have mediaItems, filter them based on loaded state and DOM validation
+		if (this.mediaItems.length > 0) {
+			return this.mediaItems.filter(item => {
+				// Only include items that are successfully loaded
+				if (item.loadingState !== 'loaded') {
+					return false;
+				}
+
+				// Additional DOM validation to ensure the media is actually displayed and loaded
+				if (item.type === 'image') {
+					const imgElement = document.querySelector(`img[src="${item.url}"]`) as HTMLImageElement;
+					return imgElement && 
+						   imgElement.complete && 
+						   imgElement.naturalHeight !== 0 && 
+						   !imgElement.classList.contains('error') &&
+						   this.isValidMediaUrl(item.url);
+				} else if (item.type === 'video') {
+					const videoElement = document.querySelector(`video[src="${item.url}"]`) as HTMLVideoElement;
+					return videoElement && 
+						   videoElement.readyState >= 2 && 
+						   !videoElement.classList.contains('error') &&
+						   this.isValidMediaUrl(item.url);
+				}
+
+				// For unknown types, just check if the URL is valid
+				return this.isValidMediaUrl(item.url);
+			});
+		}
+
+		// Fallback to the old method for backward compatibility
+		const validUrls = this.getValidImageUrls();
+		return validUrls.map(url => ({
+			url,
+			type: 'unknown' as const,
+			mimeType: 'application/octet-stream',
+			loadingState: 'loaded' as const
+		}));
 	}
 
 	private getValidImageUrls(): string[] {

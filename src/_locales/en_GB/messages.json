@@ -561,6 +561,18 @@
 		"message": "Download failed. Please try again.",
 		"description": "Error message when download fails"
 	},
+	"Gallery_DownloadPromptFilename": {
+		"message": "Enter filename for the ZIP archive:",
+		"description": "Prompt message for entering ZIP filename"
+	},
+	"Gallery_DownloadingMedia": {
+		"message": "Downloading $1 media items ($2 images, $3 videos)...",
+		"description": "Status message when downloading mixed media (images and videos)"
+	},
+	"Gallery_DownloadingItem": {
+		"message": "Downloading $1 ($2/$3/$4)...",
+		"description": "Status message when downloading individual media item with progress and type"
+	},
 	"Gallery_ImageNotFound": {
 		"message": "Image not found",
 		"description": "Alt text and placeholder text for broken images"
