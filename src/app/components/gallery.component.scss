@@ -88,6 +88,17 @@
 		color: var(--text-color);
 		border-radius: 15px;
 		font-size: 14px;
+
+		&.keyboard-hint {
+			background-color: var(--primary-color, #0d6efd);
+			color: white;
+			font-size: 12px;
+			opacity: 0.9;
+			
+			i {
+				font-size: 10px;
+			}
+		}
 	}
 }
 
@@ -426,6 +437,20 @@
 				border: none !important;
 				background-color: transparent !important;
 			}
+		}
+	}
+
+	// Keyboard navigation focus styles
+	.image-item.keyboard-focused {
+		outline: 3px solid var(--primary-color, #0d6efd);
+		outline-offset: 2px;
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-hover), 0 0 0 3px rgba(13, 110, 253, 0.3);
+		z-index: 10;
+		position: relative;
+
+		.image-overlay {
+			opacity: 1;
 		}
 	}
 

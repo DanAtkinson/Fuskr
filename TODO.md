@@ -1,7 +1,6 @@
 # TODO
 
 ## 🎯 High Priority Features
-* When the focus is not on a form element, allow up/left or down/right keyboard to choose which image to scroll to.
 * **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
 
 ## 🚀 Enhanced Features

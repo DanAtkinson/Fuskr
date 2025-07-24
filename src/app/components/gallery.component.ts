@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuskrService } from '@services/fuskr.service';
 import { LoggerService } from '@services/logger.service';
@@ -19,6 +19,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	brokenImages: number = 0;
 	currentViewerImage: string = '';
 	currentViewerIndex: number = 0;
+	currentGalleryIndex: number = -1; // For keyboard navigation in main gallery
 	darkMode: boolean = false;
 	downloadProgress: number = 0;
 	downloadStatus: string = '';
@@ -522,7 +523,191 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.showUrlList = !this.showUrlList;
 	}
 
+	// Keyboard navigation methods
+	@HostListener('document:keydown', ['$event'])
+	handleKeyboardEvent(event: KeyboardEvent) {
+		// Don't handle if focus is on a form element
+		if (this.isFormElementFocused()) {
+			return;
+		}
+
+		// Handle modal viewer navigation
+		if (this.showImageViewer && this.mediaItems.length > 0) {
+			switch (event.key) {
+				case 'ArrowLeft':
+				case 'ArrowUp':
+					event.preventDefault();
+					this.previousImage();
+					break;
+				case 'ArrowRight':
+				case 'ArrowDown':
+					event.preventDefault();
+					this.nextImage();
+					break;
+				case 'Escape':
+					event.preventDefault();
+					this.closeImageViewer();
+					break;
+				case 'Home':
+					event.preventDefault();
+					this.goToFirstImageInViewer();
+					break;
+				case 'End':
+					event.preventDefault();
+					this.goToLastImageInViewer();
+					break;
+			}
+			return;
+		}
+
+		// Handle main gallery navigation
+		if (this.mediaItems.length === 0) {
+			return;
+		}
+
+		switch (event.key) {
+			case 'ArrowUp':
+			case 'ArrowLeft':
+				event.preventDefault();
+				this.navigateToPreviousImage();
+				break;
+			case 'ArrowDown':
+			case 'ArrowRight':
+				event.preventDefault();
+				this.navigateToNextImage();
+				break;
+			case 'Enter':
+			case ' ': // Spacebar
+				event.preventDefault();
+				this.openCurrentImage();
+				break;
+			case 'Home':
+				event.preventDefault();
+				this.navigateToFirstImage();
+				break;
+			case 'End':
+				event.preventDefault();
+				this.navigateToLastImage();
+				break;
+		}
+	}
+
+	private isFormElementFocused(): boolean {
+		const activeElement = document.activeElement;
+		if (!activeElement) return false;
+
+		const formElements = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
+		return formElements.includes(activeElement.tagName) || 
+			   activeElement.hasAttribute('contenteditable');
+	}
+
+	private navigateToNextImage() {
+		if (this.currentGalleryIndex < this.mediaItems.length - 1) {
+			this.currentGalleryIndex++;
+		} else {
+			this.currentGalleryIndex = 0; // Wrap to first image
+		}
+		this.scrollToCurrentImage();
+		this.highlightCurrentImage();
+	}
+
+	private navigateToPreviousImage() {
+		if (this.currentGalleryIndex > 0) {
+			this.currentGalleryIndex--;
+		} else {
+			this.currentGalleryIndex = this.mediaItems.length - 1; // Wrap to last image
+		}
+		this.scrollToCurrentImage();
+		this.highlightCurrentImage();
+	}
+
+	private navigateToFirstImage() {
+		this.currentGalleryIndex = 0;
+		this.scrollToCurrentImage();
+		this.highlightCurrentImage();
+	}
+
+	private navigateToLastImage() {
+		this.currentGalleryIndex = this.mediaItems.length - 1;
+		this.scrollToCurrentImage();
+		this.highlightCurrentImage();
+	}
+
+	private openCurrentImage() {
+		if (this.currentGalleryIndex >= 0 && this.currentGalleryIndex < this.mediaItems.length) {
+			const mediaItem = this.mediaItems[this.currentGalleryIndex];
+			this.openImageViewer(mediaItem.url, this.currentGalleryIndex);
+		}
+	}
+
+	private goToFirstImageInViewer() {
+		this.currentViewerIndex = 0;
+		if (this.mediaItems.length > 0) {
+			this.currentViewerImage = this.mediaItems[0].url;
+			this.currentMediaItem = this.mediaItems[0];
+		} else if (this.imageUrls.length > 0) {
+			this.currentViewerImage = this.imageUrls[0];
+			this.currentMediaItem = null;
+		}
+	}
+
+	private goToLastImageInViewer() {
+		const lastIndex = this.mediaItems.length > 0 ? this.mediaItems.length - 1 : this.imageUrls.length - 1;
+		this.currentViewerIndex = lastIndex;
+		if (this.mediaItems.length > 0) {
+			this.currentViewerImage = this.mediaItems[lastIndex].url;
+			this.currentMediaItem = this.mediaItems[lastIndex];
+		} else if (this.imageUrls.length > 0) {
+			this.currentViewerImage = this.imageUrls[lastIndex];
+			this.currentMediaItem = null;
+		}
+	}
+
+	private scrollToCurrentImage() {
+		if (this.currentGalleryIndex < 0) return;
+
+		// Find the image element by its index
+		const imageElements = document.querySelectorAll('.image-item');
+		const targetElement = imageElements[this.currentGalleryIndex] as HTMLElement;
+		
+		if (targetElement) {
+			// Scroll the element into view with smooth behavior
+			targetElement.scrollIntoView({
+				behavior: 'smooth',
+				block: 'center',
+				inline: 'center'
+			});
+		}
+	}
+
+	private highlightCurrentImage() {
+		// Remove previous highlights
+		document.querySelectorAll('.image-item.keyboard-focused').forEach(el => {
+			el.classList.remove('keyboard-focused');
+		});
+
+		// Add highlight to current image
+		if (this.currentGalleryIndex >= 0) {
+			const imageElements = document.querySelectorAll('.image-item');
+			const targetElement = imageElements[this.currentGalleryIndex];
+			if (targetElement) {
+				targetElement.classList.add('keyboard-focused');
+			}
+		}
+	}
+
 	// Private methods (alphabetically)
+	private initializeKeyboardNavigation() {
+		// Set initial focus to first image if gallery has items
+		if (this.mediaItems.length > 0) {
+			this.currentGalleryIndex = 0;
+			// Small delay to ensure DOM is updated
+			setTimeout(() => {
+				this.highlightCurrentImage();
+			}, 100);
+		}
+	}
+
 	private addToHistory() {
 		// Add gallery to history after images have had time to load
 		setTimeout(async () => {
@@ -734,6 +919,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 				// Update computed properties
 				this.updateAllUrlsText();
+
+				// Initialize keyboard navigation
+				this.initializeKeyboardNavigation();
 			}
 
 			// Do a final count after images have had time to load

@@ -573,6 +573,14 @@
 		"message": "Downloading $1 ($2/$3/$4)...",
 		"description": "Status message when downloading individual media item with progress and type"
 	},
+	"Gallery_KeyboardShortcuts": {
+		"message": "Keyboard Shortcuts",
+		"description": "Header for keyboard shortcuts help section"
+	},
+	"Gallery_KeyboardNavigation": {
+		"message": "Use arrow keys to navigate, Enter/Space to open, Home/End to jump",
+		"description": "Description of keyboard navigation controls"
+	},
 	"Gallery_ImageNotFound": {
 		"message": "Image not found",
 		"description": "Alt text and placeholder text for broken images"
