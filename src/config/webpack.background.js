@@ -2,10 +2,19 @@ const path = require('path');
 
 module.exports = {
 	mode: 'production',
-	entry: './src/background.ts',
+	entry: {
+		background: './src/background.ts',
+		'fuskr-core': './src/fuskr-core.ts'
+	},
 	output: {
 		path: path.resolve(__dirname, 'dist/chromium'),
-		filename: 'background.js',
+		filename: '[name].js',
+		library: {
+			name: 'FuskrCore',
+			type: 'umd',
+			umdNamedDefine: true
+		},
+		globalObject: 'this'
 	},
 	resolve: {
 		extensions: ['.ts', '.js'],

@@ -7,17 +7,17 @@
 		"build": "npm run clean && npm run test:ci && npm run build:extensions",
 		"build:extensions": "npm run build:angular && npm run build:background && npm run copy:files && npm run organise:builds && npm run zip:builds",
 		"build:angular": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" ng build --configuration production && ng build --configuration production --output-path=dist/firefox",
-		"build:background": "webpack --config webpack.background.js",
+		"build:background": "webpack --config src/config/webpack.background.js",
 		"clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', {recursive: true, force: true})\"",
-		"copy:files": "node -e \"const fs = require('fs'); fs.copyFileSync('src/fuskr-core.js', 'dist/chromium/fuskr-core.js'); fs.copyFileSync('src/fuskr-core.js', 'dist/firefox/fuskr-core.js'); fs.cpSync('src/_locales', 'dist/chromium/_locales', {recursive: true}); fs.cpSync('src/_locales', 'dist/firefox/_locales', {recursive: true}); fs.copyFileSync('src/manifest-firefox.json', 'dist/firefox/manifest.json')\"",
+		"copy:files": "node -e \"const fs = require('fs'); fs.cpSync('src/_locales', 'dist/chromium/_locales', {recursive: true}); fs.cpSync('src/_locales', 'dist/firefox/_locales', {recursive: true}); fs.copyFileSync('src/manifest-firefox.json', 'dist/firefox/manifest.json'); fs.copyFileSync('dist/chromium/fuskr-core.js', 'dist/firefox/fuskr-core.js')\"",
 		"ng": "ng",
-		"organise:builds": "node scripts/organise-build.js dist/chromium && node scripts/organise-build.js dist/firefox",
+		"organise:builds": "node src/build/organise-build.js dist/chromium && node src/build/organise-build.js dist/firefox",
 		"start": "ng serve",
 		"test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
 		"test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
 		"test": "ng test",
 		"watch": "ng build --watch --configuration development",
-		"zip:builds": "node scripts/zip-build.js dist/chromium dist/fuskr-chromium.zip && node scripts/zip-build.js dist/firefox dist/fuskr-firefox.zip"
+		"zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip"
 	},
 	"dependencies": {
 		"@angular/animations": "^20.1.2",
