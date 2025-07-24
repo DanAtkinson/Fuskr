@@ -1,0 +1,614 @@
+{
+	"ManifestName": {
+		"message": "Fuskr",
+		"description": "The title of the application, displayed in the web store."
+	},
+	"ManifestDescription": {
+		"message": "Create photo galleries from a single image based on the image name.",
+		"description": "The description of the application, displayed in the web store."
+	},
+	"ManifestLanguage": {
+		"message": "en-GB",
+		"description": "The BCP-47 language code."
+	},
+	"Application_ContextMenu_Fusk": {
+		"message": "Fusk"
+	},
+	"Application_ContextMenu_10": {
+		"message": "10"
+	},
+	"Application_ContextMenu_20": {
+		"message": "20"
+	},
+	"Application_ContextMenu_50": {
+		"message": "50"
+	},
+	"Application_ContextMenu_100": {
+		"message": "100"
+	},
+	"Application_ContextMenu_200": {
+		"message": "200"
+	},
+	"Application_ContextMenu_500": {
+		"message": "500"
+	},
+	"Application_ContextMenu_Other": {
+		"message": "Other"
+	},
+	"Application_ContextMenu_Infinite": {
+		"message": "Infinite"
+	},
+	"Application_ContextMenu_CreateFromSelection": {
+		"message": "Create from selection"
+	},
+	"Application_ContextMenu_Manual": {
+		"message": "Manual"
+	},
+	"Application_ContextMenu_Help": {
+		"message": "Help"
+	},
+	"Application_ContextMenu_Recent": {
+		"message": "Recent"
+	},
+	"Application_ContextMenu_ClearRecentActivity": {
+		"message": "Clear recent activity"
+	},
+	"Application_ContextMenu_Options": {
+		"message": "Options"
+	},
+	"Application_ContextMenu_History": {
+		"message": "History"
+	},
+	"Application_ContextMenu_Saved": {
+		"message": "Saved"
+	},
+	"History_Loading": {
+		"message": "Loading history...",
+		"description": "Loading message displayed while history is being fetched"
+	},
+	"History_NoEntries": {
+		"message": "No History Entries",
+		"description": "Title displayed when history is empty"
+	},
+	"History_NoEntriesText": {
+		"message": "You haven't created any galleries yet. Click the 'New Gallery' button above to get started!",
+		"description": "Explanatory text displayed when history is empty"
+	},
+	"History_CreateFirst": {
+		"message": "Create Your First Gallery",
+		"description": "Button text for creating first gallery when history is empty"
+	},
+	"History_TotalEntries": {
+		"message": "entries",
+		"description": "Label for total number of history entries"
+	},
+	"History_Title": {
+		"message": "Gallery History",
+		"description": "Page title for history page"
+	},
+	"History_NewGallery": {
+		"message": "New Gallery",
+		"description": "Button text for creating a new gallery"
+	},
+	"History_ClearAll": {
+		"message": "Clear All",
+		"description": "Button text for clearing all history"
+	},
+	"History_OpenInNewTab": {
+		"message": "Open in New Tab",
+		"description": "Button title for opening gallery in new tab"
+	},
+	"History_RemoveEntry": {
+		"message": "Remove from History",
+		"description": "Button title for removing entry from history"
+	},
+	"History_TotalImages": {
+		"message": "Total Images",
+		"description": "Label for total number of images in gallery"
+	},
+	"History_LoadedImages": {
+		"message": "Loaded Successfully",
+		"description": "Label for successfully loaded images"
+	},
+	"History_BrokenImages": {
+		"message": "Failed to Load",
+		"description": "Label for images that failed to load"
+	},
+	"History_SuccessRate": {
+		"message": "Success Rate",
+		"description": "Label for image loading success rate"
+	},
+	"History_DisplayMode": {
+		"message": "Display Mode",
+		"description": "Label for gallery display mode"
+	},
+	"Application_Prompt_PleaseEnterTheUrl": {
+		"message": "Please enter the url:"
+	},
+	"Application_Prompt_HowMany": {
+		"message": "How many?:"
+	},
+	"Application_Prompt_NotAValidFusk": {
+		"message": "This is not a valid fusk - https://example.com/[1-8].jpg"
+	},
+	"Application_Prompt_NotAValidNumber": {
+		"message": "This is not a valid number."
+	},
+	"Images_Done": {
+		"message": "Done!"
+	},
+	"Images_Images": {
+		"message": "{} Images"
+	},
+	"Images_Loaded": {
+		"message": "{} Loaded"
+	},
+	"Images_Failed": {
+		"message": "{} Failed"
+	},
+	"Images_DownloadImage": {
+		"message": "Download Image"
+	},
+	"Images_SaveFusk": {
+		"message": "Save Fusk"
+	},
+	"Images_Top": {
+		"message": "Top"
+	},
+	"Images_Bottom": {
+		"message": "Bottom"
+	},
+	"Images_Resubmit": {
+		"message": "Resubmit"
+	},
+	"Images_ClickToOpenInNewTab": {
+		"message": "Click to open this image in a new tab"
+	},
+	"Images_ClickForNextPicture": {
+		"message": "Click image for next picture"
+	},
+	"Images_ResizeImagesToFullWidth": {
+		"message": "Resize images to full width"
+	},
+	"Images_ResizeImagesToFitOnPage": {
+		"message": "Resize images to fit on page"
+	},
+	"Images_ResizeImagesToFillPage": {
+		"message": "Resize images to fill the page"
+	},
+	"Images_ResizeImagesToThumbnails": {
+		"message": "Resize images to thumbnails"
+	},
+	"Images_GoToTop": {
+		"message": "Go to the top of the page"
+	},
+	"Images_GoToBottom": {
+		"message": "Go to the bottom of the page"
+	},
+	"Images_ShowImageUrls": {
+		"message": "Show generated urls"
+	},
+	"Images_ShowImagesInViewer": {
+		"message": "Show images in viewer"
+	},
+	"Images_ToggleBrokenImages": {
+		"message": "Toggle broken images"
+	},
+	"Images_RemoveBrokenImages": {
+		"message": "Remove broken images"
+	},
+	"Images_DownloadDialog_Title": {
+		"message": "Download Images"
+	},
+	"Images_DownloadDialog_Unique": {
+		"message": "Unique"
+	},
+	"Images_DownloadDialog_UniqueInfo": {
+		"message": "To avoid duplication, the filename will be appended with a number eg "
+	},
+	"Images_DownloadDialog_UniqueInfoFilename": {
+		"message": "filename1 (1).jpg"
+	},
+	"Images_DownloadDialog_Overwrite": {
+		"message": "Overwrite"
+	},
+	"Images_DownloadDialog_OverwriteInfo": {
+		"message": "The existing file will be overwritten with the new file."
+	},
+	"Images_DownloadDialog_Prompt": {
+		"message": "Prompt"
+	},
+	"Images_DownloadDialog_PromptInfo": {
+		"message": "You will be prompted to choose a filename."
+	},
+	"Images_DownloadDialog_ConflictQuestion": {
+		"message": "In case of a conflict of filenames, what do you want to do?"
+	},
+	"Images_SaveDialog_Title": {
+		"message": "Save Fusk"
+	},
+	"Images_SaveDialog_Question": {
+		"message": "What name do you wish to give this fusk (defaults to this url if empty)?"
+	},
+	"Options_Title": {
+		"message": "Fuskr Options"
+	},
+	"Options_Tab_Settings": {
+		"message": "Settings"
+	},
+	"Options_Tab_Foreground": {
+		"message": "Foreground"
+	},
+	"Options_Tab_History": {
+		"message": "History"
+	},
+	"Options_Tab_VersionHistory": {
+		"message": "Version History"
+	},
+	"Options_Tab_About": {
+		"message": "About Fuskr"
+	},
+	"Options_DarkMode": {
+		"message": "Show Fuskr with a dark background"
+	},
+	"Options_DarkMode_Description": {
+		"message": "Changes the background of image sets to a darker colour. Will take effect once you refresh pages."
+	},
+	"Options_OpenNewFusksInForeground": {
+		"message": "Open new fusks in the foreground"
+	},
+	"Options_OpenNewFusksInForeground_Description": {
+		"message": "When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead."
+	},
+	"Options_History_Keep": {
+		"message": "Keep a recent history of fusks"
+	},
+	"Options_History_Keep_Description": {
+		"message": "Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery."
+	},
+	"Options_History_Keep_Limit": {
+		"message": "<p class='bold'>Last <span class='totalFusks'></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>"
+	},
+	"Options_History_NoRecent" : {
+		"message": "There are currently no records of any galleries created. When you start using Fuskr, the gallery links will appear below!"
+	},
+	"Options_Credits_Title": {
+		"message": "Credits"
+	},
+	"Options_Credits_Description": {
+		"message": "<p>Fuskr (originally called ChromeFusk) was created in 2011 by <a href='https://twitter.com/danbo' title='Dan on Twitter'>Dan Atkinson</a> with oodles of help from <a href='https://bolsterweb.com' title='Jonathon Bolster'>Jonathon Bolster</a>.</p><p>The Fuskr logos were created by <a href='https://twitter.com/richardstelmach' title='Richard on Twitter'>Richard Stelmach</a> of <a href='http://www.creativebinge.co.uk' title='Creative Binge'>Creative Binge</a>.</p>"
+	},
+	"Options_About_Description": {
+		"message": "<p>Fuskr was borne of a frustation that my favourite Firefox plugin <a href='https://addons.mozilla.org/en-US/firefox/addon/2087/' title='Firefusk on Mozilla Addons'>Firefusk</a> (dead link) created by <a href='http://jonathansoma.com/' title='Jonathan Soma'>Jonathan Soma</a> was not available for Chrome.</p><p>Once I had stopped crying, I remembered that I was a developer and could do almost anything if I put my mind to it.</p><p><i>Then</i>, I remembered that I was actually a pretty rubbish developer and asked for help from <a href='https://bolsterweb.com' title='Jonathon Bolster'>Jonathon Bolster</a>.</p><p>Jonathon gratefully helped and actually rewrote pretty much all of the code for Fuskr to make it so damned extensible and also provided lots of unit tests for it.</p>"
+	},
+	"Gallery_Title": {
+		"message": "Fuskr Gallery",
+		"description": "Main title of the gallery page"
+	},
+	"Gallery_ViewHistory": {
+		"message": "View Gallery History",
+		"description": "Button text to view gallery history"
+	},
+	"Gallery_SwitchToLightMode": {
+		"message": "Switch to Light Mode",
+		"description": "Theme toggle tooltip for switching to light mode"
+	},
+	"Gallery_SwitchToDarkMode": {
+		"message": "Switch to Dark Mode",
+		"description": "Theme toggle tooltip for switching to dark mode"
+	},
+	"Gallery_OriginalUrl": {
+		"message": "Original URL:",
+		"description": "Label for the URL input field"
+	},
+	"Gallery_UrlPlaceholder": {
+		"message": "Enter URL to fusk...",
+		"description": "Placeholder text for the URL input field"
+	},
+	"Gallery_GenerateGallery": {
+		"message": "Generate Gallery",
+		"description": "Button text to generate a new gallery"
+	},
+	"Gallery_Stats_Total": {
+		"message": "total",
+		"description": "Statistics label for total images"
+	},
+	"Gallery_Stats_Loaded": {
+		"message": "loaded",
+		"description": "Statistics label for loaded images"
+	},
+	"Gallery_Stats_Broken": {
+		"message": "broken",
+		"description": "Statistics label for broken images"
+	},
+	"Gallery_DownloadAll": {
+		"message": "Download All",
+		"description": "Button text to download all images"
+	},
+	"Gallery_DisplayMode": {
+		"message": "Display Mode:",
+		"description": "Label for display mode controls"
+	},
+	"Gallery_Options": {
+		"message": "Options:",
+		"description": "Label for gallery options controls"
+	},
+	"Gallery_HideBroken": {
+		"message": "Hide Broken",
+		"description": "Button text to hide broken images"
+	},
+	"Gallery_ShowBroken": {
+		"message": "Show Broken",
+		"description": "Button text to show broken images"
+	},
+	"Gallery_GeneratingGallery": {
+		"message": "Generating gallery...",
+		"description": "Loading text while generating gallery"
+	},
+	"Gallery_CopyUrl": {
+		"message": "Copy URL",
+		"description": "Button text to copy image URL"
+	},
+	"Gallery_OpenInTab": {
+		"message": "Open in Tab",
+		"description": "Button text to open image in new tab"
+	},
+	"Gallery_Close": {
+		"message": "Close",
+		"description": "Button text to close image viewer"
+	},
+	"Gallery_PreviousImage": {
+		"message": "Previous Image",
+		"description": "Tooltip for previous image button"
+	},
+	"Gallery_NextImage": {
+		"message": "Next Image",
+		"description": "Tooltip for next image button"
+	},
+	"Gallery_DownloadVideo": {
+		"message": "Download Video",
+		"description": "Tooltip for download video button"
+	},
+	"Gallery_ShowVideoInViewer": {
+		"message": "Show Video in Viewer",
+		"description": "Tooltip for show video in viewer button"
+	},
+	"Gallery_VideoNotSupported": {
+		"message": "Your browser does not support this video format",
+		"description": "Error message for unsupported video formats"
+	},
+	"Gallery_MediaLoadError": {
+		"message": "Failed to load media",
+		"description": "Error message when media fails to load due to HTTP errors or network issues"
+	},
+	"Gallery_Welcome": {
+		"message": "Welcome to Fuskr",
+		"description": "Welcome message title"
+	},
+	"Gallery_WelcomeText": {
+		"message": "Enter a URL with numbers in the filename to generate an image gallery.",
+		"description": "Welcome message description"
+	},
+	"Gallery_ExampleUrls": {
+		"message": "Example URLs:",
+		"description": "Header for example URLs section"
+	},
+	"Gallery_FitPage": {
+		"message": "Fit Page",
+		"description": "Short label for fit page display mode"
+	},
+	"Gallery_FullWidth": {
+		"message": "Full Width",
+		"description": "Short label for full width display mode"
+	},
+	"Gallery_FillPage": {
+		"message": "Fill Page",
+		"description": "Short label for fill page display mode"
+	},
+	"Gallery_Thumbnails": {
+		"message": "Thumbnails",
+		"description": "Short label for thumbnails display mode"
+	},
+	"Gallery_ImageAlt": {
+		"message": "Image",
+		"description": "Alt text prefix for gallery images (e.g., 'Image 1', 'Image 2')"
+	},
+	"Options_Appearance": {
+		"message": "Appearance",
+		"description": "Options section header for appearance settings"
+	},
+	"Options_ImageDisplay": {
+		"message": "Image Display",
+		"description": "Options section header for image display settings"
+	},
+	"Options_Behaviour": {
+		"message": "Behaviour",
+		"description": "Options section header for behaviour settings"
+	},
+	"Options_DefaultImageDisplayMode": {
+		"message": "Default Image Display Mode:",
+		"description": "Label for default image display mode options"
+	},
+	"Options_DisplayModeDescription": {
+		"message": "Choose how images are displayed by default in the gallery",
+		"description": "Description for image display mode setting"
+	},
+	"Options_ShowImagesInViewerDefault": {
+		"message": "Show images in viewer by default",
+		"description": "Checkbox label for default image viewer setting"
+	},
+	"Options_ShowImagesInViewerDescription": {
+		"message": "Open images in a full-screen viewer when clicked",
+		"description": "Description for image viewer setting"
+	},
+	"Options_ShowBrokenImagesDefault": {
+		"message": "Show broken images by default",
+		"description": "Checkbox label for broken images setting"
+	},
+	"Options_ShowBrokenImagesDescription": {
+		"message": "Display placeholder images for missing/broken images",
+		"description": "Description for broken images setting"
+	},
+	"Options_KeepRecentFusks": {
+		"message": "Keep Recent Fusks",
+		"description": "Checkbox label for keeping recent fusks"
+	},
+	"Options_KeepRecentFusksDescription": {
+		"message": "Save recent Fusk URLs for quick access",
+		"description": "Description for recent fusks setting"
+	},
+	"Options_SettingsSaved": {
+		"message": "Settings saved!",
+		"description": "Status message when settings are saved successfully"
+	},
+	"Options_ErrorSaving": {
+		"message": "Error saving options",
+		"description": "Error message when settings fail to save"
+	},
+	"Options_ResizeImagesFitOnPage": {
+		"message": "Resize images to fit on page",
+		"description": "Radio button option for fit on page display mode"
+	},
+	"Options_ResizeImagesFullWidth": {
+		"message": "Resize images to full width",
+		"description": "Radio button option for full width display mode"
+	},
+	"Options_ResizeImagesFillPage": {
+		"message": "Resize images to fill the page",
+		"description": "Radio button option for fill page display mode"
+	},
+	"Options_ResizeImagesThumbnails": {
+		"message": "Resize images to thumbnails",
+		"description": "Radio button option for thumbnails display mode"
+	},
+	"Options_OpenNewFusksDescription": {
+		"message": "New tabs created from Fusk operations will be opened in the foreground",
+		"description": "Description for opening new fusks in foreground setting"
+	},
+	"Gallery_CopyUrls": {
+		"message": "Copy URLs",
+		"description": "Button text to copy all image URLs to clipboard"
+	},
+	"Gallery_SelectAllUrls": {
+		"message": "Select All",
+		"description": "Button text to select all URLs in the textarea"
+	},
+	"Gallery_UrlListPlaceholder": {
+		"message": "Image URLs will appear here...",
+		"description": "Placeholder text for the URL list textarea"
+	},
+	"Gallery_UrlList": {
+		"message": "URL List",
+		"description": "Header for the URL list section"
+	},
+	"Gallery_ShowUrlList": {
+		"message": "Show URL List",
+		"description": "Button text to show the list of image URLs"
+	},
+	"Gallery_HideUrlList": {
+		"message": "Hide URL List",
+		"description": "Button text to hide the list of image URLs"
+	},
+	"Gallery_Loading": {
+		"message": "Loading...",
+		"description": "Generic loading text for accessibility"
+	},
+	"Gallery_ErrorValidUrl": {
+		"message": "Please enter a valid URL",
+		"description": "Error message when no URL is provided"
+	},
+	"Gallery_ErrorNoPattern": {
+		"message": "No fuskable pattern found in the URL. Try a URL with numbers in the filename.",
+		"description": "Error message when URL has no fuskable pattern"
+	},
+	"Gallery_ErrorGenerating": {
+		"message": "Error generating gallery:",
+		"description": "Error message prefix when gallery generation fails"
+	},
+	"Gallery_DownloadPreparing": {
+		"message": "Preparing download...",
+		"description": "Status message when preparing ZIP download"
+	},
+	"Gallery_DownloadNoImages": {
+		"message": "No valid images to download",
+		"description": "Status message when no valid images found for download"
+	},
+	"Gallery_DownloadingImages": {
+		"message": "Downloading $1 images...",
+		"description": "Status message when downloading multiple images"
+	},
+	"Gallery_DownloadingImage": {
+		"message": "Downloading $1 ($2/$3)...",
+		"description": "Status message when downloading individual image with progress"
+	},
+	"Gallery_DownloadAddingMetadata": {
+		"message": "Adding metadata...",
+		"description": "Status message when adding metadata to ZIP"
+	},
+	"Gallery_DownloadCreatingZip": {
+		"message": "Creating ZIP file...",
+		"description": "Status message when creating ZIP file"
+	},
+	"Gallery_DownloadSaving": {
+		"message": "Saving file...",
+		"description": "Status message when saving ZIP file"
+	},
+	"Gallery_DownloadComplete": {
+		"message": "Download complete!",
+		"description": "Status message when download is finished"
+	},
+	"Gallery_DownloadFailed": {
+		"message": "Download failed. Please try again.",
+		"description": "Error message when download fails"
+	},
+	"Gallery_DownloadPromptFilename": {
+		"message": "Enter filename for the ZIP archive:",
+		"description": "Prompt message for entering ZIP filename"
+	},
+	"Gallery_DownloadingMedia": {
+		"message": "Downloading $1 media items ($2 images, $3 videos)...",
+		"description": "Status message when downloading mixed media (images and videos)"
+	},
+	"Gallery_DownloadingItem": {
+		"message": "Downloading $1 ($2/$3/$4)...",
+		"description": "Status message when downloading individual media item with progress and type"
+	},
+	"Gallery_KeyboardShortcuts": {
+		"message": "Keyboard Shortcuts",
+		"description": "Header for keyboard shortcuts help section"
+	},
+	"Gallery_KeyboardNavigation": {
+		"message": "Use arrow keys to navigate, Enter/Space to open, Home/End to jump",
+		"description": "Description of keyboard navigation controls"
+	},
+	"Gallery_ImageNotFound": {
+		"message": "Image not found",
+		"description": "Alt text and placeholder text for broken images"
+	},
+	"Gallery_ExampleUrl1": {
+		"message": "https://example.com/image01.jpg",
+		"description": "First example URL showing numbered filename pattern"
+	},
+	"Gallery_ExampleUrl2": {
+		"message": "https://example.com/photo[01-10].png",
+		"description": "Second example URL showing bracket range pattern"
+	},
+	"Options_OverloadProtection": {
+		"message": "Overload Protection"
+	},
+	"Options_EnableOverloadProtection": {
+		"message": "Enable overload protection"
+	},
+	"Options_EnableOverloadProtection_Description": {
+		"message": "When enabled, Fuskr will warn you before generating galleries with a large number of images to prevent browser slowdown or crashes."
+	},
+	"Options_OverloadProtectionLimit": {
+		"message": "Image limit"
+	},
+	"Options_OverloadProtectionLimit_Description": {
+		"message": "Maximum number of images to generate before showing a warning. Recommended: 500 images."
+	},
+	"Gallery_OverloadWarning": {
+		"message": "This URL pattern would generate $1 images, which exceeds the safety limit of $2 images.\n\nGenerating this many images may slow down or crash your browser.\n\nDo you want to continue anyway?"
+	}
+}

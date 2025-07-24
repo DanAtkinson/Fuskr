@@ -18,7 +18,7 @@
 					"builder": "@angular-builders/custom-webpack:browser",
 					"options": {
 						"customWebpackConfig": {
-							"path": "./webpack.config.js"
+							"path": "./src/config/webpack.config.js"
 						},
 						"outputPath": "dist/chromium",
 						"index": "src/index.html",

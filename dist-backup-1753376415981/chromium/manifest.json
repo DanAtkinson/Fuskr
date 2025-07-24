@@ -1,0 +1,35 @@
+{
+	"manifest_version": 3,
+	"name": "__MSG_ManifestName__",
+	"description": "__MSG_ManifestDescription__",
+	"version": "4.0.0",
+	"default_locale": "en_GB",
+	"author": "Dan Atkinson and Jonathon Bolster",
+	"action": {
+		"default_popup": "index.html",
+		"default_title": "Fuskr - Image Gallery Generator"
+	},
+	"background": {
+		"service_worker": "js/background.js"
+	},
+	"options_ui": {
+		"page": "index.html#/options",
+		"open_in_tab": true
+	},
+	"omnibox": {
+		"keyword": "fuskr"
+	},
+	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage"],
+	"host_permissions": ["http://*/*", "https://*/*"],
+	"icons": {
+		"16": "assets/images/16x16.png",
+		"48": "assets/images/48x48.png",
+		"128": "assets/images/128x128.png"
+	},
+	"web_accessible_resources": [
+		{
+			"resources": ["assets/*"],
+			"matches": ["<all_urls>"]
+		}
+	]
+}

@@ -7,7 +7,7 @@ module.exports = {
 		'fuskr-core': './src/fuskr-core.ts'
 	},
 	output: {
-		path: path.resolve(__dirname, '../../dist/chromium'),
+		path: path.resolve(__dirname, 'dist/chromium'),
 		filename: '[name].js',
 		library: {
 			name: 'FuskrCore',
