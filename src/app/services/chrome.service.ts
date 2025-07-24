@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { LoggerService } from './logger.service';
-import { GalleryHistoryEntry, GalleryHistory } from '../interfaces/gallery-history.interface';
+import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history';
 import {
 	IChromeStorageData,
 	IDisplaySettings,
 	IBehaviourSettings,
 	ISafetySettings
-} from '../interfaces/chrome-storage.interface';
-import { ChromeStorageData } from '../models/chrome-storage.model';
+} from '@interfaces/chrome-storage';
+import { ChromeStorageData } from '@models/chrome-storage';
 
 // Cross-browser compatibility
 declare var browser: any;

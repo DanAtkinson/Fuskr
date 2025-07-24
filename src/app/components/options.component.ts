@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
-import { ChromeStorageData } from '../models/chrome-storage.model';
+import { IChromeStorageData } from '@interfaces/chrome-storage';
+import { ChromeStorageData } from '@models/chrome-storage';
 import { LoggerService, LogLevel } from '@services/logger.service';
 import { BaseComponent } from './base.component';
 

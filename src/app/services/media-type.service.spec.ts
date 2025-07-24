@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { MediaTypeService } from './media-type.service';
 import { LoggerService } from './logger.service';
-import { MediaItem, MediaTypeResult } from '../models/media-item.interface';
+import { MediaItem, MediaTypeResult } from '@interfaces/media';
 
 describe('MediaTypeService', () => {
 	let service: MediaTypeService;

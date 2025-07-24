@@ -26,12 +26,3 @@ export interface MediaItem {
 	/** Timestamp when metadata was loaded */
 	loadedAt?: Date;
 }
-
-/**
- * Media type determination result
- */
-export interface MediaTypeResult {
-	type: 'image' | 'video' | 'unknown';
-	mimeType: string;
-	contentLength?: number;
-}

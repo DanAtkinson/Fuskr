@@ -1,5 +1,5 @@
-import { DisplaySettings, BehaviourSettings, SafetySettings, ChromeStorageData } from '@models/chrome-storage.model';
-import { IDisplaySettings, IBehaviourSettings, ISafetySettings, IChromeStorageData } from '@interfaces/chrome-storage.interface';
+import { DisplaySettings, BehaviourSettings, SafetySettings, ChromeStorageData } from '@models/chrome-storage';
+import { IDisplaySettings, IBehaviourSettings, ISafetySettings, IChromeStorageData } from '@interfaces/chrome-storage';
 
 describe('Chrome Storage Models', () => {
 

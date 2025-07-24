@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ChromeService } from './chrome.service';
-import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
-import { ChromeStorageData } from '../models/chrome-storage.model';
+import { IChromeStorageData } from '@interfaces/chrome-storage';
+import { ChromeStorageData } from '@models/chrome-storage';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type { } from 'jasmine';

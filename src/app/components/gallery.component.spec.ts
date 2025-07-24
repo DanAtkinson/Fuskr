@@ -7,7 +7,7 @@ import { FuskrService } from '@services/fuskr.service';
 import { ChromeService } from '@services/chrome.service';
 import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponentTestHelper } from './base-component-test.helper';
-import { MediaItem } from '../models/media-item.interface';
+import { MediaItem } from '@interfaces/media';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type { } from 'jasmine';

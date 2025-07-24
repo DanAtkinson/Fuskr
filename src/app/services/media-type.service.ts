@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { MediaItem, MediaTypeResult } from '../models/media-item.interface';
+import { MediaItem, MediaTypeResult } from '@interfaces/media';
 import { LoggerService } from './logger.service';
 
 @Injectable({

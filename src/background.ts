@@ -1,7 +1,7 @@
 /// <reference types="chrome"/>
 
 import { FuskrService } from './app/services/fuskr.service';
-import { ChromeStorageData } from './app/models/chrome-storage.model';
+import { ChromeStorageData } from './app/models/chrome-storage/chrome-storage-data.model';
 
 // Background script for Chrome extension
 // This runs as a service worker in Manifest V3

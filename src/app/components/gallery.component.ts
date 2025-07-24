@@ -4,7 +4,7 @@ import { FuskrService } from '@services/fuskr.service';
 import { LoggerService } from '@services/logger.service';
 import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponent } from './base.component';
-import { MediaItem } from '../models/media-item.interface';
+import { MediaItem } from '@interfaces/media';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 

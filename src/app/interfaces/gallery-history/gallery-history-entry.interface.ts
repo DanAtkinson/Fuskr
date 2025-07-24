@@ -8,8 +8,3 @@ export interface GalleryHistoryEntry {
 	imageUrls: string[]; // The actual URLs that were generated
 	displayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails'; // How it was displayed
 }
-
-export interface GalleryHistory {
-	entries: GalleryHistoryEntry[];
-	maxEntries: number; // Maximum number of entries to keep
-}

@@ -2,8 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { OptionsComponent } from './options.component';
 import { ChromeService } from '@services/chrome.service';
-import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
-import { ChromeStorageData } from '../models/chrome-storage.model';
+import { IChromeStorageData } from '@interfaces/chrome-storage';
+import { ChromeStorageData } from '@models/chrome-storage';
 import { BaseComponentTestHelper } from './base-component-test.helper';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle

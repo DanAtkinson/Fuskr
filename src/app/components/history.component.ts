@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { ChromeService } from '@services/chrome.service';
 import { LoggerService } from '@services/logger.service';
 import { BaseComponent } from '@components/base.component';
-import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history.interface';
+import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history';
 
 @Component({
 	selector: 'app-history',
