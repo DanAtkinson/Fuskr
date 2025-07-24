@@ -2,7 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuskrService } from '@services/fuskr.service';
 import { LoggerService } from '@services/logger.service';
+import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponent } from './base.component';
+import { MediaItem } from '../models/media-item.interface';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
@@ -23,16 +25,22 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	enableOverloadProtection: boolean = true;
 	errorMessage: string = '';
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
-	imageUrls: string[] = [];
+	imageUrls: string[] = []; // Deprecated: Use mediaItems instead
 	isDownloading: boolean = false;
 	loadedImages: number = 0;
 	loading: boolean = false;
+	mediaItems: MediaItem[] = [];
+	mediaTypeLoadingProgress: number = 0;
 	originalUrl: string = '';
 	overloadProtectionLimit: number = 50;
 	showBrokenImages: boolean = false;
 	showImageViewer: boolean = false;
 	showUrlList: boolean = false;
 	totalImages: number = 0;
+
+	// Computed properties for template
+	allUrlsText: string = '';
+	currentMediaItem: MediaItem | null = null;
 
 	// Private properties (alphabetically)
 	private hasInitialized: boolean = false;
@@ -41,7 +49,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		private route: ActivatedRoute,
 		private router: Router,
 		private fuskrService: FuskrService,
-		private logger: LoggerService
+		private logger: LoggerService,
+		private mediaTypeService: MediaTypeService
 	) {
 		super();
 	}
@@ -186,7 +195,15 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	getAllUrlsText(): string {
+		// Use mediaItems if available, otherwise fall back to imageUrls for backward compatibility
+		if (this.mediaItems.length > 0) {
+			return this.mediaItems.map(item => item.url).join('\n');
+		}
 		return this.imageUrls.join('\n');
+	}
+
+	private updateAllUrlsText(): void {
+		this.allUrlsText = this.getAllUrlsText();
 	}
 
 	getFilename(url: string): string {
@@ -222,9 +239,16 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	nextImage() {
-		if (this.currentViewerIndex < this.imageUrls.length - 1) {
+		const totalCount = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
+		if (this.currentViewerIndex < totalCount - 1) {
 			this.currentViewerIndex++;
-			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+			if (this.mediaItems.length > 0) {
+				this.currentViewerImage = this.mediaItems[this.currentViewerIndex].url;
+				this.currentMediaItem = this.mediaItems[this.currentViewerIndex];
+			} else {
+				this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+				this.currentMediaItem = null;
+			}
 		}
 	}
 
@@ -302,11 +326,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			const subtextColor = isDark ? '#6c757d' : '#adb5bd';
 
 			const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
-				<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-					<rect width="100%" height="100%" fill="${bgColor}" stroke="${borderColor}" stroke-width="2"/>
-					<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
-					<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="${subtextColor}" text-anchor="middle" dominant-baseline="middle">🚫</text>
-				</svg>
+	<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+		<rect width="100%" height="100%" fill="${bgColor}" stroke="${borderColor}" stroke-width="2"/>
+		<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
+		<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="${subtextColor}" text-anchor="middle" dominant-baseline="middle">🚫</text>
+	</svg>
 			`)}`;
 
 			if (!this.showBrokenImages) {
@@ -322,10 +346,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	onImageLoad(event: Event) {
-		const img = event.target as HTMLImageElement;
+		const element = event.target as HTMLImageElement | HTMLVideoElement;
 
 		// Only count successful loads (not our error placeholders)
-		if (!img.src.startsWith('data:') && !img.classList.contains('error')) {
+		if (!element.src.startsWith('data:') && !element.classList.contains('error')) {
 			this.updateImageCounts();
 		}
 	}
@@ -341,21 +365,30 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	openImageViewer(url: string, index: number) {
 		this.currentViewerImage = url;
 		this.currentViewerIndex = index;
+		this.currentMediaItem = this.mediaItems[index] || null;
 		this.showImageViewer = true;
 	}
 
 	previousImage() {
 		if (this.currentViewerIndex > 0) {
 			this.currentViewerIndex--;
-			this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+			if (this.mediaItems.length > 0) {
+				this.currentViewerImage = this.mediaItems[this.currentViewerIndex].url;
+				this.currentMediaItem = this.mediaItems[this.currentViewerIndex];
+			} else {
+				this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
+				this.currentMediaItem = null;
+			}
 		}
 	}
 
 	removeBrokenImages() {
-		// Create a list of URLs that correspond to broken images
+		// Create a list of URLs that correspond to broken images and videos
 		const brokenImages = document.querySelectorAll('img.error');
+		const brokenVideos = document.querySelectorAll('video.error');
 		const brokenUrls = new Set<string>();
 
+		// Handle broken images
 		brokenImages.forEach((img: Element) => {
 			const htmlImg = img as HTMLImageElement;
 			// Get the original URL from the data attribute
@@ -371,9 +404,26 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}
 		});
 
-		// Update the URLs array to remove broken URLs
-		this.imageUrls = this.imageUrls.filter(url => !brokenUrls.has(url));
-		this.totalImages = this.imageUrls.length;
+		// Handle broken videos
+		brokenVideos.forEach((video: Element) => {
+			const htmlVideo = video as HTMLVideoElement;
+			// Get the original URL from the data attribute
+			const originalUrl = htmlVideo.getAttribute('data-original-url');
+			if (originalUrl) {
+				brokenUrls.add(originalUrl);
+			}
+
+			// Remove the container from DOM
+			const container = htmlVideo.closest('.image-item');
+			if (container) {
+				container.remove();
+			}
+		});
+
+		// Update both arrays to remove broken URLs
+		this.imageUrls = this.imageUrls.filter((url: string) => !brokenUrls.has(url));
+		this.mediaItems = this.mediaItems.filter(item => !brokenUrls.has(item.url));
+		this.totalImages = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
 		this.brokenImages = 0;
 	}
 
@@ -445,7 +495,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				totalImages: this.totalImages,
 				loadedImages: this.loadedImages,
 				brokenImages: this.brokenImages,
-				imageUrls: this.imageUrls,
+				imageUrls: this.mediaItems.length > 0 ? this.mediaItems.map(item => item.url) : this.imageUrls,
 				displayMode: this.imageDisplayMode
 			};
 
@@ -510,16 +560,30 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private getValidImageUrls(): string[] {
-		// Get all images that are not broken and are actual image URLs (not data URLs or placeholders)
+		// Get all images and videos that are not broken and are actual media URLs (not data URLs or placeholders)
 		const images = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
+		const videos = document.querySelectorAll('.fusk-video') as NodeListOf<HTMLVideoElement>;
 		const validUrls: string[] = [];
 
+		// Process images
 		images.forEach(img => {
 			// Check if image has loaded successfully (not broken)
 			if (img.complete && img.naturalHeight !== 0) {
 				const url = img.src;
 				// Filter out data URLs, placeholder images, and invalid URLs
-				if (this.isValidImageUrl(url)) {
+				if (this.isValidMediaUrl(url)) {
+					validUrls.push(url);
+				}
+			}
+		});
+
+		// Process videos
+		videos.forEach(video => {
+			// Check if video has loaded successfully (not broken)
+			if (video.readyState >= 2) { // HAVE_CURRENT_DATA or better
+				const url = video.src;
+				// Filter out data URLs, placeholder videos, and invalid URLs
+				if (this.isValidMediaUrl(url)) {
 					validUrls.push(url);
 				}
 			}
@@ -528,7 +592,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		return validUrls;
 	}
 
-	private isValidImageUrl(url: string): boolean {
+	private isValidMediaUrl(url: string): boolean {
 		// Reject data URLs (like the SVG placeholder)
 		if (url.startsWith('data:')) {
 			return false;
@@ -544,25 +608,54 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			return false;
 		}
 
-		// Check for common image extensions
+		// Check for common image and video extensions
 		const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
+		const videoExtensions = ['.mp4', '.webm', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.m4v'];
 		const urlWithoutQuery = url.split('?')[0].toLowerCase();
-		const hasImageExtension = imageExtensions.some(ext => urlWithoutQuery.endsWith(ext));
 
-		return hasImageExtension;
+		const hasImageExtension = imageExtensions.some(ext => urlWithoutQuery.endsWith(ext));
+		const hasVideoExtension = videoExtensions.some(ext => urlWithoutQuery.endsWith(ext));
+
+		return hasImageExtension || hasVideoExtension;
 	}
 
-	private performGalleryGeneration() {
+	private async performGalleryGeneration() {
 		this.loading = true;
 		this.errorMessage = '';
 		this.imageUrls = [];
+		this.mediaItems = [];
 
 		try {
 			const result = this.fuskrService.generateImageGallery(this.originalUrl);
-			this.imageUrls = result.urls;
+			this.imageUrls = result.urls; // Keep for backward compatibility
 			this.totalImages = this.imageUrls.length;
 			this.loadedImages = 0;
 			this.brokenImages = 0;
+
+			// Create MediaItems and determine their types
+			if (this.imageUrls.length > 0) {
+				this.logger.info('GalleryComponent', 'Starting media type detection', {
+					totalUrls: this.imageUrls.length
+				});
+
+				// Process media items in batches to determine their actual types
+				this.mediaTypeLoadingProgress = 0;
+				this.mediaItems = await this.mediaTypeService.batchDetermineMediaTypes(
+					this.imageUrls,
+					5 // Process 5 at a time to be respectful to servers
+				);
+
+				this.mediaTypeLoadingProgress = 100;
+				this.logger.info('GalleryComponent', 'Media type detection completed', {
+					totalItems: this.mediaItems.length,
+					imageCount: this.mediaItems.filter(item => item.type === 'image').length,
+					videoCount: this.mediaItems.filter(item => item.type === 'video').length,
+					unknownCount: this.mediaItems.filter(item => item.type === 'unknown').length
+				});
+
+				// Update computed properties
+				this.updateAllUrlsText();
+			}
 
 			// Do a final count after images have had time to load
 			setTimeout(() => {
@@ -625,11 +718,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private updateImageCounts() {
-		// Count images directly from DOM
+		// Count both images and videos from DOM
 		const allImages = document.querySelectorAll('.fusk-image') as NodeListOf<HTMLImageElement>;
+		const allVideos = document.querySelectorAll('.fusk-video') as NodeListOf<HTMLVideoElement>;
 		let loaded = 0;
 		let broken = 0;
 
+		// Count images
 		allImages.forEach(img => {
 			if (img.classList.contains('error')) {
 				broken++;
@@ -638,7 +733,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}
 		});
 
+		// Count videos
+		allVideos.forEach(video => {
+			if (video.classList.contains('error')) {
+				broken++;
+			} else if (video.readyState >= 2 && !video.src.startsWith('data:')) { // HAVE_CURRENT_DATA or better
+				loaded++;
+			}
+		});
+
 		this.loadedImages = loaded;
 		this.brokenImages = broken;
 	}
+
 }

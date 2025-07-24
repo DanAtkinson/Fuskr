@@ -1,18 +1,8 @@
-import {
-	DisplaySettings,
-	BehaviourSettings,
-	SafetySettings,
-	ChromeStorageData
-} from './chrome-storage.model';
-import {
-	IDisplaySettings,
-	IBehaviourSettings,
-	ISafetySettings,
-	IChromeStorageData
-} from '../interfaces/chrome-storage.interface';
+import { DisplaySettings, BehaviourSettings, SafetySettings, ChromeStorageData } from '@models/chrome-storage.model';
+import { IDisplaySettings, IBehaviourSettings, ISafetySettings, IChromeStorageData } from '@interfaces/chrome-storage.interface';
 
 describe('Chrome Storage Models', () => {
-	
+
 	describe('DisplaySettings', () => {
 		it('should create instance with default values', () => {
 			const settings = new DisplaySettings();
@@ -387,8 +377,8 @@ describe('Chrome Storage Models', () => {
 		it('should work together in realistic scenario', () => {
 			const userData = {
 				version: 2,
-				display: { 
-					darkMode: true, 
+				display: {
+					darkMode: true,
 					imageDisplayMode: 'fullWidth' as const,
 					resizeImagesToFillPage: false,
 					resizeImagesToFitOnPage: true,
@@ -397,15 +387,15 @@ describe('Chrome Storage Models', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behaviour: { 
+				behaviour: {
 					galleryHistory: { entries: [], maxEntries: 10 },
 					keepRecentFusks: true,
 					openInForeground: false,
 					recentFusks: ['https://site1.com/[1-10].jpg', 'https://site2.com/[a-z].png']
 				},
-				safety: { 
+				safety: {
 					enableOverloadProtection: true,
-					overloadProtectionLimit: 100 
+					overloadProtectionLimit: 100
 				}
 			};
 
@@ -422,7 +412,7 @@ describe('Chrome Storage Models', () => {
 
 		it('should maintain data integrity across instantiation', () => {
 			const original = {
-				display: { 
+				display: {
 					darkMode: true,
 					imageDisplayMode: 'fitOnPage' as const,
 					resizeImagesToFillPage: false,
@@ -432,15 +422,15 @@ describe('Chrome Storage Models', () => {
 					showImagesInViewer: true,
 					toggleBrokenImages: true
 				},
-				behaviour: { 
+				behaviour: {
 					galleryHistory: { entries: [], maxEntries: 10 },
 					keepRecentFusks: true,
 					openInForeground: true,
-					recentFusks: ['test'] 
+					recentFusks: ['test']
 				},
-				safety: { 
+				safety: {
 					enableOverloadProtection: true,
-					overloadProtectionLimit: 99 
+					overloadProtectionLimit: 99
 				}
 			};
 

@@ -28,3 +28,4 @@ yarn-error.log*
 # IDE
 .idea/
 .vscode/
+Tidy-Indentation.ps1

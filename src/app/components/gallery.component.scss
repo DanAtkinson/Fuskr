@@ -143,8 +143,13 @@
 }
 
 @keyframes spin {
-	0% { transform: rotate(0deg); }
-	100% { transform: rotate(360deg); }
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 .error {
@@ -170,12 +175,12 @@
 	margin-top: 30px;
 
 	code {
-	display: block;
-	background: var(--bg-secondary);
-	padding: 10px;
-	margin: 10px 0;
-	border-radius: 4px;
-	font-family: 'Courier New', monospace;
+		display: block;
+		background: var(--bg-secondary);
+		padding: 10px;
+		margin: 10px 0;
+		border-radius: 4px;
+		font-family: 'Courier New', monospace;
 	}
 }
 
@@ -249,6 +254,54 @@
 		max-width: 100%;
 		max-height: 70vh;
 		object-fit: contain;
+	}
+
+	// Video styles for the viewer modal
+	.viewer-video {
+		max-width: 100%;
+		max-height: 70vh;
+		object-fit: contain;
+		background-color: #000;
+	}
+
+	// Video styles - similar to images but with specific video properties
+	video {
+		width: 100%;
+		height: 250px;
+		object-fit: contain;
+		cursor: pointer;
+		transition: transform 0.3s ease;
+		border: none;
+		background-color: #000; // Black background for videos
+
+		&:hover {
+			transform: scale(1.02);
+		}
+
+		// Style for broken/error videos
+		&.error {
+			border: none !important;
+			background-color: transparent !important;
+		}
+	}
+
+	// Common styles for both images and videos
+	.fusk-media {
+		width: 100%;
+		height: 250px;
+		object-fit: contain;
+		cursor: pointer;
+		transition: transform 0.3s ease;
+		border: none;
+
+		&:hover {
+			transform: scale(1.02);
+		}
+
+		&.error {
+			border: none !important;
+			background-color: transparent !important;
+		}
 	}
 }
 
@@ -334,6 +387,46 @@
 				background-color: transparent !important; // Remove hardcoded background
 			}
 		}
+
+		// Video styles - similar to images but with specific video properties
+		video {
+			width: 100%;
+			height: 250px;
+			object-fit: contain;
+			cursor: pointer;
+			transition: transform 0.3s ease;
+			border: none;
+			background-color: #000; // Black background for videos
+
+			&:hover {
+				transform: scale(1.02);
+			}
+
+			// Style for broken/error videos
+			&.error {
+				border: none !important;
+				background-color: transparent !important;
+			}
+		}
+
+		// Common styles for both images and videos
+		.fusk-media {
+			width: 100%;
+			height: 250px;
+			object-fit: contain;
+			cursor: pointer;
+			transition: transform 0.3s ease;
+			border: none;
+
+			&:hover {
+				transform: scale(1.02);
+			}
+
+			&.error {
+				border: none !important;
+				background-color: transparent !important;
+			}
+		}
 	}
 
 	// Image overlay styles
@@ -342,7 +435,7 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		background: linear-gradient(transparent, rgba(0,0,0,0.8));
+		background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
 		color: white;
 		padding: 15px 10px 10px;
 		opacity: 0;
@@ -579,5 +672,81 @@
 				}
 			}
 		}
+	}
+}
+
+// Media loading and error states
+.media-loading-indicator {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(0, 0, 0, 0.8);
+	border-radius: 8px;
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	z-index: 10;
+
+	.spinner-small {
+		width: 24px;
+		height: 24px;
+		border: 2px solid transparent;
+		border-top: 2px solid var(--primary-color);
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+}
+
+.media-error-indicator {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	background: rgba(220, 53, 69, 0.9);
+	color: white;
+	border-radius: 8px;
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	text-align: center;
+	z-index: 10;
+	max-width: 80%;
+
+	i {
+		font-size: 1.5rem;
+	}
+
+	span {
+		font-size: 0.875rem;
+		font-weight: 500;
+	}
+}
+
+// Loading state styling for media items
+.image-item[data-loading-state="loading"] {
+	opacity: 0.7;
+	position: relative;
+}
+
+.image-item[data-loading-state="error"] {
+	opacity: 0.5;
+	position: relative;
+
+	&::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(220, 53, 69, 0.1);
+		border: 2px solid rgba(220, 53, 69, 0.3);
+		border-radius: 8px;
+		pointer-events: none;
 	}
 }

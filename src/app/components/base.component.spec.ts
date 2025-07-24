@@ -8,7 +8,7 @@ import { ChromeService } from '@services/chrome.service';
 	template: '<div>Test Component</div>',
 	standalone: false
 })
-class TestBaseComponent extends BaseComponent {}
+class TestBaseComponent extends BaseComponent { }
 
 describe('BaseComponent', () => {
 	let component: TestBaseComponent;
@@ -50,7 +50,7 @@ describe('BaseComponent', () => {
 		it('should call chromeService.getMessage with key only', () => {
 			const testKey = 'test_key';
 			const expectedMessage = 'Test Message';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey);
@@ -63,7 +63,7 @@ describe('BaseComponent', () => {
 			const testKey = 'test_key_with_subs';
 			const testSubstitutions = ['value1', 'value2'];
 			const expectedMessage = 'Test Message with value1 and value2';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubstitutions);
@@ -76,7 +76,7 @@ describe('BaseComponent', () => {
 			const testKey = 'test_empty_subs';
 			const testSubstitutions: string[] = [];
 			const expectedMessage = 'Empty substitutions message';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubstitutions);
@@ -88,7 +88,7 @@ describe('BaseComponent', () => {
 		it('should handle undefined substitutions', () => {
 			const testKey = 'test_undefined_subs';
 			const expectedMessage = 'Undefined substitutions message';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey, undefined);
@@ -100,7 +100,7 @@ describe('BaseComponent', () => {
 		it('should handle special characters in key', () => {
 			const testKey = 'test_key_with_special-chars.123';
 			const expectedMessage = 'Special chars message';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey);
@@ -113,7 +113,7 @@ describe('BaseComponent', () => {
 			const testKey = 'multi_substitution_key';
 			const testSubstitutions = ['first', 'second', 'third', 'fourth'];
 			const expectedMessage = 'Message with first, second, third, and fourth';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubstitutions);
@@ -126,7 +126,7 @@ describe('BaseComponent', () => {
 	describe('Error Handling', () => {
 		it('should handle chromeService.getMessage throwing error', () => {
 			const testKey = 'error_key';
-			
+
 			mockChromeService.getMessage.and.throwError('Translation error');
 
 			expect(() => {
@@ -136,7 +136,7 @@ describe('BaseComponent', () => {
 
 		it('should handle chromeService.getMessage returning null', () => {
 			const testKey = 'null_key';
-			
+
 			mockChromeService.getMessage.and.returnValue(null as any);
 
 			const result = component.translate(testKey);
@@ -146,7 +146,7 @@ describe('BaseComponent', () => {
 
 		it('should handle chromeService.getMessage returning undefined', () => {
 			const testKey = 'undefined_key';
-			
+
 			mockChromeService.getMessage.and.returnValue(undefined as any);
 
 			const result = component.translate(testKey);
@@ -170,7 +170,7 @@ describe('BaseComponent', () => {
 		it('should allow subclasses to use translate method', () => {
 			const testKey = 'inheritance_test';
 			const expectedMessage = 'Inheritance works';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey);
@@ -182,7 +182,7 @@ describe('BaseComponent', () => {
 			const testKey = 'subclass_test';
 			const testSubs = ['sub1', 'sub2'];
 			const expectedMessage = 'Subclass message with sub1 and sub2';
-			
+
 			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubs);

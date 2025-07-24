@@ -112,7 +112,7 @@ export class ChromeService {
 		if (history.entries) {
 			history.entries = history.entries.map(entry => {
 				let validDate: Date;
-				
+
 				// Handle various timestamp formats
 				if (entry.timestamp instanceof Date) {
 					validDate = entry.timestamp;

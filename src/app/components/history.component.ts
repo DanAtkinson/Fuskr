@@ -29,11 +29,11 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 	async clearAllHistory() {
 		if (confirm(this.translate('History_ConfirmClearAll'))) {
 			try {
-				await this.chromeService.clearGalleryHistory();
-				this.history.entries = [];
-				this.logger.debug('history.cleared', 'All history cleared');
+	await this.chromeService.clearGalleryHistory();
+	this.history.entries = [];
+	this.logger.debug('history.cleared', 'All history cleared');
 			} catch (error) {
-				this.logger.error('history.clearFailed', 'Failed to clear history', error);
+	this.logger.error('history.clearFailed', 'Failed to clear history', error);
 			}
 		}
 	}
@@ -43,20 +43,20 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 			let dateObj: Date;
 
 			if (date instanceof Date) {
-				dateObj = date;
+	dateObj = date;
 			} else {
-				// Convert string/number to Date
-				dateObj = new Date(date);
+	// Convert string/number to Date
+	dateObj = new Date(date);
 			}
 
 			// Check if the date is valid
 			if (isNaN(dateObj.getTime())) {
-				this.logger.warn('history.formatDate', 'Invalid date provided', { 
-					date, 
-					dateType: typeof date,
-					isDate: date instanceof Date 
-				});
-				return 'Invalid Date';
+	this.logger.warn('history.formatDate', 'Invalid date provided', {
+		date,
+		dateType: typeof date,
+		isDate: date instanceof Date
+	});
+	return 'Invalid Date';
 			}
 
 			return dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString();
@@ -104,9 +104,9 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 			const galleryUrl = `${baseUrl}#/gallery?url=${encodeURIComponent(entry.originalUrl)}`;
 
 			if (this.chromeService.isExtensionContext()) {
-				await this.chromeService.openTab(galleryUrl, true);
+	await this.chromeService.openTab(galleryUrl, true);
 			} else {
-				window.open(galleryUrl, '_blank');
+	window.open(galleryUrl, '_blank');
 			}
 
 			this.logger.debug('history.galleryOpened', `Opened gallery in new tab: ${entry.originalUrl}`);
@@ -146,17 +146,17 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 	private async loadHistory() {
 		try {
 			this.history = await this.chromeService.getGalleryHistory();
-			
+
 			// Debug timestamp data
 			if (this.history.entries.length > 0) {
-				const firstEntry = this.history.entries[0];
-				this.logger.debug('history.loaded', `Loaded ${this.history.entries.length} history entries`, {
-					firstEntryTimestamp: firstEntry.timestamp,
-					timestampType: typeof firstEntry.timestamp,
-					isDate: firstEntry.timestamp instanceof Date
-				});
+	const firstEntry = this.history.entries[0];
+	this.logger.debug('history.loaded', `Loaded ${this.history.entries.length} history entries`, {
+		firstEntryTimestamp: firstEntry.timestamp,
+		timestampType: typeof firstEntry.timestamp,
+		isDate: firstEntry.timestamp instanceof Date
+	});
 			} else {
-				this.logger.debug('history.loaded', 'No history entries found');
+	this.logger.debug('history.loaded', 'No history entries found');
 			}
 		} catch (error) {
 			this.logger.error('history.loadFailed', 'Failed to load gallery history', error);

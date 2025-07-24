@@ -1,6 +1,8 @@
 # TODO
 
 ## 🎯 High Priority Features
+* When "Download All" is pressed, prompt the user to enter a zip filename. Default it to the timestamp.
+* When in Full Width/Fill Page allow up/left or down/right keyboard to choose which image to scroll to.
 * **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
 
 ## 🚀 Enhanced Features
@@ -10,7 +12,6 @@
 
 ## 🎬 Mini-Projects
 * **Video support** - Show videos instead of images for video URL patterns.
-* **Cross-browser compatibility** - Split out Chrome-specific functionality so that we can create a Firefox/Opera version of Fuskr.
 
 ## 🤔 Under Consideration
-* **GUID-based URLs** - Consider moving the fusk url to inside the page. Use a guid in the url instead which is tied to the url in storage. This way, the fusk can still persist across browser restarts, and potentially browsers when used in conjunction with Chrome Sync.
+* **GUID-based URLs** - Consider moving the fusk url to inside the page. Use a guid in the url instead which is tied to the url in storage. This way, the extension can persist the request across browser restarts, and potentially browsers when used in conjunction with Chrome Sync.

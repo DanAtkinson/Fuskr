@@ -365,6 +365,22 @@
 		"message": "Next Image",
 		"description": "Tooltip for next image button"
 	},
+	"Gallery_DownloadVideo": {
+		"message": "Download Video",
+		"description": "Tooltip for download video button"
+	},
+	"Gallery_ShowVideoInViewer": {
+		"message": "Show Video in Viewer",
+		"description": "Tooltip for show video in viewer button"
+	},
+	"Gallery_VideoNotSupported": {
+		"message": "Your browser does not support this video format",
+		"description": "Error message for unsupported video formats"
+	},
+	"Gallery_MediaLoadError": {
+		"message": "Failed to load media",
+		"description": "Error message when media fails to load due to HTTP errors or network issues"
+	},
 	"Gallery_Welcome": {
 		"message": "Welcome to Fuskr",
 		"description": "Welcome message title"

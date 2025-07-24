@@ -5,21 +5,25 @@ import { of } from 'rxjs';
 import { GalleryComponent } from './gallery.component';
 import { FuskrService } from '@services/fuskr.service';
 import { ChromeService } from '@services/chrome.service';
+import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponentTestHelper } from './base-component-test.helper';
+import { MediaItem } from '../models/media-item.interface';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
+import type { } from 'jasmine';
 
 describe('GalleryComponent', () => {
 	let component: GalleryComponent;
 	let fixture: ComponentFixture<GalleryComponent>;
 	let mockFuskrService: jasmine.SpyObj<FuskrService>;
 	let mockChromeService: jasmine.SpyObj<ChromeService>;
+	let mockMediaTypeService: jasmine.SpyObj<MediaTypeService>;
 	let mockRouter: jasmine.SpyObj<Router>;
 	let mockActivatedRoute: any;
 
 	beforeEach(async () => {
 		mockFuskrService = jasmine.createSpyObj('FuskrService', ['generateImageGallery', 'getImageFilename', 'countPotentialUrls']);
+		mockMediaTypeService = jasmine.createSpyObj('MediaTypeService', ['batchDetermineMediaTypes']);
 		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 		mockActivatedRoute = {
 			queryParams: of({ url: 'https://example.com/test.jpg' }),
@@ -34,6 +38,7 @@ describe('GalleryComponent', () => {
 			providers: [
 				{ provide: FuskrService, useValue: mockFuskrService },
 				{ provide: ChromeService, useValue: mockChromeService },
+				{ provide: MediaTypeService, useValue: mockMediaTypeService },
 				{ provide: Router, useValue: mockRouter },
 				{ provide: ActivatedRoute, useValue: mockActivatedRoute }
 			]
@@ -56,20 +61,40 @@ describe('GalleryComponent', () => {
 	});
 
 	describe('Gallery Generation', () => {
-		it('should generate gallery from URL', () => {
+		it('should generate gallery from URL', async () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[01-10].jpg',
 				urls: ['https://example.com/image01.jpg', 'https://example.com/image02.jpg']
 			};
+			const mockMediaItems: MediaItem[] = [
+				{
+					url: 'https://example.com/image01.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+					extension: 'jpg'
+				},
+				{
+					url: 'https://example.com/image02.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+					extension: 'jpg'
+				}
+			];
+
 			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
 			mockFuskrService.countPotentialUrls.and.returnValue(2); // Below limit
+			mockMediaTypeService.batchDetermineMediaTypes.and.returnValue(Promise.resolve(mockMediaItems));
 
 			component.originalUrl = 'https://example.com/image05.jpg';
-			component.generateGallery();
+			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image05.jpg');
+			expect(mockMediaTypeService.batchDetermineMediaTypes).toHaveBeenCalledWith(mockResult.urls, 5);
 			expect(component.imageUrls).toEqual(mockResult.urls);
+			expect(component.mediaItems).toEqual(mockMediaItems);
 			expect(component.originalUrl).toBe(mockResult.originalUrl);
 		});
 
@@ -98,7 +123,7 @@ describe('GalleryComponent', () => {
 		it('should proceed when user confirms overload protection warning', () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[001-1000].jpg',
-				urls: Array.from({length: 1000}, (_, i) => `https://example.com/image${String(i+1).padStart(3, '0')}.jpg`)
+				urls: Array.from({ length: 1000 }, (_, i) => `https://example.com/image${String(i + 1).padStart(3, '0')}.jpg`)
 			};
 
 			spyOn(window, 'confirm').and.returnValue(true); // User chooses to proceed
@@ -118,7 +143,7 @@ describe('GalleryComponent', () => {
 		it('should bypass overload protection when disabled', () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[001-1000].jpg',
-				urls: Array.from({length: 1000}, (_, i) => `https://example.com/image${String(i+1).padStart(3, '0')}.jpg`)
+				urls: Array.from({ length: 1000 }, (_, i) => `https://example.com/image${String(i + 1).padStart(3, '0')}.jpg`)
 			};
 
 			mockFuskrService.generateImageGallery.and.returnValue(mockResult);

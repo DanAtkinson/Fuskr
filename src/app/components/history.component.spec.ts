@@ -168,7 +168,7 @@ describe('HistoryComponent', () => {
 		it('should handle numeric timestamps', () => {
 			const timestamp = 1640995200000; // January 1, 2022
 			const result = component.formatDate(timestamp as any);
-			
+
 			expect(result).not.toBe('Invalid Date');
 			expect(result).toContain('2022');
 		});
@@ -176,10 +176,10 @@ describe('HistoryComponent', () => {
 		it('should handle future and past dates', () => {
 			const futureDate = new Date('2099-12-31T23:59:59.999Z');
 			const pastDate = new Date('1900-01-01T00:00:00.000Z');
-			
+
 			const futureResult = component.formatDate(futureDate);
 			const pastResult = component.formatDate(pastDate);
-			
+
 			expect(futureResult).not.toBe('Invalid Date');
 			expect(pastResult).not.toBe('Invalid Date');
 			expect(futureResult).toContain('2099');

@@ -7,10 +7,10 @@ describe('LoggerService', () => {
 	beforeEach(() => {
 		TestBed.configureTestingModule({});
 		service = TestBed.inject(LoggerService);
-		
+
 		// Clear any existing logs
 		service.clearLogs();
-		
+
 		// Reset to default configuration
 		service.configure({
 			enabled: true,
@@ -31,9 +31,9 @@ describe('LoggerService', () => {
 	describe('configuration', () => {
 		it('should configure logging settings', () => {
 			const config = {
-				enabled: false,
-				logLevel: LogLevel.WARN,
-				maxLogs: 50
+	enabled: false,
+	logLevel: LogLevel.WARN,
+	maxLogs: 50
 			};
 
 			service.configure(config);
@@ -65,8 +65,8 @@ describe('LoggerService', () => {
 			service.debug('test.debug', 'Debug message', { data: 'test' });
 
 			expect(console.log).toHaveBeenCalledWith(
-				jasmine.stringContaining('DEBUG'),
-				{ data: 'test' }
+	jasmine.stringContaining('DEBUG'),
+	{ data: 'test' }
 			);
 
 			const logs = service.getLogs();
@@ -81,8 +81,8 @@ describe('LoggerService', () => {
 			service.info('test.info', 'Info message');
 
 			expect(console.info).toHaveBeenCalledWith(
-				jasmine.stringContaining('INFO'),
-				''
+	jasmine.stringContaining('INFO'),
+	''
 			);
 
 			const logs = service.getLogs();
@@ -95,8 +95,8 @@ describe('LoggerService', () => {
 			service.warn('test.warn', 'Warning message');
 
 			expect(console.warn).toHaveBeenCalledWith(
-				jasmine.stringContaining('WARN'),
-				''
+	jasmine.stringContaining('WARN'),
+	''
 			);
 
 			const logs = service.getLogs();
@@ -110,8 +110,8 @@ describe('LoggerService', () => {
 			service.error('test.error', 'Error message', error);
 
 			expect(console.error).toHaveBeenCalledWith(
-				jasmine.stringContaining('ERROR'),
-				error
+	jasmine.stringContaining('ERROR'),
+	error
 			);
 
 			const logs = service.getLogs();
@@ -127,7 +127,7 @@ describe('LoggerService', () => {
 			spyOn(console, 'info');
 			spyOn(console, 'warn');
 			spyOn(console, 'error');
-			
+
 			// Clear existing logs and start fresh
 			service.clearLogs();
 		});
@@ -188,7 +188,7 @@ describe('LoggerService', () => {
 			const logs = service.getLogs();
 			const testLog = logs.find(log => log.component === 'test');
 			expect(testLog).toBeDefined();
-			
+
 			const logTime = testLog!.timestamp;
 			expect(logTime.getTime()).toBeGreaterThanOrEqual(beforeTime.getTime());
 			expect(logTime.getTime()).toBeLessThanOrEqual(afterTime.getTime());
@@ -206,7 +206,7 @@ describe('LoggerService', () => {
 
 			const logs = service.getLogs();
 			expect(logs).toHaveSize(3);
-			
+
 			// Should keep the most recent logs
 			expect(logs[0].message).toBe('Message 3');
 			expect(logs[1].message).toBe('Message 4');
@@ -232,17 +232,17 @@ describe('LoggerService', () => {
 		beforeEach(() => {
 			// Mock the browser's download functionality
 			Object.defineProperty(window, 'URL', {
-				value: {
-					createObjectURL: jasmine.createSpy('createObjectURL').and.returnValue('blob:mock-url'),
-					revokeObjectURL: jasmine.createSpy('revokeObjectURL')
-				}
+	value: {
+		createObjectURL: jasmine.createSpy('createObjectURL').and.returnValue('blob:mock-url'),
+		revokeObjectURL: jasmine.createSpy('revokeObjectURL')
+	}
 			});
 
 			// Mock document.createElement for download link
 			const mockLink = {
-				href: '',
-				download: '',
-				click: jasmine.createSpy('click')
+	href: '',
+	download: '',
+	click: jasmine.createSpy('click')
 			};
 			spyOn(document, 'createElement').and.returnValue(mockLink as any);
 			spyOn(document.body, 'appendChild');
@@ -257,7 +257,7 @@ describe('LoggerService', () => {
 
 			expect(document.createElement).toHaveBeenCalledWith('a');
 			expect(window.URL.createObjectURL).toHaveBeenCalledWith(jasmine.any(Blob));
-			
+
 			// Verify the download was triggered
 			const mockLink = (document.createElement as jasmine.Spy).calls.mostRecent().returnValue;
 			expect(mockLink.download).toBe('fuskr-debug-logs.txt');
@@ -266,7 +266,7 @@ describe('LoggerService', () => {
 
 		it('should handle export when no logs exist', () => {
 			service.clearLogs();
-			
+
 			service.exportLogs();
 
 			expect(document.createElement).toHaveBeenCalledWith('a');
@@ -289,18 +289,18 @@ describe('LoggerService', () => {
 			service.info('test', 'Message with undefined data', undefined);
 
 			expect(console.info).toHaveBeenCalledTimes(2);
-			
+
 			const logs = service.getLogs();
 			expect(logs.length).toBeGreaterThanOrEqual(2);
 		});
 
 		it('should handle complex objects in data', () => {
 			const complexObject = {
-				nested: {
-					array: [1, 2, 3],
-					object: { key: 'value' },
-					date: new Date()
-				}
+	nested: {
+		array: [1, 2, 3],
+		object: { key: 'value' },
+		date: new Date()
+	}
 			};
 
 			service.debug('test', 'Complex object test', complexObject);
@@ -311,7 +311,7 @@ describe('LoggerService', () => {
 
 		it('should handle very long messages', () => {
 			const longMessage = 'A'.repeat(10000);
-			
+
 			service.info('test', longMessage);
 
 			const logs = service.getLogs();
@@ -330,8 +330,8 @@ describe('LoggerService', () => {
 
 		it('should filter logs by minimum level', () => {
 			const warnAndAbove = service.getLogs(LogLevel.WARN);
-			const errorMessages = warnAndAbove.filter(log => 
-				log.message === 'Warn message' || log.message === 'Error message'
+			const errorMessages = warnAndAbove.filter(log =>
+	log.message === 'Warn message' || log.message === 'Error message'
 			);
 			expect(errorMessages).toHaveSize(2);
 		});

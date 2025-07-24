@@ -79,7 +79,8 @@ label {
 	}
 }
 
-input[type="checkbox"], input[type="radio"] {
+input[type="checkbox"],
+input[type="radio"] {
 	margin-right: 10px;
 	transform: scale(1.2);
 	accent-color: #3498db;
@@ -175,7 +176,8 @@ input[type="checkbox"], input[type="radio"] {
 	}
 
 	// Bootstrap form overrides
-	.form-check-label, .form-label {
+	.form-check-label,
+	.form-label {
 		color: var(--text-color) !important;
 	}
 
@@ -184,7 +186,12 @@ input[type="checkbox"], input[type="radio"] {
 	}
 
 	// Headings
-	h1, h2, h3, h4, h5, h6 {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
 		color: var(--text-color) !important;
 		border-bottom-color: var(--border-color);
 	}
@@ -194,12 +201,14 @@ input[type="checkbox"], input[type="radio"] {
 		color: var(--text-color) !important;
 	}
 
-	.description, .form-text {
+	.description,
+	.form-text {
 		color: var(--text-secondary) !important;
 	}
 
 	// Form controls
-	input[type="checkbox"], input[type="radio"] {
+	input[type="checkbox"],
+	input[type="radio"] {
 		filter: brightness(1.2) contrast(1.1);
 	}
 
@@ -221,12 +230,19 @@ input[type="checkbox"], input[type="radio"] {
 	}
 
 	// Icons
-	.fas, .fa {
+	.fas,
+	.fa {
 		color: var(--text-color) !important;
 	}
 
 	// Ensure all text elements use the correct color
-	p, span, div, strong, em, small, .text-muted {
+	p,
+	span,
+	div,
+	strong,
+	em,
+	small,
+	.text-muted {
 		color: var(--text-color) !important;
 	}
 
@@ -312,7 +328,8 @@ body.dark-mode {
 	}
 
 	// Bootstrap form overrides
-	.form-check-label, .form-label {
+	.form-check-label,
+	.form-label {
 		color: var(--text-color) !important;
 	}
 
@@ -321,7 +338,12 @@ body.dark-mode {
 	}
 
 	// Headings
-	h1, h2, h3, h4, h5, h6 {
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
 		color: var(--text-color) !important;
 		border-bottom-color: var(--border-color);
 	}
@@ -331,12 +353,14 @@ body.dark-mode {
 		color: var(--text-color) !important;
 	}
 
-	.description, .form-text {
+	.description,
+	.form-text {
 		color: var(--text-secondary) !important;
 	}
 
 	// Form controls
-	input[type="checkbox"], input[type="radio"] {
+	input[type="checkbox"],
+	input[type="radio"] {
 		filter: brightness(1.2) contrast(1.1);
 	}
 
@@ -358,12 +382,19 @@ body.dark-mode {
 	}
 
 	// Icons
-	.fas, .fa {
+	.fas,
+	.fa {
 		color: var(--text-color) !important;
 	}
 
 	// Ensure all text elements use the correct color
-	p, span, div, strong, em, small, .text-muted {
+	p,
+	span,
+	div,
+	strong,
+	em,
+	small,
+	.text-muted {
 		color: var(--text-color) !important;
 	}
 

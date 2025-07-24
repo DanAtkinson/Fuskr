@@ -55,33 +55,60 @@
 		</div>
 	}
 
-	@if (imageUrls.length > 0 && !loading) {
+	@if (mediaItems.length > 0 && !loading) {
 		<div class="image-gallery"
 			[class.images-are-full-width]="imageDisplayMode === 'fullWidth'"
 			[class.images-are-full-page]="imageDisplayMode === 'fillPage'"
 			[class.images-are-thumbnails]="imageDisplayMode === 'thumbnails'">
-			@for (url of imageUrls; track url; let i = $index) {
-				<div class="image-item wrap">
-					<img
-						class="fusk-image"
-						(click)="openImageViewer(url, i)"
-						(error)="onImageError($event)"
-						(load)="onImageLoad($event)"
-						[alt]="getImageAltText(i)"
-						[src]="url"
-						[attr.data-original-url]="url"
-						[attr.data-index]="i"
-						>
+			@for (mediaItem of mediaItems; track mediaItem.url; let i = $index) {
+				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
+					@if (mediaItem.type === 'video') {
+						<video
+							class="fusk-media fusk-video"
+							(click)="openImageViewer(mediaItem.url, i)"
+							(error)="onImageError($event)"
+							(loadeddata)="onImageLoad($event)"
+							[attr.data-original-url]="mediaItem.url"
+							[attr.data-index]="i"
+							controls
+							preload="metadata"
+							>
+							<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'">
+							{{ translate('Gallery_VideoNotSupported') }}
+						</video>
+					} @else {
+						<img
+							class="fusk-image fusk-media"
+							(click)="openImageViewer(mediaItem.url, i)"
+							(error)="onImageError($event)"
+							(load)="onImageLoad($event)"
+							[alt]="getImageAltText(i)"
+							[src]="mediaItem.url"
+							[attr.data-original-url]="mediaItem.url"
+							[attr.data-index]="i"
+							>
+					}
+					@if (mediaItem.loadingState === 'loading') {
+						<div class="media-loading-indicator">
+							<div class="spinner-small"></div>
+						</div>
+					}
+					@if (mediaItem.loadingState === 'error') {
+						<div class="media-error-indicator">
+							<i class="fas fa-exclamation-triangle"></i>
+							<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
+						</div>
+					}
 					<div class="image-overlay">
-						<span class="image-filename">{{ getFilename(url) }}</span>
+						<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
 						<div class="image-actions">
-							<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(url, $event)" [title]="translate('Images_DownloadImage')">
+							<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
 								<i class="fas fa-download"></i>
 							</button>
-							<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(url, $event)" [title]="translate('Gallery_CopyUrl')">
+							<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
 								<i class="fas fa-clipboard"></i>
 							</button>
-							<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(url, i); $event.stopPropagation()" [title]="translate('Images_ShowImagesInViewer')">
+							<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
 								<i class="fas fa-search-plus"></i>
 							</button>
 						</div>
@@ -92,14 +119,14 @@
 	}
 
 	<!-- Bottom Controls -->
-	@if (imageUrls.length > 0 && !loading) {
+	@if (mediaItems.length > 0 && !loading) {
 		<div class="gallery-footer">
 			<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
 		</div>
 	}
 
 	<!-- URL List Section -->
-	@if (imageUrls.length > 0 && !loading) {
+	@if (mediaItems.length > 0 && !loading) {
 		<div class="url-list-section">
 			<div class="url-list-header">
 				<button
@@ -126,7 +153,7 @@
 						placeholder="{{ translate('Gallery_UrlListPlaceholder') }}"
 						readonly
 						rows="10"
-						[value]="getAllUrlsText()"
+						[value]="allUrlsText"
 						#urlTextarea
 						>
 					</textarea>
@@ -154,18 +181,29 @@
 						(click)="previousImage()"
 						[disabled]="currentViewerIndex === 0"
 						><i class="fas fa-chevron-left"></i></button>
-					<img [src]="currentViewerImage" [alt]="getImageAltText(currentViewerIndex)">
+					@if (currentMediaItem?.type === 'video') {
+						<video
+							class="viewer-video"
+							[src]="currentViewerImage"
+							controls
+							preload="metadata"
+							[attr.data-video-type]="currentMediaItem?.mimeType || 'video/mp4'">>
+							{{ translate('Gallery_VideoNotSupported') }}
+						</video>
+					} @else {
+						<img [src]="currentViewerImage" [alt]="getImageAltText(currentViewerIndex)">
+					}
 					<button
 						class="btn btn-lg btn-outline-secondary nav-btn next-btn"
 						type="button"
 						[title]="translate('Gallery_NextImage')"
 						(click)="nextImage()"
-						[disabled]="currentViewerIndex === imageUrls.length - 1"
+						[disabled]="currentViewerIndex === mediaItems.length - 1"
 						><i class="fas fa-chevron-right"></i></button>
 				</div>
 				<div class="viewer-footer">
 					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage, $event)">
-						<i class="fas fa-download me-1"></i>{{ translate('Images_DownloadImage') }}
+						<i class="fas fa-download me-1"></i>{{ currentMediaItem?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}
 					</button>
 					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage, $event)">
 						<i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrl') }}
@@ -178,7 +216,7 @@
 		</div>
 	}
 
-	@if (imageUrls.length === 0 && !loading && !errorMessage) {
+	@if (mediaItems.length === 0 && !loading && !errorMessage) {
 		<div class="empty-state">
 			<h2>{{ translate('Gallery_Welcome') }}</h2>
 			<p>{{ translate('Gallery_WelcomeText') }}</p>
@@ -193,7 +231,7 @@
 
 <!-- Gallery Stats and Controls Template -->
 <ng-template #galleryControls>
-	@if (imageUrls.length > 0) {
+	@if (mediaItems.length > 0) {
 		<div class="gallery-stats">
 			<div class="stats-info">
 				<span class="stat">{{ totalImages }} {{ translate('Gallery_Stats_Total') }}</span>

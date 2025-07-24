@@ -4,7 +4,7 @@ import { IChromeStorageData } from '../interfaces/chrome-storage.interface';
 import { ChromeStorageData } from '../models/chrome-storage.model';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
+import type { } from 'jasmine';
 
 // Mock chrome API
 const mockChrome = {

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { FuskrService } from './fuskr.service';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
+import type { } from 'jasmine';
 
 describe('FuskrService', () => {
 	let service: FuskrService;

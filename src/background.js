@@ -213,7 +213,7 @@ browserAPI.contextMenus.onClicked.addListener(async (info, tab) => {
 					const historyIndex = parseInt(info.menuItemId.split('_')[1]);
 					const historicalUrl = options.recentFusks[historyIndex];
 					if (historicalUrl) {
-					await handleFuskFromUrl(historicalUrl);
+						await handleFuskFromUrl(historicalUrl);
 					}
 				}
 				break;
@@ -317,36 +317,36 @@ async function openFuskTab(url) {
 // Omnibox functionality
 if (browserAPI.omnibox) {
 	browserAPI.omnibox.onInputEntered.addListener(async (text) => {
-	try {
-		let url = text;
+		try {
+			let url = text;
 
-		// If it doesn't look like a URL, try to make it one
-		if (!url.includes('://')) {
-		url = 'http://' + url;
-		}
+			// If it doesn't look like a URL, try to make it one
+			if (!url.includes('://')) {
+				url = 'http://' + url;
+			}
 
-		if (isFuskable(url)) {
-		await handleFuskFromUrl(url);
-		} else {
-		// Try to create a fuskable URL
-		const fuskUrl = createFuskUrl(url, 10, 0);
-		await handleFuskFromUrl(fuskUrl);
+			if (isFuskable(url)) {
+				await handleFuskFromUrl(url);
+			} else {
+				// Try to create a fuskable URL
+				const fuskUrl = createFuskUrl(url, 10, 0);
+				await handleFuskFromUrl(fuskUrl);
+			}
+		} catch (error) {
+			console.error('Error handling omnibox input:', error);
 		}
-	} catch (error) {
-		console.error('Error handling omnibox input:', error);
-	}
 	});
 }
 
 // Listen for storage changes
 browserAPI.storage.onChanged.addListener((changes, area) => {
 	if (area === 'sync') {
-	Object.keys(changes).forEach(key => {
-		if (key in options) {
-		options[key] = changes[key].newValue;
-		}
-	});
-	updateRecentMenu();
+		Object.keys(changes).forEach(key => {
+			if (key in options) {
+				options[key] = changes[key].newValue;
+			}
+		});
+		updateRecentMenu();
 	}
 });
 
@@ -362,7 +362,7 @@ function createFuskUrl(url, count, direction) {
 	const digitsCheck = findDigitsRegexp.exec(url);
 
 	if (!digitsCheck) {
-	return url;
+		return url;
 	}
 
 	const begin = digitsCheck[1];
@@ -374,12 +374,12 @@ function createFuskUrl(url, count, direction) {
 	let lastNum = originalNum;
 
 	if (direction === 0) {
-	firstNum -= count;
-	lastNum += count;
+		firstNum -= count;
+		lastNum += count;
 	} else if (direction === -1) {
-	firstNum -= count;
+		firstNum -= count;
 	} else if (direction === 1) {
-	lastNum += count;
+		lastNum += count;
 	}
 
 	firstNum = Math.max(0, firstNum);
@@ -390,11 +390,11 @@ function createFuskUrl(url, count, direction) {
 
 	// Pad with zeros to match original length
 	while (firstNumStr.length < number.length) {
-	firstNumStr = '0' + firstNumStr;
+		firstNumStr = '0' + firstNumStr;
 	}
 
 	while (lastNumStr.length < firstNumStr.length) {
-	lastNumStr = '0' + lastNumStr;
+		lastNumStr = '0' + lastNumStr;
 	}
 
 	return begin + '[' + firstNumStr + '-' + lastNumStr + ']' + end;

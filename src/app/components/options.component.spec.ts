@@ -7,7 +7,7 @@ import { ChromeStorageData } from '../models/chrome-storage.model';
 import { BaseComponentTestHelper } from './base-component-test.helper';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
+import type { } from 'jasmine';
 
 describe('OptionsComponent', () => {
 	let component: OptionsComponent;
@@ -37,25 +37,25 @@ describe('OptionsComponent', () => {
 		const testStyleSheet = document.createElement('style');
 		testStyleSheet.textContent = `
 			:root {
-				--bg-color: #ffffff;
-				--bg-secondary: #f5f5f5;
-				--text-color: #333333;
-				--text-secondary: #666666;
-				--border-color: #dddddd;
+	--bg-color: #ffffff;
+	--bg-secondary: #f5f5f5;
+	--text-color: #333333;
+	--text-secondary: #666666;
+	--border-color: #dddddd;
 			}
 			body.dark-mode {
-				--bg-color: #1a1a1a;
-				--bg-secondary: #2d2d2d;
-				--text-color: #e0e0e0;
-				--text-secondary: #a0a0a0;
-				--border-color: #404040;
+	--bg-color: #1a1a1a;
+	--bg-secondary: #2d2d2d;
+	--text-color: #e0e0e0;
+	--text-secondary: #a0a0a0;
+	--border-color: #404040;
 			}
 			body.dark-mode .card {
-				background-color: var(--bg-secondary) !important;
-				color: var(--text-color) !important;
+	background-color: var(--bg-secondary) !important;
+	color: var(--text-color) !important;
 			}
 			body.dark-mode h1, body.dark-mode h5, body.dark-mode label, body.dark-mode .form-text {
-				color: var(--text-color) !important;
+	color: var(--text-color) !important;
 			}
 		`;
 		document.head.appendChild(testStyleSheet);
