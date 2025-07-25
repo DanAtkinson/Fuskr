@@ -60,6 +60,23 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
 	}
 
+	async resetToDefaults() {
+		const confirmed = confirm(this.translate('Options_ResetConfirmation'));
+		if (!confirmed) {
+			return;
+		}
+
+		try {
+			await this.chromeService.resetOptionsToDefaults();
+			await this.loadOptions(); // Reload the fresh options
+			this.showStatus(this.translate('Options_ResetSuccessful'));
+			this.logger.info('options.reset', 'User reset options to defaults');
+		} catch (error) {
+			this.logger.error('options.resetFailed', 'Failed to reset options', error);
+			this.showStatus(this.translate('Options_ResetFailed'));
+		}
+	}
+
 	async saveOptions() {
 		try {
 			await this.chromeService.setStorageData(this.options);

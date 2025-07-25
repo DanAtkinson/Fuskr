@@ -345,4 +345,58 @@ describe('OptionsComponent', () => {
 			expect(document.body.classList.contains('dark-mode')).toBeTruthy();
 		});
 	});
+
+	describe('resetToDefaults', () => {
+		beforeEach(() => {
+			// Setup spies for the reset functionality
+			mockChromeService.resetOptionsToDefaults = jasmine.createSpy('resetOptionsToDefaults').and.returnValue(Promise.resolve());
+			spyOn(window, 'confirm').and.returnValue(true);
+			spyOn(component, 'loadOptions').and.returnValue(Promise.resolve());
+		});
+
+		it('should reset options to defaults when confirmed', async () => {
+			await component.resetToDefaults();
+
+			expect(window.confirm).toHaveBeenCalledWith(component.translate('Options_ResetConfirmation'));
+			expect(mockChromeService.resetOptionsToDefaults).toHaveBeenCalled();
+			expect(component.loadOptions).toHaveBeenCalled();
+			expect(component.statusMessage).toBe(component.translate('Options_ResetSuccessful'));
+		});
+
+		it('should not reset options when user cancels confirmation', async () => {
+			(window.confirm as jasmine.Spy).and.returnValue(false);
+
+			await component.resetToDefaults();
+
+			expect(window.confirm).toHaveBeenCalledWith(component.translate('Options_ResetConfirmation'));
+			expect(mockChromeService.resetOptionsToDefaults).not.toHaveBeenCalled();
+			expect(component.loadOptions).not.toHaveBeenCalled();
+			expect(component.statusMessage).toBe('');
+		});
+
+		it('should handle reset errors gracefully', async () => {
+			const errorMessage = 'Reset failed';
+			mockChromeService.resetOptionsToDefaults.and.returnValue(Promise.reject(new Error(errorMessage)));
+
+			await component.resetToDefaults();
+
+			expect(mockChromeService.resetOptionsToDefaults).toHaveBeenCalled();
+			expect(component.loadOptions).not.toHaveBeenCalled();
+			expect(component.statusMessage).toBe(component.translate('Options_ResetFailed'));
+		});
+
+		it('should show status message that clears after 2 seconds', async () => {
+			jasmine.clock().install();
+
+			await component.resetToDefaults();
+
+			expect(component.statusMessage).toBe(component.translate('Options_ResetSuccessful'));
+
+			jasmine.clock().tick(2001);
+
+			expect(component.statusMessage).toBe('');
+
+			jasmine.clock().uninstall();
+		});
+	});
 });

@@ -60,6 +60,24 @@ export class ChromeService {
 		this.logger.debug('chrome.history.cleared', 'Gallery history cleared');
 	}
 
+	async resetOptionsToDefaults(): Promise<void> {
+		try {
+			// Get current storage data to preserve history
+			const currentData = await this.getStorageData();
+			
+			// Create new default data with preserved history
+			const defaultData = new ChromeStorageData();
+			defaultData.behaviour.galleryHistory = currentData.behaviour.galleryHistory;
+			
+			// Save the reset data
+			await this.setStorageData(defaultData);
+			this.logger.info('chrome.options.reset', 'Options reset to defaults (history preserved)');
+		} catch (error) {
+			this.logger.error('chrome.options.resetFailed', 'Failed to reset options', error);
+			throw error;
+		}
+	}
+
 	async downloadFile(url: string, filename?: string): Promise<void> {
 		return new Promise((resolve) => {
 			if (this.browserAPI && this.browserAPI.downloads) {

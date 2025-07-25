@@ -465,6 +465,22 @@
 		"message": "Error saving options",
 		"description": "Error message when settings fail to save"
 	},
+	"Options_ResetToDefaults": {
+		"message": "Reset to Defaults",
+		"description": "Button text for resetting options to default values"
+	},
+	"Options_ResetConfirmation": {
+		"message": "Are you sure you want to reset all options to their default values? Your gallery history will be preserved, but all other settings will be lost.",
+		"description": "Confirmation dialog when user clicks reset to defaults"
+	},
+	"Options_ResetSuccessful": {
+		"message": "Options reset to defaults successfully!",
+		"description": "Status message when options are reset successfully"
+	},
+	"Options_ResetFailed": {
+		"message": "Error resetting options to defaults",
+		"description": "Error message when resetting options fails"
+	},
 	"Options_ResizeImagesFitOnPage": {
 		"message": "Resize images to fit on page",
 		"description": "Radio button option for fit on page display mode"

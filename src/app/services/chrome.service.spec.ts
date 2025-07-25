@@ -218,4 +218,71 @@ describe('ChromeService', () => {
 			expect(result).toBeFalsy();
 		});
 	});
+
+	describe('resetOptionsToDefaults', () => {
+		it('should reset options to defaults while preserving history', async () => {
+			const currentData: IChromeStorageData = {
+				display: { 
+					darkMode: true, 
+					imageDisplayMode: 'thumbnails',
+					resizeImagesToFillPage: false,
+					resizeImagesToFitOnPage: true,
+					resizeImagesToFullWidth: false,
+					resizeImagesToThumbnails: false,
+					showImagesInViewer: false,
+					toggleBrokenImages: true
+				},
+				behaviour: { 
+					openInForeground: false,
+					keepRecentFusks: true,
+					recentFusks: ['recent1', 'recent2'],
+					galleryHistory: {
+						entries: [{
+							id: 'test-id',
+							originalUrl: 'test-url',
+							timestamp: new Date(),
+							totalImages: 10,
+							loadedImages: 8,
+							brokenImages: 2,
+							imageUrls: ['url1', 'url2'],
+							displayMode: 'thumbnails'
+						}],
+						maxEntries: 5
+					}
+				},
+				safety: { enableOverloadProtection: false, overloadProtectionLimit: 200 },
+				version: 1
+			};
+
+			// Mock getStorageData to return current data
+			spyOn(service, 'getStorageData').and.returnValue(Promise.resolve(currentData));
+			spyOn(service, 'setStorageData').and.returnValue(Promise.resolve());
+
+			await service.resetOptionsToDefaults();
+
+			expect(service.getStorageData).toHaveBeenCalled();
+			expect(service.setStorageData).toHaveBeenCalled();
+
+			// Verify the reset data preserves history but resets other options
+			const resetCall = (service.setStorageData as jasmine.Spy).calls.mostRecent();
+			const resetData = resetCall.args[0];
+
+			// History should be preserved
+			expect(resetData.behaviour.galleryHistory).toEqual(currentData.behaviour.galleryHistory);
+
+			// Other options should be reset to defaults
+			const defaults = new ChromeStorageData();
+			expect(resetData.display.darkMode).toBe(defaults.display.darkMode);
+			expect(resetData.display.imageDisplayMode).toBe(defaults.display.imageDisplayMode);
+			expect(resetData.behaviour.openInForeground).toBe(defaults.behaviour.openInForeground);
+			expect(resetData.safety.enableOverloadProtection).toBe(defaults.safety.enableOverloadProtection);
+			expect(resetData.safety.overloadProtectionLimit).toBe(defaults.safety.overloadProtectionLimit);
+		});
+
+		it('should handle errors during reset', async () => {
+			spyOn(service, 'getStorageData').and.returnValue(Promise.reject(new Error('Storage error')));
+
+			await expectAsync(service.resetOptionsToDefaults()).toBeRejected();
+		});
+	});
 });
