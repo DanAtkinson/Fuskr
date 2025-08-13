@@ -1,0 +1,20 @@
+# Set default line ending behavior for all files
+* text=auto
+
+# Ensure these files always use CRLF on Windows
+*.json text eol=crlf
+*.js text eol=crlf
+*.ts text eol=crlf
+*.html text eol=crlf
+*.css text eol=crlf
+*.scss text eol=crlf
+*.md text eol=crlf
+*.markdown text eol=crlf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
