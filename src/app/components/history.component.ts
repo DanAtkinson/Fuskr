@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ChromeService } from '@services/chrome.service';
 import { LoggerService } from '@services/logger.service';
@@ -7,7 +7,7 @@ import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history
 
 @Component({
 	selector: 'app-history',
-	standalone: false,
+	standalone: true,
 	styleUrls: ['./history.component.scss'],
 	templateUrl: './history.component.html',
 })
@@ -17,11 +17,12 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 	history: GalleryHistory = { entries: [], maxEntries: 10 };
 	loading = true;
 
-	constructor(
-		public router: Router,
-		protected override chromeService: ChromeService,
-		private logger: LoggerService
-	) {
+	// Injected services
+	public router = inject(Router);
+	protected override chromeService = inject(ChromeService);
+	private logger = inject(LoggerService);
+
+	constructor() {
 		super();
 	}
 

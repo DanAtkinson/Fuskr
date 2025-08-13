@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MediaItem, MediaTypeResult } from '@interfaces/media';
 import { LoggerService } from './logger.service';
 
@@ -6,7 +6,8 @@ import { LoggerService } from './logger.service';
 	providedIn: 'root',
 })
 export class MediaTypeService {
-	constructor(private logger: LoggerService) {}
+	// Injected services
+	private logger = inject(LoggerService);
 
 	/**
 	 * Creates a MediaItem from a URL with initial metadata

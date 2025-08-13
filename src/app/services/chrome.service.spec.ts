@@ -21,7 +21,7 @@ describe('ChromeService', () => {
 
 	beforeEach(() => {
 		// Set up chrome mock
-		(window as any).chrome = mockChrome;
+		(window as unknown as { chrome: typeof mockChrome }).chrome = mockChrome;
 
 		TestBed.configureTestingModule({});
 		service = TestBed.inject(ChromeService);
@@ -41,9 +41,11 @@ describe('ChromeService', () => {
 
 	describe('getStorageData', () => {
 		it('should return default data when chrome storage is empty', async () => {
-			mockChrome.storage.sync.get.and.callFake((_keys: any, callback: any) => {
-				callback({});
-			});
+			mockChrome.storage.sync.get.and.callFake(
+				(_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
+					callback({});
+				}
+			);
 
 			const result = await service.getStorageData();
 
@@ -78,9 +80,11 @@ describe('ChromeService', () => {
 				},
 			};
 
-			mockChrome.storage.sync.get.and.callFake((_keys: any, callback: any) => {
-				callback(storedData);
-			});
+			mockChrome.storage.sync.get.and.callFake(
+				(_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
+					callback(storedData);
+				}
+			);
 
 			const result = await service.getStorageData();
 
@@ -148,7 +152,7 @@ describe('ChromeService', () => {
 				version: 1,
 			});
 
-			mockChrome.storage.sync.set.and.callFake((_data: any, callback: any) => {
+			mockChrome.storage.sync.set.and.callFake((_data: unknown, callback: () => void) => {
 				callback();
 			});
 

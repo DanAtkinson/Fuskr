@@ -232,7 +232,7 @@ describe('LoggerService', () => {
 				download: '',
 				click: jasmine.createSpy('click'),
 			};
-			spyOn(document, 'createElement').and.returnValue(mockLink as any);
+			spyOn(document, 'createElement').and.returnValue(mockLink as unknown as HTMLAnchorElement);
 			spyOn(document.body, 'appendChild');
 			spyOn(document.body, 'removeChild');
 		});

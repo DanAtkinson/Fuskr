@@ -6,7 +6,14 @@ const angular = require('angular-eslint');
 module.exports = tseslint.config(
 	{
 		files: ['**/*.ts'],
-		ignores: ['**/coverage/**', '**/dist/**', '**/node_modules/**', 'src/config/coverage/**'],
+		ignores: [
+			'**/coverage/**', 
+			'**/dist/**', 
+			'**/node_modules/**', 
+			'src/config/coverage/**',
+			'coverage/**',
+			'.nyc_output/**'
+		],
 		extends: [
 			eslint.configs.recommended,
 			...tseslint.configs.recommended,
@@ -39,6 +46,14 @@ module.exports = tseslint.config(
 	},
 	{
 		files: ['**/*.html'],
+		ignores: [
+			'**/coverage/**', 
+			'**/dist/**', 
+			'**/node_modules/**', 
+			'src/config/coverage/**',
+			'coverage/**',
+			'.nyc_output/**'
+		],
 		extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
 		rules: {},
 	}

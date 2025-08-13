@@ -132,24 +132,27 @@ describe('BaseComponent', () => {
 			}).toThrowError('Translation error');
 		});
 
-		it('should handle chromeService.getMessage returning null', () => {
-			const testKey = 'null_key';
+		it('should return key when chromeService.getMessage returns empty string', () => {
+			const testKey = 'empty_key';
 
-			mockChromeService.getMessage.and.returnValue(null as any);
+			mockChromeService.getMessage.and.returnValue('');
 
 			const result = component.translate(testKey);
 
-			expect(result).toBeNull();
+			expect(result).toBe('');
 		});
 
-		it('should handle chromeService.getMessage returning undefined', () => {
-			const testKey = 'undefined_key';
+		it('should handle chromeService.getMessage with substitutions', () => {
+			const testKey = 'substitution_key';
+			const substitutions = ['value1', 'value2'];
+			const expectedMessage = 'Message with value1 and value2';
 
-			mockChromeService.getMessage.and.returnValue(undefined as any);
+			mockChromeService.getMessage.and.returnValue(expectedMessage);
 
-			const result = component.translate(testKey);
+			const result = component.translate(testKey, substitutions);
 
-			expect(result).toBeUndefined();
+			expect(mockChromeService.getMessage).toHaveBeenCalledWith(testKey, substitutions);
+			expect(result).toBe(expectedMessage);
 		});
 	});
 

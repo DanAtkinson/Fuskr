@@ -51,7 +51,7 @@ describe('HistoryComponent', () => {
 		const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
 		await TestBed.configureTestingModule({
-			declarations: [HistoryComponent],
+			imports: [HistoryComponent],
 			providers: [
 				{ provide: ChromeService, useValue: chromeServiceSpy },
 				{ provide: LoggerService, useValue: loggerServiceSpy },
@@ -141,11 +141,11 @@ describe('HistoryComponent', () => {
 
 		it('should handle null/undefined input', () => {
 			// null becomes epoch time (Jan 1, 1970) which is a valid date
-			const result = component.formatDate(null as any);
+			const result = component.formatDate(null as unknown as Date);
 			expect(result).toContain('1/1/1970'); // US format for epoch
 
 			// undefined should be invalid
-			const undefinedResult = component.formatDate(undefined as any);
+			const undefinedResult = component.formatDate(undefined as unknown as Date);
 			expect(undefinedResult).toBe('Invalid Date');
 		});
 
@@ -170,7 +170,7 @@ describe('HistoryComponent', () => {
 
 		it('should handle numeric timestamps', () => {
 			const timestamp = 1640995200000; // January 1, 2022
-			const result = component.formatDate(timestamp as any);
+			const result = component.formatDate(timestamp as unknown as Date);
 
 			expect(result).not.toBe('Invalid Date');
 			expect(result).toContain('2022');
@@ -343,7 +343,7 @@ describe('HistoryComponent', () => {
 
 		it('should handle NaN and undefined', () => {
 			expect(component.getSuccessRateClass(NaN)).toBe('danger');
-			expect(component.getSuccessRateClass(undefined as any)).toBe('danger');
+			expect(component.getSuccessRateClass(undefined as unknown as number)).toBe('danger');
 		});
 	});
 

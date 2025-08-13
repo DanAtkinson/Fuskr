@@ -1,22 +1,32 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ChromeStorageData } from '@models/chrome-storage';
 import { LoggerService, LogLevel } from '@services/logger.service';
 import { BaseComponent } from './base.component';
 
 @Component({
 	selector: 'app-options',
-	standalone: false,
+	standalone: true,
 	styleUrls: ['./options.component.scss'],
 	templateUrl: './options.component.html',
+	imports: [FormsModule],
 })
 export class OptionsComponent extends BaseComponent implements OnInit {
 	// Public properties (alphabetically)
-	loggerConfig: any = {};
+	loggerConfig: { enabled: boolean; logLevel: LogLevel; maxLogs: number; logCount: number } = {
+		enabled: false,
+		logLevel: LogLevel.INFO,
+		maxLogs: 0,
+		logCount: 0,
+	};
 	options: ChromeStorageData = new ChromeStorageData();
 	showDebugPanel = false;
 	statusMessage = '';
 
-	constructor(private logger: LoggerService) {
+	// Injected services
+	private logger = inject(LoggerService);
+
+	constructor() {
 		super();
 	}
 

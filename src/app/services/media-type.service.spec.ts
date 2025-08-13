@@ -53,7 +53,7 @@ describe('MediaTypeService', () => {
 
 	describe('determineMediaType', () => {
 		it('should determine image type from Content-Type header', async () => {
-			const mockResponse = {
+			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
 					get: jasmine.createSpy('get').and.callFake((header: string) => {
@@ -61,8 +61,8 @@ describe('MediaTypeService', () => {
 						if (header === 'Content-Length') return '12345';
 						return null;
 					}),
-				},
-			} as any;
+				} as unknown as Headers,
+			};
 
 			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
 
@@ -74,7 +74,7 @@ describe('MediaTypeService', () => {
 		});
 
 		it('should determine video type from Content-Type header', async () => {
-			const mockResponse = {
+			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
 					get: jasmine.createSpy('get').and.callFake((header: string) => {
@@ -82,8 +82,8 @@ describe('MediaTypeService', () => {
 						if (header === 'Content-Length') return '54321';
 						return null;
 					}),
-				},
-			} as any;
+				} as unknown as Headers,
+			};
 
 			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
 
@@ -105,12 +105,12 @@ describe('MediaTypeService', () => {
 		});
 
 		it('should use HEAD request with correct options', async () => {
-			const mockResponse = {
+			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
 					get: jasmine.createSpy('get').and.returnValue('image/png'),
-				},
-			} as any;
+				} as unknown as Headers,
+			};
 
 			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
 
@@ -133,15 +133,15 @@ describe('MediaTypeService', () => {
 				extension: 'jpg',
 			};
 
-			const mockResponse = {
+			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
 					get: jasmine.createSpy('get').and.callFake((header: string) => {
 						if (header === 'Content-Type') return 'image/jpeg';
 						return null;
 					}),
-				},
-			} as any;
+				} as unknown as Headers,
+			};
 
 			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
 
@@ -177,12 +177,12 @@ describe('MediaTypeService', () => {
 		it('should process URLs in batches', async () => {
 			const urls = ['https://example.com/1.jpg', 'https://example.com/2.mp4', 'https://example.com/3.png'];
 
-			const mockResponse = {
+			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
 					get: jasmine.createSpy('get').and.returnValue('image/jpeg'),
-				},
-			} as any;
+				} as unknown as Headers,
+			};
 
 			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
 

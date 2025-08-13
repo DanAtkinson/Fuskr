@@ -20,8 +20,8 @@ describe('FuskrService', () => {
 
 	describe('isFuskable Method', () => {
 		it('should return false for null or undefined URLs', () => {
-			expect(service.isFuskable(null as any)).toBeFalsy();
-			expect(service.isFuskable(undefined as any)).toBeFalsy();
+			expect(service.isFuskable(null as unknown as string)).toBeFalsy();
+			expect(service.isFuskable(undefined as unknown as string)).toBeFalsy();
 		});
 
 		it('should return false for empty string URLs', () => {
@@ -93,11 +93,11 @@ describe('FuskrService', () => {
 
 	describe('getLinks Method', () => {
 		it('should return empty array for null or invalid URLs', () => {
-			expect(service.getLinks(null as any)).toEqual([]);
-			expect(service.getLinks(undefined as any)).toEqual([]);
+			expect(service.getLinks(null as unknown as string)).toEqual([]);
+			expect(service.getLinks(undefined as unknown as string)).toEqual([]);
 			expect(service.getLinks('')).toEqual([]);
-			expect(service.getLinks({ hey: 'ho' } as any)).toEqual([]);
-			expect(service.getLinks(['string', 1234] as any)).toEqual([]);
+			expect(service.getLinks({ hey: 'ho' } as unknown as string)).toEqual([]);
+			expect(service.getLinks(['string', 1234] as unknown as string)).toEqual([]);
 		});
 
 		it('should return empty array for unfuskable URLs', () => {

@@ -78,8 +78,8 @@ describe('Chrome Storage Models', () => {
 
 		it('should handle null values in data', () => {
 			const data = {
-				darkMode: null as any,
-				imageDisplayMode: null as any,
+				darkMode: null as unknown as boolean,
+				imageDisplayMode: null as unknown as 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails',
 			};
 
 			const settings = new DisplaySettings(data);
@@ -305,7 +305,7 @@ describe('Chrome Storage Models', () => {
 		});
 
 		it('should handle undefined version', () => {
-			const data = new ChromeStorageData({ version: undefined as any });
+			const data = new ChromeStorageData({ version: undefined as unknown as number });
 			expect(data.version).toBe(1); // Should use default
 		});
 
@@ -365,7 +365,7 @@ describe('Chrome Storage Models', () => {
 		});
 
 		it('should handle null input', () => {
-			const data = new ChromeStorageData(null as any);
+			const data = new ChromeStorageData(null as unknown as Partial<IChromeStorageData>);
 
 			expect(data.version).toBe(1);
 			expect(data.display).toBeInstanceOf(DisplaySettings);

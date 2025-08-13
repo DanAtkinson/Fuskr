@@ -19,7 +19,7 @@ describe('GalleryComponent', () => {
 	let mockChromeService: jasmine.SpyObj<ChromeService>;
 	let mockMediaTypeService: jasmine.SpyObj<MediaTypeService>;
 	let mockRouter: jasmine.SpyObj<Router>;
-	let mockActivatedRoute: any;
+	let mockActivatedRoute: Partial<ActivatedRoute>;
 
 	beforeEach(async () => {
 		mockFuskrService = jasmine.createSpyObj('FuskrService', [
@@ -32,13 +32,13 @@ describe('GalleryComponent', () => {
 		mockActivatedRoute = {
 			queryParams: of({ url: 'https://example.com/test.jpg' }),
 			snapshot: { queryParams: {} },
-		};
+		} as unknown as ActivatedRoute;
 
 		// Setup the ChromeService mock using BaseComponentTestHelper
 		mockChromeService = BaseComponentTestHelper.setupChromeServiceMock();
 
 		await TestBed.configureTestingModule({
-			declarations: [GalleryComponent],
+			imports: [GalleryComponent],
 			providers: [
 				{ provide: FuskrService, useValue: mockFuskrService },
 				{ provide: ChromeService, useValue: mockChromeService },

@@ -6,7 +6,7 @@ import { ChromeService } from '@services/chrome.service';
  */
 @Component({
 	template: '',
-	standalone: false,
+	standalone: true,
 })
 export abstract class BaseComponent {
 	/**

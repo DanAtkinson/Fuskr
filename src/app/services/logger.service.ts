@@ -12,7 +12,7 @@ export interface LogEntry {
 	level: LogLevel;
 	component: string;
 	message: string;
-	data?: any;
+	data?: unknown;
 }
 
 @Injectable({
@@ -40,11 +40,11 @@ export class LoggerService {
 		this.info('LoggerService', 'Logger configuration updated', settings);
 	}
 
-	debug(component: string, message: string, data?: any): void {
+	debug(component: string, message: string, data?: unknown): void {
 		this.log(LogLevel.DEBUG, component, message, data);
 	}
 
-	error(component: string, message: string, data?: any): void {
+	error(component: string, message: string, data?: unknown): void {
 		this.log(LogLevel.ERROR, component, message, data);
 	}
 
@@ -99,11 +99,11 @@ export class LoggerService {
 		return this.logs.filter((log) => log.level >= minLevel);
 	}
 
-	info(component: string, message: string, data?: any): void {
+	info(component: string, message: string, data?: unknown): void {
 		this.log(LogLevel.INFO, component, message, data);
 	}
 
-	warn(component: string, message: string, data?: any): void {
+	warn(component: string, message: string, data?: unknown): void {
 		this.log(LogLevel.WARN, component, message, data);
 	}
 
@@ -114,7 +114,7 @@ export class LoggerService {
 	private maxLogs = 1000; // Keep last 1000 logs
 
 	// Private methods (alphabetically)
-	private log(level: LogLevel, component: string, message: string, data?: any): void {
+	private log(level: LogLevel, component: string, message: string, data?: unknown): void {
 		if (!this.isEnabled || level < this.currentLogLevel) {
 			return;
 		}

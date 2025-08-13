@@ -21,8 +21,7 @@ describe('OptionsComponent', () => {
 		const chromeServiceSpy = BaseComponentTestHelper.setupChromeServiceMock();
 
 		await TestBed.configureTestingModule({
-			declarations: [OptionsComponent],
-			imports: [FormsModule],
+			imports: [OptionsComponent, FormsModule],
 			providers: [{ provide: ChromeService, useValue: chromeServiceSpy }],
 		}).compileComponents();
 

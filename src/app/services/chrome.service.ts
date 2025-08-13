@@ -1,18 +1,54 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { LoggerService } from './logger.service';
 import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history';
 import { IChromeStorageData, IDisplaySettings, IBehaviourSettings, ISafetySettings } from '@interfaces/chrome-storage';
 import { ChromeStorageData } from '@models/chrome-storage';
 
-// Cross-browser compatibility
-declare const browser: any;
-declare const chrome: any;
+// Cross-browser compatibility types
+interface TabInfo {
+	id?: number;
+	url?: string;
+	active?: boolean;
+	windowId?: number;
+}
+
+interface BrowserAPI {
+	tabs?: {
+		query: (queryInfo: { active: boolean; currentWindow: boolean }, callback: (tabs: TabInfo[]) => void) => void;
+		create: (createProperties: { url: string; active: boolean }, callback?: () => void) => void;
+	};
+	storage?: {
+		local?: {
+			get: (keys: string | string[] | null, callback: (items: Record<string, unknown>) => void) => void;
+			set: (items: Record<string, unknown>, callback?: () => void) => void;
+		};
+		sync?: {
+			get: (keys: string | string[] | null, callback: (items: Record<string, unknown>) => void) => void;
+			set: (items: Record<string, unknown>, callback?: () => void) => void;
+		};
+	};
+	downloads?: {
+		download: (options: { url: string; filename?: string }) => void;
+	};
+	i18n?: {
+		getMessage: (messageName: string, substitutions?: string | string[]) => string;
+	};
+	runtime?: {
+		id?: string;
+	};
+}
+
+declare const browser: BrowserAPI;
+declare const chrome: BrowserAPI;
 
 @Injectable({
 	providedIn: 'root',
 })
 export class ChromeService {
-	constructor(private logger: LoggerService) {
+	// Injected services
+	private logger = inject(LoggerService);
+
+	constructor() {
 		// Prefer browser API for Firefox, fallback to chrome for Chrome
 		this.browserAPI = typeof browser !== 'undefined' ? browser : typeof chrome !== 'undefined' ? chrome : null;
 	}
@@ -22,11 +58,12 @@ export class ChromeService {
 		const currentData = await this.getStorageData();
 		const history = currentData.behaviour.galleryHistory;
 
-		// Create new entry with ID and timestamp as ISO string for reliable storage
+		// Create new entry with ID and timestamp
+		// Note: We store timestamp as Date object, Chrome storage handles serialization
 		const newEntry: GalleryHistoryEntry = {
 			...entry,
 			id: this.generateHistoryId(),
-			timestamp: new Date().toISOString() as any, // Store as ISO string, will be converted back to Date when retrieved
+			timestamp: new Date(),
 		};
 
 		// Add to beginning of array
@@ -76,15 +113,11 @@ export class ChromeService {
 	async downloadFile(url: string, filename?: string): Promise<void> {
 		return new Promise((resolve) => {
 			if (this.browserAPI && this.browserAPI.downloads) {
-				this.browserAPI.downloads.download(
-					{
-						url,
-						filename: filename || undefined,
-					},
-					() => {
-						resolve();
-					}
-				);
+				this.browserAPI.downloads.download({
+					url,
+					filename: filename || undefined,
+				});
+				resolve();
 			} else {
 				// Fallback for development
 				const link = document.createElement('a');
@@ -98,10 +131,10 @@ export class ChromeService {
 		});
 	}
 
-	async getCurrentTab(): Promise<any> {
+	async getCurrentTab(): Promise<TabInfo | null> {
 		return new Promise((resolve) => {
 			if (this.browserAPI && this.browserAPI.tabs) {
-				this.browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs: any[]) => {
+				this.browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs: TabInfo[]) => {
 					resolve(tabs[0] || null);
 				});
 			} else {
@@ -186,10 +219,10 @@ export class ChromeService {
 
 	async getStorageData(): Promise<IChromeStorageData> {
 		return new Promise((resolve) => {
-			if (this.browserAPI && this.browserAPI.storage) {
-				this.browserAPI.storage.sync.get(null, (data: IChromeStorageData) => {
+			if (this.browserAPI && this.browserAPI.storage && this.browserAPI.storage.sync) {
+				this.browserAPI.storage.sync.get(null, (data: Record<string, unknown>) => {
 					// Apply defaults to stored data
-					const structuredData = this.applyDefaults(data);
+					const structuredData = this.applyDefaults(data as unknown as IChromeStorageData);
 					resolve(structuredData);
 				});
 			} else {
@@ -229,7 +262,7 @@ export class ChromeService {
 
 	async setStorageData(data: Partial<IChromeStorageData>): Promise<void> {
 		return new Promise((resolve) => {
-			if (this.browserAPI && this.browserAPI.storage) {
+			if (this.browserAPI && this.browserAPI.storage && this.browserAPI.storage.sync) {
 				this.browserAPI.storage.sync.set(data, () => {
 					resolve();
 				});
@@ -269,7 +302,7 @@ export class ChromeService {
 	}
 
 	// Private properties (alphabetically)
-	private browserAPI: any;
+	private browserAPI: BrowserAPI | null;
 
 	// Private methods (alphabetically)
 	private applyDefaults(data: Partial<IChromeStorageData>): IChromeStorageData {

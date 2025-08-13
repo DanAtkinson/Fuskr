@@ -1,4 +1,6 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FuskrService } from '@services/fuskr.service';
 import { LoggerService } from '@services/logger.service';
@@ -10,9 +12,10 @@ import { saveAs } from 'file-saver';
 
 @Component({
 	selector: 'app-gallery',
-	standalone: false,
+	standalone: true,
 	styleUrls: ['./gallery.component.scss'],
 	templateUrl: './gallery.component.html',
+	imports: [CommonModule, FormsModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit {
 	// Public properties (alphabetically)
@@ -46,13 +49,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Private properties (alphabetically)
 	private hasInitialized = false;
 
-	constructor(
-		private route: ActivatedRoute,
-		private router: Router,
-		private fuskrService: FuskrService,
-		private logger: LoggerService,
-		private mediaTypeService: MediaTypeService
-	) {
+	// Injected services
+	private route = inject(ActivatedRoute);
+	private router = inject(Router);
+	private fuskrService = inject(FuskrService);
+	private logger = inject(LoggerService);
+	private mediaTypeService = inject(MediaTypeService);
+
+	constructor() {
 		super();
 	}
 
