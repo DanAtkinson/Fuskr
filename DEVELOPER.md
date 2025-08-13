@@ -184,6 +184,34 @@ Gallery history management:
 - Batch operations (clear, export)
 - History persistence across sessions
 
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions
+The project uses GitHub Actions for continuous integration and deployment. The workflow includes:
+
+**Automated Testing:**
+- Multi-version Node.js testing (18.x, 20.x, 22.x)
+- Unit tests with Jasmine/Karma
+- Code coverage reporting with Codecov
+- Chrome headless browser testing
+
+**Code Quality Checks:**
+- ESLint for code linting
+- Prettier for code formatting (if configured)
+- TypeScript compilation validation
+
+**Build & Packaging:**
+- Production builds for both Chrome and Firefox
+- Automatic extension packaging
+- Build artifact uploads with 30-day retention
+
+**Trigger Events:**
+- Push to `master`, `main`, or `develop` branches
+- Pull requests to `master` or `main` branches
+
+### Workflow Status
+View the current build status: [![CI/CD Pipeline](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml/badge.svg)](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml)
+
 ## 🧪 Testing
 
 ### Test Setup

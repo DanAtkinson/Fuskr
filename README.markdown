@@ -1,6 +1,6 @@
 # 🖼️ Fuskr - Image Gallery Generator
 
-[![Build Status](https://travis-ci.org/DanAtkinson/Fuskr.svg?branch=master)](https://travis-ci.org/DanAtkinson/Fuskr)
+[![CI/CD Pipeline](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml/badge.svg)](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml)
 ![Chrome](https://img.shields.io/badge/Chrome-88+-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-109+-orange.svg)
 ![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)

@@ -1,5 +1,8 @@
 # TODO
 
+## ✅ Completed
+* ~~Replace Travis and use Github for build status.~~ - **DONE**: GitHub Actions CI/CD pipeline now provides comprehensive build, test, and deployment status with multiple Node.js versions, code quality checks, and browser extension packaging.
+
 ## 🚀 Main Enhancements
 * Creation of a public key for additional security. This should aid in both Chromium and Firefox add-on store submission.
 * Add a "Reset Options" button to the bottom of the Options screen which deletes the options (but not history) and resets them back to their defaults.
