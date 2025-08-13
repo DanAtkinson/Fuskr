@@ -1,10 +1,10 @@
 {
 	"name": "fuskr",
 	"description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
-	"version": "4.0.0",
+	"version": "5.0.0",
 	"main": "src/main.ts",
 	"scripts": {
-		"build": "npm run clean && npm run test:ci && npm run build:extensions",
+		"build": "npm run clean && npm run sync:version && npm run test:ci && npm run build:extensions",
 		"build:extensions": "npm run build:angular && npm run build:background && npm run copy:files && npm run organise:builds && npm run zip:builds",
 		"build:angular": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" ng build --configuration production && ng build --configuration production --output-path=dist/firefox",
 		"build:background": "webpack --config src/config/webpack.background.js",
@@ -13,9 +13,11 @@
 		"ng": "ng",
 		"organise:builds": "node src/build/organise-build.js dist/chromium && node src/build/organise-build.js dist/firefox",
 		"start": "ng serve",
+		"sync:version": "node src/build/sync-version.js",
 		"test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
 		"test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
 		"test": "ng test",
+		"version:sync": "npm run sync:version",
 		"watch": "ng build --watch --configuration development",
 		"zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip"
 	},
