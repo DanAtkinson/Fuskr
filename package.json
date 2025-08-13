@@ -1,83 +1,86 @@
 {
-	"name": "fuskr",
-	"description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
-	"version": "5.0.1",
-	"engines": {
-		"node": ">=20.19.0",
-		"npm": ">=10.0.0"
-	},
-	"main": "src/main.ts",
-	"scripts": {
-		"build": "npm run clean && npm run sync:version && npm run test:ci && npm run build:extensions",
-		"build:extensions": "npm run build:angular && npm run build:background && npm run copy:files && npm run organise:builds && npm run zip:builds",
-		"build:angular": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" ng build --configuration production && ng build --configuration production --output-path=dist/firefox",
-		"build:background": "webpack --config src/config/webpack.background.js",
-		"clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', {recursive: true, force: true})\"",
-		"copy:files": "node -e \"const fs = require('fs'); fs.cpSync('src/_locales', 'dist/chromium/_locales', {recursive: true}); fs.cpSync('src/_locales', 'dist/firefox/_locales', {recursive: true}); fs.copyFileSync('src/manifest-firefox.json', 'dist/firefox/manifest.json'); fs.copyFileSync('dist/chromium/fuskr-core.js', 'dist/firefox/fuskr-core.js')\"",
-		"lint": "echo 'ESLint not configured yet - run: ng add @angular-eslint/schematics'",
-		"ng": "ng",
-		"organise:builds": "node src/build/organise-build.js dist/chromium && node src/build/organise-build.js dist/firefox",
-		"start": "ng serve",
-		"sync:version": "node src/build/sync-version.js",
-		"test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
-		"test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
-		"test": "ng test",
-		"version:sync": "npm run sync:version",
-		"watch": "ng build --watch --configuration development",
-		"zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip"
-	},
-	"dependencies": {
-		"@angular/animations": "^20.1.2",
-		"@angular/common": "^20.1.2",
-		"@angular/compiler": "^20.1.2",
-		"@angular/core": "^20.1.2",
-		"@angular/forms": "^20.1.2",
-		"@angular/platform-browser": "^20.1.2",
-		"@angular/platform-browser-dynamic": "^20.1.2",
-		"@angular/router": "^20.1.2",
-		"@fortawesome/fontawesome-free": "^6.7.2",
-		"bootstrap": "^5.3.7",
-		"file-saver": "^2.0.5",
-		"jszip": "^3.10.1",
-		"rxjs": "~7.8.0",
-		"tslib": "^2.3.0",
-		"zone.js": "~0.15.1"
-	},
-	"devDependencies": {
-		"@angular-builders/custom-webpack": "^20.0.0",
-		"@angular-devkit/build-angular": "^20.1.1",
-		"@angular/cli": "^20.1.1",
-		"@angular/compiler-cli": "^20.1.2",
-		"@types/chrome": "^0.0.258",
-		"@types/file-saver": "^2.0.7",
-		"@types/jasmine": "~5.1.0",
-		"@types/jszip": "^3.4.0",
-		"@types/node": "^24.0.14",
-		"@types/webpack-env": "^1.18.8",
-		"cross-env": "^7.0.3",
-		"jasmine-core": "~5.1.0",
-		"karma": "~6.4.0",
-		"karma-chrome-launcher": "~3.2.0",
-		"karma-coverage": "~2.2.0",
-		"karma-jasmine": "~5.1.0",
-		"karma-jasmine-html-reporter": "~2.1.0",
-		"ts-loader": "^9.5.2",
-		"typescript": "~5.8.3",
-		"webpack": "^5.100.2",
-		"webpack-cli": "^6.0.1"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/DanAtkinson/Fuskr.git"
-	},
-	"keywords": [
-		"image",
-		"slideshow"
-	],
-	"author": "Dan Atkinson and Jonathon Bolster",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/DanAtkinson/Fuskr/issues"
-	},
-	"homepage": "https://github.com/DanAtkinson/Fuskr"
+  "name": "fuskr",
+  "description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
+  "version": "5.0.1",
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=10.0.0"
+  },
+  "main": "src/main.ts",
+  "scripts": {
+    "build": "npm run clean && npm run sync:version && npm run test:ci && npm run build:extensions",
+    "build:extensions": "npm run build:angular && npm run build:background && npm run copy:files && npm run organise:builds && npm run zip:builds",
+    "build:angular": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" ng build --configuration production && ng build --configuration production --output-path=dist/firefox",
+    "build:background": "webpack --config src/config/webpack.background.js",
+    "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', {recursive: true, force: true})\"",
+    "copy:files": "node -e \"const fs = require('fs'); fs.cpSync('src/_locales', 'dist/chromium/_locales', {recursive: true}); fs.cpSync('src/_locales', 'dist/firefox/_locales', {recursive: true}); fs.copyFileSync('src/manifest-firefox.json', 'dist/firefox/manifest.json'); fs.copyFileSync('dist/chromium/fuskr-core.js', 'dist/firefox/fuskr-core.js')\"",
+    "lint": "ng lint",
+    "ng": "ng",
+    "organise:builds": "node src/build/organise-build.js dist/chromium && node src/build/organise-build.js dist/firefox",
+    "start": "ng serve",
+    "sync:version": "node src/build/sync-version.js",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
+    "test": "ng test",
+    "version:sync": "npm run sync:version",
+    "watch": "ng build --watch --configuration development",
+    "zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip"
+  },
+  "dependencies": {
+    "@angular/animations": "^20.1.2",
+    "@angular/common": "^20.1.2",
+    "@angular/compiler": "^20.1.2",
+    "@angular/core": "^20.1.2",
+    "@angular/forms": "^20.1.2",
+    "@angular/platform-browser": "^20.1.2",
+    "@angular/platform-browser-dynamic": "^20.1.2",
+    "@angular/router": "^20.1.2",
+    "@fortawesome/fontawesome-free": "^6.7.2",
+    "bootstrap": "^5.3.7",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.15.1"
+  },
+  "devDependencies": {
+    "@angular-builders/custom-webpack": "^20.0.0",
+    "@angular-devkit/build-angular": "^20.1.1",
+    "@angular/cli": "^20.1.1",
+    "@angular/compiler-cli": "^20.1.2",
+    "@types/chrome": "^0.0.258",
+    "@types/file-saver": "^2.0.7",
+    "@types/jasmine": "~5.1.0",
+    "@types/jszip": "^3.4.0",
+    "@types/node": "^24.0.14",
+    "@types/webpack-env": "^1.18.8",
+    "angular-eslint": "20.1.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.29.0",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "~5.8.3",
+    "typescript-eslint": "8.34.1",
+    "webpack": "^5.100.2",
+    "webpack-cli": "^6.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DanAtkinson/Fuskr.git"
+  },
+  "keywords": [
+    "image",
+    "slideshow"
+  ],
+  "author": "Dan Atkinson and Jonathon Bolster",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DanAtkinson/Fuskr/issues"
+  },
+  "homepage": "https://github.com/DanAtkinson/Fuskr"
 }
