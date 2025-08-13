@@ -1,6 +1,7 @@
 # TODO
 
 ## 🚀 Main Enhancements
+* Creation of a public key for additional security. This should aid in both Chromium and Firefox add-on store submission.
 * Add a "Reset Options" button to the bottom of the Options screen which deletes the options (but not history) and resets them back to their defaults.
 * **Allow fusks from URL lists** - Create fusks from a list of URLs rather than sequential patterns. Example: Imgur albums where filenames are not sequential. NB: This should also be able to parse the Fuskr.txt file being loaded in.
 * **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
