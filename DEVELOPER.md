@@ -7,6 +7,7 @@ This document contains technical information for developers who want to build, m
 ### Prerequisites
 
 1. **Node.js** - Use the version specified in `.nvmrc`:
+
    ```bash
    nvm use  # Uses version specified in .nvmrc
    ```
@@ -39,6 +40,7 @@ npm run build
 ```
 
 This will:
+
 1. Clean previous builds
 2. Sync version numbers across manifest files
 3. Run all tests
@@ -49,6 +51,7 @@ This will:
 8. Create zip files for distribution
 
 #### Output Structure
+
 ```
 dist/
 ├── chromium/              # Chrome extension (Manifest V3)
@@ -68,6 +71,7 @@ dist/
 ## 🏗️ Architecture
 
 ### Project Structure
+
 ```
 src/
 ├── app/
@@ -110,43 +114,53 @@ src/
 ### Key Services
 
 #### FuskrService
+
 Core business logic for URL pattern recognition and gallery generation:
 
 **Key Methods:**
+
 - `isFuskable(url: string): boolean` - Check if URL contains fuskable patterns
 - `getLinks(url: string): string[]` - Generate array of URLs from pattern
 - `createFuskUrl(url: string, count: number, direction: number): string` - Create fusk pattern from regular URL
 
 **Pattern Recognition:**
+
 - Numeric patterns: `image01.jpg` → `image[00-11].jpg`
-- Alphabetic patterns: `imagea.jpg` → `image[a-k].jpg`  
+- Alphabetic patterns: `imagea.jpg` → `image[a-k].jpg`
 - Complex patterns: `file001x999.png` → `file[000-011]x[989-999].png`
 
 #### ChromeService
+
 Browser API integration and extension functionality:
 
 **Storage Management:**
+
 - `loadOptions(): Promise<ChromeStorageData>` - Load user preferences
 - `saveOptions(options: ChromeStorageData): Promise<void>` - Save user preferences
 - `resetOptions(): Promise<void>` - Reset to defaults
 
 **Tab and Download Management:**
+
 - `openTab(url: string): Promise<void>` - Open URLs in new tabs
 - `downloadImage(url: string, filename: string): Promise<void>` - Download images
 
 #### LoggerService
+
 Comprehensive logging system for debugging:
 
 **Features:**
+
 - Multiple log levels (DEBUG, INFO, WARN, ERROR)
 - Log persistence and export
 - Configurable log limits
 - Context-aware logging
 
 #### MediaTypeService
+
 Media detection and type resolution:
 
 **Capabilities:**
+
 - Image format detection
 - Video format support
 - URL validation
@@ -155,9 +169,11 @@ Media detection and type resolution:
 ### Components
 
 #### GalleryComponent
+
 Main interface for displaying image galleries:
 
 **Features:**
+
 - URL input and validation with pattern preview
 - Responsive image grid with lazy loading
 - Keyboard navigation (arrows, page keys, numbers)
@@ -166,9 +182,11 @@ Main interface for displaying image galleries:
 - Progress tracking and overload protection
 
 #### OptionsComponent
+
 User preferences management:
 
 **Settings:**
+
 - Theme selection (dark/light mode)
 - Tab behaviour (foreground/background)
 - History management options
@@ -176,9 +194,11 @@ User preferences management:
 - Display preferences
 
 #### HistoryComponent
+
 Gallery history management:
 
 **Features:**
+
 - Recent gallery history display
 - History search and filtering
 - Batch operations (clear, export)
@@ -187,39 +207,47 @@ Gallery history management:
 ## 🔄 CI/CD Pipeline
 
 ### GitHub Actions
+
 The project uses GitHub Actions for continuous integration and deployment. The workflow includes:
 
 **Automated Testing:**
+
 - Multi-version Node.js testing (20.19.x, 22.12.x, 22.x)
 - Unit tests with Jasmine/Karma
 - Code coverage reporting with Codecov
 - Chrome headless browser testing
 
 **Code Quality Checks:**
+
 - ESLint for code linting
 - Prettier for code formatting (if configured)
 - TypeScript compilation validation
 
 **Build & Packaging:**
+
 - Production builds for both Chrome and Firefox
 - Automatic extension packaging
 - Build artifact uploads with 30-day retention
 
 **Trigger Events:**
+
 - Push to `master`, `main`, or `develop` branches
 - Pull requests to `master` or `main` branches
 
 ### Workflow Status
+
 View the current build status: [![CI/CD Pipeline](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml/badge.svg)](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml)
 
 ## 🧪 Testing
 
 ### Test Setup
+
 - **Framework:** Jasmine with Karma runner
 - **Coverage:** Istanbul for code coverage reports
 - **Angular Testing:** Angular Testing Utilities for component testing
 
 ### Test Commands
+
 ```bash
 npm test              # Watch mode for development
 npm run test:ci       # Single run for CI/CD
@@ -227,6 +255,7 @@ npm run test:coverage # Generate coverage reports
 ```
 
 ### Test Structure
+
 ```
 src/app/
 ├── components/
@@ -242,6 +271,7 @@ src/app/
 ```
 
 ### Test Coverage Goals
+
 - **Statements:** >80%
 - **Branches:** >75%
 - **Functions:** >80%
@@ -250,11 +280,13 @@ src/app/
 ## 🎨 Styling Architecture
 
 ### CSS Organisation
+
 - **Global Styles:** `src/styles.scss` - Global utilities and theme variables
 - **Component Styles:** Scoped styles in `.component.scss` files
 - **Theme System:** CSS Custom Properties for consistent theming
 
 ### Theme System
+
 ```css
 :root {
   --primary-color: #4a90e2;
@@ -263,14 +295,14 @@ src/app/
   --danger-color: #dc3545;
   --warning-color: #ffc107;
   --info-color: #17a2b8;
-  
+
   --bg-color: #ffffff;
   --surface-color: #f8f9fa;
   --text-color: #333333;
   --text-muted: #6c757d;
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --bg-color: #1a1a1a;
   --surface-color: #2d2d2d;
   --text-color: #e0e0e0;
@@ -279,6 +311,7 @@ src/app/
 ```
 
 ### Responsive Design
+
 - **CSS Grid** for gallery layouts
 - **Flexbox** for component layouts
 - **Media queries** for mobile optimisation
@@ -287,19 +320,23 @@ src/app/
 ## 🔧 Configuration Files
 
 ### TypeScript Configuration
+
 - `tsconfig.json` - Main TypeScript configuration with strict mode
 - `tsconfig.app.json` - Application-specific TypeScript settings
 - `tsconfig.spec.json` - Test-specific TypeScript settings
 
 ### Angular Configuration
+
 - `angular.json` - Angular CLI workspace configuration
 - `src/environments/` - Environment-specific configurations
 
 ### Build Configuration
+
 - `src/config/webpack.background.js` - Service worker build configuration
 - `src/config/karma.conf.js` - Test runner configuration
 
 ### Extension Configuration
+
 - `src/manifest.json` - Chrome extension manifest (Manifest V3)
 - `src/manifest-firefox.json` - Firefox extension manifest (Manifest V2)
 - `src/_locales/en_GB/messages.json` - Internationalisation strings
@@ -307,27 +344,30 @@ src/app/
 ## 🔐 Security and Permissions
 
 ### Required Permissions
+
 ```json
 {
   "permissions": [
-    "tabs",           // Access tab information
-    "downloads",      // Download images
-    "storage",        // Save user preferences  
-    "contextMenus",   // Context menu integration
-    "activeTab"       // Access current tab
+    "tabs", // Access tab information
+    "downloads", // Download images
+    "storage", // Save user preferences
+    "contextMenus", // Context menu integration
+    "activeTab" // Access current tab
   ],
   "host_permissions": [
-    "http://*/*",     // Access HTTP content
-    "https://*/*"    // Access HTTPS content
+    "http://*/*", // Access HTTP content
+    "https://*/*" // Access HTTPS content
   ]
 }
 ```
 
 ### Content Security Policy
+
 - **Chrome (V3):** Uses default Manifest V3 CSP (no explicit policy needed)
 - **Firefox (V2):** Uses relaxed CSP with `'unsafe-inline'` for styles
 
 ### Privacy Considerations
+
 - No data collection or external analytics
 - All processing happens locally
 - User preferences stored in browser sync storage
@@ -336,6 +376,7 @@ src/app/
 ## 🤝 Contributing
 
 ### Development Workflow
+
 1. **Fork** the repository
 2. **Clone** your fork locally
 3. **Create** a feature branch: `git checkout -b feature/your-feature-name`
@@ -348,6 +389,7 @@ src/app/
 10. **Create** a pull request
 
 ### Code Style Guidelines
+
 - **TypeScript** with strict mode enabled
 - **Angular Style Guide** compliance
 - **ESLint** for code quality (if configured)
@@ -356,6 +398,7 @@ src/app/
 - **British English** spelling in comments and documentation
 
 ### Commit Message Format
+
 ```
 type(scope): brief description
 
@@ -367,6 +410,7 @@ Fixes #issue-number
 **Types:** feat, fix, docs, style, refactor, test, chore
 
 ### Pull Request Checklist
+
 - [ ] Tests pass (`npm test`)
 - [ ] Build succeeds (`npm run build`)
 - [ ] Code follows style guidelines
@@ -377,17 +421,20 @@ Fixes #issue-number
 ## 📈 Performance Considerations
 
 ### Bundle Optimisation
+
 - **Tree Shaking** - Unused code elimination
 - **Code Splitting** - Lazy loading where appropriate
 - **Asset Optimisation** - Image and file size optimisation
 
 ### Runtime Performance
+
 - **Lazy Loading** - Images loaded on demand
 - **Virtual Scrolling** - For large galleries
 - **Memory Management** - Proper cleanup and disposal
 - **Efficient Rendering** - OnPush change detection where possible
 
 ### Extension-Specific Optimisations
+
 - **Service Worker** efficiency for background tasks
 - **Storage** optimisation for user preferences
 - **Context Menu** performance for large lists
@@ -396,6 +443,7 @@ Fixes #issue-number
 ## 🐛 Debugging
 
 ### Development Tools
+
 - **Angular DevTools** browser extension
 - **Chrome Extension DevTools** for extension debugging
 - **Logger Service** with configurable levels
@@ -404,18 +452,22 @@ Fixes #issue-number
 ### Common Issues and Solutions
 
 #### Service Worker Issues
+
 - **Problem:** Service worker not updating
 - **Solution:** Check `chrome://extensions/` and reload extension
 
-#### Build Issues  
+#### Build Issues
+
 - **Problem:** Build fails with TypeScript errors
 - **Solution:** Run `npm run clean` and rebuild
 
 #### Test Issues
+
 - **Problem:** Tests fail in headless mode
 - **Solution:** Check `karma.conf.js` browser configuration
 
 ### Logging and Monitoring
+
 ```typescript
 // Use LoggerService for consistent logging
 constructor(private logger: LoggerService) {}

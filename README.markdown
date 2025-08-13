@@ -12,25 +12,28 @@
 ## 🚀 Quick Start Guide
 
 ### Option 1: Right-Click Context Menu
+
 1. **Right-click** on any image with a numbered URL
-2. **Select "Fusk"** from the context menu  
+2. **Select "Fusk"** from the context menu
 3. **Choose direction**:
    - `+/-` - Images before and after the current one
-   - `+` - Only images that come after  
+   - `+` - Only images that come after
    - `-` - Only images that come before
 4. **Pick gallery size** - 10/20/50/100/200/500 or custom amount
 5. **Enjoy your gallery!** Opens in a new tab with full navigation
 
 ### Option 2: Address Bar (Omnibox)
+
 1. Type `fuskr` in your browser's address bar
-2. Press **Tab** or **Space**  
+2. Press **Tab** or **Space**
 3. **Paste your image URL** and press Enter
 4. Gallery opens automatically!
 
 ### 🎮 Navigation Controls
+
 - **Arrow Keys** - Previous/Next image
 - **Page Up/Down** - Jump by 10 images
-- **Home/End** - First/Last image  
+- **Home/End** - First/Last image
 - **Number Keys** - Jump to specific image
 - **Escape** - Close gallery
 - **Mouse** - Click thumbnails or use scroll wheel
@@ -38,6 +41,7 @@
 ## 🎯 Features
 
 ### Core Functionality
+
 - **URL Pattern Recognition** - Automatically detects numeric and alphabetic patterns in URLs
 - **Gallery Generation** - Creates image galleries from sequential URLs
 - **Context Menu Integration** - Right-click on any image URL to create galleries
@@ -45,6 +49,7 @@
 - **Download Management** - Download individual images or entire galleries
 
 ### Modern Interface
+
 - **Responsive Design** - Works on all screen sizes
 - **Dark/Light Theme** - User-configurable themes
 - **Image Lazy Loading** - Performance optimised image loading
@@ -52,15 +57,18 @@
 - **Copy/Download Actions** - Quick actions for each image
 
 ### Pattern Examples
+
 Fuskr recognises these URL patterns and automatically converts simple URLs to bracketed patterns:
 
 **Input → Generated Pattern:**
+
 - `https://test.com/files/3141.webp` → `https://test.com/files/31[31-51].webp` (±10 range)
 - `image01.jpg` → `image[00-11].jpg` (±10 range)
 - `photo001.png` → `photo[000-011].png` (±10 range)
 - `imagea.jpg` → `image[a-k].jpg` (±10 range)
 
 **Existing patterns are preserved:**
+
 - `image[01-10].jpg` → `image[01-10].jpg` (no change)
 - `photo[001-999].png` → `photo[001-999].png` (no change)
 - `file[05-20].gif` → `file[05-20].gif` (no change)
@@ -70,12 +78,14 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 ### Installing as Browser Extension
 
 #### Chrome Installation
+
 1. Download the extension files or build from source (see [DEVELOPER.md](DEVELOPER.md))
 2. Open Chrome and navigate to `chrome://extensions/`
 3. Enable "Developer mode"
 4. Click "Load unpacked" and select the extension folder
 
 #### Firefox Installation
+
 1. Download the extension files or build from source (see [DEVELOPER.md](DEVELOPER.md))
 2. Open Firefox and navigate to `about:addons`
 3. Click the gear icon and select "Install Add-on From File"
@@ -101,7 +111,7 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 
 ## 💻 Developer Resources
 
-- 🛠️ **[Developer Guide](DEVELOPER.md)** - Setup, architecture, and contribution guidelines  
+- 🛠️ **[Developer Guide](DEVELOPER.md)** - Setup, architecture, and contribution guidelines
 - 📚 **[Version History](HISTORY.md)** - Complete changelog with all versions
 - 🧪 **Testing** - 223 passing unit tests with comprehensive coverage
 - 🔧 **Build System** - Modern webpack-based build process
@@ -109,8 +119,9 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 ## 🤝 Contributing
 
 We welcome contributions! Please see our [DEVELOPER.md](DEVELOPER.md) for:
+
 - Development setup instructions
-- Code architecture overview  
+- Code architecture overview
 - Testing guidelines
 - Contribution workflow
 

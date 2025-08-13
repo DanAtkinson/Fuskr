@@ -4,19 +4,19 @@ import { DisplaySettings } from './display-settings.model';
 import { SafetySettings } from './safety-settings.model';
 
 export class ChromeStorageData implements IChromeStorageData {
-  // Public properties (alphabetically)
-  behaviour: BehaviourSettings;
-  display: DisplaySettings;
-  safety: SafetySettings;
-  version: number = 1;
+	// Public properties (alphabetically)
+	behaviour: BehaviourSettings;
+	display: DisplaySettings;
+	safety: SafetySettings;
+	version = 1;
 
-  constructor(data?: Partial<IChromeStorageData>) {
-    this.display = new DisplaySettings(data?.display);
-    this.behaviour = new BehaviourSettings(data?.behaviour);
-    this.safety = new SafetySettings(data?.safety);
+	constructor(data?: Partial<IChromeStorageData>) {
+		this.display = new DisplaySettings(data?.display);
+		this.behaviour = new BehaviourSettings(data?.behaviour);
+		this.safety = new SafetySettings(data?.safety);
 
-    if (data?.version !== undefined) {
-      this.version = data.version;
-    }
-  }
+		if (data?.version !== undefined) {
+			this.version = data.version;
+		}
+	}
 }

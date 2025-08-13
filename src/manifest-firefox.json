@@ -1,42 +1,42 @@
 {
-  "manifest_version": 2,
-  "name": "__MSG_ManifestName__",
-  "description": "__MSG_ManifestDescription__",
-  "version": "5.0.1",
-  "default_locale": "en_GB",
-  "author": "Dan Atkinson and Jonathon Bolster",
-  "browser_action": {
-    "default_popup": "index.html",
-    "default_title": "Fuskr - Image Gallery Generator",
-    "default_icon": {
-      "16": "assets/images/16x16.png",
-      "48": "assets/images/48x48.png",
-      "128": "assets/images/128x128.png"
-    }
-  },
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": false
-  },
-  "options_ui": {
-    "page": "index.html#/options",
-    "open_in_tab": false
-  },
-  "omnibox": {
-    "keyword": "fuskr"
-  },
-  "permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage", "http://*/*", "https://*/*"],
-  "icons": {
-    "16": "assets/images/16x16.png",
-    "48": "assets/images/48x48.png",
-    "128": "assets/images/128x128.png"
-  },
-  "content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self'; style-src 'self' 'unsafe-inline';",
-  "web_accessible_resources": ["assets/*"],
-  "browser_specific_settings": {
-    "gecko": {
-      "id": "fuskr@danatkinson.com",
-      "strict_min_version": "109.0"
-    }
-  }
+	"manifest_version": 2,
+	"name": "__MSG_ManifestName__",
+	"description": "__MSG_ManifestDescription__",
+	"version": "5.0.1",
+	"default_locale": "en_GB",
+	"author": "Dan Atkinson and Jonathon Bolster",
+	"browser_action": {
+		"default_popup": "index.html",
+		"default_title": "Fuskr - Image Gallery Generator",
+		"default_icon": {
+			"16": "assets/images/16x16.png",
+			"48": "assets/images/48x48.png",
+			"128": "assets/images/128x128.png"
+		}
+	},
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"options_ui": {
+		"page": "index.html#/options",
+		"open_in_tab": false
+	},
+	"omnibox": {
+		"keyword": "fuskr"
+	},
+	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage", "http://*/*", "https://*/*"],
+	"icons": {
+		"16": "assets/images/16x16.png",
+		"48": "assets/images/48x48.png",
+		"128": "assets/images/128x128.png"
+	},
+	"content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self'; style-src 'self' 'unsafe-inline';",
+	"web_accessible_resources": ["assets/*"],
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "fuskr@danatkinson.com",
+			"strict_min_version": "109.0"
+		}
+	}
 }

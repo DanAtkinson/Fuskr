@@ -10,9 +10,9 @@ import { OptionsComponent } from '@components/options.component';
 import { HistoryComponent } from '@components/history.component';
 
 @NgModule({
-  declarations: [AppComponent, GalleryComponent, OptionsComponent, HistoryComponent],
-  imports: [BrowserModule, AppRoutingModule, FormsModule],
-  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
-  bootstrap: [AppComponent],
+	declarations: [AppComponent, GalleryComponent, OptionsComponent, HistoryComponent],
+	imports: [BrowserModule, AppRoutingModule, FormsModule],
+	providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
+	bootstrap: [AppComponent],
 })
 export class AppModule {}

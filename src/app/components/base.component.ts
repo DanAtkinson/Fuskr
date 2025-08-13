@@ -5,16 +5,16 @@ import { ChromeService } from '@services/chrome.service';
  * Base component that provides common functionality like translation
  */
 @Component({
-  template: '',
-  standalone: false,
+	template: '',
+	standalone: false,
 })
 export abstract class BaseComponent {
-  /**
-   * Get translated message from chrome.i18n
-   */
-  translate(key: string, substitutions?: string[]): string {
-    return this.chromeService.getMessage(key, substitutions);
-  }
+	/**
+	 * Get translated message from chrome.i18n
+	 */
+	translate(key: string, substitutions?: string[]): string {
+		return this.chromeService.getMessage(key, substitutions);
+	}
 
-  protected chromeService = inject(ChromeService);
+	protected chromeService = inject(ChromeService);
 }

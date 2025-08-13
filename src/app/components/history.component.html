@@ -1,125 +1,109 @@
 <div class="history-container">
-  <div class="history-header">
-    <div class="header-top">
-      <h1>{{ translate('History_Title') }}</h1>
-      <div class="header-controls">
-        <button
-          class="btn btn-lg btn-outline-secondary theme-toggle"
-          type="button"
-          (click)="toggleDarkMode()"
-          [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')"
-        >
-          <i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
-        </button>
-      </div>
-    </div>
+	<div class="history-header">
+		<div class="header-top">
+			<h1>{{ translate('History_Title') }}</h1>
+			<div class="header-controls">
+				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
+					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+				</button>
+			</div>
+		</div>
 
-    <div class="header-actions">
-      <button class="btn btn-outline-secondary" type="button" (click)="router.navigate(['/gallery'])">
-        <i class="fas fa-images me-1"></i>{{ translate('History_NewGallery') }}
-      </button>
+		<div class="header-actions">
+			<button class="btn btn-outline-secondary" type="button" (click)="router.navigate(['/gallery'])"><i class="fas fa-images me-1"></i>{{ translate('History_NewGallery') }}</button>
 
-      @if (history.entries.length > 0) {
-        <button class="btn btn-outline-danger" type="button" (click)="clearAllHistory()">
-          <i class="fas fa-trash me-1"></i>{{ translate('History_ClearAll') }}
-        </button>
-      }
-    </div>
-  </div>
+			@if (history.entries.length > 0) {
+				<button class="btn btn-outline-danger" type="button" (click)="clearAllHistory()"><i class="fas fa-trash me-1"></i>{{ translate('History_ClearAll') }}</button>
+			}
+		</div>
+	</div>
 
-  @if (loading) {
-    <div class="loading">
-      <div class="spinner"></div>
-      <p>{{ translate('History_Loading') }}</p>
-    </div>
-  }
+	@if (loading) {
+		<div class="loading">
+			<div class="spinner"></div>
+			<p>{{ translate('History_Loading') }}</p>
+		</div>
+	}
 
-  @if (!loading && history.entries.length === 0) {
-    <div class="empty-state">
-      <i class="fas fa-history fa-4x mb-3"></i>
-      <h2>{{ translate('History_NoEntries') }}</h2>
-      <p>{{ translate('History_NoEntriesText') }}</p>
-      <button class="btn btn-primary btn-lg" type="button" (click)="router.navigate(['/gallery'])">
-        <i class="fas fa-plus me-1"></i>{{ translate('History_CreateFirst') }}
-      </button>
-    </div>
-  }
+	@if (!loading && history.entries.length === 0) {
+		<div class="empty-state">
+			<i class="fas fa-history fa-4x mb-3"></i>
+			<h2>{{ translate('History_NoEntries') }}</h2>
+			<p>{{ translate('History_NoEntriesText') }}</p>
+			<button class="btn btn-primary btn-lg" type="button" (click)="router.navigate(['/gallery'])"><i class="fas fa-plus me-1"></i>{{ translate('History_CreateFirst') }}</button>
+		</div>
+	}
 
-  @if (!loading && history.entries.length > 0) {
-    <div class="history-list">
-      <div class="history-stats">
-        <span class="stat">{{ history.entries.length }} {{ translate('History_TotalEntries') }}</span>
-      </div>
+	@if (!loading && history.entries.length > 0) {
+		<div class="history-list">
+			<div class="history-stats">
+				<span class="stat">{{ history.entries.length }} {{ translate('History_TotalEntries') }}</span>
+			</div>
 
-      <div class="history-entries">
-        @for (entry of history.entries; track entry.id) {
-          <div class="history-entry" (click)="openGallery(entry)">
-            <div class="entry-header">
-              <div class="entry-info">
-                <h3 class="entry-title">{{ getFilename(entry.originalUrl) }}</h3>
-                <p class="entry-url">{{ entry.originalUrl }}</p>
-                <p class="entry-date">{{ formatDate(entry.timestamp) }}</p>
-              </div>
-              <div class="entry-actions">
-                <button
-                  class="btn btn-sm btn-outline-primary"
-                  type="button"
-                  (click)="openGalleryInNewTab(entry); $event.stopPropagation()"
-                  [title]="translate('History_OpenInNewTab')"
-                >
-                  <i class="fas fa-external-link-alt"></i>
-                </button>
-                <button
-                  class="btn btn-sm btn-outline-danger"
-                  type="button"
-                  (click)="removeEntry(entry, $event)"
-                  [title]="translate('History_RemoveEntry')"
-                >
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </div>
+			<div class="history-entries">
+				@for (entry of history.entries; track entry.id) {
+					<div class="history-entry" (click)="openGallery(entry)">
+						<div class="entry-header">
+							<div class="entry-info">
+								<h3 class="entry-title">{{ getFilename(entry.originalUrl) }}</h3>
+								<p class="entry-url">{{ entry.originalUrl }}</p>
+								<p class="entry-date">{{ formatDate(entry.timestamp) }}</p>
+							</div>
+							<div class="entry-actions">
+								<button class="btn btn-sm btn-outline-primary" type="button" (click)="openGalleryInNewTab(entry); $event.stopPropagation()" [title]="translate('History_OpenInNewTab')">
+									<i class="fas fa-external-link-alt"></i>
+								</button>
+								<button class="btn btn-sm btn-outline-danger" type="button" (click)="removeEntry(entry, $event)" [title]="translate('History_RemoveEntry')">
+									<i class="fas fa-trash"></i>
+								</button>
+							</div>
+						</div>
 
-            <div class="entry-stats">
-              <div class="stat-group">
-                <span class="stat-label">{{ translate('History_TotalImages') }}:</span>
-                <span class="stat-value">{{ entry.totalImages }}</span>
-              </div>
-              <div class="stat-group">
-                <span class="stat-label">{{ translate('History_LoadedImages') }}:</span>
-                <span class="stat-value">{{ entry.loadedImages }}</span>
-              </div>
-              @if (entry.brokenImages > 0) {
-                <div class="stat-group">
-                  <span class="stat-label">{{ translate('History_BrokenImages') }}:</span>
-                  <span class="stat-value text-danger">{{ entry.brokenImages }}</span>
-                </div>
-              }
-              <div class="stat-group">
-                <span class="stat-label">{{ translate('History_SuccessRate') }}:</span>
-                <span class="stat-value" [class]="'text-' + getSuccessRateClass(getSuccessRate(entry))">
-                  {{ getSuccessRate(entry) }}%
-                </span>
-              </div>
-              <div class="stat-group">
-                <span class="stat-label">{{ translate('History_DisplayMode') }}:</span>
-                <span class="stat-value">{{
-                  translate(
-                    'Gallery_' +
-                      (entry.displayMode === 'fitOnPage'
-                        ? 'FitPage'
-                        : entry.displayMode === 'fullWidth'
-                          ? 'FullWidth'
-                          : entry.displayMode === 'fillPage'
-                            ? 'FillPage'
-                            : 'Thumbnails')
-                  )
-                }}</span>
-              </div>
-            </div>
-          </div>
-        }
-      </div>
-    </div>
-  }
+						<div class="entry-stats">
+							<div class="stat-group">
+								<span class="stat-label">{{ translate('History_TotalImages') }}:</span>
+								<span class="stat-value">{{ entry.totalImages }}</span>
+							</div>
+							<div class="stat-group">
+								<span class="stat-label">{{ translate('History_LoadedImages') }}:</span>
+								<span class="stat-value">{{ entry.loadedImages }}</span>
+							</div>
+							@if (entry.brokenImages > 0) {
+								<div class="stat-group">
+									<span class="stat-label">{{ translate('History_BrokenImages') }}:</span>
+									<span class="stat-value text-danger">{{ entry.brokenImages }}</span>
+								</div>
+							}
+							<div class="stat-group">
+								<span class="stat-label">{{ translate('History_SuccessRate') }}:</span>
+								<span class="stat-value" [class]="'text-' + getSuccessRateClass(getSuccessRate(entry))"> {{ getSuccessRate(entry) }}% </span>
+							</div>
+							<div class="stat-group">
+								<span class="stat-label">{{ translate('History_DisplayMode') }}:</span>
+								<span class="stat-value">
+									@switch (entry.displayMode) {
+										@case ('fitOnPage') {
+											{{ translate('Gallery_FitPage') }}
+										}
+										@case ('fullWidth') {
+											{{ translate('Gallery_FullWidth') }}
+										}
+										@case ('fillPage') {
+											{{ translate('Gallery_FillPage') }}
+										}
+										@case ('thumbnails') {
+											{{ translate('Gallery_Thumbnails') }}
+										}
+										@default {
+											{{ translate('Gallery_Thumbnails') }}
+										}
+									}
+								</span>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
 </div>
