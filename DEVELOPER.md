@@ -190,7 +190,7 @@ Gallery history management:
 The project uses GitHub Actions for continuous integration and deployment. The workflow includes:
 
 **Automated Testing:**
-- Multi-version Node.js testing (18.x, 20.x, 22.x)
+- Multi-version Node.js testing (20.19.x, 22.12.x, 22.x)
 - Unit tests with Jasmine/Karma
 - Code coverage reporting with Codecov
 - Chrome headless browser testing
