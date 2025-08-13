@@ -62,18 +62,19 @@ jobs:
       
     - name: 🔍 Run linter
       run: |
-        if npm run --silent | grep -q "lint"; then
-          npm run lint
-        else
-          echo "Lint script not configured, skipping linter check"
-        fi
+        echo "Running lint check..."
+        npm run lint
+        echo "Lint check completed - see output above for any setup instructions"
       
     - name: 🎨 Check code formatting
       run: |
+        echo "Checking if Prettier is configured..."
         if command -v prettier &> /dev/null; then
+          echo "Prettier found, checking formatting..."
           npx prettier --check "src/**/*.{ts,js,html,scss,css}"
         else
-          echo "Prettier not configured, skipping format check"
+          echo "Prettier not installed. To add formatting: npm install -D prettier"
+          echo "Code formatting check skipped - this is not an error"
         fi
 
   build-extensions:
