@@ -1,416 +1,416 @@
 .options-container {
-	max-width: 100%;
-	width: 100%;
-	margin: 0 auto;
-	padding: 15px;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-	box-sizing: border-box;
+  max-width: 100%;
+  width: 100%;
+  margin: 0 auto;
+  padding: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  box-sizing: border-box;
 }
 
 h1 {
-	color: #2c3e50;
-	margin-bottom: 30px;
-	text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  text-align: center;
 }
 
 h2 {
-	color: #34495e;
-	margin-bottom: 20px;
-	font-size: 1.3rem;
-	border-bottom: 2px solid #e0e0e0;
-	padding-bottom: 10px;
+  color: #34495e;
+  margin-bottom: 20px;
+  font-size: 1.3rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
 }
 
 // Dark mode overrides for headings
 :host-context(body.dark-mode) h1 {
-	color: var(--text-color) !important;
+  color: var(--text-color) !important;
 }
 
 :host-context(body.dark-mode) h2 {
-	color: var(--text-color) !important;
-	border-bottom-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  border-bottom-color: var(--border-color) !important;
 }
 
 .options-section {
-	margin-bottom: 20px;
-	background-color: #f8f9fa;
-	border-radius: 8px;
-	padding: 15px;
-	border: 1px solid #e9ecef;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  border: 1px solid #e9ecef;
 }
 
 .option-group {
-	margin-bottom: 15px;
+  margin-bottom: 15px;
 
-	&:last-child {
-		margin-bottom: 0;
-	}
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 label {
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	font-weight: 500;
-	color: #2c3e50;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 500;
+  color: #2c3e50;
 
-	&:not(.radio-label) {
-		margin-bottom: 8px;
-	}
+  &:not(.radio-label) {
+    margin-bottom: 8px;
+  }
 }
 
 // Dark mode override for labels
 :host-context(body.dark-mode) label {
-	color: var(--text-color) !important;
+  color: var(--text-color) !important;
 }
 
 .radio-group {
-	margin: 10px 0;
-	padding-left: 20px;
+  margin: 10px 0;
+  padding-left: 20px;
 
-	.radio-label {
-		margin-bottom: 8px;
-		font-weight: normal;
+  .radio-label {
+    margin-bottom: 8px;
+    font-weight: normal;
 
-		input[type="radio"] {
-			margin-right: 8px;
-			transform: scale(1.1);
-		}
-	}
+    input[type='radio'] {
+      margin-right: 8px;
+      transform: scale(1.1);
+    }
+  }
 }
 
-input[type="checkbox"],
-input[type="radio"] {
-	margin-right: 10px;
-	transform: scale(1.2);
-	accent-color: #3498db;
+input[type='checkbox'],
+input[type='radio'] {
+  margin-right: 10px;
+  transform: scale(1.2);
+  accent-color: #3498db;
 }
 
 .description {
-	margin: 8px 0 0 0;
-	color: #7f8c8d;
-	font-size: 0.9em;
-	line-height: 1.4;
-	padding-left: 5px;
+  margin: 8px 0 0 0;
+  color: #7f8c8d;
+  font-size: 0.9em;
+  line-height: 1.4;
+  padding-left: 5px;
 }
 
 // Dark mode override for descriptions
 :host-context(body.dark-mode) .description {
-	color: var(--text-secondary) !important;
+  color: var(--text-secondary) !important;
 }
 
 .status {
-	position: fixed;
-	bottom: 20px;
-	right: 20px;
-	background: #27ae60;
-	color: white;
-	padding: 12px 20px;
-	border-radius: 6px;
-	opacity: 0;
-	transition: opacity 0.3s ease;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	font-weight: 500;
-	z-index: 1000;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #27ae60;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-weight: 500;
+  z-index: 1000;
 
-	&.show {
-		opacity: 1;
-	}
+  &.show {
+    opacity: 1;
+  }
 }
 
 // Responsive adjustments for small popup windows
 @media (max-width: 600px) {
-	.options-container {
-		padding: 10px;
-	}
+  .options-container {
+    padding: 10px;
+  }
 
-	.options-section {
-		padding: 10px;
-		margin-bottom: 15px;
-	}
+  .options-section {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
 
-	.option-group {
-		margin-bottom: 10px;
-	}
+  .option-group {
+    margin-bottom: 10px;
+  }
 
-	h1 {
-		margin-bottom: 20px;
-		font-size: 1.5rem;
-	}
+  h1 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
 
-	h2 {
-		margin-bottom: 15px;
-		font-size: 1.2rem;
-	}
+  h2 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+  }
 }
 
 // Dark mode styles using :host-context for better specificity
 :host-context(body.dark-mode) {
-	.options-container {
-		background-color: var(--bg-color);
-		color: var(--text-color);
-	}
+  .options-container {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
 
-	.options-section {
-		background-color: var(--bg-secondary);
-		border-color: var(--border-color);
-		color: var(--text-color);
-	}
+  .options-section {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-color);
+  }
 
-	// Bootstrap card overrides
-	.card {
-		background-color: var(--bg-secondary) !important;
-		border-color: var(--border-color) !important;
-		color: var(--text-color) !important;
-	}
+  // Bootstrap card overrides
+  .card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
 
-	.card-header {
-		background-color: var(--bg-secondary) !important;
-		border-color: var(--border-color) !important;
-		color: var(--text-color) !important;
-	}
+  .card-header {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
 
-	.card-body {
-		background-color: var(--bg-secondary) !important;
-		color: var(--text-color) !important;
-	}
+  .card-body {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-color) !important;
+  }
 
-	// Bootstrap form overrides
-	.form-check-label,
-	.form-label {
-		color: var(--text-color) !important;
-	}
+  // Bootstrap form overrides
+  .form-check-label,
+  .form-label {
+    color: var(--text-color) !important;
+  }
 
-	.form-text {
-		color: var(--text-secondary) !important;
-	}
+  .form-text {
+    color: var(--text-secondary) !important;
+  }
 
-	// Headings
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		color: var(--text-color) !important;
-		border-bottom-color: var(--border-color);
-	}
+  // Headings
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color);
+  }
 
-	// Labels
-	label {
-		color: var(--text-color) !important;
-	}
+  // Labels
+  label {
+    color: var(--text-color) !important;
+  }
 
-	.description,
-	.form-text {
-		color: var(--text-secondary) !important;
-	}
+  .description,
+  .form-text {
+    color: var(--text-secondary) !important;
+  }
 
-	// Form controls
-	input[type="checkbox"],
-	input[type="radio"] {
-		filter: brightness(1.2) contrast(1.1);
-	}
+  // Form controls
+  input[type='checkbox'],
+  input[type='radio'] {
+    filter: brightness(1.2) contrast(1.1);
+  }
 
-	input[type="number"] {
-		background-color: var(--bg-secondary) !important;
-		border-color: var(--border-color) !important;
-		color: var(--text-color) !important;
+  input[type='number'] {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
 
-		&:focus {
-			border-color: #3498db !important;
-			outline: none;
-			background-color: #3a3a3a !important;
-			box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25) !important;
-		}
+    &:focus {
+      border-color: #3498db !important;
+      outline: none;
+      background-color: #3a3a3a !important;
+      box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25) !important;
+    }
 
-		&::placeholder {
-			color: var(--text-secondary) !important;
-		}
-	}
+    &::placeholder {
+      color: var(--text-secondary) !important;
+    }
+  }
 
-	// Icons
-	.fas,
-	.fa {
-		color: var(--text-color) !important;
-	}
+  // Icons
+  .fas,
+  .fa {
+    color: var(--text-color) !important;
+  }
 
-	// Ensure all text elements use the correct color
-	p,
-	span,
-	div,
-	strong,
-	em,
-	small,
-	.text-muted {
-		color: var(--text-color) !important;
-	}
+  // Ensure all text elements use the correct color
+  p,
+  span,
+  div,
+  strong,
+  em,
+  small,
+  .text-muted {
+    color: var(--text-color) !important;
+  }
 
-	// Override any remaining Bootstrap text utilities
-	.text-dark {
-		color: var(--text-color) !important;
-	}
+  // Override any remaining Bootstrap text utilities
+  .text-dark {
+    color: var(--text-color) !important;
+  }
 
-	.text-secondary {
-		color: var(--text-secondary) !important;
-	}
+  .text-secondary {
+    color: var(--text-secondary) !important;
+  }
 
-	// Fix for any remaining text elements
-	* {
-		&:not(input):not(button):not(select):not(textarea) {
-			color: inherit;
-		}
-	}
+  // Fix for any remaining text elements
+  * {
+    &:not(input):not(button):not(select):not(textarea) {
+      color: inherit;
+    }
+  }
 
-	// Dark mode alert styles for status messages
-	.alert {
-		background-color: #2d3748 !important;
-		border-color: #4a5568 !important;
-		color: #e2e8f0 !important;
+  // Dark mode alert styles for status messages
+  .alert {
+    background-color: #2d3748 !important;
+    border-color: #4a5568 !important;
+    color: #e2e8f0 !important;
 
-		&.alert-success {
-			background-color: #22543d !important;
-			border-color: #38a169 !important;
-			color: #9ae6b4 !important;
-		}
+    &.alert-success {
+      background-color: #22543d !important;
+      border-color: #38a169 !important;
+      color: #9ae6b4 !important;
+    }
 
-		&.alert-danger {
-			background-color: #742a2a !important;
-			border-color: #e53e3e !important;
-			color: #feb2b2 !important;
-		}
+    &.alert-danger {
+      background-color: #742a2a !important;
+      border-color: #e53e3e !important;
+      color: #feb2b2 !important;
+    }
 
-		&.alert-warning {
-			background-color: #7c2d12 !important;
-			border-color: #dd6b20 !important;
-			color: #fbd38d !important;
-		}
+    &.alert-warning {
+      background-color: #7c2d12 !important;
+      border-color: #dd6b20 !important;
+      color: #fbd38d !important;
+    }
 
-		&.alert-info {
-			background-color: #2a4365 !important;
-			border-color: #3182ce !important;
-			color: #90cdf4 !important;
-		}
-	}
+    &.alert-info {
+      background-color: #2a4365 !important;
+      border-color: #3182ce !important;
+      color: #90cdf4 !important;
+    }
+  }
 }
 
 // Legacy dark mode styles for backwards compatibility
 body.dark-mode {
-	background-color: var(--bg-color) !important;
+  background-color: var(--bg-color) !important;
 
-	.options-container {
-		background-color: var(--bg-color);
-		color: var(--text-color);
-	}
+  .options-container {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+  }
 
-	.options-section {
-		background-color: var(--bg-secondary);
-		border-color: var(--border-color);
-		color: var(--text-color);
-	}
+  .options-section {
+    background-color: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-color);
+  }
 
-	// Bootstrap card overrides
-	.card {
-		background-color: var(--bg-secondary) !important;
-		border-color: var(--border-color) !important;
-		color: var(--text-color) !important;
-	}
+  // Bootstrap card overrides
+  .card {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
 
-	.card-header {
-		background-color: var(--bg-secondary) !important;
-		border-color: var(--border-color) !important;
-		color: var(--text-color) !important;
-	}
+  .card-header {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
+  }
 
-	.card-body {
-		background-color: var(--bg-secondary) !important;
-		color: var(--text-color) !important;
-	}
+  .card-body {
+    background-color: var(--bg-secondary) !important;
+    color: var(--text-color) !important;
+  }
 
-	// Bootstrap form overrides
-	.form-check-label,
-	.form-label {
-		color: var(--text-color) !important;
-	}
+  // Bootstrap form overrides
+  .form-check-label,
+  .form-label {
+    color: var(--text-color) !important;
+  }
 
-	.form-text {
-		color: var(--text-secondary) !important;
-	}
+  .form-text {
+    color: var(--text-secondary) !important;
+  }
 
-	// Headings
-	h1,
-	h2,
-	h3,
-	h4,
-	h5,
-	h6 {
-		color: var(--text-color) !important;
-		border-bottom-color: var(--border-color);
-	}
+  // Headings
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--text-color) !important;
+    border-bottom-color: var(--border-color);
+  }
 
-	// Labels
-	label {
-		color: var(--text-color) !important;
-	}
+  // Labels
+  label {
+    color: var(--text-color) !important;
+  }
 
-	.description,
-	.form-text {
-		color: var(--text-secondary) !important;
-	}
+  .description,
+  .form-text {
+    color: var(--text-secondary) !important;
+  }
 
-	// Form controls
-	input[type="checkbox"],
-	input[type="radio"] {
-		filter: brightness(1.2) contrast(1.1);
-	}
+  // Form controls
+  input[type='checkbox'],
+  input[type='radio'] {
+    filter: brightness(1.2) contrast(1.1);
+  }
 
-	input[type="number"] {
-		background-color: var(--bg-secondary) !important;
-		border-color: var(--border-color) !important;
-		color: var(--text-color) !important;
+  input[type='number'] {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-color) !important;
 
-		&:focus {
-			border-color: #3498db !important;
-			outline: none;
-			background-color: #3a3a3a !important;
-			box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25) !important;
-		}
+    &:focus {
+      border-color: #3498db !important;
+      outline: none;
+      background-color: #3a3a3a !important;
+      box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25) !important;
+    }
 
-		&::placeholder {
-			color: var(--text-secondary) !important;
-		}
-	}
+    &::placeholder {
+      color: var(--text-secondary) !important;
+    }
+  }
 
-	// Icons
-	.fas,
-	.fa {
-		color: var(--text-color) !important;
-	}
+  // Icons
+  .fas,
+  .fa {
+    color: var(--text-color) !important;
+  }
 
-	// Ensure all text elements use the correct color
-	p,
-	span,
-	div,
-	strong,
-	em,
-	small,
-	.text-muted {
-		color: var(--text-color) !important;
-	}
+  // Ensure all text elements use the correct color
+  p,
+  span,
+  div,
+  strong,
+  em,
+  small,
+  .text-muted {
+    color: var(--text-color) !important;
+  }
 
-	// Override any remaining Bootstrap text utilities
-	.text-dark {
-		color: var(--text-color) !important;
-	}
+  // Override any remaining Bootstrap text utilities
+  .text-dark {
+    color: var(--text-color) !important;
+  }
 
-	.text-secondary {
-		color: var(--text-secondary) !important;
-	}
+  .text-secondary {
+    color: var(--text-secondary) !important;
+  }
 
-	// Fix for any remaining text elements
-	* {
-		&:not(input):not(button):not(select):not(textarea) {
-			color: inherit;
-		}
-	}
+  // Fix for any remaining text elements
+  * {
+    &:not(input):not(button):not(select):not(textarea) {
+      color: inherit;
+    }
+  }
 }

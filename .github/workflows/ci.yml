@@ -68,14 +68,8 @@ jobs:
       
     - name: 🎨 Check code formatting
       run: |
-        echo "Checking if Prettier is configured..."
-        if command -v prettier &> /dev/null; then
-          echo "Prettier found, checking formatting..."
-          npx prettier --check "src/**/*.{ts,js,html,scss,css}"
-        else
-          echo "Prettier not installed. To add formatting: npm install -D prettier"
-          echo "Code formatting check skipped - this is not an error"
-        fi
+        echo "Checking code formatting with Prettier..."
+        npm run format:check
 
   build-extensions:
     name: Build Browser Extensions

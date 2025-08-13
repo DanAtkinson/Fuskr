@@ -5,24 +5,21 @@ import { OptionsComponent } from '@components/options.component';
 import { HistoryComponent } from '@components/history.component';
 
 const routes: Routes = [
-	{ path: 'gallery', component: GalleryComponent },
-	{ path: 'options', component: OptionsComponent },
-	{ path: 'history', component: HistoryComponent },
-	{ path: '', redirectTo: '/gallery', pathMatch: 'full' },
-	{ path: '**', redirectTo: '/gallery' }
+  { path: 'gallery', component: GalleryComponent },
+  { path: 'options', component: OptionsComponent },
+  { path: 'history', component: HistoryComponent },
+  { path: '', redirectTo: '/gallery', pathMatch: 'full' },
+  { path: '**', redirectTo: '/gallery' },
 ];
 
 @NgModule({
-	imports: [
-		RouterModule.forRoot(
-			routes,
-			{
-				useHash: true,
-				enableTracing: false,
-				onSameUrlNavigation: 'reload'
-			}
-		)
-	],
-	exports: [RouterModule]
+  imports: [
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      enableTracing: false,
+      onSameUrlNavigation: 'reload',
+    }),
+  ],
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

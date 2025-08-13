@@ -1,4 +1,4 @@
 export interface ISafetySettings {
-	enableOverloadProtection: boolean;
-	overloadProtectionLimit: number;
+  enableOverloadProtection: boolean;
+  overloadProtectionLimit: number;
 }
