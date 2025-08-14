@@ -427,7 +427,9 @@ class BackgroundScript {
 	}
 
 	private optionsOnClick(): void {
-		chrome.runtime.openOptionsPage();
+		chrome.tabs.create({
+			url: chrome.runtime.getURL('index.html#/options'),
+		});
 	}
 
 	private historyOnClick(): void {
