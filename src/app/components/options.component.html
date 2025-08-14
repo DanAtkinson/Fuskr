@@ -30,13 +30,14 @@
 				</div>
 				<div class="card-body">
 					<div class="mb-3">
-						<label class="form-label fw-bold">{{ translate('Options_DefaultImageDisplayMode') }}</label>
-						<div class="form-text mb-2">{{ translate('Options_DisplayModeDescription') }}</div>
+						<fieldset>
+							<legend class="form-label fw-bold">{{ translate('Options_DefaultImageDisplayMode') }}</legend>
+							<div class="form-text mb-2">{{ translate('Options_DisplayModeDescription') }}</div>
 
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="imageDisplayMode" value="fitOnPage" id="fitOnPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-							<label class="form-check-label" for="fitOnPage"> <i class="fas fa-compress-alt me-1"></i>{{ translate('Options_ResizeImagesFitOnPage') }} </label>
-						</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fitOnPage" id="fitOnPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
+								<label class="form-check-label" for="fitOnPage"> <i class="fas fa-compress-alt me-1"></i>{{ translate('Options_ResizeImagesFitOnPage') }} </label>
+							</div>
 						<div class="form-check">
 							<input class="form-check-input" type="radio" name="imageDisplayMode" value="fullWidth" id="fullWidth" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
 							<label class="form-check-label" for="fullWidth"> <i class="fas fa-arrows-alt-h me-1"></i>{{ translate('Options_ResizeImagesFullWidth') }} </label>
@@ -49,6 +50,7 @@
 							<input class="form-check-input" type="radio" name="imageDisplayMode" value="thumbnails" id="thumbnails" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
 							<label class="form-check-label" for="thumbnails"> <i class="fas fa-th me-1"></i>{{ translate('Options_ResizeImagesThumbnails') }} </label>
 						</div>
+						</fieldset>
 					</div>
 
 					<div class="form-check mb-3">

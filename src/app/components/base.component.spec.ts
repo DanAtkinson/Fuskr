@@ -6,7 +6,7 @@ import { ChromeService } from '@services/chrome.service';
 // Create a concrete test component that extends BaseComponent
 @Component({
 	template: '<div>Test Component</div>',
-	standalone: false,
+	standalone: true,
 })
 class TestBaseComponent extends BaseComponent {}
 
@@ -19,7 +19,7 @@ describe('BaseComponent', () => {
 		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', ['getMessage']);
 
 		await TestBed.configureTestingModule({
-			declarations: [TestBaseComponent],
+			imports: [TestBaseComponent],
 			providers: [{ provide: ChromeService, useValue: chromeServiceSpy }],
 		}).compileComponents();
 

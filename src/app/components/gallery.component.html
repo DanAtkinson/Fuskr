@@ -13,9 +13,9 @@
 		</div>
 
 		<div class="url-info">
-			<label class="form-label">{{ translate('Gallery_OriginalUrl') }}</label>
+			<label for="originalUrlInput" class="form-label">{{ translate('Gallery_OriginalUrl') }}</label>
 			<div class="input-group mb-3">
-				<input class="form-control" type="url" (keyup.enter)="generateGallery()" [(ngModel)]="originalUrl" [placeholder]="translate('Gallery_UrlPlaceholder')" />
+				<input id="originalUrlInput" class="form-control" type="url" (keyup.enter)="generateGallery()" [(ngModel)]="originalUrl" [placeholder]="translate('Gallery_UrlPlaceholder')" />
 				<button class="btn btn-primary" (click)="generateGallery()"><i class="fas fa-images me-1"></i>{{ translate('Gallery_GenerateGallery') }}</button>
 			</div>
 		</div>
@@ -42,12 +42,35 @@
 			@for (mediaItem of mediaItems; track mediaItem.url; let i = $index) {
 				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
 					@if (mediaItem.type === 'video') {
-						<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" controls preload="metadata">
+						<video class="fusk-media fusk-video" 
+							   (click)="openImageViewer(mediaItem.url, i)" 
+							   (keydown.enter)="openImageViewer(mediaItem.url, i)" 
+							   (keydown.space)="openImageViewer(mediaItem.url, i)" 
+							   (error)="onImageError($event)" 
+							   (loadeddata)="onImageLoad($event)" 
+							   [attr.data-original-url]="mediaItem.url" 
+							   [attr.data-index]="i"
+							   tabindex="0"
+							   role="button"
+							   [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'"
+							   controls preload="metadata">
 							<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
 							{{ translate('Gallery_VideoNotSupported') }}
 						</video>
 					} @else {
-						<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(i)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" />
+						<img class="fusk-image fusk-media" 
+							 (click)="openImageViewer(mediaItem.url, i)" 
+							 (keydown.enter)="openImageViewer(mediaItem.url, i)" 
+							 (keydown.space)="openImageViewer(mediaItem.url, i)" 
+							 (error)="onImageError($event)" 
+							 (load)="onImageLoad($event)" 
+							 [alt]="getImageAltText(i)" 
+							 [src]="mediaItem.url" 
+							 [attr.data-original-url]="mediaItem.url" 
+							 [attr.data-index]="i"
+							 tabindex="0"
+							 role="button"
+							 [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
 					}
 					@if (mediaItem.loadingState === 'loading') {
 						<div class="media-loading-indicator">
@@ -109,8 +132,17 @@
 
 	<!-- Image Viewer Modal -->
 	@if (showImageViewer) {
-		<div class="image-viewer-modal" (click)="closeImageViewer()">
-			<div class="viewer-content" (click)="$event.stopPropagation()">
+		<div class="image-viewer-modal" 
+			 (click)="closeImageViewer()" 
+			 (keydown.escape)="closeImageViewer()"
+			 tabindex="0"
+			 role="dialog"
+			 aria-modal="true"
+			 [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage)">
+			<div class="viewer-content" 
+				 (click)="$event.stopPropagation()"
+				 (keydown)="$event.stopPropagation()"
+				 role="document">
 				<div class="viewer-header">
 					<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
 					<span class="viewer-counter">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>
@@ -189,8 +221,8 @@
 		<!-- Display Mode Controls -->
 		<div class="display-controls">
 			<div class="control-group">
-				<label>{{ translate('Gallery_DisplayMode') }}</label>
-				<div class="button-group">
+				<label for="displayModeControls">{{ translate('Gallery_DisplayMode') }}</label>
+				<div id="displayModeControls" class="button-group" role="group" [attr.aria-labelledby]="'displayModeControls'">
 					<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
 						{{ translate('Gallery_FitPage') }}
 					</button>
@@ -207,8 +239,8 @@
 			</div>
 			@if (brokenImages > 0 || loading) {
 				<div class="control-group">
-					<label>{{ translate('Gallery_Options') }}</label>
-					<div class="button-group">
+					<label for="galleryOptionsControls">{{ translate('Gallery_Options') }}</label>
+					<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
 						<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
 							{{ translate(showBrokenImages ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
 						</button>

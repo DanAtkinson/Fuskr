@@ -42,7 +42,13 @@
 
 			<div class="history-entries">
 				@for (entry of history.entries; track entry.id) {
-					<div class="history-entry" (click)="openGallery(entry)">
+					<div class="history-entry" 
+						 (click)="openGallery(entry)"
+						 (keydown.enter)="openGallery(entry)"
+						 (keydown.space)="openGallery(entry)"
+						 tabindex="0"
+						 role="button"
+						 [attr.aria-label]="'Open gallery for ' + getFilename(entry.originalUrl)">
 						<div class="entry-header">
 							<div class="entry-info">
 								<h3 class="entry-title">{{ getFilename(entry.originalUrl) }}</h3>
