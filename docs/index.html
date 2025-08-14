@@ -1,521 +1,521 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fuskr - Chrome Extension for Image Gallery Generation</title>
-    <meta name="description" content="Fuskr is a powerful Chrome extension that creates instant image galleries from sequential URLs. Perfect for browsing image series and collections.">
-    
-    <!-- Open Graph / Social Media -->
-    <meta property="og:title" content="Fuskr - Chrome Extension">
-    <meta property="og:description" content="Create instant image galleries from sequential URLs">
-    <meta property="og:image" content="./images/social-preview.png">
-    <meta property="og:url" content="https://danatkinson.github.io/Fuskr/">
-    
-    <link rel="icon" href="./images/favicon.png" type="image/png">
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1e40af;
-            --secondary-color: #64748b;
-            --accent-color: #10b981;
-            --background: #ffffff;
-            --surface: #f8fafc;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Fuskr - Chrome Extension for Image Gallery Generation</title>
+	<meta name="description" content="Fuskr is a powerful Chrome extension that creates instant image galleries from sequential URLs. Perfect for browsing image series and collections.">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+	<!-- Open Graph / Social Media -->
+	<meta property="og:title" content="Fuskr - Chrome Extension">
+	<meta property="og:description" content="Create instant image galleries from sequential URLs">
+	<meta property="og:image" content="./images/social-preview.png">
+	<meta property="og:url" content="https://danatkinson.github.io/Fuskr/">
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: var(--text-primary);
-            background: var(--background);
-        }
+	<link rel="icon" href="./images/favicon.png" type="image/png">
+	<style>
+		:root {
+			--primary-color: #2563eb;
+			--primary-dark: #1e40af;
+			--secondary-color: #64748b;
+			--accent-color: #10b981;
+			--background: #ffffff;
+			--surface: #f8fafc;
+			--text-primary: #1e293b;
+			--text-secondary: #64748b;
+			--border: #e2e8f0;
+			--shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+			--shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-        /* Header */
-        .header {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			line-height: 1.6;
+			color: var(--text-primary);
+			background: var(--background);
+		}
 
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 0 20px;
+		}
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
+		/* Header */
+		.header {
+			background: var(--surface);
+			border-bottom: 1px solid var(--border);
+			padding: 20px 0;
+			position: sticky;
+			top: 0;
+			z-index: 100;
+		}
 
-        .logo img {
-            width: 32px;
-            height: 32px;
-        }
+		.header-content {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
 
-        .nav {
-            display: flex;
-            gap: 30px;
-        }
+		.logo {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			font-size: 24px;
+			font-weight: 700;
+			color: var(--primary-color);
+			text-decoration: none;
+		}
 
-        .nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
+		.logo img {
+			width: 32px;
+			height: 32px;
+		}
 
-        .nav a:hover {
-            color: var(--primary-color);
-        }
+		.nav {
+			display: flex;
+			gap: 30px;
+		}
 
-        /* Hero Section */
-        .hero {
-            padding: 80px 0;
-            text-align: center;
-            background: linear-gradient(135deg, var(--surface) 0%, var(--background) 100%);
-        }
+		.nav a {
+			color: var(--text-secondary);
+			text-decoration: none;
+			font-weight: 500;
+			transition: color 0.2s;
+		}
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 20px;
-        }
+		.nav a:hover {
+			color: var(--primary-color);
+		}
 
-        .hero .subtitle {
-            font-size: 1.25rem;
-            color: var(--text-secondary);
-            margin-bottom: 30px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+		/* Hero Section */
+		.hero {
+			padding: 80px 0;
+			text-align: center;
+			background: linear-gradient(135deg, var(--surface) 0%, var(--background) 100%);
+		}
 
-        .version-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--primary-color);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 40px;
-        }
+		.hero h1 {
+			font-size: 3.5rem;
+			font-weight: 800;
+			color: var(--text-primary);
+			margin-bottom: 20px;
+		}
 
-        .cta-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+		.hero .subtitle {
+			font-size: 1.25rem;
+			color: var(--text-secondary);
+			margin-bottom: 30px;
+			max-width: 600px;
+			margin-left: auto;
+			margin-right: auto;
+		}
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
+		.version-badge {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			background: var(--primary-color);
+			color: white;
+			padding: 8px 16px;
+			border-radius: 20px;
+			font-size: 14px;
+			font-weight: 600;
+			margin-bottom: 40px;
+		}
 
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
+		.cta-buttons {
+			display: flex;
+			gap: 20px;
+			justify-content: center;
+			flex-wrap: wrap;
+		}
 
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-lg);
-        }
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			padding: 12px 24px;
+			border-radius: 8px;
+			font-weight: 600;
+			text-decoration: none;
+			transition: all 0.2s;
+			border: 2px solid transparent;
+		}
 
-        .btn-secondary {
-            background: var(--surface);
-            color: var(--text-primary);
-            border-color: var(--border);
-        }
+		.btn-primary {
+			background: var(--primary-color);
+			color: white;
+		}
 
-        .btn-secondary:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
+		.btn-primary:hover {
+			background: var(--primary-dark);
+			transform: translateY(-1px);
+			box-shadow: var(--shadow-lg);
+		}
 
-        /* Features Section */
-        .features {
-            padding: 80px 0;
-            background: var(--background);
-        }
+		.btn-secondary {
+			background: var(--surface);
+			color: var(--text-primary);
+			border-color: var(--border);
+		}
 
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 60px;
-            color: var(--text-primary);
-        }
+		.btn-secondary:hover {
+			border-color: var(--primary-color);
+			color: var(--primary-color);
+		}
 
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 40px;
-        }
+		/* Features Section */
+		.features {
+			padding: 80px 0;
+			background: var(--background);
+		}
 
-        .feature {
-            text-align: center;
-            padding: 30px;
-            border-radius: 12px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-        }
+		.section-title {
+			text-align: center;
+			font-size: 2.5rem;
+			font-weight: 700;
+			margin-bottom: 60px;
+			color: var(--text-primary);
+		}
 
-        .feature-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            font-size: 24px;
-            color: white;
-        }
+		.features-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 40px;
+		}
 
-        .feature h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-        }
+		.feature {
+			text-align: center;
+			padding: 30px;
+			border-radius: 12px;
+			background: var(--surface);
+			border: 1px solid var(--border);
+		}
 
-        .feature p {
-            color: var(--text-secondary);
-        }
+		.feature-icon {
+			width: 60px;
+			height: 60px;
+			background: var(--primary-color);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto 20px;
+			font-size: 24px;
+			color: white;
+		}
 
-        /* How to Use Section */
-        .how-to-use {
-            padding: 80px 0;
-            background: var(--surface);
-        }
+		.feature h3 {
+			font-size: 1.25rem;
+			font-weight: 600;
+			margin-bottom: 15px;
+			color: var(--text-primary);
+		}
 
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-            margin-top: 40px;
-        }
+		.feature p {
+			color: var(--text-secondary);
+		}
 
-        .step {
-            display: flex;
-            align-items: flex-start;
-            gap: 20px;
-        }
+		/* How to Use Section */
+		.how-to-use {
+			padding: 80px 0;
+			background: var(--surface);
+		}
 
-        .step-number {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
+		.steps {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 30px;
+			margin-top: 40px;
+		}
 
-        .step-content h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
+		.step {
+			display: flex;
+			align-items: flex-start;
+			gap: 20px;
+		}
 
-        .step-content p {
-            color: var(--text-secondary);
-        }
+		.step-number {
+			width: 40px;
+			height: 40px;
+			background: var(--primary-color);
+			color: white;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			flex-shrink: 0;
+		}
 
-        /* Stats Section */
-        .stats {
-            padding: 60px 0;
-            background: var(--primary-color);
-            color: white;
-        }
+		.step-content h3 {
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 8px;
+		}
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            text-align: center;
-        }
+		.step-content p {
+			color: var(--text-secondary);
+		}
 
-        .stat h3 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
+		/* Stats Section */
+		.stats {
+			padding: 60px 0;
+			background: var(--primary-color);
+			color: white;
+		}
 
-        .stat p {
-            opacity: 0.9;
-            font-weight: 500;
-        }
+		.stats-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 40px;
+			text-align: center;
+		}
 
-        /* Footer */
-        .footer {
-            padding: 60px 0;
-            background: var(--text-primary);
-            color: white;
-        }
+		.stat h3 {
+			font-size: 2.5rem;
+			font-weight: 800;
+			margin-bottom: 8px;
+		}
 
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 40px;
-        }
+		.stat p {
+			opacity: 0.9;
+			font-weight: 500;
+		}
 
-        .footer-section h4 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
+		/* Footer */
+		.footer {
+			padding: 60px 0;
+			background: var(--text-primary);
+			color: white;
+		}
 
-        .footer-section a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 10px;
-            transition: color 0.2s;
-        }
+		.footer-content {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 40px;
+		}
 
-        .footer-section a:hover {
-            color: white;
-        }
+		.footer-section h4 {
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 20px;
+		}
 
-        .footer-bottom {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            opacity: 0.8;
-        }
+		.footer-section a {
+			color: rgba(255, 255, 255, 0.8);
+			text-decoration: none;
+			display: block;
+			margin-bottom: 10px;
+			transition: color 0.2s;
+		}
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .cta-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .nav {
-                display: none;
-            }
-        }
-    </style>
+		.footer-section a:hover {
+			color: white;
+		}
+
+		.footer-bottom {
+			margin-top: 40px;
+			padding-top: 20px;
+			border-top: 1px solid rgba(255, 255, 255, 0.1);
+			text-align: center;
+			opacity: 0.8;
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			.hero h1 {
+				font-size: 2.5rem;
+			}
+
+			.cta-buttons {
+				flex-direction: column;
+				align-items: center;
+			}
+
+			.nav {
+				display: none;
+			}
+		}
+	</style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="#" class="logo">
-                    <img src="./images/icon-48.png" alt="Fuskr Icon">
-                    Fuskr
-                </a>
-                <nav class="nav">
-                    <a href="#features">Features</a>
-                    <a href="#how-to-use">How to Use</a>
-                    <a href="https://github.com/DanAtkinson/Fuskr">GitHub</a>
-                </nav>
-            </div>
-        </div>
-    </header>
+	<header class="header">
+		<div class="container">
+			<div class="header-content">
+				<a href="#" class="logo">
+					<img src="./images/icon-48.png" alt="Fuskr Icon">
+					Fuskr
+				</a>
+				<nav class="nav">
+					<a href="#features">Features</a>
+					<a href="#how-to-use">How to Use</a>
+					<a href="https://github.com/DanAtkinson/Fuskr">GitHub</a>
+				</nav>
+			</div>
+		</div>
+	</header>
 
-    <section class="hero">
-        <div class="container">
-            <div class="version-badge">
-                <span>🚀</span>
-                Version {{VERSION}} - Latest Release
-            </div>
-            <h1>Fuskr</h1>
-            <p class="subtitle">
-                Create instant image galleries from sequential URLs. Perfect for browsing image series, comics, and photo collections with just a right-click.
-            </p>
-            <div class="cta-buttons">
-                <a href="https://chrome.google.com/webstore/detail/{{EXTENSION_ID}}" class="btn btn-primary">
-                    <span>🛒</span>
-                    Install from Chrome Web Store
-                </a>
-                <a href="https://github.com/DanAtkinson/Fuskr/releases/latest" class="btn btn-secondary">
-                    <span>📦</span>
-                    Download ZIP
-                </a>
-            </div>
-        </div>
-    </section>
+	<section class="hero">
+		<div class="container">
+			<div class="version-badge">
+				<span>🚀</span>
+				Version {{VERSION}} - Latest Release
+			</div>
+			<h1>Fuskr</h1>
+			<p class="subtitle">
+				Create instant image galleries from sequential URLs. Perfect for browsing image series, comics, and photo collections with just a right-click.
+			</p>
+			<div class="cta-buttons">
+				<a href="https://chrome.google.com/webstore/detail/{{EXTENSION_ID}}" class="btn btn-primary">
+					<span>🛒</span>
+					Install from Chrome Web Store
+				</a>
+				<a href="https://github.com/DanAtkinson/Fuskr/releases/latest" class="btn btn-secondary">
+					<span>📦</span>
+					Download ZIP
+				</a>
+			</div>
+		</div>
+	</section>
 
-    <section id="features" class="features">
-        <div class="container">
-            <h2 class="section-title">Powerful Features</h2>
-            <div class="features-grid">
-                <div class="feature">
-                    <div class="feature-icon">🖱️</div>
-                    <h3>Right-Click Fusking</h3>
-                    <p>Simply right-click any image and select "Fusk" to instantly create a gallery of sequential images.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Lightning Fast</h3>
-                    <p>Built with modern Angular and optimised for speed. Gallery generation happens in milliseconds.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🎨</div>
-                    <h3>Beautiful Interface</h3>
-                    <p>Clean, modern design with dark mode support. Slideshow mode for hands-free viewing.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">📊</div>
-                    <h3>Smart Detection</h3>
-                    <p>Automatically detects sequential patterns in URLs, including alphabetical and mixed sequences.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">💾</div>
-                    <h3>Download & Export</h3>
-                    <p>Save individual images or download entire galleries as ZIP files with preserved structure.</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🔧</div>
-                    <h3>Highly Configurable</h3>
-                    <p>Customise gallery size, behaviour, safety limits, and appearance to suit your needs.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+	<section id="features" class="features">
+		<div class="container">
+			<h2 class="section-title">Powerful Features</h2>
+			<div class="features-grid">
+				<div class="feature">
+					<div class="feature-icon">🖱️</div>
+					<h3>Right-Click Fusking</h3>
+					<p>Simply right-click any image and select "Fusk" to instantly create a gallery of sequential images.</p>
+				</div>
+				<div class="feature">
+					<div class="feature-icon">⚡</div>
+					<h3>Lightning Fast</h3>
+					<p>Built with modern Angular and optimised for speed. Gallery generation happens in milliseconds.</p>
+				</div>
+				<div class="feature">
+					<div class="feature-icon">🎨</div>
+					<h3>Beautiful Interface</h3>
+					<p>Clean, modern design with dark mode support. Slideshow mode for hands-free viewing.</p>
+				</div>
+				<div class="feature">
+					<div class="feature-icon">📊</div>
+					<h3>Smart Detection</h3>
+					<p>Automatically detects sequential patterns in URLs, including alphabetical and mixed sequences.</p>
+				</div>
+				<div class="feature">
+					<div class="feature-icon">💾</div>
+					<h3>Download & Export</h3>
+					<p>Save individual images or download entire galleries as ZIP files with preserved structure.</p>
+				</div>
+				<div class="feature">
+					<div class="feature-icon">🔧</div>
+					<h3>Highly Configurable</h3>
+					<p>Customise gallery size, behaviour, safety limits, and appearance to suit your needs.</p>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <section id="how-to-use" class="how-to-use">
-        <div class="container">
-            <h2 class="section-title">How to Use Fuskr</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Install the Extension</h3>
-                        <p>Add Fuskr to Chrome from the Chrome Web Store with one click.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Find an Image</h3>
-                        <p>Navigate to any image that's part of a numbered sequence or series.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Right-Click & Fusk</h3>
-                        <p>Right-click the image and select "Fusk" from the context menu.</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h3>Choose Gallery Size</h3>
-                        <p>Select how many images you want (10, 50, 100, or custom amount).</p>
-                    </div>
-                </div>
-                <div class="step">
-                    <div class="step-number">5</div>
-                    <div class="step-content">
-                        <h3>Enjoy Your Gallery</h3>
-                        <p>Your gallery opens in a new tab with all sequential images loaded automatically.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+	<section id="how-to-use" class="how-to-use">
+		<div class="container">
+			<h2 class="section-title">How to Use Fuskr</h2>
+			<div class="steps">
+				<div class="step">
+					<div class="step-number">1</div>
+					<div class="step-content">
+						<h3>Install the Extension</h3>
+						<p>Add Fuskr to Chrome from the Chrome Web Store with one click.</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number">2</div>
+					<div class="step-content">
+						<h3>Find an Image</h3>
+						<p>Navigate to any image that's part of a numbered sequence or series.</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number">3</div>
+					<div class="step-content">
+						<h3>Right-Click & Fusk</h3>
+						<p>Right-click the image and select "Fusk" from the context menu.</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number">4</div>
+					<div class="step-content">
+						<h3>Choose Gallery Size</h3>
+						<p>Select how many images you want (10, 50, 100, or custom amount).</p>
+					</div>
+				</div>
+				<div class="step">
+					<div class="step-number">5</div>
+					<div class="step-content">
+						<h3>Enjoy Your Gallery</h3>
+						<p>Your gallery opens in a new tab with all sequential images loaded automatically.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <section class="stats">
-        <div class="container">
-            <div class="stats-grid">
-                <div class="stat">
-                    <h3>{{INSTALL_COUNT}}+</h3>
-                    <p>Active Users</p>
-                </div>
-                <div class="stat">
-                    <h3>15+</h3>
-                    <p>Years of Development</p>
-                </div>
-                <div class="stat">
-                    <h3>{{VERSION}}</h3>
-                    <p>Current Version</p>
-                </div>
-                <div class="stat">
-                    <h3>100%</h3>
-                    <p>Open Source</p>
-                </div>
-            </div>
-        </div>
-    </section>
+	<section class="stats">
+		<div class="container">
+			<div class="stats-grid">
+				<div class="stat">
+					<h3>{{INSTALL_COUNT}}+</h3>
+					<p>Active Users</p>
+				</div>
+				<div class="stat">
+					<h3>15+</h3>
+					<p>Years of Development</p>
+				</div>
+				<div class="stat">
+					<h3>{{VERSION}}</h3>
+					<p>Current Version</p>
+				</div>
+				<div class="stat">
+					<h3>100%</h3>
+					<p>Open Source</p>
+				</div>
+			</div>
+		</div>
+	</section>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>Fuskr Extension</h4>
-                    <a href="https://chrome.google.com/webstore/detail/{{EXTENSION_ID}}">Chrome Web Store</a>
-                    <a href="https://github.com/DanAtkinson/Fuskr/releases">Download Releases</a>
-                    <a href="https://github.com/DanAtkinson/Fuskr/blob/master/README.markdown">Documentation</a>
-                </div>
-                <div class="footer-section">
-                    <h4>Development</h4>
-                    <a href="https://github.com/DanAtkinson/Fuskr">Source Code</a>
-                    <a href="https://github.com/DanAtkinson/Fuskr/issues">Report Issues</a>
-                    <a href="https://github.com/DanAtkinson/Fuskr/blob/master/CONTRIBUTING.markdown">Contributing</a>
-                </div>
-                <div class="footer-section">
-                    <h4>Authors</h4>
-                    <a href="https://github.com/DanAtkinson">Dan Atkinson</a>
-                    <a href="https://github.com/jonathonbolster">Jonathon Bolster</a>
-                    <a href="https://github.com/DanAtkinson/Fuskr/graphs/contributors">All Contributors</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; {{YEAR}} Fuskr Extension. Open source under MIT License.</p>
-            </div>
-        </div>
-    </footer>
+	<footer class="footer">
+		<div class="container">
+			<div class="footer-content">
+				<div class="footer-section">
+					<h4>Fuskr Extension</h4>
+					<a href="https://chrome.google.com/webstore/detail/{{EXTENSION_ID}}">Chrome Web Store</a>
+					<a href="https://github.com/DanAtkinson/Fuskr/releases">Download Releases</a>
+					<a href="https://github.com/DanAtkinson/Fuskr/blob/master/README.markdown">Documentation</a>
+				</div>
+				<div class="footer-section">
+					<h4>Development</h4>
+					<a href="https://github.com/DanAtkinson/Fuskr">Source Code</a>
+					<a href="https://github.com/DanAtkinson/Fuskr/issues">Report Issues</a>
+					<a href="https://github.com/DanAtkinson/Fuskr/blob/master/CONTRIBUTING.markdown">Contributing</a>
+				</div>
+				<div class="footer-section">
+					<h4>Authors</h4>
+					<a href="https://github.com/DanAtkinson">Dan Atkinson</a>
+					<a href="https://github.com/jonathonbolster">Jonathon Bolster</a>
+					<a href="https://github.com/DanAtkinson/Fuskr/graphs/contributors">All Contributors</a>
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<p>&copy; {{YEAR}} Fuskr Extension. Open source under MIT License.</p>
+			</div>
+		</div>
+	</footer>
 </body>
 </html>

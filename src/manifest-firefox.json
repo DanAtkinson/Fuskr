@@ -16,9 +16,7 @@
 		}
 	},
 	"background": {
-		"scripts": [
-			"background.js"
-		],
+		"scripts": ["background.js"],
 		"persistent": false
 	},
 	"options_ui": {
@@ -28,24 +26,14 @@
 	"omnibox": {
 		"keyword": "fuskr"
 	},
-	"permissions": [
-		"tabs",
-		"downloads",
-		"contextMenus",
-		"activeTab",
-		"storage",
-		"http://*/*",
-		"https://*/*"
-	],
+	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage", "http://*/*", "https://*/*"],
 	"icons": {
 		"16": "assets/images/16x16.png",
 		"48": "assets/images/48x48.png",
 		"128": "assets/images/128x128.png"
 	},
 	"content_security_policy": "script-src 'self' 'unsafe-inline'; object-src 'self'; style-src 'self' 'unsafe-inline';",
-	"web_accessible_resources": [
-		"assets/*"
-	],
+	"web_accessible_resources": ["assets/*"],
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "fuskr@danatkinson.com",
