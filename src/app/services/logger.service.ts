@@ -109,7 +109,7 @@ export class LoggerService {
 
 	// Private properties (alphabetically)
 	private currentLogLevel = LogLevel.DEBUG; // Can be configured in options
-	private isEnabled = true; // Can be toggled in options
+	private isEnabled = false; // Can be toggled in options - disabled by default
 	private logs: LogEntry[] = [];
 	private maxLogs = 1000; // Keep last 1000 logs
 

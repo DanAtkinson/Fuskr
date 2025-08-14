@@ -38,18 +38,18 @@
 								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fitOnPage" id="fitOnPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
 								<label class="form-check-label" for="fitOnPage"> <i class="fas fa-compress-alt me-1"></i>{{ translate('Options_ResizeImagesFitOnPage') }} </label>
 							</div>
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="imageDisplayMode" value="fullWidth" id="fullWidth" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-							<label class="form-check-label" for="fullWidth"> <i class="fas fa-arrows-alt-h me-1"></i>{{ translate('Options_ResizeImagesFullWidth') }} </label>
-						</div>
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="imageDisplayMode" value="fillPage" id="fillPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-							<label class="form-check-label" for="fillPage"> <i class="fas fa-expand-alt me-1"></i>{{ translate('Options_ResizeImagesFillPage') }} </label>
-						</div>
-						<div class="form-check">
-							<input class="form-check-input" type="radio" name="imageDisplayMode" value="thumbnails" id="thumbnails" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-							<label class="form-check-label" for="thumbnails"> <i class="fas fa-th me-1"></i>{{ translate('Options_ResizeImagesThumbnails') }} </label>
-						</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fullWidth" id="fullWidth" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
+								<label class="form-check-label" for="fullWidth"> <i class="fas fa-arrows-alt-h me-1"></i>{{ translate('Options_ResizeImagesFullWidth') }} </label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fillPage" id="fillPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
+								<label class="form-check-label" for="fillPage"> <i class="fas fa-expand-alt me-1"></i>{{ translate('Options_ResizeImagesFillPage') }} </label>
+							</div>
+							<div class="form-check">
+								<input class="form-check-input" type="radio" name="imageDisplayMode" value="thumbnails" id="thumbnails" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
+								<label class="form-check-label" for="thumbnails"> <i class="fas fa-th me-1"></i>{{ translate('Options_ResizeImagesThumbnails') }} </label>
+							</div>
 						</fieldset>
 					</div>
 
@@ -136,6 +136,14 @@
 							Use this panel to export debug logs when reporting issues. Logs help diagnose problems and improve the extension.
 						</div>
 
+						<div class="mb-3">
+							<div class="form-check">
+								<input class="form-check-input" type="checkbox" id="enableLogging" [checked]="loggerConfig.enabled" (change)="onLoggingToggle($event)" />
+								<label class="form-check-label" for="enableLogging"> <i class="fas fa-toggle-on me-1"></i>Enable Debug Logging </label>
+								<div class="form-text">When enabled, Fuskr will collect debug information to help diagnose issues. Logs are stored locally and never sent anywhere automatically.</div>
+							</div>
+						</div>
+
 						<div class="row mb-3">
 							<div class="col-md-6">
 								<h6>Logger Status</h6>
@@ -148,8 +156,8 @@
 							<div class="col-md-6">
 								<h6>Actions</h6>
 								<div class="btn-group-vertical d-grid gap-2">
-									<button class="btn btn-primary" type="button" (click)="exportLogs()"><i class="fas fa-download me-1"></i>Export Debug Logs</button>
-									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()"><i class="fas fa-trash me-1"></i>Clear Logs</button>
+									<button class="btn btn-primary" type="button" (click)="exportLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-download me-1"></i>Export Debug Logs</button>
+									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-trash me-1"></i>Clear Logs</button>
 								</div>
 							</div>
 						</div>

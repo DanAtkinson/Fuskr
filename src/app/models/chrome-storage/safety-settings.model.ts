@@ -3,7 +3,7 @@ import { ISafetySettings } from '@interfaces/chrome-storage/safety-settings.inte
 export class SafetySettings implements ISafetySettings {
 	// Public properties (alphabetically)
 	enableOverloadProtection = true;
-	overloadProtectionLimit = 50;
+	overloadProtectionLimit = 250;
 
 	constructor(data?: Partial<ISafetySettings>) {
 		if (data) {

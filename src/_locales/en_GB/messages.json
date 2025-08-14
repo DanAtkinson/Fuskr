@@ -86,6 +86,10 @@
 		"message": "Gallery History",
 		"description": "Page title for history page"
 	},
+	"History_ViewOptions": {
+		"message": "View Options",
+		"description": "Button text to view options/settings"
+	},
 	"History_NewGallery": {
 		"message": "New Gallery",
 		"description": "Button text for creating a new gallery"
@@ -281,6 +285,9 @@
 	"Options_About_Description": {
 		"message": "<p>Fuskr was borne of a frustation that my favourite Firefox plugin <a href='https://addons.mozilla.org/en-US/firefox/addon/2087/' title='Firefusk on Mozilla Addons'>Firefusk</a> (dead link) created by <a href='http://jonathansoma.com/' title='Jonathan Soma'>Jonathan Soma</a> was not available for Chrome.</p><p>Once I had stopped crying, I remembered that I was a developer and could do almost anything if I put my mind to it.</p><p><i>Then</i>, I remembered that I was actually a pretty rubbish developer and asked for help from <a href='https://bolsterweb.com' title='Jonathon Bolster'>Jonathon Bolster</a>.</p><p>Jonathon gratefully helped and actually rewrote pretty much all of the code for Fuskr to make it so damned extensible and also provided lots of unit tests for it.</p>"
 	},
+	"Options_Debug": {
+		"message": "Debug & Diagnostics"
+	},
 	"Gallery_Title": {
 		"message": "Fuskr Gallery",
 		"description": "Main title of the gallery page"
@@ -288,6 +295,10 @@
 	"Gallery_ViewHistory": {
 		"message": "View Gallery History",
 		"description": "Button text to view gallery history"
+	},
+	"Gallery_ViewOptions": {
+		"message": "View Options",
+		"description": "Button text to view options/settings"
 	},
 	"Gallery_SwitchToLightMode": {
 		"message": "Switch to Light Mode",
@@ -622,7 +633,7 @@
 		"message": "Image limit"
 	},
 	"Options_OverloadProtectionLimit_Description": {
-		"message": "Maximum number of images to generate before showing a warning. Recommended: 500 images."
+		"message": "Maximum number of images to generate before showing a warning. Default: 250 images."
 	},
 	"Gallery_OverloadWarning": {
 		"message": "This URL pattern would generate $1 images, which exceeds the safety limit of $2 images.\n\nGenerating this many images may slow down or crash your browser.\n\nDo you want to continue anyway?"

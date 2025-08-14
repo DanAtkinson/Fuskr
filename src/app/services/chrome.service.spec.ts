@@ -65,7 +65,7 @@ describe('ChromeService', () => {
 			expect(result.behaviour.galleryHistory.entries).toEqual([]);
 			expect(result.behaviour.galleryHistory.maxEntries).toBe(10);
 			expect(result.safety.enableOverloadProtection).toBe(true);
-			expect(result.safety.overloadProtectionLimit).toBe(50);
+			expect(result.safety.overloadProtectionLimit).toBe(250);
 			expect(result.version).toBe(1);
 		});
 
@@ -105,7 +105,7 @@ describe('ChromeService', () => {
 			expect(result.behaviour.galleryHistory.maxEntries).toBe(10);
 
 			expect(result.safety.enableOverloadProtection).toBe(true); // from defaults
-			expect(result.safety.overloadProtectionLimit).toBe(50); // from defaults
+			expect(result.safety.overloadProtectionLimit).toBe(250); // from defaults
 			expect(result.version).toBe(1);
 		});
 

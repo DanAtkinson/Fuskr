@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ChromeService } from '@services/chrome.service';
 import { LoggerService } from '@services/logger.service';
@@ -8,6 +9,7 @@ import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history
 @Component({
 	selector: 'app-history',
 	standalone: true,
+	imports: [CommonModule],
 	styleUrls: ['./history.component.scss'],
 	templateUrl: './history.component.html',
 })
@@ -97,6 +99,10 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 		// Navigate to gallery with the URL as parameter
 		const encodedUrl = encodeURIComponent(entry.originalUrl);
 		this.router.navigate(['/gallery'], { queryParams: { url: encodedUrl } });
+	}
+
+	navigateToOptions() {
+		this.router.navigate(['/options']);
 	}
 
 	async openGalleryInNewTab(entry: GalleryHistoryEntry) {

@@ -181,7 +181,7 @@ describe('Chrome Storage Models', () => {
 			const settings = new SafetySettings();
 
 			expect(settings.enableOverloadProtection).toBe(true);
-			expect(settings.overloadProtectionLimit).toBe(50);
+			expect(settings.overloadProtectionLimit).toBe(250);
 		});
 
 		it('should create instance with provided data', () => {
@@ -222,8 +222,8 @@ describe('Chrome Storage Models', () => {
 			expect(settings1.enableOverloadProtection).toBe(true);
 			expect(settings2.enableOverloadProtection).toBe(false);
 			// Both should have default limit
-			expect(settings1.overloadProtectionLimit).toBe(50);
-			expect(settings2.overloadProtectionLimit).toBe(50);
+			expect(settings1.overloadProtectionLimit).toBe(250);
+			expect(settings2.overloadProtectionLimit).toBe(250);
 		});
 	});
 
@@ -394,7 +394,7 @@ describe('Chrome Storage Models', () => {
 				},
 				safety: {
 					enableOverloadProtection: true,
-					overloadProtectionLimit: 100,
+					overloadProtectionLimit: 250,
 				},
 			};
 
@@ -405,7 +405,7 @@ describe('Chrome Storage Models', () => {
 			expect(storage.display.imageDisplayMode).toBe('fullWidth');
 			expect(storage.behaviour.openInForeground).toBe(false);
 			expect(storage.behaviour.recentFusks.length).toBe(2);
-			expect(storage.safety.overloadProtectionLimit).toBe(100);
+			expect(storage.safety.overloadProtectionLimit).toBe(250);
 			expect(storage.safety.enableOverloadProtection).toBe(true); // Default value
 		});
 

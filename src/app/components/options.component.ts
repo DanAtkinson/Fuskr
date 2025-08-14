@@ -1,4 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChromeStorageData } from '@models/chrome-storage';
 import { LoggerService, LogLevel } from '@services/logger.service';
@@ -9,7 +10,7 @@ import { BaseComponent } from './base.component';
 	standalone: true,
 	styleUrls: ['./options.component.scss'],
 	templateUrl: './options.component.html',
-	imports: [FormsModule],
+	imports: [CommonModule, FormsModule],
 })
 export class OptionsComponent extends BaseComponent implements OnInit {
 	// Public properties (alphabetically)
@@ -67,6 +68,18 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 	onDarkModeChange() {
 		// Apply dark mode change immediately
 		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
+	}
+
+	onLoggingToggle(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const isEnabled = target.checked;
+
+		this.logger.configure({ enabled: isEnabled });
+		this.loggerConfig = this.logger.getConfig();
+
+		const message = isEnabled ? 'Debug logging enabled' : 'Debug logging disabled';
+		this.showStatus(message);
+		this.logger.info('options.debugPanel.toggled', `Logging ${isEnabled ? 'enabled' : 'disabled'} by user`);
 	}
 
 	async resetToDefaults() {

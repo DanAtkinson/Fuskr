@@ -6,6 +6,9 @@
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToHistory()" [title]="translate('Gallery_ViewHistory')">
 					<i class="fas fa-history"></i>
 				</button>
+				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('Gallery_ViewOptions')">
+					<i class="fas fa-cog"></i>
+				</button>
 				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
 					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
 				</button>
@@ -42,35 +45,12 @@
 			@for (mediaItem of mediaItems; track mediaItem.url; let i = $index) {
 				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
 					@if (mediaItem.type === 'video') {
-						<video class="fusk-media fusk-video" 
-							   (click)="openImageViewer(mediaItem.url, i)" 
-							   (keydown.enter)="openImageViewer(mediaItem.url, i)" 
-							   (keydown.space)="openImageViewer(mediaItem.url, i)" 
-							   (error)="onImageError($event)" 
-							   (loadeddata)="onImageLoad($event)" 
-							   [attr.data-original-url]="mediaItem.url" 
-							   [attr.data-index]="i"
-							   tabindex="0"
-							   role="button"
-							   [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'"
-							   controls preload="metadata">
+						<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
 							<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
 							{{ translate('Gallery_VideoNotSupported') }}
 						</video>
 					} @else {
-						<img class="fusk-image fusk-media" 
-							 (click)="openImageViewer(mediaItem.url, i)" 
-							 (keydown.enter)="openImageViewer(mediaItem.url, i)" 
-							 (keydown.space)="openImageViewer(mediaItem.url, i)" 
-							 (error)="onImageError($event)" 
-							 (load)="onImageLoad($event)" 
-							 [alt]="getImageAltText(i)" 
-							 [src]="mediaItem.url" 
-							 [attr.data-original-url]="mediaItem.url" 
-							 [attr.data-index]="i"
-							 tabindex="0"
-							 role="button"
-							 [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
+						<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(i)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
 					}
 					@if (mediaItem.loadingState === 'loading') {
 						<div class="media-loading-indicator">
@@ -132,17 +112,8 @@
 
 	<!-- Image Viewer Modal -->
 	@if (showImageViewer) {
-		<div class="image-viewer-modal" 
-			 (click)="closeImageViewer()" 
-			 (keydown.escape)="closeImageViewer()"
-			 tabindex="0"
-			 role="dialog"
-			 aria-modal="true"
-			 [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage)">
-			<div class="viewer-content" 
-				 (click)="$event.stopPropagation()"
-				 (keydown)="$event.stopPropagation()"
-				 role="document">
+		<div class="image-viewer-modal" (click)="closeImageViewer()" (keydown.escape)="closeImageViewer()" tabindex="0" role="dialog" aria-modal="true" [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage)">
+			<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" role="document">
 				<div class="viewer-header">
 					<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
 					<span class="viewer-counter">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>

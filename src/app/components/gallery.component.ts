@@ -274,6 +274,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.router.navigate(['/history']);
 	}
 
+	navigateToOptions() {
+		this.router.navigate(['/options']);
+	}
+
 	nextImage() {
 		const totalCount = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
 		if (this.currentViewerIndex < totalCount - 1) {
@@ -717,7 +721,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				totalImages: this.totalImages,
 				loadedImages: this.loadedImages,
 				brokenImages: this.brokenImages,
-				imageUrls: this.mediaItems.length > 0 ? this.mediaItems.map((item) => item.url) : this.imageUrls,
+				imageUrls: [], // No longer store individual URLs - use originalUrl pattern instead
 				displayMode: this.imageDisplayMode,
 			};
 

@@ -91,7 +91,7 @@ describe('OptionsComponent', () => {
 			expect(component.options.behaviour.galleryHistory.maxEntries).toBe(10);
 
 			expect(component.options.safety.enableOverloadProtection).toBe(true);
-			expect(component.options.safety.overloadProtectionLimit).toBe(50);
+			expect(component.options.safety.overloadProtectionLimit).toBe(250);
 			expect(component.options.version).toBe(1);
 		});
 

@@ -1,11 +1,9 @@
 # TODO
 
-## ✅ Completed
-
-- ~~Replace Travis and use Github for build status.~~ - **DONE**: GitHub Actions CI/CD pipeline now provides comprehensive build, test, and deployment status with multiple Node.js versions, code quality checks, and browser extension packaging.
-
 ## 🚀 Main Enhancements
 
+- The url is being corrupted when it goes into the history. It should be base-64 encoded when storing and then base-64 encoded when retrieving.
+- Add a Settings button icon on the main gallery and history pages.
 - Creation of a public key for additional security. This should aid in both Chromium and Firefox add-on store submission.
 - Add a "Reset Options" button to the bottom of the Options screen which deletes the options (but not history) and resets them back to their defaults.
 - **Allow fusks from URL lists** - Create fusks from a list of URLs rather than sequential patterns. Example: Imgur albums where filenames are not sequential. NB: This should also be able to parse the Fuskr.txt file being loaded in.
