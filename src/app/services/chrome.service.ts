@@ -322,9 +322,14 @@ export class ChromeService {
 		try {
 			// Check if this looks like a base-64 encoded URL by trying to decode it
 			const decoded = atob(storedUrl);
-			
+
 			// Basic validation - decoded URL should start with http/https or be a relative path
-			if (decoded.startsWith('http') || decoded.startsWith('/') || decoded.includes('[') || decoded.includes(']')) {
+			if (
+				decoded.startsWith('http') ||
+				decoded.startsWith('/') ||
+				decoded.includes('[') ||
+				decoded.includes(']')
+			) {
 				return decoded;
 			} else {
 				// If decoded value doesn't look like a URL, assume it's already plain text

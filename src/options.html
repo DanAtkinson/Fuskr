@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>Fuskr Options</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/x-icon" href="favicon.ico" />
+		<base href="" />
+	</head>
+	<body>
+		<app-root></app-root>
+		<script>
+			// Force navigation to options route when this page loads
+			window.addEventListener('DOMContentLoaded', function () {
+				// Small delay to ensure Angular has initialized
+				setTimeout(function () {
+					if (window.location.hash !== '#/options') {
+						window.location.hash = '#/options';
+						// Force router to recognize the change
+						window.dispatchEvent(new HashChangeEvent('hashchange'));
+					}
+				}, 100);
+			});
+		</script>
+	</body>
+</html>

@@ -4,6 +4,11 @@ dist
 fuskr-*.zip
 .angular
 
+# Security keys - keep private!
+######################
+extension-private-key.pem
+generate-extension-keys.js
+
 # OS generated files #
 ######################
 .DS_Store
