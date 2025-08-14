@@ -59,9 +59,10 @@ export class ChromeService {
 		const history = currentData.behaviour.galleryHistory;
 
 		// Create new entry with ID and timestamp
-		// Note: We store timestamp as Date object, Chrome storage handles serialization
+		// Base-64 encode the URL to prevent corruption during storage
 		const newEntry: GalleryHistoryEntry = {
 			...entry,
+			originalUrl: this.encodeUrlForStorage(entry.originalUrl),
 			id: this.generateHistoryId(),
 			timestamp: new Date(),
 		};
@@ -157,7 +158,7 @@ export class ChromeService {
 		const data = await this.getStorageData();
 		const history = data.behaviour.galleryHistory;
 
-		// Convert timestamp strings back to Date objects
+		// Convert timestamp strings back to Date objects and decode URLs
 		if (history.entries) {
 			history.entries = history.entries.map((entry) => {
 				let validDate: Date;
@@ -188,8 +189,12 @@ export class ChromeService {
 					validDate = new Date();
 				}
 
+				// Decode the URL from base-64 storage format
+				const decodedUrl = this.decodeUrlFromStorage(entry.originalUrl);
+
 				return {
 					...entry,
+					originalUrl: decodedUrl,
 					timestamp: validDate,
 				};
 			});
@@ -307,6 +312,42 @@ export class ChromeService {
 	// Private methods (alphabetically)
 	private applyDefaults(data: Partial<IChromeStorageData>): IChromeStorageData {
 		return new ChromeStorageData(data);
+	}
+
+	/**
+	 * Decode a URL from base-64 storage format back to original URL
+	 * Handles both old unencoded URLs and new base-64 encoded URLs for backward compatibility
+	 */
+	private decodeUrlFromStorage(storedUrl: string): string {
+		try {
+			// Check if this looks like a base-64 encoded URL by trying to decode it
+			const decoded = atob(storedUrl);
+			
+			// Basic validation - decoded URL should start with http/https or be a relative path
+			if (decoded.startsWith('http') || decoded.startsWith('/') || decoded.includes('[') || decoded.includes(']')) {
+				return decoded;
+			} else {
+				// If decoded value doesn't look like a URL, assume it's already plain text
+				return storedUrl;
+			}
+		} catch (error) {
+			// If base-64 decoding fails, it's likely an old unencoded URL
+			this.logger.debug('chrome.decodeUrl', 'URL appears to be unencoded, using as-is', { url: storedUrl });
+			return storedUrl;
+		}
+	}
+
+	/**
+	 * Encode a URL to base-64 format for storage to prevent corruption
+	 */
+	private encodeUrlForStorage(url: string): string {
+		try {
+			return btoa(url);
+		} catch (error) {
+			// If encoding fails (rare), log warning and return original
+			this.logger.warn('chrome.encodeUrl', 'Failed to encode URL, storing as-is', error);
+			return url;
+		}
 	}
 
 	private generateHistoryId(): string {
