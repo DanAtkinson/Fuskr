@@ -337,7 +337,10 @@ export class ChromeService {
 			}
 		} catch (error) {
 			// If base-64 decoding fails, it's likely an old unencoded URL
-			this.logger.debug('chrome.decodeUrl', 'URL appears to be unencoded, using as-is', { url: storedUrl });
+			this.logger.debug('chrome.decodeUrl', 'URL appears to be unencoded, using as-is', {
+				url: storedUrl,
+				error,
+			});
 			return storedUrl;
 		}
 	}
@@ -356,7 +359,7 @@ export class ChromeService {
 	}
 
 	private generateHistoryId(): string {
-		return `gallery_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+		return `gallery_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
 	}
 
 	private getDefaultData(): IChromeStorageData {
