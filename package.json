@@ -21,6 +21,7 @@
 		"organise:builds": "node src/build/organise-build.js dist/chromium && node src/build/organise-build.js dist/firefox",
 		"start": "ng serve",
 		"sync:version": "node src/build/sync-version.js",
+		"extension:id": "node scripts/get-extension-id.js",
 		"test:ci": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
 		"test:coverage": "ng test --watch=false --browsers=ChromeHeadless --code-coverage",
 		"test": "ng test",

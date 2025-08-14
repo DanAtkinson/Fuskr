@@ -1,0 +1,94 @@
+name: Build and Release Extension
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v5.0.2
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run full build pipeline
+        run: npm run build
+        
+      - name: Extract version from tag
+        id: version
+        run: |
+          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.TAG_NAME }}
+          release_name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
+          body: |
+            ## Fuskr Extension ${{ steps.version.outputs.VERSION }}
+            
+            ### Chrome Extension
+            - Download `fuskr-chromium.zip` for Chrome/Edge/Chromium browsers
+            - Install by loading as unpacked extension in Developer Mode
+            
+            ### Firefox Extension
+            - Download `fuskr-firefox.zip` for Firefox browsers
+            - Install as temporary add-on or submit to Mozilla Add-ons
+            
+            ### Changes
+            See the commit history for detailed changes in this release.
+            
+            ---
+            **Installation Instructions:**
+            1. Download the appropriate ZIP file for your browser
+            2. Extract if needed for development/testing
+            3. For Chrome: Enable Developer Mode in chrome://extensions/ and "Load unpacked"
+            4. For Firefox: Visit about:debugging and "Load Temporary Add-on"
+          draft: false
+          prerelease: false
+          
+      - name: Upload Chrome Extension
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/fuskr-chromium.zip
+          asset_name: fuskr-chromium-${{ steps.version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
+          
+      - name: Upload Firefox Extension  
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./dist/fuskr-firefox.zip
+          asset_name: fuskr-firefox-${{ steps.version.outputs.VERSION }}.zip
+          asset_content_type: application/zip
+          
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-builds-${{ steps.version.outputs.VERSION }}
+          path: |
+            dist/*.zip
+            dist/chromium/**
+            dist/firefox/**
+          retention-days: 90
