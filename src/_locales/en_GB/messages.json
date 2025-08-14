@@ -637,5 +637,57 @@
 	},
 	"Gallery_OverloadWarning": {
 		"message": "This URL pattern would generate $1 images, which exceeds the safety limit of $2 images.\n\nGenerating this many images may slow down or crash your browser.\n\nDo you want to continue anyway?"
+	},
+	"Options_Debug_Description": {
+		"message": "Use this panel to export debug logs when reporting issues. Logs help diagnose problems and improve the extension.",
+		"description": "Description for debug panel"
+	},
+	"Options_EnableLogging": {
+		"message": "Enable Debug Logging",
+		"description": "Checkbox label for enabling debug logging"
+	},
+	"Options_EnableLogging_Description": {
+		"message": "When enabled, Fuskr will collect debug information to help diagnose issues. Logs are stored locally and never sent anywhere automatically.",
+		"description": "Description for debug logging setting"
+	},
+	"Options_LoggerStatus": {
+		"message": "Logger Status",
+		"description": "Header for logger status section"
+	},
+	"Options_LoggerEnabled": {
+		"message": "Enabled:",
+		"description": "Label for logger enabled status"
+	},
+	"Options_LogLevel": {
+		"message": "Log Level:",
+		"description": "Label for current log level"
+	},
+	"Options_StoredLogs": {
+		"message": "Stored Logs:",
+		"description": "Label for number of stored logs"
+	},
+	"Options_Actions": {
+		"message": "Actions",
+		"description": "Header for debug actions section"
+	},
+	"Options_ExportLogs": {
+		"message": "Export Debug Logs",
+		"description": "Button text for exporting debug logs"
+	},
+	"Options_ClearLogs": {
+		"message": "Clear Logs",
+		"description": "Button text for clearing debug logs"
+	},
+	"Options_PrivacyNote": {
+		"message": "Privacy Note:",
+		"description": "Header for privacy note section"
+	},
+	"Options_PrivacyNote_Description": {
+		"message": "Debug logs may contain URLs and settings data. Review exported logs before sharing them for support.",
+		"description": "Privacy warning about debug logs"
+	},
+	"Options_ResetDescription": {
+		"message": "Reset all options to their default values. Your gallery history will be preserved.",
+		"description": "Description for reset to defaults functionality"
 	}
 }

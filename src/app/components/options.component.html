@@ -124,7 +124,7 @@
 				<div class="card-header">
 					<h5 class="mb-0">
 						<button class="btn btn-link text-decoration-none p-0 text-start w-100" type="button" (click)="toggleDebugPanel()" [attr.aria-expanded]="showDebugPanel">
-							<i class="fas fa-bug me-2"></i>{{ translate('Options_Debug') || 'Debug & Diagnostics' }}
+							<i class="fas fa-bug me-2"></i>{{ translate('Options_Debug') }}
 							<i [class]="showDebugPanel ? 'fas fa-chevron-up float-end' : 'fas fa-chevron-down float-end'"></i>
 						</button>
 					</h5>
@@ -133,38 +133,44 @@
 					<div class="card-body">
 						<div class="alert alert-info">
 							<i class="fas fa-info-circle me-1"></i>
-							Use this panel to export debug logs when reporting issues. Logs help diagnose problems and improve the extension.
+							{{ translate('Options_Debug_Description') }}
 						</div>
 
 						<div class="mb-3">
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" id="enableLogging" [checked]="loggerConfig.enabled" (change)="onLoggingToggle($event)" />
-								<label class="form-check-label" for="enableLogging"> <i class="fas fa-toggle-on me-1"></i>Enable Debug Logging </label>
-								<div class="form-text">When enabled, Fuskr will collect debug information to help diagnose issues. Logs are stored locally and never sent anywhere automatically.</div>
+								<label class="form-check-label" for="enableLogging"> <i class="fas fa-toggle-on me-1"></i>{{ translate('Options_EnableLogging') }} </label>
+								<div class="form-text">{{ translate('Options_EnableLogging_Description') }}</div>
 							</div>
 						</div>
 
 						<div class="row mb-3">
 							<div class="col-md-6">
-								<h6>Logger Status</h6>
+								<h6>{{ translate('Options_LoggerStatus') }}</h6>
 								<ul class="list-unstyled">
-									<li><strong>Enabled:</strong> {{ loggerConfig.enabled ? 'Yes' : 'No' }}</li>
-									<li><strong>Log Level:</strong> {{ getLogLevelName(loggerConfig.logLevel) }}</li>
-									<li><strong>Stored Logs:</strong> {{ loggerConfig.logCount }}/{{ loggerConfig.maxLogs }}</li>
+									<li>
+										<strong>{{ translate('Options_LoggerEnabled') }}</strong> {{ loggerConfig.enabled ? 'Yes' : 'No' }}
+									</li>
+									<li>
+										<strong>{{ translate('Options_LogLevel') }}</strong> {{ getLogLevelName(loggerConfig.logLevel) }}
+									</li>
+									<li>
+										<strong>{{ translate('Options_StoredLogs') }}</strong> {{ loggerConfig.logCount }}/{{ loggerConfig.maxLogs }}
+									</li>
 								</ul>
 							</div>
 							<div class="col-md-6">
-								<h6>Actions</h6>
+								<h6>{{ translate('Options_Actions') }}</h6>
 								<div class="btn-group-vertical d-grid gap-2">
-									<button class="btn btn-primary" type="button" (click)="exportLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-download me-1"></i>Export Debug Logs</button>
-									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-trash me-1"></i>Clear Logs</button>
+									<button class="btn btn-primary" type="button" (click)="exportLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-download me-1"></i>{{ translate('Options_ExportLogs') }}</button>
+									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-trash me-1"></i>{{ translate('Options_ClearLogs') }}</button>
 								</div>
 							</div>
 						</div>
 
 						<div class="alert alert-warning">
 							<i class="fas fa-exclamation-triangle me-1"></i>
-							<strong>Privacy Note:</strong> Debug logs may contain URLs and settings data. Review exported logs before sharing them for support.
+							<strong>{{ translate('Options_PrivacyNote') }}</strong> {{ translate('Options_PrivacyNote_Description') }}
 						</div>
 					</div>
 				}
@@ -182,7 +188,7 @@
 				<div class="card-body">
 					<p class="mb-3">
 						<i class="fas fa-info-circle me-1"></i>
-						Reset all options to their default values. Your gallery history will be preserved.
+						{{ translate('Options_ResetDescription') }}
 					</p>
 					<button class="btn btn-outline-warning" type="button" (click)="resetToDefaults()"><i class="fas fa-undo me-1"></i>{{ translate('Options_ResetToDefaults') }}</button>
 				</div>
