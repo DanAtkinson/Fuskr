@@ -40,7 +40,7 @@ jobs:
       - name: Get extension ID
         id: extension-id  
         run: |
-          echo "EXTENSION_ID=lmllmppkplhgnmjnklnkngmijnlogink" >> $GITHUB_OUTPUT
+          echo "EXTENSION_ID=glieaboaghdnlglpkekghloldikefofo" >> $GITHUB_OUTPUT
           
       - name: Process HTML template
         run: |

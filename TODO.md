@@ -3,8 +3,6 @@
 ## 🚀 Main Enhancements
 
 - **Allow fusks from URL lists** - Create fusks from a list of URLs rather than sequential patterns. Example: Imgur albums where filenames are not sequential. NB: This should also be able to parse the Fuskr.txt file being loaded in.
-- **Individual image downloads** *(from #45)* - Option to download images separately instead of ZIP files. Include image selection UI, bulk download options, and preserve original filenames. Many users prefer individual files over ZIP archives.
-- **Keyboard shortcuts** *(from #38)* - Programmable keyboard shortcuts for common actions. Allow users to configure custom shortcuts for different fusk directions (+/-), counts (10/20/50), and auto-download options.
 - **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
 - **'Infinite' fusk mode** - Provide a single starting point and continue loading in blocks of 100 until the user requests it stops. For example, fusk url is https://www.example.com/images/5.jpg. Start by creating a range from 0 to 100 and continue going in blocks of 100 until the user stops us.
 - **Advanced URL builder UI** - Change the url building UI so that we can break it into different parts and allow the user to change it as needed, rather than a simple string that gets evaluated.

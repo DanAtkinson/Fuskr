@@ -46,7 +46,7 @@ jobs:
       - name: Get extension ID from manifest
         id: extension-id  
         run: |
-          echo "EXTENSION_ID=$(node scripts/get-extension-id.js | grep -o 'lmllmppkplhgnmjnklnkngmijnlogink')" >> $GITHUB_OUTPUT
+          echo "EXTENSION_ID=$(node scripts/get-extension-id.js | grep -o 'glieaboaghdnlglpkekghloldikefofo')" >> $GITHUB_OUTPUT
           
       - name: Get installation statistics (mock data for now)
         id: stats
