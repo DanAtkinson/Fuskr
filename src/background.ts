@@ -347,10 +347,10 @@ class BackgroundScript {
 				this.clearRecentOnClick();
 				return;
 			case 'FuskrHistory':
-				this.historyOnClick();
+				this.historyOnClick(tab);
 				return;
 			case 'FuskrOptions':
-				this.optionsOnClick();
+				this.optionsOnClick(tab);
 				return;
 		}
 
@@ -426,15 +426,17 @@ class BackgroundScript {
 		chrome.storage.sync.set({ history: [] });
 	}
 
-	private optionsOnClick(): void {
+	private optionsOnClick(tab: chrome.tabs.Tab): void {
 		chrome.tabs.create({
 			url: chrome.runtime.getURL('index.html#/options'),
+			windowId: tab.windowId,
 		});
 	}
 
-	private historyOnClick(): void {
+	private historyOnClick(tab: chrome.tabs.Tab): void {
 		chrome.tabs.create({
 			url: chrome.runtime.getURL('index.html#/history'),
+			windowId: tab.windowId,
 		});
 	}
 
