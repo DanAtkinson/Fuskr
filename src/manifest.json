@@ -5,7 +5,6 @@
 	"version": "5.0.4",
 	"default_locale": "en_GB",
 	"author": "Dan Atkinson and Jonathon Bolster",
-	"key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAmXDRJZCDo/ZOmhTMd98YE0hzNMJEqBz+MZcX5z1w6hwWzlz9koJHYHFUMCIM4LtrSroh0lkK6tk7JgdMWwd5vNjNIs1f3ZqwOEbq8Eb1p0GhRQltUNLn5ZAimDYapSy/MR0AyoeQG2tgXG6w2i+WnnUnY12LBsh/svEjG2HNBL9QgZYuny4SQ8cRxOSKG8TrqOc+TyR8CN+xlT9G6cxuGCqzC/3b1/ejyhNx+SQUe15kKzEx/5z9PN0MObxerdcL+da7xSiyWelBOx8VyE3z/ka79Umk0/wJYdHGht/oPxgzmrvjyOBF5AqP4oXP4f2C8RNbi1Wz4vtfgWf4o0PeXwIDAQAB",
 	"action": {
 		"default_popup": "index.html",
 		"default_title": "Fuskr - Image Gallery Generator"
