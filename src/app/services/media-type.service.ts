@@ -184,7 +184,7 @@ export class MediaTypeService {
 	/**
 	 * Fallback method using URL extension when Content-Type is unavailable
 	 */
-	private fallbackTypeDetection(url: string): MediaTypeResult {
+	fallbackTypeDetection(url: string): MediaTypeResult {
 		const extension = this.extractExtension(url);
 
 		if (!extension) {

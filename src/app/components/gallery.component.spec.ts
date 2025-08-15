@@ -27,7 +27,11 @@ describe('GalleryComponent', () => {
 			'getImageFilename',
 			'countPotentialUrls',
 		]);
-		mockMediaTypeService = jasmine.createSpyObj('MediaTypeService', ['batchDetermineMediaTypes']);
+		mockMediaTypeService = jasmine.createSpyObj('MediaTypeService', [
+			'batchDetermineMediaTypes',
+			'createMediaItem',
+			'fallbackTypeDetection',
+		]);
 		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 		mockActivatedRoute = {
 			queryParams: of({ url: 'https://example.com/test.jpg' }),
@@ -89,16 +93,28 @@ describe('GalleryComponent', () => {
 
 			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
 			mockFuskrService.countPotentialUrls.and.returnValue(2); // Below limit
-			mockMediaTypeService.batchDetermineMediaTypes.and.returnValue(Promise.resolve(mockMediaItems));
+			mockMediaTypeService.createMediaItem.and.callFake((url: string) => ({
+				url,
+				type: 'unknown',
+				mimeType: 'application/octet-stream',
+				loadingState: 'pending',
+				extension: url.split('.').pop()?.toLowerCase(),
+			}));
+			mockMediaTypeService.fallbackTypeDetection.and.callFake((url: string) => ({
+				type: 'image',
+				mimeType: 'image/jpeg',
+			}));
 
 			component.originalUrl = 'https://example.com/image05.jpg';
 			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image05.jpg');
-			expect(mockMediaTypeService.batchDetermineMediaTypes).toHaveBeenCalledWith(mockResult.urls, 5);
+			expect(mockMediaTypeService.createMediaItem).toHaveBeenCalledTimes(2);
+			expect(mockMediaTypeService.fallbackTypeDetection).toHaveBeenCalledTimes(2);
 			expect(component.imageUrls).toEqual(mockResult.urls);
-			expect(component.mediaItems).toEqual(mockMediaItems);
+			expect(component.mediaItems.length).toBe(2);
+			expect(component.mediaItems[0].type).toBe('image');
 			expect(component.originalUrl).toBe(mockResult.originalUrl);
 		});
 

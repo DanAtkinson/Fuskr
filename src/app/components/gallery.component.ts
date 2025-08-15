@@ -906,32 +906,46 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.loadedImages = 0;
 			this.brokenImages = 0;
 
-			// Create MediaItems and determine their types
+			// Create MediaItems immediately with fallback extension-based detection
 			if (this.imageUrls.length > 0) {
-				this.logger.info('GalleryComponent', 'Starting media type detection', {
+				this.logger.info('GalleryComponent', 'Creating media items with fallback detection', {
 					totalUrls: this.imageUrls.length,
 				});
 
-				// Process media items in batches to determine their actual types
-				this.mediaTypeLoadingProgress = 0;
-				this.mediaItems = await this.mediaTypeService.batchDetermineMediaTypes(
-					this.imageUrls,
-					5 // Process 5 at a time to be respectful to servers
-				);
+				// Create media items immediately using fallback extension-based detection
+				this.mediaItems = this.imageUrls.map((url) => {
+					const mediaItem = this.mediaTypeService.createMediaItem(url);
+					// Use fallback detection to get immediate type/MIME info
+					const fallbackResult = this.mediaTypeService.fallbackTypeDetection(url);
+					return {
+						...mediaItem,
+						type: fallbackResult.type,
+						mimeType: fallbackResult.mimeType,
+						loadingState: 'loaded' as const, // Mark as loaded so UI renders immediately
+					};
+				});
 
-				this.mediaTypeLoadingProgress = 100;
-				this.logger.info('GalleryComponent', 'Media type detection completed', {
+				// Update computed properties immediately
+				this.updateAllUrlsText();
+
+				// Initialize keyboard navigation
+				this.initializeKeyboardNavigation();
+
+				// Hide loading state immediately so gallery renders
+				this.loading = false;
+
+				this.logger.info('GalleryComponent', 'Gallery rendered immediately with fallback detection', {
 					totalItems: this.mediaItems.length,
 					imageCount: this.mediaItems.filter((item) => item.type === 'image').length,
 					videoCount: this.mediaItems.filter((item) => item.type === 'video').length,
 					unknownCount: this.mediaItems.filter((item) => item.type === 'unknown').length,
 				});
 
-				// Update computed properties
-				this.updateAllUrlsText();
-
-				// Initialize keyboard navigation
-				this.initializeKeyboardNavigation();
+				// Now start progressive HTTP-based type detection in the background
+				this.startProgressiveTypeDetection();
+			} else {
+				// No URLs generated, hide loading state
+				this.loading = false;
 			}
 
 			// Do a final count after images have had time to load
@@ -954,10 +968,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 			if (this.imageUrls.length === 0) {
 				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
+				this.loading = false;
 			}
 		} catch (error) {
 			this.errorMessage = this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message;
-		} finally {
 			this.loading = false;
 		}
 	}
@@ -1022,5 +1036,72 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		this.loadedImages = loaded;
 		this.brokenImages = broken;
+	}
+
+	private async startProgressiveTypeDetection() {
+		// Start progressive HTTP-based type detection in the background
+		// This will update media items one by one as HTTP requests complete
+		this.logger.info('GalleryComponent', 'Starting progressive media type detection', {
+			totalItems: this.mediaItems.length,
+		});
+
+		const concurrencyLimit = 3; // Lower concurrency to be more respectful and faster
+
+		for (let i = 0; i < this.mediaItems.length; i += concurrencyLimit) {
+			const batch = this.mediaItems.slice(i, i + concurrencyLimit);
+
+			// Process batch in parallel
+			const updatePromises = batch.map(async (mediaItem, batchIndex) => {
+				const globalIndex = i + batchIndex;
+
+				try {
+					// Make HTTP request to get actual media type
+					const result = await this.mediaTypeService.determineMediaType(mediaItem.url);
+
+					// Update the mediaItem in place only if the type changed
+					if (result.type !== mediaItem.type || result.mimeType !== mediaItem.mimeType) {
+						this.mediaItems[globalIndex] = {
+							...mediaItem,
+							type: result.type,
+							mimeType: result.mimeType,
+							contentLength: result.contentLength,
+							loadedAt: new Date(),
+						};
+
+						this.logger.debug('GalleryComponent', 'Updated media type via HTTP', {
+							url: mediaItem.url.substring(0, 50) + '...',
+							oldType: mediaItem.type,
+							newType: result.type,
+							oldMimeType: mediaItem.mimeType,
+							newMimeType: result.mimeType,
+						});
+					}
+				} catch (error) {
+					// Keep the fallback detection, just log the failure
+					this.logger.debug('GalleryComponent', 'HTTP type detection failed, keeping fallback', {
+						url: mediaItem.url.substring(0, 50) + '...',
+						error: error instanceof Error ? error.message : String(error),
+					});
+				}
+			});
+
+			// Wait for this batch to complete
+			await Promise.all(updatePromises);
+
+			// Small delay between batches to be respectful to servers
+			if (i + concurrencyLimit < this.mediaItems.length) {
+				await new Promise((resolve) => setTimeout(resolve, 50));
+			}
+		}
+
+		// Update computed properties after all updates
+		this.updateAllUrlsText();
+
+		this.logger.info('GalleryComponent', 'Progressive media type detection completed', {
+			totalItems: this.mediaItems.length,
+			imageCount: this.mediaItems.filter((item) => item.type === 'image').length,
+			videoCount: this.mediaItems.filter((item) => item.type === 'video').length,
+			unknownCount: this.mediaItems.filter((item) => item.type === 'unknown').length,
+		});
 	}
 }
