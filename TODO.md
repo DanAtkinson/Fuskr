@@ -2,6 +2,7 @@
 
 ## 🚀 Main Enhancements
 
+- When I press "Remove broken images", any images that are unsuccessfully loaded after this should also not show.
 - **Allow fusks from URL lists** - Create fusks from a list of URLs rather than sequential patterns. Example: Imgur albums where filenames are not sequential. NB: This should also be able to parse the Fuskr.txt file being loaded in.
 - **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
 - **'Infinite' fusk mode** - Provide a single starting point and continue loading in blocks of 100 until the user requests it stops. For example, fusk url is https://www.example.com/images/5.jpg. Start by creating a range from 0 to 100 and continue going in blocks of 100 until the user stops us.

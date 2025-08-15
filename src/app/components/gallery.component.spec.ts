@@ -7,7 +7,6 @@ import { FuskrService } from '@services/fuskr.service';
 import { ChromeService } from '@services/chrome.service';
 import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponentTestHelper } from './base-component-test.helper';
-import { MediaItem } from '@interfaces/media';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type {} from 'jasmine';
@@ -74,22 +73,6 @@ describe('GalleryComponent', () => {
 				originalUrl: 'https://example.com/image[01-10].jpg',
 				urls: ['https://example.com/image01.jpg', 'https://example.com/image02.jpg'],
 			};
-			const mockMediaItems: MediaItem[] = [
-				{
-					url: 'https://example.com/image01.jpg',
-					type: 'image',
-					mimeType: 'image/jpeg',
-					loadingState: 'loaded',
-					extension: 'jpg',
-				},
-				{
-					url: 'https://example.com/image02.jpg',
-					type: 'image',
-					mimeType: 'image/jpeg',
-					loadingState: 'loaded',
-					extension: 'jpg',
-				},
-			];
 
 			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
 			mockFuskrService.countPotentialUrls.and.returnValue(2); // Below limit
@@ -100,10 +83,13 @@ describe('GalleryComponent', () => {
 				loadingState: 'pending',
 				extension: url.split('.').pop()?.toLowerCase(),
 			}));
-			mockMediaTypeService.fallbackTypeDetection.and.callFake((url: string) => ({
-				type: 'image',
-				mimeType: 'image/jpeg',
-			}));
+			mockMediaTypeService.fallbackTypeDetection.and.callFake(
+				// eslint-disable-next-line @typescript-eslint/no-unused-vars
+				(_url: string) => ({
+					type: 'image',
+					mimeType: 'image/jpeg',
+				})
+			);
 
 			component.originalUrl = 'https://example.com/image05.jpg';
 			await component.generateGallery();
