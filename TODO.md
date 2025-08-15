@@ -2,7 +2,6 @@
 
 ## 🚀 Main Enhancements
 
-- When I press "Remove broken images", any images that are unsuccessfully loaded after this should also not show.
 - **Allow fusks from URL lists** - Create fusks from a list of URLs rather than sequential patterns. Example: Imgur albums where filenames are not sequential. NB: This should also be able to parse the Fuskr.txt file being loaded in.
 - **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
 - **'Infinite' fusk mode** - Provide a single starting point and continue loading in blocks of 100 until the user requests it stops. For example, fusk url is https://www.example.com/images/5.jpg. Start by creating a range from 0 to 100 and continue going in blocks of 100 until the user stops us.
@@ -16,8 +15,10 @@
 
 ## 🚨 Priority Fixes
 
+- If I go to a Fusk again from the history, simply update the existing item in the history matching that url, instead of replacing it.
+- The history page is broken in 5.0.5. When clicking on the url in the history, the url in the bar becomes url-encoded. That bad-url then gets saved again to the history (which shouldn't happen - see above).
+- When I press "Remove broken images", any images that are unsuccessfully loaded after this should also not show.
 - **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation.
-- **Incognito mode support** *(from #42)* - Ensure context menus work properly in incognito/private browsing modes across all browsers.
 
 ## 📚 Documentation & Marketing
 

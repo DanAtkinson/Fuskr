@@ -239,11 +239,15 @@ class BackgroundScript {
 
 		this.addUrlToHistory(url, tab);
 
-		chrome.tabs.create({
-			active: this.options.behaviour.openInForeground,
-			index: (tab.index || 0) + 1,
-			url: `index.html#gallery?url=${encodeURIComponent(url)}`,
-			windowId: tab.windowId,
+		// Query current active tab to ensure we get the correct window context
+		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+			const activeTab = tabs[0] || tab;
+			chrome.tabs.create({
+				active: this.options.behaviour.openInForeground,
+				index: (activeTab.index || 0) + 1,
+				url: chrome.runtime.getURL(`index.html#gallery?url=${encodeURIComponent(url)}`),
+				windowId: activeTab.windowId,
+			});
 		});
 	}
 
@@ -399,11 +403,15 @@ class BackgroundScript {
 			this.createTab(targetUrl, tab);
 		} else {
 			// If no valid URL available, open gallery in manual mode without pre-filling
-			chrome.tabs.create({
-				active: this.options.behaviour.openInForeground,
-				index: (tab.index || 0) + 1,
-				url: chrome.runtime.getURL('index.html'),
-				windowId: tab.windowId,
+			// Query current active tab to ensure we get the correct window context
+			chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+				const activeTab = tabs[0] || tab;
+				chrome.tabs.create({
+					active: this.options.behaviour.openInForeground,
+					index: (activeTab.index || 0) + 1,
+					url: chrome.runtime.getURL('index.html'),
+					windowId: activeTab.windowId,
+				});
 			});
 		}
 	}
@@ -427,16 +435,24 @@ class BackgroundScript {
 	}
 
 	private optionsOnClick(tab: chrome.tabs.Tab): void {
-		chrome.tabs.create({
-			url: chrome.runtime.getURL('index.html#/options'),
-			windowId: tab.windowId,
+		// Query current active tab to ensure we get the correct window context
+		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+			const activeTab = tabs[0] || tab;
+			chrome.tabs.create({
+				url: chrome.runtime.getURL('index.html#/options'),
+				windowId: activeTab.windowId,
+			});
 		});
 	}
 
 	private historyOnClick(tab: chrome.tabs.Tab): void {
-		chrome.tabs.create({
-			url: chrome.runtime.getURL('index.html#/history'),
-			windowId: tab.windowId,
+		// Query current active tab to ensure we get the correct window context
+		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+			const activeTab = tabs[0] || tab;
+			chrome.tabs.create({
+				url: chrome.runtime.getURL('index.html#/history'),
+				windowId: activeTab.windowId,
+			});
 		});
 	}
 

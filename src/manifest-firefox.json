@@ -26,6 +26,7 @@
 		"keyword": "fuskr"
 	},
 	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage", "http://*/*", "https://*/*"],
+	"incognito": "split",
 	"icons": {
 		"16": "assets/images/16x16.png",
 		"48": "assets/images/48x48.png",

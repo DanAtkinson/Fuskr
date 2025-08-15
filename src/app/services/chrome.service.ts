@@ -15,7 +15,7 @@ interface TabInfo {
 interface BrowserAPI {
 	tabs?: {
 		query: (queryInfo: { active: boolean; currentWindow: boolean }, callback: (tabs: TabInfo[]) => void) => void;
-		create: (createProperties: { url: string; active: boolean }, callback?: () => void) => void;
+		create: (createProperties: { url: string; active: boolean; windowId?: number }, callback?: () => void) => void;
 	};
 	storage?: {
 		local?: {
@@ -244,8 +244,22 @@ export class ChromeService {
 	async openTab(url: string, active = true): Promise<void> {
 		return new Promise((resolve) => {
 			if (this.browserAPI && this.browserAPI.tabs) {
-				this.browserAPI.tabs.create({ url, active }, () => {
-					resolve();
+				// Get current tab to preserve window context (including incognito)
+				this.browserAPI.tabs.query({ active: true, currentWindow: true }, (tabs: TabInfo[]) => {
+					const currentTab = tabs[0];
+					const createProperties: { url: string; active: boolean; windowId?: number } = {
+						url,
+						active,
+					};
+
+					// Preserve window context if we have a current tab
+					if (currentTab && currentTab.windowId !== undefined) {
+						createProperties.windowId = currentTab.windowId;
+					}
+
+					this.browserAPI!.tabs!.create(createProperties, () => {
+						resolve();
+					});
 				});
 			} else {
 				// Fallback for development
