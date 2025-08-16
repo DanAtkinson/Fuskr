@@ -58,17 +58,49 @@ export class ChromeService {
 		const currentData = await this.getStorageData();
 		const history = currentData.behaviour.galleryHistory;
 
-		// Create new entry with ID and timestamp
-		// Base-64 encode the URL to prevent corruption during storage
-		const newEntry: GalleryHistoryEntry = {
+		// Check if an entry with this URL already exists
+		const existingEntryIndex = history.entries.findIndex(
+			(existingEntry) => this.decodeUrlFromStorage(existingEntry.originalUrl) === entry.originalUrl
+		);
+
+		// Create entry data with base-64 encoded URL to prevent corruption during storage
+		const entryData = {
 			...entry,
 			originalUrl: this.encodeUrlForStorage(entry.originalUrl),
-			id: this.generateHistoryId(),
 			timestamp: new Date(),
 		};
 
-		// Add to beginning of array
-		history.entries.unshift(newEntry);
+		if (existingEntryIndex !== -1) {
+			// Update existing entry - preserve ID but update other fields
+			const existingEntry = history.entries[existingEntryIndex];
+			history.entries[existingEntryIndex] = {
+				...entryData,
+				id: existingEntry.id, // Preserve original ID
+			};
+
+			// Move updated entry to the beginning
+			const updatedEntry = history.entries.splice(existingEntryIndex, 1)[0];
+			history.entries.unshift(updatedEntry);
+
+			this.logger.debug('chrome.history.updated', `Updated existing gallery in history: ${entry.originalUrl}`, {
+				existingId: existingEntry.id,
+				timestamp: entryData.timestamp,
+			});
+		} else {
+			// Create new entry with new ID
+			const newEntry: GalleryHistoryEntry = {
+				...entryData,
+				id: this.generateHistoryId(),
+			};
+
+			// Add to beginning of array
+			history.entries.unshift(newEntry);
+
+			this.logger.debug('chrome.history.added', `Added new gallery to history: ${entry.originalUrl}`, {
+				newId: newEntry.id,
+				timestamp: newEntry.timestamp,
+			});
+		}
 
 		// Limit to max entries
 		if (history.entries.length > history.maxEntries) {
@@ -77,11 +109,6 @@ export class ChromeService {
 
 		// Update storage
 		await this.updateBehaviourSettings({ galleryHistory: history });
-
-		this.logger.debug('chrome.history.added', `Added gallery to history: ${entry.originalUrl}`, {
-			timestamp: newEntry.timestamp,
-			timestampType: typeof newEntry.timestamp,
-		});
 	}
 
 	async clearGalleryHistory(): Promise<void> {

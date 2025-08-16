@@ -46,7 +46,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	allUrlsText = '';
 	currentMediaItem: MediaItem | null = null;
 
+	// Getters for filtered data
+	get visibleMediaItems(): MediaItem[] {
+		return this.mediaItems.filter((item) => !this.brokenUrls.has(item.url));
+	}
+
 	// Private properties (alphabetically)
+	private brokenUrls = new Set<string>(); // Track URLs that failed to load persistently
 	private hasInitialized = false;
 
 	// Injected services
@@ -279,16 +285,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	nextImage() {
-		const totalCount = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
-		if (this.currentViewerIndex < totalCount - 1) {
+		const visibleItems = this.visibleMediaItems;
+		if (this.currentViewerIndex < visibleItems.length - 1) {
 			this.currentViewerIndex++;
-			if (this.mediaItems.length > 0) {
-				this.currentViewerImage = this.mediaItems[this.currentViewerIndex].url;
-				this.currentMediaItem = this.mediaItems[this.currentViewerIndex];
-			} else {
-				this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
-				this.currentMediaItem = null;
-			}
+			this.currentViewerImage = visibleItems[this.currentViewerIndex].url;
+			this.currentMediaItem = visibleItems[this.currentViewerIndex];
 		}
 	}
 
@@ -359,6 +360,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		// Only process if this image hasn't been marked as error yet
 		if (!img.classList.contains('error')) {
 			img.classList.add('error');
+
+			// Track the URL as broken persistently
+			const originalUrl = img.getAttribute('data-original-url');
+			if (originalUrl) {
+				this.brokenUrls.add(originalUrl);
+			}
+
 			this.updateImageCounts();
 
 			// Create a theme-aware broken image placeholder
@@ -408,20 +416,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	openImageViewer(url: string, index: number) {
 		this.currentViewerImage = url;
 		this.currentViewerIndex = index;
-		this.currentMediaItem = this.mediaItems[index] || null;
+		// Find the media item in visibleMediaItems using the visible index
+		this.currentMediaItem = this.visibleMediaItems[index] || null;
 		this.showImageViewer = true;
 	}
 
 	previousImage() {
 		if (this.currentViewerIndex > 0) {
 			this.currentViewerIndex--;
-			if (this.mediaItems.length > 0) {
-				this.currentViewerImage = this.mediaItems[this.currentViewerIndex].url;
-				this.currentMediaItem = this.mediaItems[this.currentViewerIndex];
-			} else {
-				this.currentViewerImage = this.imageUrls[this.currentViewerIndex];
-				this.currentMediaItem = null;
-			}
+			const visibleItems = this.visibleMediaItems;
+			this.currentViewerImage = visibleItems[this.currentViewerIndex].url;
+			this.currentMediaItem = visibleItems[this.currentViewerIndex];
 		}
 	}
 
@@ -438,6 +443,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			const originalUrl = htmlImg.getAttribute('data-original-url');
 			if (originalUrl) {
 				brokenUrls.add(originalUrl);
+				// Add to persistent broken URLs list
+				this.brokenUrls.add(originalUrl);
 			}
 
 			// Remove the container from DOM
@@ -454,6 +461,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			const originalUrl = htmlVideo.getAttribute('data-original-url');
 			if (originalUrl) {
 				brokenUrls.add(originalUrl);
+				// Add to persistent broken URLs list
+				this.brokenUrls.add(originalUrl);
 			}
 
 			// Remove the container from DOM
@@ -468,6 +477,12 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.mediaItems = this.mediaItems.filter((item) => !brokenUrls.has(item.url));
 		this.totalImages = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
 		this.brokenImages = 0;
+
+		this.logger.debug('GalleryComponent', 'Removed broken images', {
+			removedCount: brokenUrls.size,
+			remainingItems: this.mediaItems.length,
+			totalBrokenUrls: this.brokenUrls.size,
+		});
 	}
 
 	selectAllUrls() {

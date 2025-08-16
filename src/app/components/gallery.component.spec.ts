@@ -211,6 +211,14 @@ describe('GalleryComponent', () => {
 	describe('Image Viewer', () => {
 		beforeEach(() => {
 			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
+			// Set up mediaItems to match imageUrls for navigation tests
+			component.mediaItems = [
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			];
+			// Initialize brokenUrls as empty set using component accessor
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
 		});
 
 		it('should open image viewer', () => {

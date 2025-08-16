@@ -348,11 +348,11 @@ describe('HistoryComponent', () => {
 	});
 
 	describe('openGallery', () => {
-		it('should navigate to gallery with encoded URL', () => {
+		it('should navigate to gallery with decoded URL', () => {
 			component.openGallery(mockHistoryEntry);
 
 			expect(mockRouter.navigate).toHaveBeenCalledWith(['/gallery'], {
-				queryParams: { url: encodeURIComponent(mockHistoryEntry.originalUrl) },
+				queryParams: { url: mockHistoryEntry.originalUrl },
 			});
 		});
 	});
