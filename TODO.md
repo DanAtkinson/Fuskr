@@ -15,8 +15,15 @@
 
 ## 🚨 Priority Fixes
 
-- When I press "Remove broken images", any images that are unsuccessfully loaded after this should also not show.
-- **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation.
+### Recently Reported (Issue #93 - August 2025)
+- **Persistent "Remove broken images" setting** - Add auto-removal option to settings so users don't need to click it manually each time *(highly requested)*
+- **"Download all" functionality broken** - Archive creation fails for large galleries (~1000 links), user waits 5+ minutes with no result
+- **UI scaling issues** - Extension breaks with OS scaling >125%, buttons disappear out of bounds in image viewer
+- **"Open in tab" button on image grid** - Add direct tab opening without requiring image click first
+
+### Existing Priority Items
+- **Persistent broken image filtering** - When "Remove broken images" is pressed, newly failed images should also be filtered out automatically
+- **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation
 
 ## 📚 Documentation & Marketing
 
