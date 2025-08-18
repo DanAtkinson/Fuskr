@@ -242,10 +242,12 @@ class BackgroundScript {
 		// Query current active tab to ensure we get the correct window context
 		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 			const activeTab = tabs[0] || tab;
+			// Use base64 encoding for cleaner URL handling without special character issues
+			const encodedUrl = btoa(url);
 			chrome.tabs.create({
 				active: this.options.behaviour.openInForeground,
 				index: (activeTab.index || 0) + 1,
-				url: chrome.runtime.getURL(`index.html#gallery?url=${encodeURIComponent(url)}`),
+				url: chrome.runtime.getURL(`index.html#gallery?url=${encodedUrl}`),
 				windowId: activeTab.windowId,
 			});
 		});

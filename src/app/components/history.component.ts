@@ -96,9 +96,9 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 	}
 
 	openGallery(entry: GalleryHistoryEntry) {
-		// Navigate to gallery with the URL as parameter
-		// Note: URL is already properly formatted, no need to encode again
-		this.router.navigate(['/gallery'], { queryParams: { url: entry.originalUrl } });
+		// Use base64 encoding for cleaner URL handling without special character issues
+		const encodedUrl = btoa(entry.originalUrl);
+		this.router.navigate(['/gallery'], { queryParams: { url: encodedUrl } });
 	}
 
 	navigateToOptions() {
@@ -108,8 +108,9 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 	async openGalleryInNewTab(entry: GalleryHistoryEntry) {
 		try {
 			const baseUrl = window.location.origin + window.location.pathname;
-			// URL is already properly formatted from storage, but encode for URL parameter
-			const galleryUrl = `${baseUrl}#/gallery?url=${encodeURIComponent(entry.originalUrl)}`;
+			// Use base64 encoding for cleaner URL handling without special character issues
+			const encodedUrl = btoa(entry.originalUrl);
+			const galleryUrl = `${baseUrl}#/gallery?url=${encodedUrl}`;
 
 			if (this.chromeService.isExtensionContext()) {
 				await this.chromeService.openTab(galleryUrl, true);

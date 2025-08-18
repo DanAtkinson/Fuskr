@@ -15,8 +15,6 @@
 
 ## 🚨 Priority Fixes
 
-- If I go to a Fusk again from the history, simply update the existing item in the history matching that url, instead of replacing it.
-- The history page is broken in 5.0.5. When clicking on the url in the history, the url in the bar becomes url-encoded. That bad-url then gets saved again to the history (which shouldn't happen - see above).
 - When I press "Remove broken images", any images that are unsuccessfully loaded after this should also not show.
 - **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation.
 

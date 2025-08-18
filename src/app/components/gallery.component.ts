@@ -248,6 +248,48 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.allUrlsText = this.getAllUrlsText();
 	}
 
+	/**
+	 * Decode URL parameter - handles both base64 encoded and legacy URL encoded strings
+	 * @param urlParam The URL parameter to decode
+	 * @returns Decoded URL string
+	 */
+	private decodeUrlParameter(urlParam: string): string {
+		try {
+			// Check if the string is base64 encoded by attempting to decode and validate
+			const decoded = atob(urlParam);
+			// Basic validation: check if decoded string looks like a URL
+			if (decoded.includes('://') || decoded.includes('http')) {
+				this.logger.debug('GalleryComponent', 'Successfully decoded base64 URL parameter', {
+					original: urlParam,
+					decoded: decoded,
+				});
+				return decoded;
+			}
+		} catch {
+			// Not base64 encoded, fall through to legacy handling
+			this.logger.debug('GalleryComponent', 'URL parameter is not base64 encoded', { urlParam });
+		}
+
+		// Legacy handling: assume it might be URL encoded or plain text
+		try {
+			// If it contains URL encoding characters, decode it
+			if (urlParam.includes('%')) {
+				const decoded = decodeURIComponent(urlParam);
+				this.logger.debug('GalleryComponent', 'Successfully decoded URL-encoded parameter', {
+					original: urlParam,
+					decoded: decoded,
+				});
+				return decoded;
+			}
+		} catch {
+			this.logger.warn('GalleryComponent', 'Failed to decode URL-encoded parameter', { urlParam });
+		}
+
+		// Return the original string if no decoding worked
+		this.logger.debug('GalleryComponent', 'Using URL parameter as-is (no encoding detected)', { urlParam });
+		return urlParam;
+	}
+
 	getFilename(url: string): string {
 		return this.fuskrService.getImageFilename(url);
 	}
@@ -308,7 +350,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				hasInitialized: this.hasInitialized,
 			});
 			if (params['url'] && !this.hasInitialized) {
-				this.originalUrl = params['url'];
+				this.originalUrl = this.decodeUrlParameter(params['url']);
 				this.hasInitialized = true;
 				this.logger.info('GalleryComponent', 'Starting gallery generation from queryParams', {
 					url: this.originalUrl,
@@ -335,7 +377,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			originalUrl: this.originalUrl,
 		});
 		if (currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
-			this.originalUrl = currentParams['url'];
+			this.originalUrl = this.decodeUrlParameter(currentParams['url']);
 			this.hasInitialized = true;
 			this.logger.info('GalleryComponent', 'Starting gallery generation from snapshot', {
 				url: this.originalUrl,

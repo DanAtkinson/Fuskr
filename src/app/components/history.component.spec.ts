@@ -348,11 +348,12 @@ describe('HistoryComponent', () => {
 	});
 
 	describe('openGallery', () => {
-		it('should navigate to gallery with decoded URL', () => {
+		it('should navigate to gallery with base64 encoded URL', () => {
 			component.openGallery(mockHistoryEntry);
 
+			const expectedEncodedUrl = btoa(mockHistoryEntry.originalUrl);
 			expect(mockRouter.navigate).toHaveBeenCalledWith(['/gallery'], {
-				queryParams: { url: mockHistoryEntry.originalUrl },
+				queryParams: { url: expectedEncodedUrl },
 			});
 		});
 	});
