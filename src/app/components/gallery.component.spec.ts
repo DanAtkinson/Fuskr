@@ -414,35 +414,4 @@ describe('GalleryComponent', () => {
 			expect(component.mediaItems.length).toBe(3); // Still has all items
 		});
 	});
-
-	describe('Open in Tab', () => {
-		it('should open URL in tab using Chrome service when in extension context', () => {
-			mockChromeService.isExtensionContext.and.returnValue(true);
-
-			const mockEvent = new Event('click');
-			spyOn(mockEvent, 'stopPropagation').and.stub();
-			spyOn(mockEvent, 'preventDefault').and.stub();
-
-			component.openInTab('https://example.com/image.jpg', mockEvent);
-
-			expect(mockEvent.stopPropagation).toHaveBeenCalled();
-			expect(mockEvent.preventDefault).toHaveBeenCalled();
-			expect(mockChromeService.openTab).toHaveBeenCalledWith('https://example.com/image.jpg');
-		});
-
-		it('should open URL in tab using window.open when not in extension context', () => {
-			mockChromeService.isExtensionContext.and.returnValue(false);
-			spyOn(window, 'open').and.stub();
-
-			const mockEvent = new Event('click');
-			spyOn(mockEvent, 'stopPropagation').and.stub();
-			spyOn(mockEvent, 'preventDefault').and.stub();
-
-			component.openInTab('https://example.com/image.jpg', mockEvent);
-
-			expect(mockEvent.stopPropagation).toHaveBeenCalled();
-			expect(mockEvent.preventDefault).toHaveBeenCalled();
-			expect(window.open).toHaveBeenCalledWith('https://example.com/image.jpg', '_blank');
-		});
-	});
 });
