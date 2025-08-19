@@ -127,6 +127,7 @@ describe('ChromeService', () => {
 		it('should save data to chrome storage', async () => {
 			const testData = new ChromeStorageData({
 				display: {
+					autoRemoveBrokenImages: false,
 					darkMode: true,
 					imageDisplayMode: 'fitOnPage',
 					resizeImagesToFitOnPage: true,
@@ -164,6 +165,7 @@ describe('ChromeService', () => {
 		it('should handle storage errors when saving', async () => {
 			const testData = new ChromeStorageData({
 				display: {
+					autoRemoveBrokenImages: false,
 					darkMode: true,
 					imageDisplayMode: 'fitOnPage',
 					resizeImagesToFitOnPage: true,
@@ -227,6 +229,7 @@ describe('ChromeService', () => {
 		it('should reset options to defaults while preserving history', async () => {
 			const currentData: IChromeStorageData = {
 				display: {
+					autoRemoveBrokenImages: false,
 					darkMode: true,
 					imageDisplayMode: 'thumbnails',
 					resizeImagesToFillPage: false,

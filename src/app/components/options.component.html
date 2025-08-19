@@ -64,6 +64,12 @@
 						<label class="form-check-label" for="toggleBrokenImages"> <i class="fas fa-exclamation-triangle me-1"></i>{{ translate('Options_ShowBrokenImagesDefault') }} </label>
 						<div class="form-text">{{ translate('Options_ShowBrokenImagesDescription') }}</div>
 					</div>
+
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="autoRemoveBrokenImages" [(ngModel)]="options.display.autoRemoveBrokenImages" (change)="saveOptions()" />
+						<label class="form-check-label" for="autoRemoveBrokenImages"> <i class="fas fa-trash-alt me-1"></i>{{ translate('Options_AutoRemoveBrokenImagesDefault') }} </label>
+						<div class="form-text">{{ translate('Options_AutoRemoveBrokenImagesDescription') }}</div>
+					</div>
 				</div>
 			</div>
 		</div>

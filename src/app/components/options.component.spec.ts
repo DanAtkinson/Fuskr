@@ -98,6 +98,7 @@ describe('OptionsComponent', () => {
 		it('should load options on init', async () => {
 			const testOptions = new ChromeStorageData({
 				display: {
+					autoRemoveBrokenImages: false,
 					darkMode: true,
 					imageDisplayMode: 'fullWidth',
 					resizeImagesToFillPage: false,

@@ -460,6 +460,14 @@
 		"message": "Display placeholder images for missing/broken images",
 		"description": "Description for broken images setting"
 	},
+	"Options_AutoRemoveBrokenImagesDefault": {
+		"message": "Automatically remove broken images",
+		"description": "Checkbox label for auto-remove broken images setting"
+	},
+	"Options_AutoRemoveBrokenImagesDescription": {
+		"message": "Automatically remove broken images from the gallery as they fail to load",
+		"description": "Description for auto-remove broken images setting"
+	},
 	"Options_KeepRecentFusks": {
 		"message": "Keep Recent Fusks",
 		"description": "Checkbox label for keeping recent fusks"

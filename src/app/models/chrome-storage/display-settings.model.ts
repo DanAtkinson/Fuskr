@@ -2,6 +2,7 @@ import { IDisplaySettings } from '@interfaces/chrome-storage/display-settings.in
 
 export class DisplaySettings implements IDisplaySettings {
 	// Public properties (alphabetically)
+	autoRemoveBrokenImages = false;
 	darkMode = false;
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
 	resizeImagesToFillPage = false;

@@ -46,6 +46,7 @@ describe('Chrome Storage Models', () => {
 
 		it('should override all properties when provided', () => {
 			const data: IDisplaySettings = {
+				autoRemoveBrokenImages: true,
 				darkMode: true,
 				imageDisplayMode: 'thumbnails',
 				resizeImagesToFillPage: true,
@@ -246,6 +247,7 @@ describe('Chrome Storage Models', () => {
 			const inputData: Partial<IChromeStorageData> = {
 				version: 2,
 				display: {
+					autoRemoveBrokenImages: false,
 					darkMode: true,
 					imageDisplayMode: 'fullWidth',
 					resizeImagesToFillPage: false,
@@ -281,6 +283,7 @@ describe('Chrome Storage Models', () => {
 		it('should handle partial nested data', () => {
 			const inputData: Partial<IChromeStorageData> = {
 				display: {
+					autoRemoveBrokenImages: false,
 					darkMode: true,
 					imageDisplayMode: 'fitOnPage',
 					resizeImagesToFillPage: false,
@@ -321,6 +324,7 @@ describe('Chrome Storage Models', () => {
 					resizeImagesToThumbnails: false,
 					showImagesInViewer: false,
 					toggleBrokenImages: false,
+					autoRemoveBrokenImages: false,
 				},
 				behaviour: {
 					galleryHistory: {
@@ -385,6 +389,7 @@ describe('Chrome Storage Models', () => {
 					resizeImagesToThumbnails: false,
 					showImagesInViewer: true,
 					toggleBrokenImages: true,
+					autoRemoveBrokenImages: false,
 				},
 				behaviour: {
 					galleryHistory: { entries: [], maxEntries: 10 },
@@ -420,6 +425,7 @@ describe('Chrome Storage Models', () => {
 					resizeImagesToThumbnails: false,
 					showImagesInViewer: true,
 					toggleBrokenImages: true,
+					autoRemoveBrokenImages: false,
 				},
 				behaviour: {
 					galleryHistory: { entries: [], maxEntries: 10 },

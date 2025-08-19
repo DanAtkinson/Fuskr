@@ -19,6 +19,7 @@ import { saveAs } from 'file-saver';
 })
 export class GalleryComponent extends BaseComponent implements OnInit {
 	// Public properties (alphabetically)
+	autoRemoveBrokenImages = false;
 	brokenImages = 0;
 	currentViewerImage = '';
 	currentViewerIndex = 0;
@@ -302,6 +303,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		try {
 			const settings = await this.chromeService.getStorageData();
 			this.logger.debug('GalleryComponent', 'Settings loaded successfully', settings);
+			this.autoRemoveBrokenImages = settings.display.autoRemoveBrokenImages;
 			this.darkMode = settings.display.darkMode;
 			this.imageDisplayMode = settings.display.imageDisplayMode;
 			this.showBrokenImages = settings.display.toggleBrokenImages;
@@ -397,44 +399,77 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	onImageError(event: Event) {
-		const img = event.target as HTMLImageElement;
+		const element = event.target as HTMLImageElement | HTMLVideoElement;
 
-		// Only process if this image hasn't been marked as error yet
-		if (!img.classList.contains('error')) {
-			img.classList.add('error');
+		// Only process if this element hasn't been marked as error yet
+		if (!element.classList.contains('error')) {
+			element.classList.add('error');
 
 			// Track the URL as broken persistently
-			const originalUrl = img.getAttribute('data-original-url');
+			const originalUrl = element.getAttribute('data-original-url');
 			if (originalUrl) {
 				this.brokenUrls.add(originalUrl);
 			}
 
 			this.updateImageCounts();
 
-			// Create a theme-aware broken image placeholder
-			const isDark = document.body.classList.contains('dark-mode');
-			const bgColor = isDark ? '#212529' : '#f8f9fa';
-			const borderColor = isDark ? '#495057' : '#dee2e6';
-			const textColor = isDark ? '#adb5bd' : '#6c757d';
-			const subtextColor = isDark ? '#6c757d' : '#adb5bd';
+			// Auto-remove broken image/video if setting is enabled
+			if (this.autoRemoveBrokenImages) {
+				// Remove the container from DOM immediately
+				const container = element.closest('.image-item');
+				if (container && originalUrl) {
+					container.remove();
 
-			const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
-	<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
-		<rect width="100%" height="100%" fill="${bgColor}" stroke="${borderColor}" stroke-width="2"/>
-		<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
-		<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="${subtextColor}" text-anchor="middle" dominant-baseline="middle">🚫</text>
-	</svg>
-			`)}`;
+					// Update arrays to remove broken URL
+					this.imageUrls = this.imageUrls.filter((url: string) => url !== originalUrl);
+					this.mediaItems = this.mediaItems.filter((item) => item.url !== originalUrl);
+					this.totalImages = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
 
-			if (!this.showBrokenImages) {
-				// Instead of hiding completely, reduce opacity
-				img.style.opacity = '0.3';
-				img.style.filter = 'grayscale(100%)';
+					this.logger.debug('GalleryComponent', 'Auto-removed broken media', {
+						url: originalUrl,
+						type: element.tagName.toLowerCase(),
+						remainingItems: this.mediaItems.length,
+					});
+
+					// Update counts after removal
+					this.updateImageCounts();
+					return; // Skip the placeholder creation
+				}
 			}
 
-			// Always show the broken image placeholder
-			img.src = brokenImageSvg;
-			img.alt = this.translate('Gallery_ImageNotFound');
+			// For images, create a theme-aware broken image placeholder
+			if (element instanceof HTMLImageElement) {
+				const isDark = document.body.classList.contains('dark-mode');
+				const bgColor = isDark ? '#212529' : '#f8f9fa';
+				const borderColor = isDark ? '#495057' : '#dee2e6';
+				const textColor = isDark ? '#adb5bd' : '#6c757d';
+				const subtextColor = isDark ? '#6c757d' : '#adb5bd';
+
+				const brokenImageSvg = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(`
+		<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
+			<rect width="100%" height="100%" fill="${bgColor}" stroke="${borderColor}" stroke-width="2"/>
+			<text x="50%" y="45%" font-family="Arial, sans-serif" font-size="16" fill="${textColor}" text-anchor="middle" dominant-baseline="middle">${this.translate('Gallery_ImageNotFound')}</text>
+			<text x="50%" y="60%" font-family="Arial, sans-serif" font-size="12" fill="${subtextColor}" text-anchor="middle" dominant-baseline="middle">🚫</text>
+		</svg>
+				`)}`;
+
+				if (!this.showBrokenImages) {
+					// Instead of hiding completely, reduce opacity
+					element.style.opacity = '0.3';
+					element.style.filter = 'grayscale(100%)';
+				}
+
+				// Always show the broken image placeholder
+				element.src = brokenImageSvg;
+				element.alt = this.translate('Gallery_ImageNotFound');
+			}
+			// For videos, just apply styling (no placeholder replacement possible)
+			else if (element instanceof HTMLVideoElement) {
+				if (!this.showBrokenImages) {
+					element.style.opacity = '0.3';
+					element.style.filter = 'grayscale(100%)';
+				}
+			}
 		}
 	}
 

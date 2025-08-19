@@ -336,4 +336,82 @@ describe('GalleryComponent', () => {
 			expect(result2).toBe('Image 6');
 		});
 	});
+
+	describe('Auto-Remove Broken Images', () => {
+		beforeEach(() => {
+			component.mediaItems = [
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			];
+			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
+		});
+
+		it('should auto-remove broken images when setting is enabled', () => {
+			component.autoRemoveBrokenImages = true;
+
+			// Create a mock img element
+			const mockImg = document.createElement('img');
+			mockImg.setAttribute('data-original-url', 'url2.jpg');
+			mockImg.classList.remove('error'); // Ensure it's not already marked as error
+
+			// Create a mock container
+			const mockContainer = document.createElement('div');
+			mockContainer.className = 'image-item';
+			mockContainer.appendChild(mockImg);
+
+			// Add container to DOM properly
+			document.body.appendChild(mockContainer);
+
+			// Mock closest method to return the actual container
+			spyOn(mockImg, 'closest').and.returnValue(mockContainer);
+
+			// Mock remove method to avoid actual DOM manipulation issues in tests
+			spyOn(mockContainer, 'remove').and.stub();
+
+			// Trigger the error handler
+			const errorEvent = new Event('error');
+			Object.defineProperty(errorEvent, 'target', { value: mockImg });
+
+			component.onImageError(errorEvent);
+
+			// Verify the broken URL was tracked
+			expect((component as unknown as { brokenUrls: Set<string> }).brokenUrls.has('url2.jpg')).toBe(true);
+
+			// Verify container.remove() was called
+			expect(mockContainer.remove).toHaveBeenCalled();
+
+			// Verify the arrays were updated
+			expect(component.imageUrls).toEqual(['url1.jpg', 'url3.jpg']);
+			expect(component.mediaItems).toEqual([
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			]);
+
+			// Clean up
+			if (document.body.contains(mockContainer)) {
+				document.body.removeChild(mockContainer);
+			}
+		});
+
+		it('should not auto-remove broken images when setting is disabled', () => {
+			component.autoRemoveBrokenImages = false;
+
+			// Create a mock img element
+			const mockImg = document.createElement('img');
+			mockImg.setAttribute('data-original-url', 'url2.jpg');
+			mockImg.classList.remove('error'); // Ensure it's not already marked as error
+
+			// Trigger the error handler
+			const errorEvent = new Event('error');
+			Object.defineProperty(errorEvent, 'target', { value: mockImg });
+
+			component.onImageError(errorEvent);
+
+			// Verify the broken URL was tracked but arrays weren't updated
+			expect((component as unknown as { brokenUrls: Set<string> }).brokenUrls.has('url2.jpg')).toBe(true);
+			expect(component.imageUrls).toEqual(['url1.jpg', 'url2.jpg', 'url3.jpg']); // Still contains broken URL
+			expect(component.mediaItems.length).toBe(3); // Still has all items
+		});
+	});
 });
