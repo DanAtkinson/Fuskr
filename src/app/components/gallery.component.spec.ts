@@ -182,6 +182,35 @@ describe('GalleryComponent', () => {
 			expect(window.open).toHaveBeenCalledWith(testUrl, '_blank');
 		});
 
+		it('should open image in tab using openInTab method', () => {
+			const testUrl = 'https://example.com/test.jpg';
+			const mockEvent = new Event('click');
+			spyOn(mockEvent, 'stopPropagation');
+			spyOn(mockEvent, 'preventDefault');
+			mockChromeService.isExtensionContext.and.returnValue(false);
+			spyOn(window, 'open');
+
+			component.openInTab(testUrl, mockEvent);
+
+			expect(mockEvent.stopPropagation).toHaveBeenCalled();
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+			expect(window.open).toHaveBeenCalledWith(testUrl, '_blank');
+		});
+
+		it('should open image in tab using Chrome service for extension context', () => {
+			const testUrl = 'https://example.com/test.jpg';
+			const mockEvent = new Event('click');
+			spyOn(mockEvent, 'stopPropagation');
+			spyOn(mockEvent, 'preventDefault');
+			mockChromeService.isExtensionContext.and.returnValue(true);
+
+			component.openInTab(testUrl, mockEvent);
+
+			expect(mockEvent.stopPropagation).toHaveBeenCalled();
+			expect(mockEvent.preventDefault).toHaveBeenCalled();
+			expect(mockChromeService.openTab).toHaveBeenCalledWith(testUrl);
+		});
+
 		it('should download single image', () => {
 			const testUrl = 'https://example.com/test.jpg';
 			const mockEvent = new Event('click');
