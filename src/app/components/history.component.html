@@ -3,11 +3,11 @@
 		<div class="header-top">
 			<h1>{{ translate('History_Title') }}</h1>
 			<div class="header-controls">
-				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('History_ViewOptions')">
-					<i class="fas fa-cog"></i>
-				</button>
 				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
 					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+				</button>
+				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('History_ViewOptions')">
+					<i class="fas fa-cog"></i>
 				</button>
 			</div>
 		</div>

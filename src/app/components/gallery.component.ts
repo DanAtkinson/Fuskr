@@ -490,6 +490,19 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 	}
 
+	openInTab(url: string, event: Event) {
+		// Prevent event bubbling to avoid triggering other click handlers
+		event.stopPropagation();
+		event.preventDefault();
+
+		// Open the URL in a new tab
+		if (this.chromeService.isExtensionContext()) {
+			this.chromeService.openTab(url);
+		} else {
+			window.open(url, '_blank');
+		}
+	}
+
 	openImageViewer(url: string, index: number) {
 		this.currentViewerImage = url;
 		this.currentViewerIndex = index;

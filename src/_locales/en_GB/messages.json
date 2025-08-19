@@ -364,6 +364,14 @@
 		"message": "Open in Tab",
 		"description": "Button text to open image in new tab"
 	},
+	"Gallery_OpenImageInTab": {
+		"message": "Open Image in Tab",
+		"description": "Button text to open image in new tab"
+	},
+	"Gallery_OpenVideoInTab": {
+		"message": "Open Video in Tab",
+		"description": "Button text to open video in new tab"
+	},
 	"Gallery_Close": {
 		"message": "Close",
 		"description": "Button text to close image viewer"

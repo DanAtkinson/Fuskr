@@ -6,11 +6,11 @@
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToHistory()" [title]="translate('Gallery_ViewHistory')">
 					<i class="fas fa-history"></i>
 				</button>
-				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('Gallery_ViewOptions')">
-					<i class="fas fa-cog"></i>
-				</button>
 				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
 					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+				</button>
+				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('Gallery_ViewOptions')">
+					<i class="fas fa-cog"></i>
 				</button>
 			</div>
 		</div>
@@ -71,6 +71,9 @@
 							</button>
 							<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
 								<i class="fas fa-clipboard"></i>
+							</button>
+							<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
+								<i class="fas fa-external-link-alt"></i>
 							</button>
 							<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
 								<i class="fas fa-search-plus"></i>
