@@ -19,6 +19,19 @@ module.exports = function (config) {
 			dir: require('path').join(__dirname, './coverage/fuskr'),
 			subdir: '.',
 			reporters: [{ type: 'html' }, { type: 'text-summary' }, { type: 'lcovonly' }],
+			// Treat <80% as red, 80-95% yellow, >95% green in reports
+			watermarks: {
+				statements: [80, 95],
+				functions: [80, 95],
+				branches: [80, 95],
+				lines: [80, 95],
+			},
+			// Optional strict thresholds: enable by setting COVERAGE_STRICT=1
+			check: process.env.COVERAGE_STRICT === '1'
+				? {
+					global: { statements: 80, functions: 80, branches: 80, lines: 80 },
+				}
+				: undefined,
 		},
 		port: 9876,
 		colors: true,

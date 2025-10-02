@@ -444,6 +444,55 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('Broken image session auto-removal', () => {
+		beforeEach(() => {
+			component.mediaItems = [
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			];
+			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
+			// Ensure brokenUrls Set exists
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+		});
+
+		it('should auto-remove newly failing images after calling removeBrokenImages()', () => {
+			// Calling removeBrokenImages should enable session-based auto removal even if nothing to remove
+			component.removeBrokenImages();
+
+			// Create a mock img element that will fail
+			const mockImg = document.createElement('img');
+			mockImg.setAttribute('data-original-url', 'url2.jpg');
+			const container = document.createElement('div');
+			container.className = 'image-item';
+			container.appendChild(mockImg);
+			document.body.appendChild(container);
+
+			spyOn(mockImg, 'closest').and.returnValue(container);
+			spyOn(container, 'remove').and.callThrough();
+
+			const errorEvent = new Event('error');
+			Object.defineProperty(errorEvent, 'target', { value: mockImg });
+
+			component.onImageError(errorEvent);
+
+			// Container removed and arrays updated (url2 removed)
+			expect(container.remove).toHaveBeenCalled();
+			expect(component.imageUrls).toEqual(['url1.jpg', 'url3.jpg']);
+			expect(component.mediaItems.map((m) => m.url)).toEqual(['url1.jpg', 'url3.jpg']);
+		});
+	});
+
+	describe('Compression mode selection', () => {
+		it('should choose DEFLATE below threshold and STORE at or above threshold', () => {
+			const build = component as unknown as { getZipCompressionMode: (n: number) => 'STORE' | 'DEFLATE' };
+			expect(build.getZipCompressionMode(100)).toBe('DEFLATE');
+			expect(build.getZipCompressionMode(299)).toBe('DEFLATE');
+			expect(build.getZipCompressionMode(300)).toBe('STORE');
+			expect(build.getZipCompressionMode(1000)).toBe('STORE');
+		});
+	});
+
 	describe('Zip filename de-duplication', () => {
 		type BuildFn = (
 			base: string,
@@ -492,6 +541,79 @@ describe('GalleryComponent', () => {
 			const used2 = new Map<string, number>();
 			const secondOfThousand = build(base, url, used2, 1, 4);
 			expect(secondOfThousand).toBe('image (0002).jpg');
+		});
+	});
+
+	describe('Video error styling', () => {
+		it('should dim broken videos when showBrokenImages is false', () => {
+			component.showBrokenImages = false;
+			const video = document.createElement('video');
+			video.setAttribute('data-original-url', 'broken.mp4');
+			const container = document.createElement('div');
+			container.className = 'image-item';
+			container.appendChild(video);
+			document.body.appendChild(container);
+
+			spyOn(video, 'closest').and.returnValue(container);
+
+			const errorEvent = new Event('error');
+			Object.defineProperty(errorEvent, 'target', { value: video });
+			component.onImageError(errorEvent);
+
+			expect(video.style.opacity).toBe('0.3');
+		});
+	});
+
+	describe('toggleBrokenImagesVisibility', () => {
+		it('should update styles on broken images when toggled', async () => {
+			component.showBrokenImages = false;
+			const img = document.createElement('img');
+			img.classList.add('error');
+			document.body.appendChild(img);
+
+			await component.toggleBrokenImagesVisibility();
+			expect(component.showBrokenImages).toBe(true);
+			expect(img.style.opacity).toBe('1');
+			expect(img.style.filter).toBe('none');
+		});
+	});
+
+	describe('generateMetadataContent', () => {
+		it('should include counts and URLs by type', () => {
+			(component as any).originalUrl = 'https://example.com/a[01-02].jpg';
+			const items = [
+				{ url: 'a1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' as const },
+				{ url: 'v1.mp4', type: 'video', mimeType: 'video/mp4', loadingState: 'loaded' as const },
+				{ url: 'u1.bin', type: 'unknown', mimeType: 'application/octet-stream', loadingState: 'loaded' as const },
+			];
+			const content = (component as any).generateMetadataContent(items);
+			expect(content).toContain('Fusk Url: https://example.com/a[01-02].jpg');
+			expect(content).toContain('IMAGE: a1.jpg');
+			expect(content).toContain('VIDEO: v1.mp4');
+			expect(content).toContain('UNKNOWN: u1.bin');
+			expect(content).toContain('Images: 1');
+			expect(content).toContain('Videos: 1');
+			expect(content).toContain('Unknown: 1');
+		});
+	});
+
+	describe('decodeUrlParameter', () => {
+		it('should decode base64 URLs', () => {
+			const url = 'https://test.example/image.jpg';
+			const b64 = btoa(url);
+			const decoded = (component as any).decodeUrlParameter(b64);
+			expect(decoded).toBe(url);
+		});
+
+		it('should decode URL-encoded strings', () => {
+			const encoded = encodeURIComponent('https://example.com/a b');
+			const decoded = (component as any).decodeUrlParameter(encoded);
+			expect(decoded).toBe('https://example.com/a b');
+		});
+
+		it('should return original when not encoded', () => {
+			const plain = 'not-encoded';
+			expect((component as any).decodeUrlParameter(plain)).toBe(plain);
 		});
 	});
 });
