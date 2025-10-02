@@ -1,8 +1,18 @@
 // Gallery component specific styles that complement Bootstrap
 .gallery-container {
-	padding: 20px;
+	padding: clamp(15px, 3vw, 20px); // Responsive padding
 	max-width: 1400px;
 	margin: 0 auto;
+
+	// Adjust for high DPI displays
+	@media (min-resolution: 1.5dppx) {
+		padding: clamp(12px, 2.5vw, 18px);
+	}
+
+	// Better mobile support
+	@media (max-width: 768px) {
+		padding: 10px;
+	}
 }
 
 .gallery-header {
@@ -20,8 +30,13 @@
 	h1 {
 		margin: 0;
 		color: var(--text-color);
-		font-size: 2.5rem;
+		font-size: clamp(1.8rem, 4vw, 2.5rem); // Responsive font size
 		font-weight: 300;
+
+		// Better mobile sizing
+		@media (max-width: 480px) {
+			font-size: 1.6rem;
+		}
 	}
 }
 
@@ -174,7 +189,31 @@
 
 .image-actions {
 	display: flex;
-	gap: 8px;
+	gap: clamp(6px, 1vw, 8px); // Responsive gap
+	flex-wrap: wrap; // Allow wrapping on small screens
+	justify-content: center;
+
+	// Ensure buttons are properly sized for touch targets
+	.btn {
+		min-width: 32px;
+		min-height: 32px;
+		padding: 6px 8px;
+		font-size: 14px;
+
+		// Adjust for high DPI displays
+		@media (min-resolution: 1.5dppx) {
+			min-width: 36px;
+			min-height: 36px;
+		}
+
+		// Better mobile sizing
+		@media (max-width: 480px) {
+			min-width: 28px;
+			min-height: 28px;
+			padding: 4px 6px;
+			font-size: 12px;
+		}
+	}
 }
 
 .empty-state {
@@ -212,12 +251,28 @@
 .viewer-content {
 	background-color: var(--bg-color);
 	border-radius: 12px;
-	max-width: 90vw;
-	max-height: 90vh;
+	max-width: clamp(300px, 90vw, 1200px); // Responsive width with min/max bounds
+	max-height: clamp(200px, 90vh, 800px); // Responsive height with min/max bounds
+	width: 90vw; // Ensure consistent width
+	height: auto;
 	display: flex;
 	flex-direction: column;
 	border: 2px solid var(--border-color);
 	overflow: hidden;
+	margin: auto; // Center the modal content
+
+	// Improve scaling for high DPI displays
+	@media (min-resolution: 1.5dppx) {
+		max-width: 85vw;
+		max-height: 85vh;
+	}
+
+	// Better mobile support
+	@media (max-width: 768px) {
+		max-width: 95vw;
+		max-height: 95vh;
+		border-radius: 8px;
+	}
 }
 
 .viewer-header {
@@ -259,12 +314,20 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 20px;
+	padding: clamp(10px, 3vw, 20px); // Responsive padding
+	min-height: 200px; // Ensure minimum height
+	overflow: hidden; // Prevent content overflow
 
 	img {
-		max-width: 100%;
-		max-height: 70vh;
+		max-width: calc(100% - 100px); // Leave space for navigation buttons
+		max-height: calc(70vh - 40px); // Account for header/footer
 		object-fit: contain;
+		border-radius: 4px;
+
+		// Better scaling for high DPI
+		@media (min-resolution: 1.5dppx) {
+			max-width: calc(100% - 120px);
+		}
 	}
 
 	// Video styles for the viewer modal
@@ -328,6 +391,9 @@
 	cursor: pointer;
 	border-radius: 50%;
 	transition: background-color 0.3s ease;
+	z-index: 10;
+	min-width: 44px; // Minimum touch target size
+	min-height: 44px; // Minimum touch target size
 
 	&:hover:not(:disabled) {
 		background-color: rgba(0, 0, 0, 0.7);
@@ -339,11 +405,25 @@
 	}
 
 	&.prev-btn {
-		left: 20px;
+		left: clamp(10px, 2vw, 20px); // Responsive positioning with min/max bounds
 	}
 
 	&.next-btn {
-		right: 20px;
+		right: clamp(10px, 2vw, 20px); // Responsive positioning with min/max bounds
+	}
+
+	// Ensure buttons stay within viewport on small screens
+	@media (max-width: 480px) {
+		font-size: 20px;
+		padding: 8px 12px;
+
+		&.prev-btn {
+			left: 5px;
+		}
+
+		&.next-btn {
+			right: 5px;
+		}
 	}
 }
 
@@ -359,9 +439,21 @@
 // Image gallery with original display mode classes
 .image-gallery {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	gap: 20px;
+	grid-template-columns: repeat(auto-fit, minmax(clamp(250px, 25vw, 300px), 1fr)); // More responsive grid
+	gap: clamp(15px, 2vw, 20px); // Responsive gap
 	margin-top: 30px;
+
+	// Adjust for high DPI displays
+	@media (min-resolution: 1.5dppx) {
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 18px;
+	}
+
+	// Better mobile layout
+	@media (max-width: 768px) {
+		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+		gap: 15px;
+	}
 
 	.image-item {
 		position: relative;
