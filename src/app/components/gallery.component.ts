@@ -123,6 +123,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				return;
 			}
 
+			// Decide compression strategy: for large galleries, STORE media files to improve performance
+			const compressionMode = this.getZipCompressionMode(validMediaItems.length); // 'STORE' | 'DEFLATE'
+
 			const imageCount = validMediaItems.filter((item) => item.type === 'image').length;
 			const videoCount = validMediaItems.filter((item) => item.type === 'video').length;
 
@@ -169,7 +172,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 					// Build a deterministic, collision-safe zip path with standard suffix formatting
 					const zipPath = this.buildUniqueZipPath(filename, mediaItem.url, usedNames, occ, padWidth);
-					zip.file(zipPath, mediaBlob);
+					zip.file(zipPath, mediaBlob, {
+						compression:
+							mediaItem.type === 'image' || mediaItem.type === 'video' ? compressionMode : 'DEFLATE',
+						binary: true,
+					});
 
 					// Record in manifest for traceability
 					manifestEntries.push({ originalUrl: mediaItem.url, zipPath, filename, type: mediaItem.type });
@@ -187,7 +194,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 			// Add Fuskr.txt metadata file
 			const metadataContent = this.generateMetadataContent(validMediaItems);
-			zip.file('Fuskr.txt', metadataContent);
+			zip.file('Fuskr.txt', metadataContent, { compression: 'DEFLATE' });
 
 			// Add JSON manifest mapping original URL to zip path
 			const manifest = {
@@ -196,7 +203,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				totalItems: validMediaItems.length,
 				entries: manifestEntries,
 			};
-			zip.file('manifest.json', JSON.stringify(manifest, null, 2));
+			zip.file('manifest.json', JSON.stringify(manifest, null, 2), { compression: 'DEFLATE' });
 
 			this.downloadStatus = this.translate('Gallery_DownloadCreatingZip');
 			this.downloadProgress = 85;
@@ -204,8 +211,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			// Generate ZIP file
 			const zipBlob = await zip.generateAsync({
 				type: 'blob',
-				compression: 'DEFLATE',
-				compressionOptions: { level: 6 },
+				compression: compressionMode,
+				compressionOptions: compressionMode === 'DEFLATE' ? { level: 6 } : undefined,
 			});
 
 			this.downloadStatus = this.translate('Gallery_DownloadSaving');
@@ -222,6 +229,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				totalItems: validMediaItems.length,
 				imageCount,
 				videoCount,
+				compressionMode,
 			});
 
 			// Reset status after 3 seconds
@@ -1290,5 +1298,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 		const hex = (hash >>> 0).toString(16).padStart(8, '0');
 		return hex.slice(0, Math.max(1, Math.min(8, length)));
+	}
+
+	// Decide compression mode: images/videos are already compressed; for large galleries, avoid recompression
+	private getZipCompressionMode(totalItems: number): 'STORE' | 'DEFLATE' {
+		// Threshold chosen pragmatically; can be refined or made configurable later
+		return totalItems >= 300 ? 'STORE' : 'DEFLATE';
 	}
 }
