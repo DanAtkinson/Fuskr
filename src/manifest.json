@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "__MSG_ManifestName__",
 	"description": "__MSG_ManifestDescription__",
-	"version": "5.0.5",
+	"version": "5.0.6",
 	"default_locale": "en_GB",
 	"author": "Dan Atkinson and Jonathon Bolster",
 	"action": {

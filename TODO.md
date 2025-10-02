@@ -15,10 +15,6 @@
 
 ## 🚨 Priority Fixes
 
-### Recently Reported (Issue #93 - August 2025)
-- **"Open in tab" button on image grid** - Add direct tab opening without requiring image click first
-
-### Existing Priority Items
 - **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation
 
 ## 🤔 Under Consideration
