@@ -294,6 +294,23 @@ input[type='radio'] {
 	}
 }
 
+/* Alignment fixes: ensure all option labels and descriptions are left-aligned */
+.options-container {
+	.card-body,
+	.form-check,
+	.form-check-label,
+	.form-text,
+	fieldset,
+	legend {
+		text-align: left !important;
+	}
+
+	// Keep helper text flush-left under its control
+	.form-text {
+		margin-left: 0;
+	}
+}
+
 // Legacy dark mode styles for backwards compatibility
 body.dark-mode {
 	background-color: var(--bg-color) !important;

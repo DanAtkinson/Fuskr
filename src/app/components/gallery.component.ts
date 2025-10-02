@@ -55,6 +55,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Private properties (alphabetically)
 	private brokenUrls = new Set<string>(); // Track URLs that failed to load persistently
 	private hasInitialized = false;
+	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
 
 	// Injected services
 	private route = inject(ActivatedRoute);
@@ -459,7 +460,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.updateImageCounts();
 
 			// Auto-remove broken image/video if setting is enabled
-			if (this.autoRemoveBrokenImages) {
+			if (this.autoRemoveBrokenImages || this.autoRemoveBrokenImagesSession) {
 				// Remove the container from DOM immediately
 				const container = element.closest('.image-item');
 				if (container && originalUrl) {
@@ -618,6 +619,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			remainingItems: this.mediaItems.length,
 			totalBrokenUrls: this.brokenUrls.size,
 		});
+
+		// Enable session-based auto removal for any future failures in this gallery
+		this.autoRemoveBrokenImagesSession = true;
 	}
 
 	selectAllUrls() {
