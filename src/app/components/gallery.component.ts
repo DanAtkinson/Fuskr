@@ -132,10 +132,29 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				videoCount.toString(),
 			]);
 
+			// Track used names to avoid overwriting within the zip
+			const usedNames = new Map<string, number>();
+			const manifestEntries: { originalUrl: string; zipPath: string; filename: string; type: string }[] = [];
+
+			// Pre-compute duplicate counts by base filename to decide padding width per group
+			const baseCounts = new Map<string, number>();
+			for (const item of validMediaItems) {
+				const base = this.getFilename(item.url);
+				baseCounts.set(base, (baseCounts.get(base) || 0) + 1);
+			}
+			const basePadWidth = new Map<string, number>();
+			baseCounts.forEach((count, base) => {
+				basePadWidth.set(base, Math.max(0, String(count).length));
+			});
+			// Track current occurrence index per base (0-based)
+			const baseOccurrence = new Map<string, number>();
+
 			// Download all media items and add to ZIP
 			for (let i = 0; i < validMediaItems.length; i++) {
 				const mediaItem = validMediaItems[i];
 				const filename = this.getFilename(mediaItem.url);
+				const occ = baseOccurrence.get(filename) ?? 0; // 0-based occurrence within this basename group
+				const padWidth = basePadWidth.get(filename) ?? 0;
 
 				try {
 					this.downloadStatus = this.translate('Gallery_DownloadingItem', [
@@ -147,7 +166,16 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 					this.downloadProgress = Math.round((i / validMediaItems.length) * 70); // Reserve 30% for ZIP generation and metadata
 
 					const mediaBlob = await this.fetchMediaAsBlob(mediaItem.url);
-					zip.file(filename, mediaBlob);
+
+					// Build a deterministic, collision-safe zip path with standard suffix formatting
+					const zipPath = this.buildUniqueZipPath(filename, mediaItem.url, usedNames, occ, padWidth);
+					zip.file(zipPath, mediaBlob);
+
+					// Record in manifest for traceability
+					manifestEntries.push({ originalUrl: mediaItem.url, zipPath, filename, type: mediaItem.type });
+
+					// Increment occurrence for this base
+					baseOccurrence.set(filename, occ + 1);
 				} catch (error) {
 					this.logger.warn('gallery.download.failed', `Failed to download ${filename}`, error);
 					// Continue with other media items
@@ -160,6 +188,15 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			// Add Fuskr.txt metadata file
 			const metadataContent = this.generateMetadataContent(validMediaItems);
 			zip.file('Fuskr.txt', metadataContent);
+
+			// Add JSON manifest mapping original URL to zip path
+			const manifest = {
+				version: 1,
+				createdAt: new Date().toISOString(),
+				totalItems: validMediaItems.length,
+				entries: manifestEntries,
+			};
+			zip.file('manifest.json', JSON.stringify(manifest, null, 2));
 
 			this.downloadStatus = this.translate('Gallery_DownloadCreatingZip');
 			this.downloadProgress = 85;
@@ -1208,5 +1245,50 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			videoCount: this.mediaItems.filter((item) => item.type === 'video').length,
 			unknownCount: this.mediaItems.filter((item) => item.type === 'unknown').length,
 		});
+	}
+
+	// Helper: build unique zip path with suffix numbering for duplicates (e.g., "name (002).jpg")
+	private buildUniqueZipPath(
+		baseFilename: string,
+		originalUrl: string,
+		usedNames: Map<string, number>,
+		occurrenceIndex: number,
+		padWidth: number
+	): string {
+		const dot = baseFilename.lastIndexOf('.');
+		const name = dot > -1 ? baseFilename.slice(0, dot) : baseFilename;
+		const ext = dot > -1 ? baseFilename.slice(dot) : '';
+
+		// First occurrence keeps the original name
+		if (occurrenceIndex === 0) {
+			if (!usedNames.has(baseFilename)) {
+				usedNames.set(baseFilename, 1);
+				return baseFilename;
+			}
+			// Extremely unlikely collision on first occurrence: fall through to suffix logic
+		}
+
+		// Subsequent occurrences: standard suffix " (NNN)" where NNN is 2..N, zero-padded to padWidth when padWidth > 1
+		const n = occurrenceIndex + 1; // 1-based count
+		const displayNum = n.toString().padStart(Math.max(2, padWidth), '0');
+		let candidate = `${name} (${displayNum})${ext}`;
+		let counter = 1;
+		while (usedNames.has(candidate)) {
+			counter += 1;
+			candidate = `${name} (${displayNum})-${counter}${ext}`;
+		}
+		usedNames.set(candidate, 1);
+		return candidate;
+	}
+
+	// Helper: small, fast, deterministic hash → short hex, stable across runs
+	private shortHash(input: string, length = 6): string {
+		let hash = 2166136261; // FNV-1a 32-bit offset basis
+		for (let i = 0; i < input.length; i++) {
+			hash ^= input.charCodeAt(i);
+			hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24);
+		}
+		const hex = (hash >>> 0).toString(16).padStart(8, '0');
+		return hex.slice(0, Math.max(1, Math.min(8, length)));
 	}
 }

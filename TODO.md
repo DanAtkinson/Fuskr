@@ -17,13 +17,23 @@
 
 ### Recently Reported (Issue #93 - August 2025)
 - **Persistent "Remove broken images" setting** - Add auto-removal option to settings so users don't need to click it manually each time *(highly requested)*
-- **"Download all" functionality broken** - Archive creation fails for large galleries (~1000 links), user waits 5+ minutes with no result
+- **"Download all" functionality broken** - Archive creation fails for large galleries (~1000 links), user waits 5+ minutes with no result.
 - **UI scaling issues** - Extension breaks with OS scaling >125%, buttons disappear out of bounds in image viewer
 - **"Open in tab" button on image grid** - Add direct tab opening without requiring image click first
 
 ### Existing Priority Items
 - **Persistent broken image filtering** - When "Remove broken images" is pressed, newly failed images should also be filtered out automatically
 - **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation
+
+## 🤔 Under Consideration
+
+- **Video tutorials** *(from #10)* - Create YouTube tutorial videos showing different fusk types and use cases for the help page and extension store listing.
+- **Complete help page** *(from #11)* - Build comprehensive help with examples covering default patterns, complex patterns, and alphabetical sequences.
+
+## 📚 Documentation & Marketing
+
+- **Firefox extension signing** *(from #91)* - Address Firefox installation issues with unsigned extensions. Either submit to Mozilla Add-ons or provide proper self-distribution documentation
+- **Persistent broken image filtering** - When "Remove broken images" is pressed, newly failed images should also be filtered out automatically
 
 ## 📚 Documentation & Marketing
 
@@ -34,3 +44,4 @@
 
 - **GUID-based URLs** - Consider moving the fusk url to inside the page. Use a guid in the url instead which is tied to the url in storage. This way, the extension can persist the request across browser restarts, and potentially browsers when used in conjunction with Chrome Sync.
 - **Hash URL handling** *(from #36)* - Long-term solution for URLs containing hashes by moving fusk URLs out of the address bar and into the page itself.
+- **Dimension filtering** - Allow the user to filter out media according to some criteria such as image height or width.

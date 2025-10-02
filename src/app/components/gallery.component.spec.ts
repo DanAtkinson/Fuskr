@@ -443,4 +443,55 @@ describe('GalleryComponent', () => {
 			expect(component.mediaItems.length).toBe(3); // Still has all items
 		});
 	});
+
+	describe('Zip filename de-duplication', () => {
+		type BuildFn = (
+			base: string,
+			url: string,
+			used: Map<string, number>,
+			occurrenceIndex: number,
+			padWidth: number
+		) => string;
+		const getBuilder = (): BuildFn =>
+			(component as unknown as { buildUniqueZipPath: BuildFn }).buildUniqueZipPath.bind(component);
+
+		it('should suffix duplicates with zero-padded numbering based on duplicate group size (example: 100)', () => {
+			// Arrange
+			const used = new Map<string, number>();
+			const base = 'comic.jpg';
+			const urlA = 'https://comic-book-heroes.com/108000/108100/comic.jpg';
+			const urlB = 'https://comic-book-heroes.com/108000/108101/comic.jpg';
+			const urlZ = 'https://comic-book-heroes.com/108000/108200/comic.jpg';
+			const padWidth = 3; // e.g. 100 duplicates → pad length 3
+			const build = getBuilder();
+
+			// Act
+			const first = build(base, urlA, used, 0, padWidth);
+			const second = build(base, urlB, used, 1, padWidth);
+			const hundredth = build(base, urlZ, used, 99, padWidth); // 100th occurrence (0-based)
+
+			// Assert
+			expect(first).toBe('comic.jpg');
+			expect(second).toBe('comic (002).jpg');
+			expect(hundredth).toBe('comic (100).jpg');
+		});
+
+		it('should use padding relative to total expected files (10 → (02), 1000 → (0002))', () => {
+			const used = new Map<string, number>();
+			const base = 'image.jpg';
+			const url = 'https://example.com/a/b/image.jpg';
+			const build = getBuilder();
+
+			// For 10 files → pad width 2
+			const secondOfTen = build(base, url, used, 0, 2);
+			const dupeOfTen = build(base, url, used, 1, 2);
+			expect(secondOfTen).toBe('image.jpg');
+			expect(dupeOfTen).toBe('image (02).jpg');
+
+			// Reset map for 1000 files → pad width 4
+			const used2 = new Map<string, number>();
+			const secondOfThousand = build(base, url, used2, 1, 4);
+			expect(secondOfThousand).toBe('image (0002).jpg');
+		});
+	});
 });
