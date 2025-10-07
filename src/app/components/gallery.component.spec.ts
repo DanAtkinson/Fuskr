@@ -30,6 +30,8 @@ describe('GalleryComponent', () => {
 			'batchDetermineMediaTypes',
 			'createMediaItem',
 			'fallbackTypeDetection',
+			// Added for progressive detection path
+			'determineMediaType',
 		]);
 		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 		mockActivatedRoute = {
@@ -584,7 +586,12 @@ describe('GalleryComponent', () => {
 			const items = [
 				{ url: 'a1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' as const },
 				{ url: 'v1.mp4', type: 'video', mimeType: 'video/mp4', loadingState: 'loaded' as const },
-				{ url: 'u1.bin', type: 'unknown', mimeType: 'application/octet-stream', loadingState: 'loaded' as const },
+				{
+					url: 'u1.bin',
+					type: 'unknown',
+					mimeType: 'application/octet-stream',
+					loadingState: 'loaded' as const,
+				},
 			];
 			const content = (component as any).generateMetadataContent(items);
 			expect(content).toContain('Fusk Url: https://example.com/a[01-02].jpg');
@@ -614,6 +621,114 @@ describe('GalleryComponent', () => {
 		it('should return original when not encoded', () => {
 			const plain = 'not-encoded';
 			expect((component as any).decodeUrlParameter(plain)).toBe(plain);
+		});
+	});
+
+	describe('Progressive type detection', () => {
+		it('should update media items based on HTTP detection and keep fallback on failure', async () => {
+			// Arrange: two items to detect
+			component.mediaItems = [
+				{
+					url: 'https://example.com/a.jpg',
+					type: 'unknown',
+					mimeType: 'application/octet-stream',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/b.mp4',
+					type: 'unknown',
+					mimeType: 'application/octet-stream',
+					loadingState: 'loaded',
+				},
+			];
+
+			mockMediaTypeService.determineMediaType.and.callFake(async (url: string) => {
+				if (url.endsWith('.jpg')) {
+					return { type: 'image', mimeType: 'image/jpeg', contentLength: 123 } as any;
+				}
+				throw new Error('HEAD failed');
+			});
+
+			// Act
+			await (component as any).startProgressiveTypeDetection();
+
+			// Assert: first becomes image, second remains unknown
+			expect(component.mediaItems[0].type).toBe('image');
+			expect(component.mediaItems[0].mimeType).toBe('image/jpeg');
+			expect(component.mediaItems[1].type).toBe('unknown');
+		});
+	});
+
+	describe('getValidImageUrls', () => {
+		it('should return only successfully loaded media URLs', () => {
+			// Create one good image, one broken image, one good video, one broken video
+			const goodImg = document.createElement('img');
+			goodImg.className = 'fusk-image';
+			Object.defineProperty(goodImg, 'complete', { value: true });
+			Object.defineProperty(goodImg, 'naturalHeight', { value: 100 });
+			goodImg.src = 'https://site/img1.jpg';
+
+			const badImg = document.createElement('img');
+			badImg.className = 'fusk-image error';
+			Object.defineProperty(badImg, 'complete', { value: true });
+			Object.defineProperty(badImg, 'naturalHeight', { value: 0 });
+			badImg.src = 'https://site/img2.jpg';
+
+			const goodVid = document.createElement('video');
+			goodVid.className = 'fusk-video';
+			Object.defineProperty(goodVid, 'readyState', { value: 2 });
+			goodVid.src = 'https://site/vid1.mp4';
+
+			const badVid = document.createElement('video');
+			badVid.className = 'fusk-video error';
+			Object.defineProperty(badVid, 'readyState', { value: 0 });
+			badVid.src = 'https://site/vid2.mp4';
+
+			document.body.appendChild(goodImg);
+			document.body.appendChild(badImg);
+			document.body.appendChild(goodVid);
+			document.body.appendChild(badVid);
+
+			const urls = (component as any).getValidImageUrls();
+			expect(urls).toEqual(['https://site/img1.jpg', 'https://site/vid1.mp4']);
+		});
+	});
+
+	describe('updateImageCounts', () => {
+		it('should count loaded and broken images/videos correctly', () => {
+			// Reset DOM
+			document.body.innerHTML = '';
+
+			const loadedImg = document.createElement('img');
+			loadedImg.className = 'fusk-image';
+			Object.defineProperty(loadedImg, 'complete', { value: true });
+			Object.defineProperty(loadedImg, 'naturalHeight', { value: 50 });
+			loadedImg.src = 'https://site/ok.jpg';
+
+			const brokenImg = document.createElement('img');
+			brokenImg.className = 'fusk-image error';
+			Object.defineProperty(brokenImg, 'complete', { value: true });
+			Object.defineProperty(brokenImg, 'naturalHeight', { value: 0 });
+			brokenImg.src = 'https://site/bad.jpg';
+
+			const loadedVid = document.createElement('video');
+			loadedVid.className = 'fusk-video';
+			Object.defineProperty(loadedVid, 'readyState', { value: 2 });
+			loadedVid.src = 'https://site/ok.mp4';
+
+			const brokenVid = document.createElement('video');
+			brokenVid.className = 'fusk-video error';
+			Object.defineProperty(brokenVid, 'readyState', { value: 0 });
+			brokenVid.src = 'https://site/bad.mp4';
+
+			document.body.appendChild(loadedImg);
+			document.body.appendChild(brokenImg);
+			document.body.appendChild(loadedVid);
+			document.body.appendChild(brokenVid);
+
+			(component as any).updateImageCounts();
+			expect(component.loadedImages).toBe(2);
+			expect(component.brokenImages).toBe(2);
 		});
 	});
 });

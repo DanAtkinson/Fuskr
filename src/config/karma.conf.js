@@ -27,11 +27,9 @@ module.exports = function (config) {
 				lines: [80, 95],
 			},
 			// Optional strict thresholds: enable by setting COVERAGE_STRICT=1
-			check: process.env.COVERAGE_STRICT === '1'
-				? {
-					global: { statements: 80, functions: 80, branches: 80, lines: 80 },
-				}
-				: undefined,
+			check: process.env.COVERAGE_STRICT === '1' ? {
+				global: { statements: 80, functions: 80, branches: 80, lines: 80 },
+			} : undefined,
 		},
 		port: 9876,
 		colors: true,
