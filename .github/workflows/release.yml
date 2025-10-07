@@ -31,6 +31,36 @@ jobs:
         run: |
           echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Build release notes (includes Product Details)
+        id: notes
+        run: |
+          echo "BODY<<'EOF'" >> $GITHUB_OUTPUT
+          echo "## Fuskr Extension ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo >> $GITHUB_OUTPUT
+          echo "### 📝 Product details (for Chrome Web Store)" >> $GITHUB_OUTPUT
+          echo >> $GITHUB_OUTPUT
+          if [ -f store/chrome-product-details.md ]; then
+            cat store/chrome-product-details.md >> $GITHUB_OUTPUT
+          else
+            echo "Product details file not found (store/chrome-product-details.md)." >> $GITHUB_OUTPUT
+          fi
+          echo >> $GITHUB_OUTPUT
+          echo >> $GITHUB_OUTPUT
+          echo "### Installation" >> $GITHUB_OUTPUT
+          echo "- Chrome/Edge/Chromium: use 'fuskr-chromium.zip' (load unpacked for development)" >> $GITHUB_OUTPUT
+          echo "- Firefox: use 'fuskr-firefox.zip' (temporary add-on)" >> $GITHUB_OUTPUT
+          echo >> $GITHUB_OUTPUT
+          echo "### Changes" >> $GITHUB_OUTPUT
+          echo "See commits for details." >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Upload product details as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-product-details
+          path: store/chrome-product-details.md
+          if-no-files-found: warn
           
       - name: Create GitHub Release
         id: create_release
@@ -40,26 +70,7 @@ jobs:
         with:
           tag_name: ${{ steps.version.outputs.TAG_NAME }}
           release_name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
-          body: |
-            ## Fuskr Extension ${{ steps.version.outputs.VERSION }}
-            
-            ### Chrome Extension
-            - Download `fuskr-chromium.zip` for Chrome/Edge/Chromium browsers
-            - Install by loading as unpacked extension in Developer Mode
-            
-            ### Firefox Extension
-            - Download `fuskr-firefox.zip` for Firefox browsers
-            - Install as temporary add-on or submit to Mozilla Add-ons
-            
-            ### Changes
-            See the commit history for detailed changes in this release.
-            
-            ---
-            **Installation Instructions:**
-            1. Download the appropriate ZIP file for your browser
-            2. Extract if needed for development/testing
-            3. For Chrome: Enable Developer Mode in chrome://extensions/ and "Load unpacked"
-            4. For Firefox: Visit about:debugging and "Load Temporary Add-on"
+          body: ${{ steps.notes.outputs.BODY }}
           draft: false
           prerelease: false
           
