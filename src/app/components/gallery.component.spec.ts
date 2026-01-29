@@ -583,7 +583,7 @@ describe('GalleryComponent', () => {
 
 	describe('generateMetadataContent', () => {
 		it('should include counts and URLs by type', () => {
-			(component as unknown as { originalUrl: string }).originalUrl = 'https://example.com/a[01-02].jpg';
+			component.originalUrl = 'https://example.com/a[01-02].jpg';
 			const items: MediaItem[] = [
 				{ url: 'a1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' as const },
 				{ url: 'v1.mp4', type: 'video', mimeType: 'video/mp4', loadingState: 'loaded' as const },
