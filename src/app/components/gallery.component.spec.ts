@@ -594,7 +594,9 @@ describe('GalleryComponent', () => {
 					loadingState: 'loaded' as const,
 				},
 			];
-			const content = (component as unknown as { generateMetadataContent: (items: MediaItem[]) => string }).generateMetadataContent(items);
+			const content = (
+				component as unknown as { generateMetadataContent: (items: MediaItem[]) => string }
+			).generateMetadataContent(items);
 			expect(content).toContain('Fusk Url: https://example.com/a[01-02].jpg');
 			expect(content).toContain('IMAGE: a1.jpg');
 			expect(content).toContain('VIDEO: v1.mp4');
@@ -609,19 +611,25 @@ describe('GalleryComponent', () => {
 		it('should decode base64 URLs', () => {
 			const url = 'https://test.example/image.jpg';
 			const b64 = btoa(url);
-			const decoded = (component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(b64);
+			const decoded = (
+				component as unknown as { decodeUrlParameter: (param: string) => string }
+			).decodeUrlParameter(b64);
 			expect(decoded).toBe(url);
 		});
 
 		it('should decode URL-encoded strings', () => {
 			const encoded = encodeURIComponent('https://example.com/a b');
-			const decoded = (component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(encoded);
+			const decoded = (
+				component as unknown as { decodeUrlParameter: (param: string) => string }
+			).decodeUrlParameter(encoded);
 			expect(decoded).toBe('https://example.com/a b');
 		});
 
 		it('should return original when not encoded', () => {
 			const plain = 'not-encoded';
-			expect((component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(plain)).toBe(plain);
+			expect(
+				(component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(plain)
+			).toBe(plain);
 		});
 	});
 
@@ -651,7 +659,9 @@ describe('GalleryComponent', () => {
 			});
 
 			// Act
-			await (component as unknown as { startProgressiveTypeDetection: () => Promise<void> }).startProgressiveTypeDetection();
+			await (
+				component as unknown as { startProgressiveTypeDetection: () => Promise<void> }
+			).startProgressiveTypeDetection();
 
 			// Assert: first becomes image, second remains unknown
 			expect(component.mediaItems[0].type).toBe('image');
