@@ -23,7 +23,9 @@ updates:
       angular:
         patterns:
           - "@angular/*"
-          - "@angular-*"
+          - "@angular-builders/*"
+          - "@angular-devkit/*"
+          - "angular-eslint"
       dev-dependencies:
         dependency-type: "development"
         update-types:
