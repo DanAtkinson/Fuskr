@@ -17,10 +17,10 @@ jobs:
 
   steps:
    - name: 📁 Checkout repository
-     uses: actions/checkout@v4
+     uses: actions/checkout@v6
 
    - name: 📦 Setup Node.js ${{ matrix.node-version }}
-     uses: actions/setup-node@v4
+     uses: actions/setup-node@v6
      with:
       node-version: ${{ matrix.node-version }}
       cache: 'npm'
@@ -36,7 +36,7 @@ jobs:
 
    - name: 📊 Upload coverage reports
      if: matrix.node-version == '22.x'
-     uses: codecov/codecov-action@v4
+     uses: codecov/codecov-action@v5
      with:
       file: ./coverage/lcov.info
       flags: unittests
@@ -49,10 +49,10 @@ jobs:
 
   steps:
    - name: 📁 Checkout repository
-     uses: actions/checkout@v4
+     uses: actions/checkout@v6
 
    - name: 📦 Setup Node.js
-     uses: actions/setup-node@v4
+     uses: actions/setup-node@v6
      with:
       node-version: '22.x'
       cache: 'npm'
@@ -78,10 +78,10 @@ jobs:
 
   steps:
    - name: 📁 Checkout repository
-     uses: actions/checkout@v4
+     uses: actions/checkout@v6
 
    - name: 📦 Setup Node.js
-     uses: actions/setup-node@v4
+     uses: actions/setup-node@v6
      with:
       node-version: '22.x'
       cache: 'npm'

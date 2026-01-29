@@ -28,7 +28,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Extract version information
         id: version
@@ -78,7 +78,7 @@ jobs:
         uses: actions/configure-pages@v5
         
       - name: Upload to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./docs
           
