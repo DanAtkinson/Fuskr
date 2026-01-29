@@ -5,7 +5,42 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  # Maintain npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
     schedule:
       interval: "weekly"
+    # Add conventional commit prefix
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    # Add labels for easier PR management
+    labels:
+      - "dependencies"
+      - "npm"
+    # Group Angular dependencies together
+    groups:
+      angular:
+        patterns:
+          - "@angular/*"
+          - "@angular-builders/*"
+          - "@angular-devkit/*"
+          - "angular-*"
+      dev-dependencies:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"
+    # Allow Dependabot to open up to 10 PRs
+    open-pull-requests-limit: 10
+
+  # Maintain GitHub Actions dependencies
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "github-actions"
