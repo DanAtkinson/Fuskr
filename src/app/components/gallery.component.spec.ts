@@ -7,6 +7,7 @@ import { FuskrService } from '@services/fuskr.service';
 import { ChromeService } from '@services/chrome.service';
 import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponentTestHelper } from './base-component-test.helper';
+import { MediaItem } from '@interfaces/media';
 
 // Type-only import for VS Code IntelliSense - won't be included in runtime bundle
 import type {} from 'jasmine';
@@ -582,8 +583,8 @@ describe('GalleryComponent', () => {
 
 	describe('generateMetadataContent', () => {
 		it('should include counts and URLs by type', () => {
-			(component as any).originalUrl = 'https://example.com/a[01-02].jpg';
-			const items = [
+			(component as unknown as { originalUrl: string }).originalUrl = 'https://example.com/a[01-02].jpg';
+			const items: MediaItem[] = [
 				{ url: 'a1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' as const },
 				{ url: 'v1.mp4', type: 'video', mimeType: 'video/mp4', loadingState: 'loaded' as const },
 				{
@@ -593,7 +594,7 @@ describe('GalleryComponent', () => {
 					loadingState: 'loaded' as const,
 				},
 			];
-			const content = (component as any).generateMetadataContent(items);
+			const content = (component as unknown as { generateMetadataContent: (items: MediaItem[]) => string }).generateMetadataContent(items);
 			expect(content).toContain('Fusk Url: https://example.com/a[01-02].jpg');
 			expect(content).toContain('IMAGE: a1.jpg');
 			expect(content).toContain('VIDEO: v1.mp4');
@@ -608,19 +609,19 @@ describe('GalleryComponent', () => {
 		it('should decode base64 URLs', () => {
 			const url = 'https://test.example/image.jpg';
 			const b64 = btoa(url);
-			const decoded = (component as any).decodeUrlParameter(b64);
+			const decoded = (component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(b64);
 			expect(decoded).toBe(url);
 		});
 
 		it('should decode URL-encoded strings', () => {
 			const encoded = encodeURIComponent('https://example.com/a b');
-			const decoded = (component as any).decodeUrlParameter(encoded);
+			const decoded = (component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(encoded);
 			expect(decoded).toBe('https://example.com/a b');
 		});
 
 		it('should return original when not encoded', () => {
 			const plain = 'not-encoded';
-			expect((component as any).decodeUrlParameter(plain)).toBe(plain);
+			expect((component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(plain)).toBe(plain);
 		});
 	});
 
@@ -644,13 +645,13 @@ describe('GalleryComponent', () => {
 
 			mockMediaTypeService.determineMediaType.and.callFake(async (url: string) => {
 				if (url.endsWith('.jpg')) {
-					return { type: 'image', mimeType: 'image/jpeg', contentLength: 123 } as any;
+					return { type: 'image', mimeType: 'image/jpeg', contentLength: 123 };
 				}
 				throw new Error('HEAD failed');
 			});
 
 			// Act
-			await (component as any).startProgressiveTypeDetection();
+			await (component as unknown as { startProgressiveTypeDetection: () => Promise<void> }).startProgressiveTypeDetection();
 
 			// Assert: first becomes image, second remains unknown
 			expect(component.mediaItems[0].type).toBe('image');
@@ -689,7 +690,7 @@ describe('GalleryComponent', () => {
 			document.body.appendChild(goodVid);
 			document.body.appendChild(badVid);
 
-			const urls = (component as any).getValidImageUrls();
+			const urls = (component as unknown as { getValidImageUrls: () => string[] }).getValidImageUrls();
 			expect(urls).toEqual(['https://site/img1.jpg', 'https://site/vid1.mp4']);
 		});
 	});
@@ -726,7 +727,7 @@ describe('GalleryComponent', () => {
 			document.body.appendChild(loadedVid);
 			document.body.appendChild(brokenVid);
 
-			(component as any).updateImageCounts();
+			(component as unknown as { updateImageCounts: () => void }).updateImageCounts();
 			expect(component.loadedImages).toBe(2);
 			expect(component.brokenImages).toBe(2);
 		});
