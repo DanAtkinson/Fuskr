@@ -14,10 +14,6 @@ updates:
     commit-message:
       prefix: "chore(deps)"
       prefix-development: "chore(deps-dev)"
-    # Add labels for easier PR management
-    labels:
-      - "dependencies"
-      - "npm"
     # Group Angular dependencies together
     groups:
       angular:
@@ -41,6 +37,3 @@ updates:
       interval: "weekly"
     commit-message:
       prefix: "chore(ci)"
-    labels:
-      - "dependencies"
-      - "github-actions"
