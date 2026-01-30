@@ -107,8 +107,12 @@ class BackgroundScript {
 		TargetUrlPatterns?: string[];
 		Title?: string;
 	}): string {
+		const contexts =
+			obj.Context && obj.Context.length > 0
+				? (obj.Context as [`${chrome.contextMenus.ContextType}`, ...`${chrome.contextMenus.ContextType}`[]])
+				: (['all'] as [`${chrome.contextMenus.ContextType}`]);
 		return chrome.contextMenus.create({
-			contexts: (obj.Context as chrome.contextMenus.ContextType[]) || ['all'],
+			contexts,
 			id: obj.Id,
 			parentId: obj.ParentId || undefined,
 			targetUrlPatterns: obj.TargetUrlPatterns || undefined,
@@ -285,27 +289,37 @@ class BackgroundScript {
 
 		// Update the entire options object with new data
 		if (changes['display']) {
-			this.options.display = { ...this.options.display, ...changes['display'].newValue };
+			this.options.display = {
+				...this.options.display,
+				...(changes['display'].newValue as typeof this.options.display),
+			};
 		}
 		if (changes['behaviour']) {
-			this.options.behaviour = { ...this.options.behaviour, ...changes['behaviour'].newValue };
+			this.options.behaviour = {
+				...this.options.behaviour,
+				...(changes['behaviour'].newValue as typeof this.options.behaviour),
+			};
 		}
 		if (changes['safety']) {
-			this.options.safety = { ...this.options.safety, ...changes['safety'].newValue };
+			this.options.safety = {
+				...this.options.safety,
+				...(changes['safety'].newValue as typeof this.options.safety),
+			};
 		}
 		if (changes['version']) {
-			this.options.version = changes['version'].newValue;
+			this.options.version = changes['version'].newValue as number;
 		}
 
 		// Handle recent menu updates
-		if (
-			changes['behaviour'] &&
-			changes['behaviour'].newValue?.keepRecentFusks !== changes['behaviour'].oldValue?.keepRecentFusks
-		) {
-			if (changes['behaviour'].newValue?.keepRecentFusks) {
-				this.createRecentMenu(this.options.behaviour.recentFusks);
-			} else {
-				this.createRecentMenu([]);
+		if (changes['behaviour']) {
+			const newBehaviour = changes['behaviour'].newValue as typeof this.options.behaviour;
+			const oldBehaviour = changes['behaviour'].oldValue as typeof this.options.behaviour;
+			if (newBehaviour?.keepRecentFusks !== oldBehaviour?.keepRecentFusks) {
+				if (newBehaviour?.keepRecentFusks) {
+					this.createRecentMenu(this.options.behaviour.recentFusks);
+				} else {
+					this.createRecentMenu([]);
+				}
 			}
 		}
 	}
@@ -315,16 +329,25 @@ class BackgroundScript {
 			if (items) {
 				// Update with the new nested structure
 				if (items['display']) {
-					this.options.display = { ...this.options.display, ...items['display'] };
+					this.options.display = {
+						...this.options.display,
+						...(items['display'] as typeof this.options.display),
+					};
 				}
 				if (items['behaviour']) {
-					this.options.behaviour = { ...this.options.behaviour, ...items['behaviour'] };
+					this.options.behaviour = {
+						...this.options.behaviour,
+						...(items['behaviour'] as typeof this.options.behaviour),
+					};
 				}
 				if (items['safety']) {
-					this.options.safety = { ...this.options.safety, ...items['safety'] };
+					this.options.safety = {
+						...this.options.safety,
+						...(items['safety'] as typeof this.options.safety),
+					};
 				}
 				if (items['version']) {
-					this.options.version = items['version'];
+					this.options.version = items['version'] as number;
 				}
 			}
 		});
