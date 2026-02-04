@@ -85,5 +85,8 @@
   "bugs": {
     "url": "https://github.com/DanAtkinson/Fuskr/issues"
   },
-  "homepage": "https://github.com/DanAtkinson/Fuskr"
+  "homepage": "https://github.com/DanAtkinson/Fuskr",
+  "overrides": {
+    "@modelcontextprotocol/sdk": "1.26.0"
+  }
 }
