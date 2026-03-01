@@ -27,7 +27,9 @@
     "test": "ng test",
     "version:sync": "npm run sync:version",
     "watch": "ng build --watch --configuration development",
-    "zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip"
+    "zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip",
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@angular/animations": "^21.1.2",
@@ -51,6 +53,7 @@
     "@angular-devkit/build-angular": "^21.1.2",
     "@angular/cli": "^21.1.2",
     "@angular/compiler-cli": "^21.1.2",
+    "@playwright/test": "^1.58.2",
     "@types/chrome": "^0.1.36",
     "@types/file-saver": "^2.0.7",
     "@types/jasmine": "^6.0.0",
