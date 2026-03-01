@@ -90,8 +90,9 @@ export const test = base.extend<{
     await use(context);
     await context.close();
   },
-  extensionId: async ({ context: _ }, use) => {
-    // extensionId is resolved together with context — re-launch to get both cleanly
+  // eslint-disable-next-line no-empty-pattern
+  extensionId: async ({}, use) => {
+    // extensionId is resolved independently — launches its own short-lived context
     const { context, extensionId } = await launchExtensionContext();
     await use(extensionId);
     await context.close();
@@ -105,6 +106,7 @@ export const test = base.extend<{
 export const testWithExtension = base.extend<{
   extensionContext: { context: BrowserContext; extensionId: string };
 }>({
+  // eslint-disable-next-line no-empty-pattern
   extensionContext: async ({}, use) => {
     const result = await launchExtensionContext();
     await use(result);
