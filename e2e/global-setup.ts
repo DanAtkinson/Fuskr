@@ -6,7 +6,7 @@ const DIST_PATH = path.resolve(__dirname, '..', 'dist', 'chromium');
 
 export default async function globalSetup() {
   // Skip build if SKIP_BUILD env var is set (useful for local re-runs)
-  if (process.env.SKIP_BUILD) {
+  if (process.env['SKIP_BUILD']) {
     console.log('[e2e] Skipping build (SKIP_BUILD is set)');
     return;
   }
