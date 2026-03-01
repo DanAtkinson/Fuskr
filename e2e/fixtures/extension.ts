@@ -7,6 +7,14 @@ export const EXTENSION_PATH = path.resolve(__dirname, '..', '..', 'dist', 'chrom
 /**
  * Launches a persistent Chromium context with the Fuskr extension loaded.
  * Detects the extension ID from the service worker URL.
+ *
+ * Notes:
+ * - Chrome extensions require the new headless mode (`--headless=new`).
+ *   The legacy headless mode doesn't support extensions.
+ * - We resolve the extension ID by waiting for the MV3 service worker to
+ *   register, then extracting the ID from its chrome-extension:// URL.
+ * - The chrome://extensions/ page is NOT used as a fallback because it is
+ *   blocked in headless Chrome (ERR_INVALID_URL).
  */
 export async function launchExtensionContext(): Promise<{
   context: BrowserContext;
@@ -20,8 +28,10 @@ export async function launchExtensionContext(): Promise<{
   }
 
   const context = await chromium.launchPersistentContext('', {
-    headless: true,
+    // Use the new headless mode — legacy headless does not support extensions
+    headless: false,
     args: [
+      '--headless=new',
       `--disable-extensions-except=${EXTENSION_PATH}`,
       `--load-extension=${EXTENSION_PATH}`,
       '--no-sandbox',
@@ -29,75 +39,55 @@ export async function launchExtensionContext(): Promise<{
     ],
   });
 
-  // Wait for the service worker to register and extract the extension ID
-  let extensionId = '';
-
-  // Try service workers first (MV3)
-  const serviceWorkerPromise = context
-    .waitForEvent('serviceworker', { timeout: 10_000 })
-    .then((worker) => {
-      const url = worker.url();
-      const match = url.match(/chrome-extension:\/\/([a-z]{32})\//);
-      return match ? match[1] : '';
-    })
-    .catch(() => '');
-
-  // Also check any already-registered service workers
-  const existingWorkers = context.serviceWorkers();
-  if (existingWorkers.length > 0) {
-    const url = existingWorkers[0].url();
-    const match = url.match(/chrome-extension:\/\/([a-z]{32})\//);
-    if (match) {
-      extensionId = match[1];
-    }
-  }
-
-  if (!extensionId) {
-    extensionId = await serviceWorkerPromise;
-  }
-
-  if (!extensionId) {
-    // Fallback: open chrome://extensions and scrape the ID
-    const page = await context.newPage();
-    await page.goto('chrome://extensions/');
-    // Give extensions a moment to load
-    await page.waitForTimeout(1000);
-    // Try to find extension ID from the page
-    const workers = context.serviceWorkers();
-    if (workers.length > 0) {
-      const url = workers[0].url();
-      const match = url.match(/chrome-extension:\/\/([a-z]{32})\//);
-      if (match) extensionId = match[1];
-    }
-    await page.close();
-  }
-
-  if (!extensionId) {
-    throw new Error('Could not detect Fuskr extension ID. Is the extension built correctly?');
-  }
+  const extensionId = await resolveExtensionId(context);
 
   return { context, extensionId };
 }
 
-/** Base fixture that provides a context + extensionId for each test. */
-export const test = base.extend<{
-  context: BrowserContext;
-  extensionId: string;
-}>({
-  // eslint-disable-next-line no-empty-pattern
-  context: async ({}, use) => {
-    const { context } = await launchExtensionContext();
-    await use(context);
-    await context.close();
-  },
-  // eslint-disable-next-line no-empty-pattern
-  extensionId: async ({}, use) => {
-    // extensionId is resolved independently — launches its own short-lived context
-    const { context, extensionId } = await launchExtensionContext();
-    await use(extensionId);
-    await context.close();
-  },
-});
+/**
+ * Waits for the extension's MV3 service worker to register and extracts
+ * the extension ID from its chrome-extension:// URL.
+ *
+ * Tries existing service workers first (already registered before we checked),
+ * then waits for the serviceworker event with a generous timeout.
+ * Polls with retries to handle slow startup in CI.
+ */
+async function resolveExtensionId(context: BrowserContext): Promise<string> {
+  // Check already-registered service workers (race: may have registered before we attached)
+  for (const worker of context.serviceWorkers()) {
+    const id = extractExtensionId(worker.url());
+    if (id) return id;
+  }
+
+  // Wait for the serviceworker event
+  try {
+    const worker = await context.waitForEvent('serviceworker', { timeout: 15_000 });
+    const id = extractExtensionId(worker.url());
+    if (id) return id;
+  } catch {
+    // Timeout — fall through to polling
+  }
+
+  // Poll as a last resort (handles cases where the event fired before we listened)
+  for (let i = 0; i < 10; i++) {
+    await new Promise((r) => setTimeout(r, 500));
+    for (const worker of context.serviceWorkers()) {
+      const id = extractExtensionId(worker.url());
+      if (id) return id;
+    }
+  }
+
+  throw new Error(
+    'Could not detect Fuskr extension ID after 20s. ' +
+      'Is the extension built correctly? ' +
+      `Expected service worker at: ${EXTENSION_PATH}/js/background.js`,
+  );
+}
+
+function extractExtensionId(url: string): string {
+  const match = url.match(/chrome-extension:\/\/([a-z]{32})\//);
+  return match ? match[1] : '';
+}
 
 /**
  * A combined fixture that yields both context and extensionId together
