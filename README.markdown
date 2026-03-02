@@ -1,11 +1,13 @@
 # 🖼️ Fuskr - Image Gallery Generator
 
 [![CI/CD Pipeline](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml/badge.svg)](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml)
+[![Angular](https://img.shields.io/badge/Angular-21-red.svg)](https://angular.dev)
+[![Playwright](https://img.shields.io/badge/Playwright-e2e-green.svg)](https://playwright.dev)
 ![Chrome](https://img.shields.io/badge/Chrome-88+-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-109+-orange.svg)
-![Version](https://img.shields.io/badge/version-5.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-5.0.6-blue.svg)
 
-> **✨ Complete Angular 20.1.2 Rewrite with TypeScript & Manifest V3 ✨**
+> **✨ Angular 21 Rewrite with TypeScript & Manifest V3 ✨**
 >
 > Transform single image URLs into stunning galleries with intelligent pattern recognition!
 
@@ -75,14 +77,24 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 
 ## 📦 Installation
 
+### Chrome Web Store
+
+[![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png)](https://chromewebstore.google.com/detail/fuskr/bmlbmpfkflhgdmjdkldkngcijdbegidk)
+
+### Firefox Add-ons (AMO)
+
+<!-- TODO: Publish to Firefox AMO and add the badge + link here -->
+> Firefox installation is currently manual only. AMO submission is planned.
+
 ### Installing as Browser Extension
 
 #### Chrome Installation
 
-1. Download the extension files or build from source (see [DEVELOPER.md](DEVELOPER.md))
-2. Open Chrome and navigate to `chrome://extensions/`
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the extension folder
+1. Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/fuskr/bmlbmpfkflhgdmjdkldkngcijdbegidk), or
+2. Download the extension files or build from source (see [DEVELOPER.md](DEVELOPER.md))
+3. Open Chrome and navigate to `chrome://extensions/`
+4. Enable "Developer mode"
+5. Click "Load unpacked" and select the extension folder
 
 #### Firefox Installation
 
@@ -103,7 +115,7 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 
 ## 📋 Version History
 
-**Current Version: 5.0.0** - Complete Angular 20.1.2 rewrite with TypeScript & Manifest V3
+**Current Version: 5.0.6** - Angular 21 rewrite with TypeScript & Manifest V3
 
 🔗 **[View Complete Version History](HISTORY.md)** - See detailed changelog from v1.0 to v5.0.0
 
