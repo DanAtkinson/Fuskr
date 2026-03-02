@@ -79,7 +79,7 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 
 ### Chrome Web Store
 
-[![Available in the Chrome Web Store](https://storage.googleapis.com/web-dev-uploads/image/WlD8wC6g8khYWPJUsQceQkhXSlv1/iNEddTyWiMfLSwFD6qGq.png)](https://chromewebstore.google.com/detail/fuskr/bmlbmpfkflhgdmjdkldkngcijdbegidk)
+[![Available in the Chrome Web Store](store/assets/chrome-web-store-badge.png)](https://chromewebstore.google.com/detail/fuskr/glieaboaghdnlglpkekghloldikefofo)
 
 ### Firefox Add-ons (AMO)
 
@@ -90,7 +90,7 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 
 #### Chrome Installation
 
-1. Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/fuskr/bmlbmpfkflhgdmjdkldkngcijdbegidk), or
+1. Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/fuskr/glieaboaghdnlglpkekghloldikefofo), or
 2. Download the extension files or build from source (see [DEVELOPER.md](DEVELOPER.md))
 3. Open Chrome and navigate to `chrome://extensions/`
 4. Enable "Developer mode"
