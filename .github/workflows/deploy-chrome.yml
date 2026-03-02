@@ -78,7 +78,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Upload product details as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: chrome-product-details
           path: store/chrome-product-details.md
