@@ -30,6 +30,7 @@ This document contains technical information for developers who want to build, m
 - `npm run watch` - Build in watch mode for development
 - `npm run clean` - Remove all dist folders
 - `npm run sync:version` - Sync version from package.json to manifests
+- `npm run build:firefox:validate` - Lint the built Firefox extension with `web-ext`
 
 ### Build Process
 
@@ -59,7 +60,7 @@ dist/
 │   ├── js/
 │   ├── _locales/
 │   └── manifest.json
-├── firefox/               # Firefox extension (Manifest V2)
+├── firefox/               # Firefox extension (Manifest V3)
 │   ├── assets/
 │   ├── js/
 │   ├── _locales/
@@ -91,9 +92,8 @@ src/
 │   │   └── media/             # Media-related interfaces
 │   ├── models/                # Data models
 │   │   └── chrome-storage/    # Storage model implementations
-│   ├── app.component.ts       # Root component
-│   ├── app.module.ts          # App module
-│   └── app-routing.module.ts  # Routing configuration
+│   ├── app.component.ts       # Root standalone component
+│   └── app-routing.module.ts  # Legacy route module (not the active bootstrap path)
 ├── build/                     # Build scripts
 │   ├── organise-build.js      # File organisation
 │   ├── zip-build.js           # Package creation
@@ -104,12 +104,15 @@ src/
 │   └── karma.conf.js          # Test configuration
 ├── assets/                    # Static assets
 ├── environments/              # Environment configs
-├── background.ts              # Service worker (TypeScript)
+├── background.ts              # Background script source (webpack builds browser-specific output)
 ├── fuskr-core.ts              # Core logic for service worker
+├── main.ts                    # Standalone Angular bootstrap and active route definitions
 ├── manifest.json              # Chrome manifest (V3)
-├── manifest-firefox.json     # Firefox manifest (V2)
+├── manifest-firefox.json     # Firefox manifest (V3, gecko strict_min_version 128.0)
 └── _locales/                  # Internationalisation files
 ```
+
+Angular now boots with `bootstrapApplication()` in `src/main.ts`. There is no active `AppModule`; routing is provided at bootstrap time and the checked-in `src/app/app-routing.module.ts` is legacy code rather than the live entry point.
 
 ### Key Services
 
@@ -212,15 +215,16 @@ The project uses GitHub Actions for continuous integration and deployment. The w
 
 **Automated Testing:**
 
-- Multi-version Node.js testing (20.19.x, 22.12.x, 22.x)
+- Node.js 24.x in all CI jobs
 - Unit tests with Jasmine/Karma
 - Code coverage reporting with Codecov
 - Chrome headless browser testing
+- Playwright extension e2e coverage in the dedicated `e2e-chrome` job
 
 **Code Quality Checks:**
 
 - ESLint for code linting
-- Prettier for code formatting (if configured)
+- Prettier for code formatting
 - TypeScript compilation validation
 
 **Build & Packaging:**
@@ -245,6 +249,7 @@ View the current build status: [![CI/CD Pipeline](https://github.com/DanAtkinson
 - **Framework:** Jasmine with Karma runner
 - **Coverage:** Istanbul for code coverage reports
 - **Angular Testing:** Angular Testing Utilities for component testing
+- **E2E:** Playwright with a Chromium extension fixture
 
 ### Test Commands
 
@@ -252,7 +257,16 @@ View the current build status: [![CI/CD Pipeline](https://github.com/DanAtkinson
 npm test              # Watch mode for development
 npm run test:ci       # Single run for CI/CD
 npm run test:coverage # Generate coverage reports
+npm run test:e2e      # Run Playwright extension tests
+npm run test:e2e:report # Open the Playwright HTML report
 ```
+
+### Playwright E2E Setup
+
+- `playwright.config.ts` runs tests from `e2e/tests` with one Chromium project and HTML reporting.
+- `e2e/global-setup.ts` builds `dist/chromium` automatically unless `SKIP_BUILD=1` is set or the manifest already exists.
+- `e2e/fixtures/extension.ts` launches a persistent Chromium context, loads the unpacked extension from `dist/chromium`, and derives the extension ID from the MV3 service worker URL.
+- The gallery e2e tests deep-link directly into the extension popup (`chrome-extension://<id>/index.html#/...`) and use that shared fixture instead of a mock browser shell.
 
 ### Test Structure
 
@@ -338,8 +352,9 @@ src/app/
 ### Extension Configuration
 
 - `src/manifest.json` - Chrome extension manifest (Manifest V3)
-- `src/manifest-firefox.json` - Firefox extension manifest (Manifest V2)
+- `src/manifest-firefox.json` - Firefox extension manifest (Manifest V3) with `browser_specific_settings.gecko.strict_min_version` set to `128.0`
 - `src/_locales/en_GB/messages.json` - Internationalisation strings
+- `docs/AMO_SUBMISSION.md` - Firefox AMO packaging and submission checklist
 
 ## 🔐 Security and Permissions
 
@@ -364,7 +379,7 @@ src/app/
 ### Content Security Policy
 
 - **Chrome (V3):** Uses default Manifest V3 CSP (no explicit policy needed)
-- **Firefox (V2):** Uses relaxed CSP with `'unsafe-inline'` for styles
+- **Firefox (V3):** Uses an explicit `content_security_policy.extension_pages` entry in `src/manifest-firefox.json`
 
 ### Privacy Considerations
 
@@ -392,7 +407,7 @@ src/app/
 
 - **TypeScript** with strict mode enabled
 - **Angular Style Guide** compliance
-- **ESLint** for code quality (if configured)
+- **ESLint** for code quality
 - **Prettier** for consistent formatting
 - **JSDoc** comments for public APIs
 - **British English** spelling in comments and documentation
