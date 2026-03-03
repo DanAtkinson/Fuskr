@@ -35,3 +35,9 @@ yarn-error.log*
 # IDE
 .idea/
 .vscode/
+
+# Agent files
+.github/copilot-instructions.md
+AGENTS.md
+CLAUDE.md
+GEMINI.md
