@@ -1,8 +1,10 @@
-node_modules
-dist
-.sass-cache
-fuskr-*.zip
 .angular
+.sass-cache
+dist
+fuskr-*.zip
+node_modules
+playwright-report
+test-results
 
 # Security keys - keep private!
 ######################
@@ -11,9 +13,9 @@ generate-extension-keys.js
 
 # OS generated files #
 ######################
+._*
 .DS_Store
 .DS_Store?
-._*
 .Spotlight-V100
 .Trashes
 ehthumbs.db
@@ -24,8 +26,8 @@ Thumbs.db
 
 # Angular
 .angular/
-coverage/
 *.log
+coverage/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -33,4 +35,3 @@ yarn-error.log*
 # IDE
 .idea/
 .vscode/
-Tidy-Indentation.ps1

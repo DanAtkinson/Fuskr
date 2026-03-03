@@ -17,6 +17,12 @@
 
 		<div class="url-info">
 			<label for="originalUrlInput" class="form-label">{{ translate('Gallery_OriginalUrl') }}</label>
+			@if (customCountRequested) {
+				<div class="input-group mb-3">
+					<span class="input-group-text">{{ translate('Application_Prompt_HowMany') }}</span>
+					<input id="customCountInput" class="form-control" type="number" min="0" step="1" [(ngModel)]="customCountValue" />
+				</div>
+			}
 			<div class="input-group mb-3">
 				<input id="originalUrlInput" class="form-control" type="url" (keyup.enter)="generateGallery()" [(ngModel)]="originalUrl" [placeholder]="translate('Gallery_UrlPlaceholder')" />
 				<button class="btn btn-primary" (click)="generateGallery()"><i class="fas fa-images me-1"></i>{{ translate('Gallery_GenerateGallery') }}</button>

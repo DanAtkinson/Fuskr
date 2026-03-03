@@ -236,22 +236,50 @@ class BackgroundScript {
 		});
 	}
 
+	private createEditorTab(
+		tab: chrome.tabs.Tab,
+		options: {
+			customCountDirection?: -1 | 0 | 1;
+			errorKey?: string;
+			prefillUrl?: string;
+		}
+	): void {
+		const queryParams = new URLSearchParams();
+
+		if (options.prefillUrl) {
+			queryParams.set('prefill', btoa(options.prefillUrl));
+		}
+		if (typeof options.customCountDirection === 'number') {
+			queryParams.set('customCount', '1');
+			queryParams.set('direction', options.customCountDirection.toString());
+		}
+		if (options.errorKey) {
+			queryParams.set('errorKey', options.errorKey);
+		}
+
+		const queryString = queryParams.toString();
+		const extensionPath = queryString.length > 0 ? `index.html#gallery?${queryString}` : 'index.html#gallery';
+		this.openExtensionPage(tab, extensionPath);
+	}
+
 	private createTab(url: string, tab: chrome.tabs.Tab): void {
 		if (!url || url.length === 0) {
 			return;
 		}
 
 		this.addUrlToHistory(url, tab);
+		const encodedUrl = btoa(url);
+		this.openExtensionPage(tab, `index.html#gallery?url=${encodedUrl}`);
+	}
 
+	private openExtensionPage(tab: chrome.tabs.Tab, extensionPath: string): void {
 		// Query current active tab to ensure we get the correct window context
 		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 			const activeTab = tabs[0] || tab;
-			// Use base64 encoding for cleaner URL handling without special character issues
-			const encodedUrl = btoa(url);
 			chrome.tabs.create({
 				active: this.options.behaviour.openInForeground,
 				index: (activeTab.index || 0) + 1,
-				url: chrome.runtime.getURL(`index.html#gallery?url=${encodedUrl}`),
+				url: chrome.runtime.getURL(extensionPath),
 				windowId: activeTab.windowId,
 			});
 		});
@@ -350,6 +378,10 @@ class BackgroundScript {
 					this.options.version = items['version'] as number;
 				}
 			}
+
+			if (this.options.behaviour.keepRecentFusks) {
+				this.createRecentMenu(this.options.behaviour.recentFusks);
+			}
 		});
 	}
 
@@ -401,7 +433,10 @@ class BackgroundScript {
 		if (!url) return;
 
 		if (!this.fuskrService.isFuskable(url)) {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+			this.createEditorTab(tab, {
+				errorKey: 'Application_Prompt_NotAValidFusk',
+				prefillUrl: url,
+			});
 			return;
 		}
 
@@ -456,7 +491,13 @@ class BackgroundScript {
 
 	private clearRecentOnClick(): void {
 		this.createRecentMenu([]);
-		chrome.storage.sync.set({ history: [] });
+		this.options.behaviour = {
+			...this.options.behaviour,
+			recentFusks: [],
+		};
+		chrome.storage.sync.set({
+			behaviour: this.options.behaviour,
+		});
 	}
 
 	private optionsOnClick(tab: chrome.tabs.Tab): void {
@@ -484,7 +525,7 @@ class BackgroundScript {
 	private choiceOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void {
 		const url = info.linkUrl || info.srcUrl;
 		if (!url) {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+			this.createEditorTab(tab, { errorKey: 'Application_Prompt_NotAValidFusk' });
 			return;
 		}
 
@@ -492,29 +533,14 @@ class BackgroundScript {
 		const menuItemInfo = (info.menuItemId as string).match(menuItemRegexp);
 
 		if (!menuItemInfo || menuItemInfo.length !== 3) {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+			this.createEditorTab(tab, {
+				errorKey: 'Application_Prompt_NotAValidFusk',
+				prefillUrl: url,
+			});
 			return;
 		}
 
-		let count: number;
-		if (menuItemInfo[1] === this.l18nify('ContextMenu_Other')) {
-			const response = prompt(this.l18nify('Prompt_HowMany'));
-			if (!response || isNaN(parseInt(response, 10))) {
-				alert(this.l18nify('Prompt_NotAValidNumber'));
-				return;
-			}
-			count = parseInt(response, 10);
-		} else {
-			// Extract number from localized string
-			const numberMatch = menuItemInfo[1].match(/\d+/);
-			if (!numberMatch) {
-				alert(this.l18nify('Prompt_NotAValidNumber'));
-				return;
-			}
-			count = parseInt(numberMatch[0], 10);
-		}
-
-		let direction: number;
+		let direction: -1 | 0 | 1 | null = null;
 		switch (menuItemInfo[2]) {
 			case 'One':
 				direction = 1;
@@ -526,28 +552,52 @@ class BackgroundScript {
 				direction = -1;
 				break;
 			default:
-				alert(this.l18nify('Prompt_NotAValidFusk'));
+				this.createEditorTab(tab, {
+					errorKey: 'Application_Prompt_NotAValidFusk',
+					prefillUrl: url,
+				});
 				return;
 		}
 
+		if (menuItemInfo[1] === this.l18nify('ContextMenu_Other')) {
+			this.createEditorTab(tab, {
+				customCountDirection: direction,
+				prefillUrl: url,
+			});
+			return;
+		}
+
+		const numberMatch = menuItemInfo[1].match(/\d+/);
+		if (!numberMatch) {
+			this.createEditorTab(tab, {
+				errorKey: 'Application_Prompt_NotAValidNumber',
+				prefillUrl: url,
+			});
+			return;
+		}
+
+		const count = parseInt(numberMatch[0], 10);
 		try {
 			const fuskUrl = this.fuskrService.createFuskUrl(url, count, direction);
 			this.createTab(fuskUrl, tab);
 		} catch {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+			this.createEditorTab(tab, {
+				errorKey: 'Application_Prompt_NotAValidFusk',
+				prefillUrl: url,
+			});
 		}
 	}
 
 	private recentOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void {
 		const historyMatch = (info.menuItemId as string).match(/^FuskrHistory_(\d+)$/);
 		if (!this.historyIds.length || !historyMatch || historyMatch.length !== 2) {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+			console.warn('Invalid recent history menu selection');
 			return;
 		}
 
 		const historyIndex = parseInt(historyMatch[1], 10);
 		if (isNaN(historyIndex) || historyIndex < 0 || this.historyIds.length <= historyIndex) {
-			alert(this.l18nify('Prompt_NotAValidFusk'));
+			console.warn('Recent history index out of range');
 			return;
 		}
 

@@ -61,6 +61,8 @@ export class BaseComponentTestHelper {
 				Gallery_ErrorValidUrl: 'Please enter a valid URL',
 				Gallery_ErrorNoPattern: 'No fuskable pattern found in the URL. Try a URL with numbers in the filename.',
 				Gallery_ErrorGenerating: 'Error generating gallery:',
+				Application_Prompt_NotAValidFusk: 'This is not a valid fusk - https://example.com/[1-8].jpg',
+				Application_Prompt_NotAValidNumber: 'This is not a valid number.',
 				Gallery_DownloadPreparing: 'Preparing download...',
 				Gallery_DownloadNoImages: 'No images to download',
 				Gallery_DownloadingImages: 'Downloading $1 images...',

@@ -23,6 +23,7 @@ describe('GalleryComponent', () => {
 
 	beforeEach(async () => {
 		mockFuskrService = jasmine.createSpyObj('FuskrService', [
+			'createFuskUrl',
 			'generateImageGallery',
 			'getImageFilename',
 			'countPotentialUrls',
@@ -105,6 +106,54 @@ describe('GalleryComponent', () => {
 			expect(component.mediaItems.length).toBe(2);
 			expect(component.mediaItems[0].type).toBe('image');
 			expect(component.originalUrl).toBe(mockResult.originalUrl);
+		});
+
+		it('should convert a custom count request before generating the gallery', async () => {
+			const generatedUrl = 'https://example.com/image[05-08].jpg';
+			const mockResult = {
+				originalUrl: generatedUrl,
+				urls: ['https://example.com/image05.jpg', 'https://example.com/image06.jpg'],
+			};
+
+			mockFuskrService.createFuskUrl.and.returnValue(generatedUrl);
+			mockFuskrService.countPotentialUrls.and.returnValue(2);
+			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
+			mockMediaTypeService.createMediaItem.and.callFake((url: string) => ({
+				url,
+				type: 'unknown',
+				mimeType: 'application/octet-stream',
+				loadingState: 'pending',
+				extension: url.split('.').pop()?.toLowerCase(),
+			}));
+			mockMediaTypeService.fallbackTypeDetection.and.returnValue({
+				type: 'image',
+				mimeType: 'image/jpeg',
+			});
+
+			component.originalUrl = 'https://example.com/image05.jpg';
+			component.customCountRequested = true;
+			component.customCountDirection = 1;
+			component.customCountValue = '3';
+
+			await component.generateGallery();
+
+			expect(mockFuskrService.createFuskUrl).toHaveBeenCalledWith('https://example.com/image05.jpg', 3, 1);
+			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith(generatedUrl);
+			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith(generatedUrl);
+			expect(component.customCountRequested).toBe(false);
+			expect(component.originalUrl).toBe(generatedUrl);
+		});
+
+		it('should show an inline error for an invalid custom count', () => {
+			component.originalUrl = 'https://example.com/image05.jpg';
+			component.customCountRequested = true;
+			component.customCountValue = 'nope';
+
+			component.generateGallery();
+
+			expect(component.errorMessage).toBe('This is not a valid number.');
+			expect(mockFuskrService.createFuskUrl).not.toHaveBeenCalled();
+			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled();
 		});
 
 		it('should handle empty URL', () => {

@@ -24,6 +24,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	currentViewerImage = '';
 	currentViewerIndex = 0;
 	currentGalleryIndex = -1; // For keyboard navigation in main gallery
+	customCountDirection: -1 | 0 | 1 = 0;
+	customCountRequested = false;
+	customCountValue = '10';
 	darkMode = false;
 	downloadProgress = 0;
 	downloadStatus = '';
@@ -258,9 +261,15 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	generateGallery() {
 		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl });
+		this.errorMessage = '';
+
 		if (!this.originalUrl.trim()) {
 			this.errorMessage = this.translate('Gallery_ErrorValidUrl');
 			this.logger.warn('GalleryComponent', 'Gallery generation failed: empty URL');
+			return;
+		}
+
+		if (this.customCountRequested && !this.applyCustomCountRequest()) {
 			return;
 		}
 
@@ -397,24 +406,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				params,
 				hasInitialized: this.hasInitialized,
 			});
-			if (params['url'] && !this.hasInitialized) {
-				this.originalUrl = this.decodeUrlParameter(params['url']);
-				this.hasInitialized = true;
-				this.logger.info('GalleryComponent', 'Starting gallery generation from queryParams', {
-					url: this.originalUrl,
-				});
-				// Small delay to ensure dark mode styles are fully applied
-				setTimeout(() => {
-					this.generateGallery();
-				}, 10);
-			} else if (!params['url'] && !this.hasInitialized) {
-				// If no URL provided (manual mode), focus on the input after a short delay
-				this.hasInitialized = true;
-				this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in queryParams)');
-				setTimeout(() => {
-					this.focusUrlInput();
-				}, 100);
-			}
+			this.initialiseFromRouteParams(params, 'queryParams');
 		});
 
 		// Also check on immediate initialization in case queryParams subscription is delayed
@@ -424,24 +416,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			hasInitialized: this.hasInitialized,
 			originalUrl: this.originalUrl,
 		});
-		if (currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
-			this.originalUrl = this.decodeUrlParameter(currentParams['url']);
-			this.hasInitialized = true;
-			this.logger.info('GalleryComponent', 'Starting gallery generation from snapshot', {
-				url: this.originalUrl,
-			});
-			// Small delay to ensure dark mode styles are fully applied
-			setTimeout(() => {
-				this.generateGallery();
-			}, 10);
-		} else if (!currentParams['url'] && !this.originalUrl && !this.hasInitialized) {
-			// Manual mode - focus on input
-			this.hasInitialized = true;
-			this.logger.debug('GalleryComponent', 'Entering manual mode (no URL in snapshot)');
-			setTimeout(() => {
-				this.focusUrlInput();
-			}, 100);
-		}
+		this.initialiseFromRouteParams(currentParams, 'snapshot');
 	}
 
 	onImageError(event: Event) {
@@ -896,6 +871,24 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode });
 	}
 
+	private applyCustomCountRequest(): boolean {
+		const count = Number.parseInt(this.customCountValue, 10);
+		if (Number.isNaN(count) || count < 0) {
+			this.errorMessage = this.translate('Application_Prompt_NotAValidNumber');
+			return false;
+		}
+
+		const updatedUrl = this.fuskrService.createFuskUrl(this.originalUrl, count, this.customCountDirection);
+		if (updatedUrl === this.originalUrl && !this.fuskrService.isFuskable(updatedUrl)) {
+			this.errorMessage = this.translate('Application_Prompt_NotAValidFusk');
+			return false;
+		}
+
+		this.originalUrl = updatedUrl;
+		this.customCountRequested = false;
+		return true;
+	}
+
 	private async fetchMediaAsBlob(url: string): Promise<Blob> {
 		const response = await fetch(url);
 		if (!response.ok) {
@@ -905,11 +898,79 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private focusUrlInput() {
-		const urlInput = document.querySelector('input[type="url"]') as HTMLInputElement;
+		const urlInput = document.querySelector(
+			this.customCountRequested ? '#customCountInput' : 'input[type="url"]'
+		) as HTMLInputElement | null;
 		if (urlInput) {
 			urlInput.focus();
 			urlInput.select(); // Select any existing text
 		}
+	}
+
+	private initialiseFromRouteParams(params: Record<string, unknown>, source: 'queryParams' | 'snapshot') {
+		if (this.hasInitialized) {
+			return;
+		}
+
+		const errorKey = typeof params['errorKey'] === 'string' ? params['errorKey'] : '';
+		if (errorKey) {
+			this.errorMessage = this.translate(errorKey);
+		}
+
+		const direction = this.parseDirectionParam(params['direction']);
+		this.customCountRequested = params['customCount'] === '1' && direction !== null;
+		if (direction !== null) {
+			this.customCountDirection = direction;
+		}
+
+		const prefillParam = typeof params['prefill'] === 'string' ? params['prefill'] : '';
+		if (prefillParam) {
+			this.originalUrl = this.decodeUrlParameter(prefillParam);
+			this.hasInitialized = true;
+			this.logger.debug('GalleryComponent', 'Entering manual mode from route params', {
+				source,
+				customCountRequested: this.customCountRequested,
+				url: this.originalUrl,
+			});
+			setTimeout(() => {
+				this.focusUrlInput();
+			}, 100);
+			return;
+		}
+
+		const urlParam = typeof params['url'] === 'string' ? params['url'] : '';
+		if (urlParam) {
+			this.originalUrl = this.decodeUrlParameter(urlParam);
+			this.hasInitialized = true;
+			this.logger.info('GalleryComponent', `Starting gallery generation from ${source}`, {
+				url: this.originalUrl,
+			});
+			setTimeout(() => {
+				this.generateGallery();
+			}, 10);
+			return;
+		}
+
+		this.hasInitialized = true;
+		this.logger.debug('GalleryComponent', `Entering manual mode (no URL in ${source})`, {
+			customCountRequested: this.customCountRequested,
+		});
+		setTimeout(() => {
+			this.focusUrlInput();
+		}, 100);
+	}
+
+	private parseDirectionParam(directionParam: unknown): -1 | 0 | 1 | null {
+		if (typeof directionParam !== 'string') {
+			return null;
+		}
+
+		const parsedDirection = Number.parseInt(directionParam, 10);
+		if (parsedDirection === -1 || parsedDirection === 0 || parsedDirection === 1) {
+			return parsedDirection;
+		}
+
+		return null;
 	}
 
 	private generateMetadataContent(mediaItems: MediaItem[]): string {
@@ -1157,8 +1218,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private updateBrowserUrl(url: string) {
 		this.router.navigate([], {
 			relativeTo: this.route,
-			queryParams: { url: url },
-			queryParamsHandling: 'merge',
+			queryParams: {
+				customCount: null,
+				direction: null,
+				errorKey: null,
+				prefill: null,
+				url: btoa(url),
+			},
 		});
 	}
 
