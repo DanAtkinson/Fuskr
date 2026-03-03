@@ -3,15 +3,12 @@ import { ChromeService } from './chrome.service';
 import { IChromeStorageData } from '@interfaces/chrome-storage';
 import { ChromeStorageData } from '@models/chrome-storage';
 
-// Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
-
 // Mock chrome API
 const mockChrome = {
 	storage: {
 		sync: {
-			get: jasmine.createSpy('get'),
-			set: jasmine.createSpy('set'),
+			get: vi.fn(),
+			set: vi.fn(),
 		},
 	},
 };
@@ -21,7 +18,11 @@ describe('ChromeService', () => {
 
 	beforeEach(() => {
 		// Set up chrome mock
-		(window as unknown as { chrome: typeof mockChrome }).chrome = mockChrome;
+		(
+			window as unknown as {
+				chrome: typeof mockChrome;
+			}
+		).chrome = mockChrome;
 
 		TestBed.configureTestingModule({});
 		service = TestBed.inject(ChromeService);
@@ -29,8 +30,8 @@ describe('ChromeService', () => {
 
 	afterEach(() => {
 		// Clean up mocks
-		mockChrome.storage.sync.get.calls.reset();
-		mockChrome.storage.sync.set.calls.reset();
+		mockChrome.storage.sync.get.mockClear();
+		mockChrome.storage.sync.set.mockClear();
 	});
 
 	describe('Service Creation', () => {
@@ -41,7 +42,7 @@ describe('ChromeService', () => {
 
 	describe('getStorageData', () => {
 		it('should return default data when chrome storage is empty', async () => {
-			mockChrome.storage.sync.get.and.callFake(
+			mockChrome.storage.sync.get.mockImplementation(
 				(_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
 					callback({});
 				}
@@ -80,7 +81,7 @@ describe('ChromeService', () => {
 				},
 			};
 
-			mockChrome.storage.sync.get.and.callFake(
+			mockChrome.storage.sync.get.mockImplementation(
 				(_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
 					callback(storedData);
 				}
@@ -110,7 +111,7 @@ describe('ChromeService', () => {
 		});
 
 		it('should handle chrome storage errors gracefully', async () => {
-			mockChrome.storage.sync.get.and.callFake(() => {
+			mockChrome.storage.sync.get.mockImplementation(() => {
 				// Simulate error by not calling callback
 				throw new Error('Storage error');
 			});
@@ -153,13 +154,13 @@ describe('ChromeService', () => {
 				version: 1,
 			});
 
-			mockChrome.storage.sync.set.and.callFake((_data: unknown, callback: () => void) => {
+			mockChrome.storage.sync.set.mockImplementation((_data: unknown, callback: () => void) => {
 				callback();
 			});
 
 			await service.setStorageData(testData);
 
-			expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(testData, jasmine.any(Function));
+			expect(mockChrome.storage.sync.set).toHaveBeenCalledWith(testData, expect.any(Function));
 		});
 
 		it('should handle storage errors when saving', async () => {
@@ -191,7 +192,7 @@ describe('ChromeService', () => {
 				version: 1,
 			});
 
-			mockChrome.storage.sync.set.and.callFake(() => {
+			mockChrome.storage.sync.set.mockImplementation(() => {
 				throw new Error('Storage save error');
 			});
 
@@ -264,8 +265,8 @@ describe('ChromeService', () => {
 			};
 
 			// Mock getStorageData to return current data
-			spyOn(service, 'getStorageData').and.returnValue(Promise.resolve(currentData));
-			spyOn(service, 'setStorageData').and.returnValue(Promise.resolve());
+			vi.spyOn(service, 'getStorageData').mockReturnValue(Promise.resolve(currentData));
+			vi.spyOn(service, 'setStorageData').mockReturnValue(Promise.resolve());
 
 			await service.resetOptionsToDefaults();
 
@@ -273,25 +274,25 @@ describe('ChromeService', () => {
 			expect(service.setStorageData).toHaveBeenCalled();
 
 			// Verify the reset data preserves history but resets other options
-			const resetCall = (service.setStorageData as jasmine.Spy).calls.mostRecent();
-			const resetData = resetCall.args[0];
+			const resetData = vi.mocked(service.setStorageData).mock.lastCall?.[0];
+			expect(resetData).toBeDefined();
 
 			// History should be preserved
-			expect(resetData.behaviour.galleryHistory).toEqual(currentData.behaviour.galleryHistory);
+			expect(resetData!.behaviour.galleryHistory).toEqual(currentData.behaviour.galleryHistory);
 
 			// Other options should be reset to defaults
 			const defaults = new ChromeStorageData();
-			expect(resetData.display.darkMode).toBe(defaults.display.darkMode);
-			expect(resetData.display.imageDisplayMode).toBe(defaults.display.imageDisplayMode);
-			expect(resetData.behaviour.openInForeground).toBe(defaults.behaviour.openInForeground);
-			expect(resetData.safety.enableOverloadProtection).toBe(defaults.safety.enableOverloadProtection);
-			expect(resetData.safety.overloadProtectionLimit).toBe(defaults.safety.overloadProtectionLimit);
+			expect(resetData!.display.darkMode).toBe(defaults.display.darkMode);
+			expect(resetData!.display.imageDisplayMode).toBe(defaults.display.imageDisplayMode);
+			expect(resetData!.behaviour.openInForeground).toBe(defaults.behaviour.openInForeground);
+			expect(resetData!.safety.enableOverloadProtection).toBe(defaults.safety.enableOverloadProtection);
+			expect(resetData!.safety.overloadProtectionLimit).toBe(defaults.safety.overloadProtectionLimit);
 		});
 
 		it('should handle errors during reset', async () => {
-			spyOn(service, 'getStorageData').and.returnValue(Promise.reject(new Error('Storage error')));
+			vi.spyOn(service, 'getStorageData').mockReturnValue(Promise.reject(new Error('Storage error')));
 
-			await expectAsync(service.resetOptionsToDefaults()).toBeRejected();
+			await expect(service.resetOptionsToDefaults()).rejects.toThrow();
 		});
 	});
 });

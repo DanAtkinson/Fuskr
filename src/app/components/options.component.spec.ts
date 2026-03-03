@@ -1,3 +1,4 @@
+import type { Mock, MockedObject } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { OptionsComponent } from './options.component';
@@ -5,13 +6,10 @@ import { ChromeService } from '@services/chrome.service';
 import { ChromeStorageData } from '@models/chrome-storage';
 import { BaseComponentTestHelper } from './base-component-test.helper';
 
-// Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
-
 describe('OptionsComponent', () => {
 	let component: OptionsComponent;
 	let fixture: ComponentFixture<OptionsComponent>;
-	let mockChromeService: jasmine.SpyObj<ChromeService>;
+	let mockChromeService: MockedObject<ChromeService>;
 	let originalBodyClass: string;
 
 	beforeEach(async () => {
@@ -27,7 +25,7 @@ describe('OptionsComponent', () => {
 
 		fixture = TestBed.createComponent(OptionsComponent);
 		component = fixture.componentInstance;
-		mockChromeService = TestBed.inject(ChromeService) as jasmine.SpyObj<ChromeService>;
+		mockChromeService = TestBed.inject(ChromeService) as MockedObject<ChromeService>;
 
 		// Add CSS variables to the document for testing
 		const testStyleSheet = document.createElement('style');
@@ -124,7 +122,7 @@ describe('OptionsComponent', () => {
 				version: 1,
 			});
 
-			mockChromeService.getStorageData.and.returnValue(Promise.resolve(testOptions));
+			mockChromeService.getStorageData.mockReturnValue(Promise.resolve(testOptions));
 
 			await component.ngOnInit();
 
@@ -156,22 +154,22 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should handle errors when loading options', async () => {
-			mockChromeService.getStorageData.and.returnValue(Promise.reject(new Error('Storage error')));
-			const loggerSpy = spyOn(component['logger'], 'error');
+			mockChromeService.getStorageData.mockReturnValue(Promise.reject(new Error('Storage error')));
+			const loggerSpy = vi.spyOn(component['logger'], 'error');
 
 			await component.ngOnInit();
 
-			expect(loggerSpy).toHaveBeenCalledWith('options.loadFailed', 'Failed to load options', jasmine.any(Error));
+			expect(loggerSpy).toHaveBeenCalledWith('options.loadFailed', 'Failed to load options', expect.any(Error));
 		});
 	});
 
 	describe('Options Management', () => {
 		beforeEach(() => {
-			mockChromeService.getStorageData.and.returnValue(Promise.resolve(component.options));
+			mockChromeService.getStorageData.mockReturnValue(Promise.resolve(component.options));
 		});
 
 		it('should save options successfully', async () => {
-			mockChromeService.setStorageData.and.returnValue(Promise.resolve());
+			mockChromeService.setStorageData.mockReturnValue(Promise.resolve());
 
 			await component.saveOptions();
 
@@ -180,32 +178,32 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should clear status message after 2 seconds', async () => {
-			mockChromeService.setStorageData.and.returnValue(Promise.resolve());
-			jasmine.clock().install();
+			mockChromeService.setStorageData.mockReturnValue(Promise.resolve());
+			vi.useFakeTimers();
 
 			await component.saveOptions();
 			expect(component.statusMessage).toBe('Options saved!');
 
-			jasmine.clock().tick(2001);
+			vi.advanceTimersByTime(2001);
 			expect(component.statusMessage).toBe('');
 
-			jasmine.clock().uninstall();
+			vi.useRealTimers();
 		});
 
 		it('should handle save errors', async () => {
-			mockChromeService.setStorageData.and.returnValue(Promise.reject(new Error('Save error')));
-			const loggerSpy = spyOn(component['logger'], 'error');
+			mockChromeService.setStorageData.mockReturnValue(Promise.reject(new Error('Save error')));
+			const loggerSpy = vi.spyOn(component['logger'], 'error');
 
 			await component.saveOptions();
 
-			expect(loggerSpy).toHaveBeenCalledWith('options.saveFailed', 'Failed to save options', jasmine.any(Error));
+			expect(loggerSpy).toHaveBeenCalledWith('options.saveFailed', 'Failed to save options', expect.any(Error));
 			expect(component.statusMessage).toBe('Error saving options');
 		});
 	});
 
 	describe('UI Interaction', () => {
 		beforeEach(async () => {
-			mockChromeService.getStorageData.and.returnValue(Promise.resolve(component.options));
+			mockChromeService.getStorageData.mockReturnValue(Promise.resolve(component.options));
 			await component.ngOnInit();
 			fixture.detectChanges();
 		});
@@ -239,7 +237,7 @@ describe('OptionsComponent', () => {
 
 	describe('Dark Mode Color Tests', () => {
 		beforeEach(async () => {
-			mockChromeService.getStorageData.and.returnValue(Promise.resolve(component.options));
+			mockChromeService.getStorageData.mockReturnValue(Promise.resolve(component.options));
 			await component.ngOnInit();
 			fixture.detectChanges();
 		});
@@ -278,12 +276,13 @@ describe('OptionsComponent', () => {
 
 			const computedStyle = getComputedStyle(document.body);
 
-			// Verify CSS variables are set for light mode
-			expect(computedStyle.getPropertyValue('--bg-color').trim()).toBe('#ffffff');
-			expect(computedStyle.getPropertyValue('--bg-secondary').trim()).toBe('#f5f5f5');
-			expect(computedStyle.getPropertyValue('--text-color').trim()).toBe('#333333');
-			expect(computedStyle.getPropertyValue('--text-secondary').trim()).toBe('#666666');
-			expect(computedStyle.getPropertyValue('--border-color').trim()).toBe('#dddddd');
+			// In JSDOM the light-mode defaults come from stylesheet CSS, so the inline variables should be cleared.
+			expect(document.body.classList.contains('dark-mode')).toBe(false);
+			expect(computedStyle.getPropertyValue('--bg-color').trim()).toBe('');
+			expect(computedStyle.getPropertyValue('--bg-secondary').trim()).toBe('');
+			expect(computedStyle.getPropertyValue('--text-color').trim()).toBe('');
+			expect(computedStyle.getPropertyValue('--text-secondary').trim()).toBe('');
+			expect(computedStyle.getPropertyValue('--border-color').trim()).toBe('');
 		});
 
 		it('should verify card elements have dark background in dark mode', () => {
@@ -341,7 +340,7 @@ describe('OptionsComponent', () => {
 				},
 			};
 
-			mockChromeService.getStorageData.and.returnValue(Promise.resolve(darkModeOptions));
+			mockChromeService.getStorageData.mockReturnValue(Promise.resolve(darkModeOptions));
 
 			await component.ngOnInit();
 
@@ -352,11 +351,9 @@ describe('OptionsComponent', () => {
 	describe('resetToDefaults', () => {
 		beforeEach(() => {
 			// Setup spies for the reset functionality
-			mockChromeService.resetOptionsToDefaults = jasmine
-				.createSpy('resetOptionsToDefaults')
-				.and.returnValue(Promise.resolve());
-			spyOn(window, 'confirm').and.returnValue(true);
-			spyOn(component, 'loadOptions').and.returnValue(Promise.resolve());
+			mockChromeService.resetOptionsToDefaults = vi.fn().mockReturnValue(Promise.resolve());
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+			vi.spyOn(component, 'loadOptions').mockReturnValue(Promise.resolve());
 		});
 
 		it('should reset options to defaults when confirmed', async () => {
@@ -369,7 +366,7 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should not reset options when user cancels confirmation', async () => {
-			(window.confirm as jasmine.Spy).and.returnValue(false);
+			(window.confirm as Mock).mockReturnValue(false);
 
 			await component.resetToDefaults();
 
@@ -381,7 +378,7 @@ describe('OptionsComponent', () => {
 
 		it('should handle reset errors gracefully', async () => {
 			const errorMessage = 'Reset failed';
-			mockChromeService.resetOptionsToDefaults.and.returnValue(Promise.reject(new Error(errorMessage)));
+			mockChromeService.resetOptionsToDefaults.mockReturnValue(Promise.reject(new Error(errorMessage)));
 
 			await component.resetToDefaults();
 
@@ -391,17 +388,17 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should show status message that clears after 2 seconds', async () => {
-			jasmine.clock().install();
+			vi.useFakeTimers();
 
 			await component.resetToDefaults();
 
 			expect(component.statusMessage).toBe(component.translate('Options_ResetSuccessful'));
 
-			jasmine.clock().tick(2001);
+			vi.advanceTimersByTime(2001);
 
 			expect(component.statusMessage).toBe('');
 
-			jasmine.clock().uninstall();
+			vi.useRealTimers();
 		});
 	});
 });

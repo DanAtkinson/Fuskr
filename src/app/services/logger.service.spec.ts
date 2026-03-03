@@ -1,3 +1,4 @@
+import type { Mock } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { LoggerService, LogLevel } from './logger.service';
 
@@ -55,16 +56,16 @@ describe('LoggerService', () => {
 
 	describe('logging methods', () => {
 		beforeEach(() => {
-			spyOn(console, 'log');
-			spyOn(console, 'info');
-			spyOn(console, 'warn');
-			spyOn(console, 'error');
+			vi.spyOn(console, 'log');
+			vi.spyOn(console, 'info');
+			vi.spyOn(console, 'warn');
+			vi.spyOn(console, 'error');
 		});
 
 		it('should log debug messages', () => {
 			service.debug('test.debug', 'Debug message', { data: 'test' });
 
-			expect(console.log).toHaveBeenCalledWith(jasmine.stringContaining('DEBUG'), { data: 'test' });
+			expect(console.log).toHaveBeenCalledWith(expect.stringContaining('DEBUG'), { data: 'test' });
 
 			const logs = service.getLogs();
 			expect(logs.length).toBeGreaterThan(0);
@@ -77,7 +78,7 @@ describe('LoggerService', () => {
 		it('should log info messages', () => {
 			service.info('test.info', 'Info message');
 
-			expect(console.info).toHaveBeenCalledWith(jasmine.stringContaining('INFO'), '');
+			expect(console.info).toHaveBeenCalledWith(expect.stringContaining('INFO'), '');
 
 			const logs = service.getLogs();
 			const infoLog = logs.find((log) => log.component === 'test.info');
@@ -88,7 +89,7 @@ describe('LoggerService', () => {
 		it('should log warn messages', () => {
 			service.warn('test.warn', 'Warning message');
 
-			expect(console.warn).toHaveBeenCalledWith(jasmine.stringContaining('WARN'), '');
+			expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('WARN'), '');
 
 			const logs = service.getLogs();
 			const warnLog = logs.find((log) => log.component === 'test.warn');
@@ -100,7 +101,7 @@ describe('LoggerService', () => {
 			const error = new Error('Test error');
 			service.error('test.error', 'Error message', error);
 
-			expect(console.error).toHaveBeenCalledWith(jasmine.stringContaining('ERROR'), error);
+			expect(console.error).toHaveBeenCalledWith(expect.stringContaining('ERROR'), error);
 
 			const logs = service.getLogs();
 			const errorLog = logs.find((log) => log.component === 'test.error');
@@ -111,10 +112,10 @@ describe('LoggerService', () => {
 
 	describe('log level filtering', () => {
 		beforeEach(() => {
-			spyOn(console, 'log');
-			spyOn(console, 'info');
-			spyOn(console, 'warn');
-			spyOn(console, 'error');
+			vi.spyOn(console, 'log');
+			vi.spyOn(console, 'info');
+			vi.spyOn(console, 'warn');
+			vi.spyOn(console, 'error');
 
 			// Clear existing logs and start fresh
 			service.clearLogs();
@@ -136,7 +137,7 @@ describe('LoggerService', () => {
 
 			const logs = service.getLogs();
 			const testLogs = logs.filter((log) => log.component === 'test');
-			expect(testLogs).toHaveSize(2); // warn + error
+			expect(testLogs).toHaveLength(2); // warn + error
 			expect(testLogs[0].level).toBe(LogLevel.WARN);
 			expect(testLogs[1].level).toBe(LogLevel.ERROR);
 		});
@@ -145,10 +146,10 @@ describe('LoggerService', () => {
 			service.configure({ enabled: false, logLevel: LogLevel.DEBUG, maxLogs: 100 });
 
 			// Reset console spies to ignore the configure call
-			(console.log as jasmine.Spy).calls.reset();
-			(console.info as jasmine.Spy).calls.reset();
-			(console.warn as jasmine.Spy).calls.reset();
-			(console.error as jasmine.Spy).calls.reset();
+			(console.log as Mock).mockClear();
+			(console.info as Mock).mockClear();
+			(console.warn as Mock).mockClear();
+			(console.error as Mock).mockClear();
 
 			service.debug('test', 'Debug message');
 			service.info('test', 'Info message');
@@ -162,7 +163,7 @@ describe('LoggerService', () => {
 
 			const logs = service.getLogs();
 			const testLogs = logs.filter((log) => log.component === 'test');
-			expect(testLogs).toHaveSize(0);
+			expect(testLogs).toHaveLength(0);
 		});
 	});
 
@@ -193,7 +194,7 @@ describe('LoggerService', () => {
 			service.info('test', 'Message 5');
 
 			const logs = service.getLogs();
-			expect(logs).toHaveSize(3);
+			expect(logs).toHaveLength(3);
 
 			// Should keep the most recent logs
 			expect(logs[0].message).toBe('Message 3');
@@ -211,30 +212,32 @@ describe('LoggerService', () => {
 
 			// After clearing, only the clearLogs info message should remain
 			const logs = service.getLogs();
-			expect(logs).toHaveSize(1);
+			expect(logs).toHaveLength(1);
 			expect(logs[0].message).toContain('Cleared');
 		});
 	});
 
 	describe('log export', () => {
+		let mockLink: { href: string; download: string; click: ReturnType<typeof vi.fn> };
+
 		beforeEach(() => {
 			// Mock the browser's download functionality
 			Object.defineProperty(window, 'URL', {
 				value: {
-					createObjectURL: jasmine.createSpy('createObjectURL').and.returnValue('blob:mock-url'),
-					revokeObjectURL: jasmine.createSpy('revokeObjectURL'),
+					createObjectURL: vi.fn().mockReturnValue('blob:mock-url'),
+					revokeObjectURL: vi.fn(),
 				},
 			});
 
 			// Mock document.createElement for download link
-			const mockLink = {
+			mockLink = {
 				href: '',
 				download: '',
-				click: jasmine.createSpy('click'),
+				click: vi.fn(),
 			};
-			spyOn(document, 'createElement').and.returnValue(mockLink as unknown as HTMLAnchorElement);
-			spyOn(document.body, 'appendChild');
-			spyOn(document.body, 'removeChild');
+			vi.spyOn(document, 'createElement').mockReturnValue(mockLink as unknown as HTMLAnchorElement);
+			vi.spyOn(document.body, 'appendChild').mockImplementation(() => document.body);
+			vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockLink as unknown as Node);
 		});
 
 		it('should export logs as text file', () => {
@@ -244,10 +247,9 @@ describe('LoggerService', () => {
 			service.exportLogs();
 
 			expect(document.createElement).toHaveBeenCalledWith('a');
-			expect(window.URL.createObjectURL).toHaveBeenCalledWith(jasmine.any(Blob));
+			expect(window.URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
 
 			// Verify the download was triggered
-			const mockLink = (document.createElement as jasmine.Spy).calls.mostRecent().returnValue;
 			expect(mockLink.download).toBe('fuskr-debug-logs.txt');
 			expect(mockLink.click).toHaveBeenCalled();
 		});
@@ -264,14 +266,13 @@ describe('LoggerService', () => {
 		it('should use custom filename when provided', () => {
 			service.exportLogs('custom-logs.txt');
 
-			const mockLink = (document.createElement as jasmine.Spy).calls.mostRecent().returnValue;
 			expect(mockLink.download).toBe('custom-logs.txt');
 		});
 	});
 
 	describe('edge cases and error handling', () => {
 		it('should handle undefined/null data gracefully', () => {
-			spyOn(console, 'info');
+			vi.spyOn(console, 'info');
 
 			service.info('test', 'Message with null data', null);
 			service.info('test', 'Message with undefined data', undefined);
@@ -321,7 +322,7 @@ describe('LoggerService', () => {
 			const errorMessages = warnAndAbove.filter(
 				(log) => log.message === 'Warn message' || log.message === 'Error message'
 			);
-			expect(errorMessages).toHaveSize(2);
+			expect(errorMessages).toHaveLength(2);
 		});
 
 		it('should return all logs when no filter specified', () => {

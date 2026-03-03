@@ -1,22 +1,23 @@
 import { TestBed } from '@angular/core/testing';
 import { ChromeService } from '@services/chrome.service';
+import type { Mocked } from 'vitest';
 
 /**
  * Base test setup for components that extend BaseComponent
  */
 export class BaseComponentTestHelper {
-	static setupChromeServiceMock(): jasmine.SpyObj<ChromeService> {
-		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', [
-			'getStorageData',
-			'setStorageData',
-			'getMessage',
-			'isExtensionContext',
-			'openTab',
-			'downloadFile',
-		]);
+	static setupChromeServiceMock(): Mocked<ChromeService> {
+		const chromeServiceSpy = {
+			getStorageData: vi.fn(),
+			setStorageData: vi.fn(),
+			getMessage: vi.fn(),
+			isExtensionContext: vi.fn(),
+			openTab: vi.fn(),
+			downloadFile: vi.fn(),
+		} as unknown as Mocked<ChromeService>;
 
 		// Setup getMessage mock to return translated text
-		chromeServiceSpy.getMessage.and.callFake((key: string) => {
+		chromeServiceSpy.getMessage.mockImplementation((key: string) => {
 			const translations: Record<string, string> = {
 				Options_Title: 'Fuskr Options',
 				Options_Appearance: 'Appearance',
@@ -97,11 +98,9 @@ export class BaseComponentTestHelper {
 		});
 
 		// Setup other method defaults
-		chromeServiceSpy.getStorageData.and.returnValue(Promise.resolve({}));
-		chromeServiceSpy.setStorageData.and.returnValue(Promise.resolve());
-		chromeServiceSpy.isExtensionContext.and.returnValue(false);
-		chromeServiceSpy.openTab.and.stub();
-		chromeServiceSpy.downloadFile.and.stub();
+		chromeServiceSpy.getStorageData.mockResolvedValue({});
+		chromeServiceSpy.setStorageData.mockResolvedValue();
+		chromeServiceSpy.isExtensionContext.mockReturnValue(false);
 
 		return chromeServiceSpy;
 	}

@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -9,33 +10,31 @@ import { MediaTypeService } from '@services/media-type.service';
 import { BaseComponentTestHelper } from './base-component-test.helper';
 import { MediaItem } from '@interfaces/media';
 
-// Type-only import for VS Code IntelliSense - won't be included in runtime bundle
-import type {} from 'jasmine';
-
 describe('GalleryComponent', () => {
 	let component: GalleryComponent;
 	let fixture: ComponentFixture<GalleryComponent>;
-	let mockFuskrService: jasmine.SpyObj<FuskrService>;
-	let mockChromeService: jasmine.SpyObj<ChromeService>;
-	let mockMediaTypeService: jasmine.SpyObj<MediaTypeService>;
-	let mockRouter: jasmine.SpyObj<Router>;
+	let mockFuskrService: MockedObject<FuskrService>;
+	let mockChromeService: MockedObject<ChromeService>;
+	let mockMediaTypeService: MockedObject<MediaTypeService>;
+	let mockRouter: MockedObject<Router>;
 	let mockActivatedRoute: Partial<ActivatedRoute>;
 
 	beforeEach(async () => {
-		mockFuskrService = jasmine.createSpyObj('FuskrService', [
-			'createFuskUrl',
-			'generateImageGallery',
-			'getImageFilename',
-			'countPotentialUrls',
-		]);
-		mockMediaTypeService = jasmine.createSpyObj('MediaTypeService', [
-			'batchDetermineMediaTypes',
-			'createMediaItem',
-			'fallbackTypeDetection',
-			// Added for progressive detection path
-			'determineMediaType',
-		]);
-		mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+		mockFuskrService = {
+			createFuskUrl: vi.fn().mockName('FuskrService.createFuskUrl'),
+			generateImageGallery: vi.fn().mockName('FuskrService.generateImageGallery'),
+			getImageFilename: vi.fn().mockName('FuskrService.getImageFilename'),
+			countPotentialUrls: vi.fn().mockName('FuskrService.countPotentialUrls'),
+		};
+		mockMediaTypeService = {
+			batchDetermineMediaTypes: vi.fn().mockName('MediaTypeService.batchDetermineMediaTypes'),
+			createMediaItem: vi.fn().mockName('MediaTypeService.createMediaItem'),
+			fallbackTypeDetection: vi.fn().mockName('MediaTypeService.fallbackTypeDetection'),
+			determineMediaType: vi.fn().mockName('MediaTypeService.determineMediaType'),
+		};
+		mockRouter = {
+			navigate: vi.fn().mockName('Router.navigate'),
+		};
 		mockActivatedRoute = {
 			queryParams: of({ url: 'https://example.com/test.jpg' }),
 			snapshot: { queryParams: {} },
@@ -78,16 +77,16 @@ describe('GalleryComponent', () => {
 				urls: ['https://example.com/image01.jpg', 'https://example.com/image02.jpg'],
 			};
 
-			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
-			mockFuskrService.countPotentialUrls.and.returnValue(2); // Below limit
-			mockMediaTypeService.createMediaItem.and.callFake((url: string) => ({
+			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
+			mockFuskrService.countPotentialUrls.mockReturnValue(2); // Below limit
+			mockMediaTypeService.createMediaItem.mockImplementation((url: string) => ({
 				url,
 				type: 'unknown',
 				mimeType: 'application/octet-stream',
 				loadingState: 'pending',
 				extension: url.split('.').pop()?.toLowerCase(),
 			}));
-			mockMediaTypeService.fallbackTypeDetection.and.callFake(
+			mockMediaTypeService.fallbackTypeDetection.mockImplementation(
 				// eslint-disable-next-line @typescript-eslint/no-unused-vars
 				(_url: string) => ({
 					type: 'image',
@@ -115,17 +114,17 @@ describe('GalleryComponent', () => {
 				urls: ['https://example.com/image05.jpg', 'https://example.com/image06.jpg'],
 			};
 
-			mockFuskrService.createFuskUrl.and.returnValue(generatedUrl);
-			mockFuskrService.countPotentialUrls.and.returnValue(2);
-			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
-			mockMediaTypeService.createMediaItem.and.callFake((url: string) => ({
+			mockFuskrService.createFuskUrl.mockReturnValue(generatedUrl);
+			mockFuskrService.countPotentialUrls.mockReturnValue(2);
+			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
+			mockMediaTypeService.createMediaItem.mockImplementation((url: string) => ({
 				url,
 				type: 'unknown',
 				mimeType: 'application/octet-stream',
 				loadingState: 'pending',
 				extension: url.split('.').pop()?.toLowerCase(),
 			}));
-			mockMediaTypeService.fallbackTypeDetection.and.returnValue({
+			mockMediaTypeService.fallbackTypeDetection.mockReturnValue({
 				type: 'image',
 				mimeType: 'image/jpeg',
 			});
@@ -165,8 +164,8 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should trigger overload protection when URL count exceeds limit', () => {
-			spyOn(window, 'confirm').and.returnValue(false); // User chooses not to proceed
-			mockFuskrService.countPotentialUrls.and.returnValue(1000); // Above default limit of 500
+			vi.spyOn(window, 'confirm').mockReturnValue(false); // User chooses not to proceed
+			mockFuskrService.countPotentialUrls.mockReturnValue(1000); // Above default limit of 500
 
 			component.originalUrl = 'https://example.com/image[001-1000].jpg';
 			component.enableOverloadProtection = true;
@@ -187,9 +186,9 @@ describe('GalleryComponent', () => {
 				),
 			};
 
-			spyOn(window, 'confirm').and.returnValue(true); // User chooses to proceed
-			mockFuskrService.countPotentialUrls.and.returnValue(1000);
-			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
+			vi.spyOn(window, 'confirm').mockReturnValue(true); // User chooses to proceed
+			mockFuskrService.countPotentialUrls.mockReturnValue(1000);
+			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
 
 			component.originalUrl = 'https://example.com/image[001-1000].jpg';
 			component.enableOverloadProtection = true;
@@ -212,7 +211,7 @@ describe('GalleryComponent', () => {
 				),
 			};
 
-			mockFuskrService.generateImageGallery.and.returnValue(mockResult);
+			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
 
 			component.originalUrl = 'https://example.com/image[001-1000].jpg';
 			component.enableOverloadProtection = false; // Disabled
@@ -226,8 +225,8 @@ describe('GalleryComponent', () => {
 
 		it('should open image in browser for non-extension context', () => {
 			const testUrl = 'https://example.com/test.jpg';
-			mockChromeService.isExtensionContext.and.returnValue(false);
-			spyOn(window, 'open');
+			mockChromeService.isExtensionContext.mockReturnValue(false);
+			vi.spyOn(window, 'open');
 
 			component.openImage(testUrl);
 
@@ -237,10 +236,10 @@ describe('GalleryComponent', () => {
 		it('should open image in tab using openInTab method', () => {
 			const testUrl = 'https://example.com/test.jpg';
 			const mockEvent = new Event('click');
-			spyOn(mockEvent, 'stopPropagation');
-			spyOn(mockEvent, 'preventDefault');
-			mockChromeService.isExtensionContext.and.returnValue(false);
-			spyOn(window, 'open');
+			vi.spyOn(mockEvent, 'stopPropagation');
+			vi.spyOn(mockEvent, 'preventDefault');
+			mockChromeService.isExtensionContext.mockReturnValue(false);
+			vi.spyOn(window, 'open');
 
 			component.openInTab(testUrl, mockEvent);
 
@@ -252,9 +251,9 @@ describe('GalleryComponent', () => {
 		it('should open image in tab using Chrome service for extension context', () => {
 			const testUrl = 'https://example.com/test.jpg';
 			const mockEvent = new Event('click');
-			spyOn(mockEvent, 'stopPropagation');
-			spyOn(mockEvent, 'preventDefault');
-			mockChromeService.isExtensionContext.and.returnValue(true);
+			vi.spyOn(mockEvent, 'stopPropagation');
+			vi.spyOn(mockEvent, 'preventDefault');
+			mockChromeService.isExtensionContext.mockReturnValue(true);
 
 			component.openInTab(testUrl, mockEvent);
 
@@ -266,8 +265,8 @@ describe('GalleryComponent', () => {
 		it('should download single image', () => {
 			const testUrl = 'https://example.com/test.jpg';
 			const mockEvent = new Event('click');
-			spyOn(mockEvent, 'stopPropagation');
-			mockFuskrService.getImageFilename.and.returnValue('test.jpg');
+			vi.spyOn(mockEvent, 'stopPropagation');
+			mockFuskrService.getImageFilename.mockReturnValue('test.jpg');
 
 			component.downloadImage(testUrl, mockEvent);
 
@@ -278,9 +277,9 @@ describe('GalleryComponent', () => {
 		it('should copy URL to clipboard', async () => {
 			const testUrl = 'https://example.com/test.jpg';
 			const mockEvent = new Event('click');
-			spyOn(mockEvent, 'stopPropagation');
-			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
-			spyOn(console, 'log');
+			vi.spyOn(mockEvent, 'stopPropagation');
+			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.resolve());
+			vi.spyOn(console, 'log');
 
 			await component.copyUrl(testUrl, mockEvent);
 
@@ -299,7 +298,11 @@ describe('GalleryComponent', () => {
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 			];
 			// Initialize brokenUrls as empty set using component accessor
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			(
+				component as unknown as {
+					brokenUrls: Set<string>;
+				}
+			).brokenUrls = new Set();
 		});
 
 		it('should open image viewer', () => {
@@ -386,8 +389,8 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should copy all URLs to clipboard', async () => {
-			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.resolve());
-			spyOn(console, 'log');
+			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.resolve());
+			vi.spyOn(console, 'log');
 
 			await component.copyAllUrls();
 
@@ -395,16 +398,12 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should handle clipboard copy errors', async () => {
-			spyOn(navigator.clipboard, 'writeText').and.returnValue(Promise.reject(new Error('Clipboard error')));
-			const loggerSpy = spyOn(component['logger'], 'error');
+			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.reject(new Error('Clipboard error')));
+			const loggerSpy = vi.spyOn(component['logger'], 'error');
 
 			await component.copyAllUrls();
 
-			expect(loggerSpy).toHaveBeenCalledWith(
-				'gallery.copyUrls.failed',
-				'Failed to copy URLs',
-				jasmine.any(Error)
-			);
+			expect(loggerSpy).toHaveBeenCalledWith('gallery.copyUrls.failed', 'Failed to copy URLs', expect.any(Error));
 		});
 	});
 
@@ -445,10 +444,10 @@ describe('GalleryComponent', () => {
 			document.body.appendChild(mockContainer);
 
 			// Mock closest method to return the actual container
-			spyOn(mockImg, 'closest').and.returnValue(mockContainer);
+			vi.spyOn(mockImg, 'closest').mockReturnValue(mockContainer);
 
 			// Mock remove method to avoid actual DOM manipulation issues in tests
-			spyOn(mockContainer, 'remove').and.stub();
+			vi.spyOn(mockContainer, 'remove').mockImplementation(() => undefined);
 
 			// Trigger the error handler
 			const errorEvent = new Event('error');
@@ -457,7 +456,13 @@ describe('GalleryComponent', () => {
 			component.onImageError(errorEvent);
 
 			// Verify the broken URL was tracked
-			expect((component as unknown as { brokenUrls: Set<string> }).brokenUrls.has('url2.jpg')).toBe(true);
+			expect(
+				(
+					component as unknown as {
+						brokenUrls: Set<string>;
+					}
+				).brokenUrls.has('url2.jpg')
+			).toBe(true);
 
 			// Verify container.remove() was called
 			expect(mockContainer.remove).toHaveBeenCalled();
@@ -490,7 +495,13 @@ describe('GalleryComponent', () => {
 			component.onImageError(errorEvent);
 
 			// Verify the broken URL was tracked but arrays weren't updated
-			expect((component as unknown as { brokenUrls: Set<string> }).brokenUrls.has('url2.jpg')).toBe(true);
+			expect(
+				(
+					component as unknown as {
+						brokenUrls: Set<string>;
+					}
+				).brokenUrls.has('url2.jpg')
+			).toBe(true);
 			expect(component.imageUrls).toEqual(['url1.jpg', 'url2.jpg', 'url3.jpg']); // Still contains broken URL
 			expect(component.mediaItems.length).toBe(3); // Still has all items
 		});
@@ -505,7 +516,11 @@ describe('GalleryComponent', () => {
 			];
 			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
 			// Ensure brokenUrls Set exists
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			(
+				component as unknown as {
+					brokenUrls: Set<string>;
+				}
+			).brokenUrls = new Set();
 		});
 
 		it('should auto-remove newly failing images after calling removeBrokenImages()', () => {
@@ -520,8 +535,8 @@ describe('GalleryComponent', () => {
 			container.appendChild(mockImg);
 			document.body.appendChild(container);
 
-			spyOn(mockImg, 'closest').and.returnValue(container);
-			spyOn(container, 'remove').and.callThrough();
+			vi.spyOn(mockImg, 'closest').mockReturnValue(container);
+			vi.spyOn(container, 'remove');
 
 			const errorEvent = new Event('error');
 			Object.defineProperty(errorEvent, 'target', { value: mockImg });
@@ -537,7 +552,9 @@ describe('GalleryComponent', () => {
 
 	describe('Compression mode selection', () => {
 		it('should choose DEFLATE below threshold and STORE at or above threshold', () => {
-			const build = component as unknown as { getZipCompressionMode: (n: number) => 'STORE' | 'DEFLATE' };
+			const build = component as unknown as {
+				getZipCompressionMode: (n: number) => 'STORE' | 'DEFLATE';
+			};
 			expect(build.getZipCompressionMode(100)).toBe('DEFLATE');
 			expect(build.getZipCompressionMode(299)).toBe('DEFLATE');
 			expect(build.getZipCompressionMode(300)).toBe('STORE');
@@ -554,7 +571,11 @@ describe('GalleryComponent', () => {
 			padWidth: number
 		) => string;
 		const getBuilder = (): BuildFn =>
-			(component as unknown as { buildUniqueZipPath: BuildFn }).buildUniqueZipPath.bind(component);
+			(
+				component as unknown as {
+					buildUniqueZipPath: BuildFn;
+				}
+			).buildUniqueZipPath.bind(component);
 
 		it('should suffix duplicates with zero-padded numbering based on duplicate group size (example: 100)', () => {
 			// Arrange
@@ -606,7 +627,7 @@ describe('GalleryComponent', () => {
 			container.appendChild(video);
 			document.body.appendChild(container);
 
-			spyOn(video, 'closest').and.returnValue(container);
+			vi.spyOn(video, 'closest').mockReturnValue(container);
 
 			const errorEvent = new Event('error');
 			Object.defineProperty(errorEvent, 'target', { value: video });
@@ -644,7 +665,9 @@ describe('GalleryComponent', () => {
 				},
 			];
 			const content = (
-				component as unknown as { generateMetadataContent: (items: MediaItem[]) => string }
+				component as unknown as {
+					generateMetadataContent: (items: MediaItem[]) => string;
+				}
 			).generateMetadataContent(items);
 			expect(content).toContain('Fusk Url: https://example.com/a[01-02].jpg');
 			expect(content).toContain('IMAGE: a1.jpg');
@@ -661,7 +684,9 @@ describe('GalleryComponent', () => {
 			const url = 'https://test.example/image.jpg';
 			const b64 = btoa(url);
 			const decoded = (
-				component as unknown as { decodeUrlParameter: (param: string) => string }
+				component as unknown as {
+					decodeUrlParameter: (param: string) => string;
+				}
 			).decodeUrlParameter(b64);
 			expect(decoded).toBe(url);
 		});
@@ -669,7 +694,9 @@ describe('GalleryComponent', () => {
 		it('should decode URL-encoded strings', () => {
 			const encoded = encodeURIComponent('https://example.com/a b');
 			const decoded = (
-				component as unknown as { decodeUrlParameter: (param: string) => string }
+				component as unknown as {
+					decodeUrlParameter: (param: string) => string;
+				}
 			).decodeUrlParameter(encoded);
 			expect(decoded).toBe('https://example.com/a b');
 		});
@@ -677,7 +704,11 @@ describe('GalleryComponent', () => {
 		it('should return original when not encoded', () => {
 			const plain = 'not-encoded';
 			expect(
-				(component as unknown as { decodeUrlParameter: (param: string) => string }).decodeUrlParameter(plain)
+				(
+					component as unknown as {
+						decodeUrlParameter: (param: string) => string;
+					}
+				).decodeUrlParameter(plain)
 			).toBe(plain);
 		});
 	});
@@ -700,7 +731,7 @@ describe('GalleryComponent', () => {
 				},
 			];
 
-			mockMediaTypeService.determineMediaType.and.callFake(async (url: string) => {
+			mockMediaTypeService.determineMediaType.mockImplementation(async (url: string) => {
 				if (url.endsWith('.jpg')) {
 					return { type: 'image', mimeType: 'image/jpeg', contentLength: 123 };
 				}
@@ -709,7 +740,9 @@ describe('GalleryComponent', () => {
 
 			// Act
 			await (
-				component as unknown as { startProgressiveTypeDetection: () => Promise<void> }
+				component as unknown as {
+					startProgressiveTypeDetection: () => Promise<void>;
+				}
 			).startProgressiveTypeDetection();
 
 			// Assert: first becomes image, second remains unknown
@@ -749,7 +782,11 @@ describe('GalleryComponent', () => {
 			document.body.appendChild(goodVid);
 			document.body.appendChild(badVid);
 
-			const urls = (component as unknown as { getValidImageUrls: () => string[] }).getValidImageUrls();
+			const urls = (
+				component as unknown as {
+					getValidImageUrls: () => string[];
+				}
+			).getValidImageUrls();
 			expect(urls).toEqual(['https://site/img1.jpg', 'https://site/vid1.mp4']);
 		});
 	});
@@ -786,7 +823,11 @@ describe('GalleryComponent', () => {
 			document.body.appendChild(loadedVid);
 			document.body.appendChild(brokenVid);
 
-			(component as unknown as { updateImageCounts: () => void }).updateImageCounts();
+			(
+				component as unknown as {
+					updateImageCounts: () => void;
+				}
+			).updateImageCounts();
 			expect(component.loadedImages).toBe(2);
 			expect(component.brokenImages).toBe(2);
 		});

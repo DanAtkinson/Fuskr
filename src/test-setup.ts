@@ -1,3 +1,9 @@
+import '@angular/compiler';
+import '@analogjs/vitest-angular/setup-snapshots';
+import { setupTestBed } from '@analogjs/vitest-angular/setup-testbed';
+
+setupTestBed();
+
 // Test setup file for polyfills and global configurations
 
 // URL polyfill for test environment
@@ -34,3 +40,17 @@ if (!globalThis.location) {
 		hash: '',
 	};
 }
+
+if (!navigator.clipboard) {
+	Object.defineProperty(navigator, 'clipboard', {
+		value: {
+			writeText: vi.fn().mockResolvedValue(undefined),
+		},
+		configurable: true,
+	});
+}
+
+afterEach(() => {
+	vi.restoreAllMocks();
+	vi.useRealTimers();
+});

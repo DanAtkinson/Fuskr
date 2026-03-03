@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { TestBed } from '@angular/core/testing';
 import { MediaTypeService } from './media-type.service';
 import { LoggerService } from './logger.service';
@@ -5,18 +6,23 @@ import { MediaItem } from '@interfaces/media';
 
 describe('MediaTypeService', () => {
 	let service: MediaTypeService;
-	let mockLoggerService: jasmine.SpyObj<LoggerService>;
+	let mockLoggerService: MockedObject<LoggerService>;
 	let originalFetch: typeof fetch;
 
 	beforeEach(() => {
-		const loggerSpy = jasmine.createSpyObj('LoggerService', ['info', 'warn', 'error', 'debug']);
+		const loggerSpy = {
+			info: vi.fn().mockName('LoggerService.info'),
+			warn: vi.fn().mockName('LoggerService.warn'),
+			error: vi.fn().mockName('LoggerService.error'),
+			debug: vi.fn().mockName('LoggerService.debug'),
+		};
 
 		TestBed.configureTestingModule({
 			providers: [MediaTypeService, { provide: LoggerService, useValue: loggerSpy }],
 		});
 
 		service = TestBed.inject(MediaTypeService);
-		mockLoggerService = TestBed.inject(LoggerService) as jasmine.SpyObj<LoggerService>;
+		mockLoggerService = TestBed.inject(LoggerService) as MockedObject<LoggerService>;
 
 		// Store original fetch to restore later
 		originalFetch = window.fetch;
@@ -56,7 +62,7 @@ describe('MediaTypeService', () => {
 			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
-					get: jasmine.createSpy('get').and.callFake((header: string) => {
+					get: vi.fn().mockImplementation((header: string) => {
 						if (header === 'Content-Type') return 'image/jpeg';
 						if (header === 'Content-Length') return '12345';
 						return null;
@@ -64,7 +70,7 @@ describe('MediaTypeService', () => {
 				} as unknown as Headers,
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
+			window.fetch = vi.fn().mockReturnValue(Promise.resolve(mockResponse));
 
 			const result = await service.determineMediaType('https://example.com/image.jpg');
 
@@ -77,7 +83,7 @@ describe('MediaTypeService', () => {
 			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
-					get: jasmine.createSpy('get').and.callFake((header: string) => {
+					get: vi.fn().mockImplementation((header: string) => {
 						if (header === 'Content-Type') return 'video/mp4';
 						if (header === 'Content-Length') return '54321';
 						return null;
@@ -85,7 +91,7 @@ describe('MediaTypeService', () => {
 				} as unknown as Headers,
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
+			window.fetch = vi.fn().mockReturnValue(Promise.resolve(mockResponse));
 
 			const result = await service.determineMediaType('https://example.com/video.mp4');
 
@@ -95,7 +101,7 @@ describe('MediaTypeService', () => {
 		});
 
 		it('should fallback to URL extension detection when fetch fails', async () => {
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.reject(new Error('Network error')));
+			window.fetch = vi.fn().mockReturnValue(Promise.reject(new Error('Network error')));
 
 			const result = await service.determineMediaType('https://example.com/video.webm');
 
@@ -108,11 +114,11 @@ describe('MediaTypeService', () => {
 			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
-					get: jasmine.createSpy('get').and.returnValue('image/png'),
+					get: vi.fn().mockReturnValue('image/png'),
 				} as unknown as Headers,
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
+			window.fetch = vi.fn().mockReturnValue(Promise.resolve(mockResponse));
 
 			await service.determineMediaType('https://example.com/image.png');
 
@@ -136,14 +142,14 @@ describe('MediaTypeService', () => {
 			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
-					get: jasmine.createSpy('get').and.callFake((header: string) => {
+					get: vi.fn().mockImplementation((header: string) => {
 						if (header === 'Content-Type') return 'image/jpeg';
 						return null;
 					}),
 				} as unknown as Headers,
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
+			window.fetch = vi.fn().mockReturnValue(Promise.resolve(mockResponse));
 
 			const result = await service.updateMediaItemType(mockMediaItem);
 
@@ -162,7 +168,7 @@ describe('MediaTypeService', () => {
 				extension: 'jpg',
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.reject(new Error('Network error')));
+			window.fetch = vi.fn().mockReturnValue(Promise.reject(new Error('Network error')));
 
 			const result = await service.updateMediaItemType(mockMediaItem);
 
@@ -180,15 +186,15 @@ describe('MediaTypeService', () => {
 			const mockResponse: Partial<Response> = {
 				ok: true,
 				headers: {
-					get: jasmine.createSpy('get').and.returnValue('image/jpeg'),
+					get: vi.fn().mockReturnValue('image/jpeg'),
 				} as unknown as Headers,
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.resolve(mockResponse));
+			window.fetch = vi.fn().mockReturnValue(Promise.resolve(mockResponse));
 
 			const results = await service.batchDetermineMediaTypes(urls, 2);
 
-			expect(results).toHaveSize(3);
+			expect(results).toHaveLength(3);
 			expect(results.every((item) => item.loadingState === 'loaded')).toBe(true);
 			expect(mockLoggerService.debug).toHaveBeenCalled();
 		});
@@ -196,11 +202,11 @@ describe('MediaTypeService', () => {
 		it('should handle batch processing errors with fallback to extension detection', async () => {
 			const urls = ['https://example.com/1.jpg', 'https://example.com/2.mp4'];
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.reject(new Error('Network error')));
+			window.fetch = vi.fn().mockReturnValue(Promise.reject(new Error('Network error')));
 
 			const results = await service.batchDetermineMediaTypes(urls, 5);
 
-			expect(results).toHaveSize(2);
+			expect(results).toHaveLength(2);
 			// Should fallback to extension-based detection instead of erroring
 			expect(results.every((item) => item.loadingState === 'loaded')).toBe(true);
 			expect(results[0].type).toBe('image');
@@ -216,7 +222,7 @@ describe('MediaTypeService', () => {
 				extension: undefined,
 			};
 
-			window.fetch = jasmine.createSpy('fetch').and.returnValue(Promise.reject(new Error('Network error')));
+			window.fetch = vi.fn().mockReturnValue(Promise.reject(new Error('Network error')));
 
 			const result = await service.updateMediaItemType(mockMediaItem);
 

@@ -14,29 +14,29 @@ import { testWithExtension } from '../fixtures/extension';
  * helper or puppeteer-in-extension approach — left for a future iteration.
  */
 testWithExtension.describe('Context menu', () => {
-  testWithExtension(
-    'should have the background service worker active (context menu registration)',
-    async ({ extensionContext: { context, extensionId } }) => {
-      // The context menu is registered in the service worker (background.ts)
-      // Verify the service worker is active — a prerequisite for context menus
-      const workers = context.serviceWorkers();
-      expect(workers.length).toBeGreaterThan(0);
+	testWithExtension(
+		'should have the background service worker active (context menu registration)',
+		async ({ extensionContext: { context, extensionId } }) => {
+			// The context menu is registered in the service worker (background.ts)
+			// Verify the service worker is active — a prerequisite for context menus
+			const workers = context.serviceWorkers();
+			expect(workers.length).toBeGreaterThan(0);
 
-      const workerUrl = workers[0].url();
-      expect(workerUrl).toContain(`chrome-extension://${extensionId}`);
-      expect(workerUrl).toContain('background.js');
-    },
-  );
+			const workerUrl = workers[0].url();
+			expect(workerUrl).toContain(`chrome-extension://${extensionId}`);
+			expect(workerUrl).toContain('background.js');
+		}
+	);
 
-  testWithExtension(
-    'should load extension on a page with images (context menu precondition)',
-    async ({ extensionContext: { context, extensionId } }) => {
-      // Navigate to a page with an image — this is the precondition for the
-      // context menu on-image entries to appear
-      const page = await context.newPage();
+	testWithExtension(
+		'should load extension on a page with images (context menu precondition)',
+		async ({ extensionContext: { context, extensionId } }) => {
+			// Navigate to a page with an image — this is the precondition for the
+			// context menu on-image entries to appear
+			const page = await context.newPage();
 
-      // Use a simple data URL page with an image
-      await page.setContent(`
+			// Use a simple data URL page with an image
+			await page.setContent(`
         <html>
           <body>
             <img id="test-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="100" height="100" />
@@ -45,14 +45,14 @@ testWithExtension.describe('Context menu', () => {
         </html>
       `);
 
-      // Extension should be loaded — verify popup URL is reachable
-      const img = page.locator('#test-img');
-      await expect(img).toBeVisible();
+			// Extension should be loaded — verify popup URL is reachable
+			const img = page.locator('#test-img');
+			await expect(img).toBeVisible();
 
-      // Extension ID should be known (extension is loaded correctly)
-      expect(extensionId).toMatch(/^[a-z]{32}$/);
+			// Extension ID should be known (extension is loaded correctly)
+			expect(extensionId).toMatch(/^[a-z]{32}$/);
 
-      await page.close();
-    },
-  );
+			await page.close();
+		}
+	);
 });

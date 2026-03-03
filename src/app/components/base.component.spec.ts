@@ -1,3 +1,4 @@
+import type { MockedObject } from 'vitest';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BaseComponent } from './base.component';
@@ -13,10 +14,12 @@ class TestBaseComponent extends BaseComponent {}
 describe('BaseComponent', () => {
 	let component: TestBaseComponent;
 	let fixture: ComponentFixture<TestBaseComponent>;
-	let mockChromeService: jasmine.SpyObj<ChromeService>;
+	let mockChromeService: MockedObject<ChromeService>;
 
 	beforeEach(async () => {
-		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', ['getMessage']);
+		const chromeServiceSpy = {
+			getMessage: vi.fn().mockName('ChromeService.getMessage'),
+		};
 
 		await TestBed.configureTestingModule({
 			imports: [TestBaseComponent],
@@ -25,7 +28,7 @@ describe('BaseComponent', () => {
 
 		fixture = TestBed.createComponent(TestBaseComponent);
 		component = fixture.componentInstance;
-		mockChromeService = TestBed.inject(ChromeService) as jasmine.SpyObj<ChromeService>;
+		mockChromeService = TestBed.inject(ChromeService) as MockedObject<ChromeService>;
 		fixture.detectChanges();
 	});
 
@@ -49,7 +52,7 @@ describe('BaseComponent', () => {
 			const testKey = 'test_key';
 			const expectedMessage = 'Test Message';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey);
 
@@ -62,7 +65,7 @@ describe('BaseComponent', () => {
 			const testSubstitutions = ['value1', 'value2'];
 			const expectedMessage = 'Test Message with value1 and value2';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubstitutions);
 
@@ -75,7 +78,7 @@ describe('BaseComponent', () => {
 			const testSubstitutions: string[] = [];
 			const expectedMessage = 'Empty substitutions message';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubstitutions);
 
@@ -87,7 +90,7 @@ describe('BaseComponent', () => {
 			const testKey = 'test_undefined_subs';
 			const expectedMessage = 'Undefined substitutions message';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey, undefined);
 
@@ -99,7 +102,7 @@ describe('BaseComponent', () => {
 			const testKey = 'test_key_with_special-chars.123';
 			const expectedMessage = 'Special chars message';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey);
 
@@ -112,7 +115,7 @@ describe('BaseComponent', () => {
 			const testSubstitutions = ['first', 'second', 'third', 'fourth'];
 			const expectedMessage = 'Message with first, second, third, and fourth';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubstitutions);
 
@@ -125,7 +128,9 @@ describe('BaseComponent', () => {
 		it('should handle chromeService.getMessage throwing error', () => {
 			const testKey = 'error_key';
 
-			mockChromeService.getMessage.and.throwError('Translation error');
+			mockChromeService.getMessage.mockImplementation(() => {
+				throw new Error('Translation error');
+			});
 
 			expect(() => {
 				component.translate(testKey);
@@ -135,7 +140,7 @@ describe('BaseComponent', () => {
 		it('should return key when chromeService.getMessage returns empty string', () => {
 			const testKey = 'empty_key';
 
-			mockChromeService.getMessage.and.returnValue('');
+			mockChromeService.getMessage.mockReturnValue('');
 
 			const result = component.translate(testKey);
 
@@ -147,7 +152,7 @@ describe('BaseComponent', () => {
 			const substitutions = ['value1', 'value2'];
 			const expectedMessage = 'Message with value1 and value2';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey, substitutions);
 
@@ -172,7 +177,7 @@ describe('BaseComponent', () => {
 			const testKey = 'inheritance_test';
 			const expectedMessage = 'Inheritance works';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey);
 
@@ -184,7 +189,7 @@ describe('BaseComponent', () => {
 			const testSubs = ['sub1', 'sub2'];
 			const expectedMessage = 'Subclass message with sub1 and sub2';
 
-			mockChromeService.getMessage.and.returnValue(expectedMessage);
+			mockChromeService.getMessage.mockReturnValue(expectedMessage);
 
 			const result = component.translate(testKey, testSubs);
 

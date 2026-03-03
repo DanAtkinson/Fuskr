@@ -1,3 +1,4 @@
+import type { Mock, MockedObject } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { HistoryComponent } from './history.component';
@@ -8,9 +9,9 @@ import { GalleryHistory, GalleryHistoryEntry } from '@interfaces/gallery-history
 describe('HistoryComponent', () => {
 	let component: HistoryComponent;
 	let fixture: ComponentFixture<HistoryComponent>;
-	let mockChromeService: jasmine.SpyObj<ChromeService>;
-	let mockLoggerService: jasmine.SpyObj<LoggerService>;
-	let mockRouter: jasmine.SpyObj<Router>;
+	let mockChromeService: MockedObject<ChromeService>;
+	let mockLoggerService: MockedObject<LoggerService>;
+	let mockRouter: MockedObject<Router>;
 
 	const mockHistoryEntry: GalleryHistoryEntry = {
 		id: 'test-id-1',
@@ -35,20 +36,27 @@ describe('HistoryComponent', () => {
 	};
 
 	beforeEach(async () => {
-		const chromeServiceSpy = jasmine.createSpyObj('ChromeService', [
-			'getGalleryHistory',
-			'clearGalleryHistory',
-			'removeGalleryFromHistory',
-			'updateDisplaySettings',
-			'getDarkMode',
-			'isExtensionContext',
-			'openTab',
-			'getMessage',
-		]);
+		const chromeServiceSpy = {
+			getGalleryHistory: vi.fn().mockName('ChromeService.getGalleryHistory'),
+			clearGalleryHistory: vi.fn().mockName('ChromeService.clearGalleryHistory'),
+			removeGalleryFromHistory: vi.fn().mockName('ChromeService.removeGalleryFromHistory'),
+			updateDisplaySettings: vi.fn().mockName('ChromeService.updateDisplaySettings'),
+			getDarkMode: vi.fn().mockName('ChromeService.getDarkMode'),
+			isExtensionContext: vi.fn().mockName('ChromeService.isExtensionContext'),
+			openTab: vi.fn().mockName('ChromeService.openTab'),
+			getMessage: vi.fn().mockName('ChromeService.getMessage'),
+		};
 
-		const loggerServiceSpy = jasmine.createSpyObj('LoggerService', ['debug', 'error', 'warn', 'info']);
+		const loggerServiceSpy = {
+			debug: vi.fn().mockName('LoggerService.debug'),
+			error: vi.fn().mockName('LoggerService.error'),
+			warn: vi.fn().mockName('LoggerService.warn'),
+			info: vi.fn().mockName('LoggerService.info'),
+		};
 
-		const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
+		const routerSpy = {
+			navigate: vi.fn().mockName('Router.navigate'),
+		};
 
 		await TestBed.configureTestingModule({
 			imports: [HistoryComponent],
@@ -61,20 +69,20 @@ describe('HistoryComponent', () => {
 
 		fixture = TestBed.createComponent(HistoryComponent);
 		component = fixture.componentInstance;
-		mockChromeService = TestBed.inject(ChromeService) as jasmine.SpyObj<ChromeService>;
-		mockLoggerService = TestBed.inject(LoggerService) as jasmine.SpyObj<LoggerService>;
-		mockRouter = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+		mockChromeService = TestBed.inject(ChromeService) as MockedObject<ChromeService>;
+		mockLoggerService = TestBed.inject(LoggerService) as MockedObject<LoggerService>;
+		mockRouter = TestBed.inject(Router) as MockedObject<Router>;
 	});
 
 	beforeEach(() => {
 		// Setup default mock returns
-		mockChromeService.getGalleryHistory.and.returnValue(Promise.resolve(mockHistory));
-		mockChromeService.getDarkMode.and.returnValue(Promise.resolve(false));
-		mockChromeService.clearGalleryHistory.and.returnValue(Promise.resolve());
-		mockChromeService.removeGalleryFromHistory.and.returnValue(Promise.resolve());
-		mockChromeService.updateDisplaySettings.and.returnValue(Promise.resolve());
-		mockChromeService.isExtensionContext.and.returnValue(false);
-		mockChromeService.getMessage.and.returnValue('Confirm clear all?');
+		mockChromeService.getGalleryHistory.mockReturnValue(Promise.resolve(mockHistory));
+		mockChromeService.getDarkMode.mockReturnValue(Promise.resolve(false));
+		mockChromeService.clearGalleryHistory.mockReturnValue(Promise.resolve());
+		mockChromeService.removeGalleryFromHistory.mockReturnValue(Promise.resolve());
+		mockChromeService.updateDisplaySettings.mockReturnValue(Promise.resolve());
+		mockChromeService.isExtensionContext.mockReturnValue(false);
+		mockChromeService.getMessage.mockReturnValue('Confirm clear all?');
 	});
 
 	it('should create', () => {
@@ -99,14 +107,14 @@ describe('HistoryComponent', () => {
 		});
 
 		it('should handle history loading error', async () => {
-			mockChromeService.getGalleryHistory.and.returnValue(Promise.reject(new Error('Storage error')));
+			mockChromeService.getGalleryHistory.mockReturnValue(Promise.reject(new Error('Storage error')));
 
 			await component.ngOnInit();
 
 			expect(mockLoggerService.error).toHaveBeenCalledWith(
 				'history.loadFailed',
 				'Failed to load gallery history',
-				jasmine.any(Error)
+				expect.any(Error)
 			);
 			expect(component.loading).toBe(false);
 		});
@@ -135,7 +143,7 @@ describe('HistoryComponent', () => {
 			expect(mockLoggerService.warn).toHaveBeenCalledWith(
 				'history.formatDate',
 				'Invalid date provided',
-				jasmine.any(Object)
+				expect.any(Object)
 			);
 		});
 
@@ -365,42 +373,44 @@ describe('HistoryComponent', () => {
 		});
 
 		it('should open tab via chrome service in extension context', async () => {
-			mockChromeService.isExtensionContext.and.returnValue(true);
+			mockChromeService.isExtensionContext.mockReturnValue(true);
 
 			await component.openGalleryInNewTab(mockHistoryEntry);
 
-			expect(mockChromeService.openTab).toHaveBeenCalledWith(jasmine.stringContaining('#/gallery?url='), true);
-			expect(mockLoggerService.debug).toHaveBeenCalledWith('history.galleryOpened', jasmine.any(String));
+			expect(mockChromeService.openTab).toHaveBeenCalledWith(expect.stringContaining('#/gallery?url='), true);
+			expect(mockLoggerService.debug).toHaveBeenCalledWith('history.galleryOpened', expect.any(String));
 		});
 
 		it('should use window.open in non-extension context', async () => {
-			mockChromeService.isExtensionContext.and.returnValue(false);
-			spyOn(window, 'open');
+			mockChromeService.isExtensionContext.mockReturnValue(false);
+			vi.spyOn(window, 'open');
 
 			await component.openGalleryInNewTab(mockHistoryEntry);
 
-			expect(window.open).toHaveBeenCalledWith(jasmine.stringContaining('#/gallery?url='), '_blank');
+			expect(window.open).toHaveBeenCalledWith(expect.stringContaining('#/gallery?url='), '_blank');
 		});
 
 		it('should handle errors when opening in new tab', async () => {
-			mockChromeService.isExtensionContext.and.returnValue(true);
-			mockChromeService.openTab.and.returnValue(Promise.reject(new Error('Tab error')));
+			mockChromeService.isExtensionContext.mockReturnValue(true);
+			mockChromeService.openTab.mockReturnValue(Promise.reject(new Error('Tab error')));
 
 			await component.openGalleryInNewTab(mockHistoryEntry);
 
 			expect(mockLoggerService.error).toHaveBeenCalledWith(
 				'history.openTabFailed',
 				'Failed to open gallery in new tab',
-				jasmine.any(Error)
+				expect.any(Error)
 			);
 		});
 	});
 
 	describe('removeEntry', () => {
-		let mockEvent: jasmine.SpyObj<Event>;
+		let mockEvent: MockedObject<Event>;
 
 		beforeEach(() => {
-			mockEvent = jasmine.createSpyObj('Event', ['stopPropagation']);
+			mockEvent = {
+				stopPropagation: vi.fn().mockName('Event.stopPropagation'),
+			};
 			component.history = { ...mockHistory };
 		});
 
@@ -412,31 +422,31 @@ describe('HistoryComponent', () => {
 			expect(component.history.entries).toEqual([]);
 			expect(mockLoggerService.debug).toHaveBeenCalledWith(
 				'history.entryRemoved',
-				jasmine.stringContaining(mockHistoryEntry.id)
+				expect.stringContaining(mockHistoryEntry.id)
 			);
 		});
 
 		it('should handle removal errors', async () => {
-			mockChromeService.removeGalleryFromHistory.and.returnValue(Promise.reject(new Error('Remove error')));
+			mockChromeService.removeGalleryFromHistory.mockReturnValue(Promise.reject(new Error('Remove error')));
 
 			await component.removeEntry(mockHistoryEntry, mockEvent);
 
 			expect(mockLoggerService.error).toHaveBeenCalledWith(
 				'history.removeFailed',
 				'Failed to remove history entry',
-				jasmine.any(Error)
+				expect.any(Error)
 			);
 		});
 	});
 
 	describe('clearAllHistory', () => {
 		beforeEach(() => {
-			spyOn(window, 'confirm');
+			vi.spyOn(window, 'confirm');
 			component.history = { ...mockHistory };
 		});
 
 		it('should clear history when confirmed', async () => {
-			(window.confirm as jasmine.Spy).and.returnValue(true);
+			(window.confirm as Mock).mockReturnValue(true);
 
 			await component.clearAllHistory();
 
@@ -446,7 +456,7 @@ describe('HistoryComponent', () => {
 		});
 
 		it('should not clear history when cancelled', async () => {
-			(window.confirm as jasmine.Spy).and.returnValue(false);
+			(window.confirm as Mock).mockReturnValue(false);
 
 			await component.clearAllHistory();
 
@@ -455,15 +465,15 @@ describe('HistoryComponent', () => {
 		});
 
 		it('should handle clear errors', async () => {
-			(window.confirm as jasmine.Spy).and.returnValue(true);
-			mockChromeService.clearGalleryHistory.and.returnValue(Promise.reject(new Error('Clear error')));
+			(window.confirm as Mock).mockReturnValue(true);
+			mockChromeService.clearGalleryHistory.mockReturnValue(Promise.reject(new Error('Clear error')));
 
 			await component.clearAllHistory();
 
 			expect(mockLoggerService.error).toHaveBeenCalledWith(
 				'history.clearFailed',
 				'Failed to clear history',
-				jasmine.any(Error)
+				expect.any(Error)
 			);
 		});
 	});
