@@ -680,7 +680,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 
 		// Handle modal viewer navigation
-		if (this.showImageViewer && this.mediaItems.length > 0) {
+		if (this.showImageViewer && this.visibleMediaItems.length > 0) {
 			switch (event.key) {
 				case 'ArrowLeft':
 				case 'ArrowUp':
@@ -709,7 +709,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 
 		// Handle main gallery navigation
-		if (this.mediaItems.length === 0) {
+		if (this.visibleMediaItems.length === 0) {
 			return;
 		}
 
@@ -749,7 +749,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private navigateToNextImage() {
-		if (this.currentGalleryIndex < this.mediaItems.length - 1) {
+		const lastIndex = this.visibleMediaItems.length - 1;
+		if (this.currentGalleryIndex < lastIndex) {
 			this.currentGalleryIndex++;
 		} else {
 			this.currentGalleryIndex = 0; // Wrap to first image
@@ -759,10 +760,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private navigateToPreviousImage() {
+		const lastIndex = this.visibleMediaItems.length - 1;
 		if (this.currentGalleryIndex > 0) {
 			this.currentGalleryIndex--;
 		} else {
-			this.currentGalleryIndex = this.mediaItems.length - 1; // Wrap to last image
+			this.currentGalleryIndex = lastIndex; // Wrap to last image
 		}
 		this.scrollToCurrentImage();
 		this.highlightCurrentImage();
@@ -775,38 +777,35 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private navigateToLastImage() {
-		this.currentGalleryIndex = this.mediaItems.length - 1;
+		this.currentGalleryIndex = this.visibleMediaItems.length - 1;
 		this.scrollToCurrentImage();
 		this.highlightCurrentImage();
 	}
 
 	private openCurrentImage() {
-		if (this.currentGalleryIndex >= 0 && this.currentGalleryIndex < this.mediaItems.length) {
-			const mediaItem = this.mediaItems[this.currentGalleryIndex];
+		const visible = this.visibleMediaItems;
+		if (this.currentGalleryIndex >= 0 && this.currentGalleryIndex < visible.length) {
+			const mediaItem = visible[this.currentGalleryIndex];
 			this.openImageViewer(mediaItem.url, this.currentGalleryIndex);
 		}
 	}
 
 	private goToFirstImageInViewer() {
+		const visible = this.visibleMediaItems;
 		this.currentViewerIndex = 0;
-		if (this.mediaItems.length > 0) {
-			this.currentViewerImage = this.mediaItems[0].url;
-			this.currentMediaItem = this.mediaItems[0];
-		} else if (this.imageUrls.length > 0) {
-			this.currentViewerImage = this.imageUrls[0];
-			this.currentMediaItem = null;
+		if (visible.length > 0) {
+			this.currentViewerImage = visible[0].url;
+			this.currentMediaItem = visible[0];
 		}
 	}
 
 	private goToLastImageInViewer() {
-		const lastIndex = this.mediaItems.length > 0 ? this.mediaItems.length - 1 : this.imageUrls.length - 1;
+		const visible = this.visibleMediaItems;
+		const lastIndex = visible.length - 1;
 		this.currentViewerIndex = lastIndex;
-		if (this.mediaItems.length > 0) {
-			this.currentViewerImage = this.mediaItems[lastIndex].url;
-			this.currentMediaItem = this.mediaItems[lastIndex];
-		} else if (this.imageUrls.length > 0) {
-			this.currentViewerImage = this.imageUrls[lastIndex];
-			this.currentMediaItem = null;
+		if (lastIndex >= 0) {
+			this.currentViewerImage = visible[lastIndex].url;
+			this.currentMediaItem = visible[lastIndex];
 		}
 	}
 

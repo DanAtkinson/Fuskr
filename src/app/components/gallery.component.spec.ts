@@ -772,6 +772,92 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('Keyboard navigation (gallery)', () => {
+		const makeItems = (urls: string[]): MediaItem[] =>
+			urls.map((url) => ({ url, type: 'image' as const, mimeType: 'image/jpeg', loadingState: 'loaded' as const }));
+
+		beforeEach(() => {
+			component.mediaItems = makeItems(['a.jpg', 'b.jpg', 'c.jpg']);
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			// jsdom does not implement scrollIntoView
+			Element.prototype.scrollIntoView = vi.fn();
+		});
+
+		it('End key navigates to the last visible item', () => {
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
+
+			expect(component.currentGalleryIndex).toBe(2);
+		});
+
+		it('Home key navigates to the first visible item', () => {
+			component.currentGalleryIndex = 2;
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'Home' }));
+
+			expect(component.currentGalleryIndex).toBe(0);
+		});
+
+		it('End key navigates to last VISIBLE item when broken images are hidden', () => {
+			// Mark the last item as broken (hidden from view)
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['c.jpg']);
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
+
+			// Only 2 visible items (a.jpg, b.jpg) — index should be 1, not 2
+			expect(component.currentGalleryIndex).toBe(1);
+		});
+
+		it('End key does nothing when all images are broken and hidden', () => {
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set([
+				'a.jpg',
+				'b.jpg',
+				'c.jpg',
+			]);
+			component.currentGalleryIndex = -1;
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
+
+			expect(component.currentGalleryIndex).toBe(-1);
+		});
+
+		it('ArrowRight wraps to first item after last visible item', () => {
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['c.jpg']);
+			component.currentGalleryIndex = 1; // Last visible item (b.jpg)
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+
+			expect(component.currentGalleryIndex).toBe(0);
+		});
+
+		it('ArrowLeft wraps to last visible item from the first', () => {
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['c.jpg']);
+			component.currentGalleryIndex = 0;
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+
+			expect(component.currentGalleryIndex).toBe(1); // Last visible (b.jpg)
+		});
+
+		it('ArrowRight advances within visible items', () => {
+			component.currentGalleryIndex = 0;
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+
+			expect(component.currentGalleryIndex).toBe(1);
+		});
+
+		it('keyboard events are ignored when a form element has focus', () => {
+			component.currentGalleryIndex = 0;
+			const input = document.createElement('input');
+			document.body.appendChild(input);
+			input.focus();
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
+
+			expect(component.currentGalleryIndex).toBe(0);
+			document.body.removeChild(input);
+		});
+	});
+
 	describe('toggleBrokenImagesVisibility', () => {
 		it('should update styles on broken images when toggled', async () => {
 			component.showBrokenImages = false;
