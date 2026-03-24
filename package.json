@@ -62,7 +62,7 @@
     "@types/webpack-env": "^1.18.8",
     "angular-eslint": "^21.2.0",
     "cross-env": "^10.1.0",
-    "eslint": "^9.39.3",
+    "eslint": "^10.1.0",
     "jasmine-core": "^6.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -73,9 +73,9 @@
     "ts-loader": "^9.5.2",
     "typescript": "~5.9",
     "typescript-eslint": "^8.56.1",
-    "web-ext": "^9.3.0",
+    "web-ext": "^10.0.0",
     "webpack": "^5.105.3",
-    "webpack-cli": "^6.0.1"
+    "webpack-cli": "^7.0.2"
   },
   "repository": {
     "type": "git",
