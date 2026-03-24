@@ -66,9 +66,9 @@ const indexPath = path.join(distPath, 'index.html');
 if (fs.existsSync(indexPath)) {
 	let html = fs.readFileSync(indexPath, 'utf8');
 
-	// Update script and stylesheet references
-	html = html.replace(/src="([^"]+\.js)"/g, 'src="js/$1"');
-	html = html.replace(/href="([^"]+\.css)"/g, 'href="css/$1"');
+	// Update script and stylesheet references, but keep the operation idempotent.
+	html = html.replace(/src="((?!js\/)[^"]+\.js)"/g, 'src="js/$1"');
+	html = html.replace(/href="((?!css\/)[^"]+\.css)"/g, 'href="css/$1"');
 
 	fs.writeFileSync(indexPath, html);
 	console.log('Updated index.html file references');
@@ -80,8 +80,11 @@ cssFiles.forEach((cssFile) => {
 	const cssPath = path.join(distPath, 'css', cssFile);
 	let css = fs.readFileSync(cssPath, 'utf8');
 
-	// Update FontAwesome font paths to point to ../assets/fonts/
-	css = css.replace(/url\(([^)]*)(fa-[^)]+\.(woff2?|ttf|eot))\)/g, 'url(../assets/fonts/$2)');
+	// Update FontAwesome font paths to point to ../assets/fonts/ without duplicating the prefix.
+	css = css.replace(
+		/url\((?!\.\.\/assets\/fonts\/)([^)]*)(fa-[^)]+\.(woff2?|ttf|eot))\)/g,
+		'url(../assets/fonts/$2)'
+	);
 
 	fs.writeFileSync(cssPath, css);
 	console.log(`Updated font paths in: css/${cssFile}`);
