@@ -125,8 +125,8 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 
 - 🛠️ **[Developer Guide](DEVELOPER.md)** - Setup, architecture, and contribution guidelines
 - 📚 **[Version History](HISTORY.md)** - Complete changelog with all versions
-- 🧪 **Testing** - 223 passing unit tests with comprehensive coverage
-- 🔧 **Build System** - Modern webpack-based build process
+- 🧪 **Testing** - 264 passing unit tests with comprehensive coverage
+- 🔧 **Build System** - Angular CLI + Vite build pipeline with automated packaging for both Chromium and Firefox
 
 ## 🤝 Contributing
 
