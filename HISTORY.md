@@ -2,6 +2,30 @@
 
 ## 📋 Complete Changelog
 
+### 5.0.7
+
+#### Bug Fixes
+
+- **🖼️ End key now navigates to the last visible image** — When broken images were hidden, the End key would overshoot the visible list and silently do nothing. All keyboard navigation (End, Home, arrow keys) now uses the filtered visible image list ([#94](https://github.com/DanAtkinson/Fuskr/issues/94))
+- **🛡️ Navigation blocked during active ZIP download** — Clicking "View Options" or "History" while a ZIP download was in progress would silently cancel it. A confirmation prompt is now shown, and the browser's `beforeunload` event is also handled to catch tab closes and navigations ([#94](https://github.com/DanAtkinson/Fuskr/issues/94))
+- **🦊 Firefox build corrections** — Resolved Firefox extension build issues; replaced use of `alert()`/`prompt()` with browser-compatible alternatives
+
+#### Improvements
+
+- **🧪 Playwright end-to-end tests** — Added full Playwright e2e test suite for the Chrome extension, loading the unpacked extension in a real Chromium browser
+- **⚡ Migrated from Karma to Vitest** — Faster, more reliable unit test runner with improved watch mode and coverage reporting
+- **📈 Increased unit test coverage** — Additional tests for session auto-removal, compression modes, video error handling, metadata, and URL decoding; 80% coverage watermarks enforced on the build
+
+#### Dependency Updates
+
+- Upgraded to Angular v21.1.2 (latest stable)
+- Updated to Node.js v24 LTS across all configurations
+- Font Awesome upgraded from 6.x to 7.1.0
+- Fixed CVE-2026-25536 security vulnerability
+- Multiple dependency bumps for security and compatibility (tar, lodash, flatted, hono, immutable, node-forge, jasmine-core, @types/jasmine)
+
+---
+
 ### 5.0.0 ⭐ **Major Release**
 
 - **🏗️ Major Architecture Overhaul** - Complete rewrite using Angular 20.1.2 with TypeScript for modern, maintainable code
