@@ -33,7 +33,6 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	enableOverloadProtection = true;
 	errorMessage = '';
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
-	imageUrls: string[] = []; // Deprecated: Use mediaItems instead
 	isDownloading = false;
 	loadedImages = 0;
 	loading = false;
@@ -96,8 +95,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	async downloadAll() {
-		// Use mediaItems if available, otherwise fall back to imageUrls for backward compatibility
-		const totalItems = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
+		const totalItems = this.mediaItems.length;
 		if (totalItems === 0) return;
 
 		// Prompt user for zip filename with timestamp default
@@ -293,11 +291,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	getAllUrlsText(): string {
-		// Use mediaItems if available, otherwise fall back to imageUrls for backward compatibility
-		if (this.mediaItems.length > 0) {
-			return this.mediaItems.map((item) => item.url).join('\n');
-		}
-		return this.imageUrls.join('\n');
+		return this.mediaItems.map((item) => item.url).join('\n');
 	}
 
 	private updateAllUrlsText(): void {
@@ -455,9 +449,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 					container.remove();
 
 					// Update arrays to remove broken URL
-					this.imageUrls = this.imageUrls.filter((url: string) => url !== originalUrl);
 					this.mediaItems = this.mediaItems.filter((item) => item.url !== originalUrl);
-					this.totalImages = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
+					this.totalImages = this.mediaItems.length;
 
 					this.logger.debug('GalleryComponent', 'Auto-removed broken media', {
 						url: originalUrl,
@@ -597,9 +590,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		});
 
 		// Update both arrays to remove broken URLs
-		this.imageUrls = this.imageUrls.filter((url: string) => !brokenUrls.has(url));
 		this.mediaItems = this.mediaItems.filter((item) => !brokenUrls.has(item.url));
-		this.totalImages = this.mediaItems.length > 0 ? this.mediaItems.length : this.imageUrls.length;
+		this.totalImages = this.mediaItems.length;
 		this.brokenImages = 0;
 
 		this.logger.debug('GalleryComponent', 'Removed broken images', {
@@ -1123,24 +1115,22 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private async performGalleryGeneration() {
 		this.loading = true;
 		this.errorMessage = '';
-		this.imageUrls = [];
 		this.mediaItems = [];
 
 		try {
 			const result = this.fuskrService.generateImageGallery(this.originalUrl);
-			this.imageUrls = result.urls; // Keep for backward compatibility
-			this.totalImages = this.imageUrls.length;
+			this.totalImages = result.urls.length;
 			this.loadedImages = 0;
 			this.brokenImages = 0;
 
 			// Create MediaItems immediately with fallback extension-based detection
-			if (this.imageUrls.length > 0) {
+			if (result.urls.length > 0) {
 				this.logger.info('GalleryComponent', 'Creating media items with fallback detection', {
-					totalUrls: this.imageUrls.length,
+					totalUrls: result.urls.length,
 				});
 
 				// Create media items immediately using fallback extension-based detection
-				this.mediaItems = this.imageUrls.map((url) => {
+				this.mediaItems = result.urls.map((url) => {
 					const mediaItem = this.mediaTypeService.createMediaItem(url);
 					// Use fallback detection to get immediate type/MIME info
 					const fallbackResult = this.mediaTypeService.fallbackTypeDetection(url);
@@ -1189,11 +1179,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.updateBrowserUrl(this.originalUrl);
 
 			// Add the gallery to history if it was successfully generated
-			if (this.imageUrls.length > 0) {
+			if (this.mediaItems.length > 0) {
 				this.addToHistory();
 			}
 
-			if (this.imageUrls.length === 0) {
+			if (this.mediaItems.length === 0) {
 				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
 				this.loading = false;
 			}

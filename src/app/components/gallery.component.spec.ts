@@ -65,7 +65,7 @@ describe('GalleryComponent', () => {
 
 		it('should initialise with default values', () => {
 			expect(component.originalUrl).toBe('');
-			expect(component.imageUrls).toEqual([]);
+			expect(component.mediaItems).toEqual([]);
 			expect(component.loading).toBeFalsy();
 		});
 	});
@@ -101,7 +101,7 @@ describe('GalleryComponent', () => {
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(mockMediaTypeService.createMediaItem).toHaveBeenCalledTimes(2);
 			expect(mockMediaTypeService.fallbackTypeDetection).toHaveBeenCalledTimes(2);
-			expect(component.imageUrls).toEqual(mockResult.urls);
+			expect(component.mediaItems.map((m) => m.url)).toEqual(mockResult.urls);
 			expect(component.mediaItems.length).toBe(2);
 			expect(component.mediaItems[0].type).toBe('image');
 			expect(component.originalUrl).toBe(mockResult.originalUrl);
@@ -290,8 +290,6 @@ describe('GalleryComponent', () => {
 
 	describe('Image Viewer', () => {
 		beforeEach(() => {
-			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
-			// Set up mediaItems to match imageUrls for navigation tests
 			component.mediaItems = [
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
@@ -367,7 +365,11 @@ describe('GalleryComponent', () => {
 
 	describe('URL List Features', () => {
 		beforeEach(() => {
-			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
+			component.mediaItems = [
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			];
 		});
 
 		it('should toggle URL list visibility', () => {
@@ -424,7 +426,6 @@ describe('GalleryComponent', () => {
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 			];
-			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
 		});
 
 		it('should auto-remove broken images when setting is enabled', () => {
@@ -467,8 +468,7 @@ describe('GalleryComponent', () => {
 			// Verify container.remove() was called
 			expect(mockContainer.remove).toHaveBeenCalled();
 
-			// Verify the arrays were updated
-			expect(component.imageUrls).toEqual(['url1.jpg', 'url3.jpg']);
+			// Verify the mediaItems array was updated
 			expect(component.mediaItems).toEqual([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
@@ -502,7 +502,6 @@ describe('GalleryComponent', () => {
 					}
 				).brokenUrls.has('url2.jpg')
 			).toBe(true);
-			expect(component.imageUrls).toEqual(['url1.jpg', 'url2.jpg', 'url3.jpg']); // Still contains broken URL
 			expect(component.mediaItems.length).toBe(3); // Still has all items
 		});
 	});
@@ -514,7 +513,6 @@ describe('GalleryComponent', () => {
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 			];
-			component.imageUrls = ['url1.jpg', 'url2.jpg', 'url3.jpg'];
 			// Ensure brokenUrls Set exists
 			(
 				component as unknown as {
@@ -543,9 +541,8 @@ describe('GalleryComponent', () => {
 
 			component.onImageError(errorEvent);
 
-			// Container removed and arrays updated (url2 removed)
+			// Container removed and mediaItems updated (url2 removed)
 			expect(container.remove).toHaveBeenCalled();
-			expect(component.imageUrls).toEqual(['url1.jpg', 'url3.jpg']);
 			expect(component.mediaItems.map((m) => m.url)).toEqual(['url1.jpg', 'url3.jpg']);
 		});
 	});

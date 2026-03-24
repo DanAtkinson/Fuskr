@@ -13,10 +13,20 @@ export default defineConfig(({ mode }) => ({
 		include: ['src/**/*.spec.ts'],
 		reporters: ['default'],
 		coverage: {
-			enabled: false,
+			enabled: true,
 			provider: 'v8',
 			reportsDirectory: 'coverage/fuskr',
 			reporter: ['html', 'text-summary', 'lcovonly'],
+			// Thresholds reflect current coverage as a regression guard.
+			// ChromeService (~17% coverage) wraps browser extension APIs that
+			// require heavy mocking; GalleryComponent has many untested paths.
+			// These values should be ratcheted up as coverage improves.
+			thresholds: {
+				statements: 60,
+				branches: 50,
+				functions: 65,
+				lines: 60,
+			},
 		},
 	},
 	define: {

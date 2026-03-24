@@ -163,7 +163,7 @@ export class FuskrService {
 	isNumeric = (url: string): boolean => this.numericRegex.test(url);
 
 	// Private properties (alphabetically)
-	private readonly alphabeticRegex = /^(.*?)\[(\w)-(\w)\](.*)$/;
+	private readonly alphabeticRegex = /^(.*?)\[([a-zA-Z])-([a-zA-Z])\](.*)$/;
 	private readonly groupRegex = /\{\d+\}/;
 	private readonly numericRegex = /^(.*?)\[(\d+)-(\d+)\](.*)$/;
 
