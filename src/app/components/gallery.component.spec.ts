@@ -766,15 +766,18 @@ describe('GalleryComponent', () => {
 
 			component.navigateToHistory();
 
-			expect(window.confirm).toHaveBeenCalledWith(
-				expect.stringContaining('download is in progress')
-			);
+			expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('download is in progress'));
 		});
 	});
 
 	describe('Keyboard navigation (gallery)', () => {
 		const makeItems = (urls: string[]): MediaItem[] =>
-			urls.map((url) => ({ url, type: 'image' as const, mimeType: 'image/jpeg', loadingState: 'loaded' as const }));
+			urls.map((url) => ({
+				url,
+				type: 'image' as const,
+				mimeType: 'image/jpeg',
+				loadingState: 'loaded' as const,
+			}));
 
 		beforeEach(() => {
 			component.mediaItems = makeItems(['a.jpg', 'b.jpg', 'c.jpg']);
@@ -807,11 +810,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('End key does nothing when all images are broken and hidden', () => {
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set([
-				'a.jpg',
-				'b.jpg',
-				'c.jpg',
-			]);
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['a.jpg', 'b.jpg', 'c.jpg']);
 			component.currentGalleryIndex = -1;
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
