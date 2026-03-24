@@ -375,11 +375,24 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 	}
 
+	@HostListener('window:beforeunload', ['$event'])
+	handleBeforeUnload(event: BeforeUnloadEvent) {
+		if (this.isDownloading) {
+			event.preventDefault();
+		}
+	}
+
 	navigateToHistory() {
+		if (this.isDownloading && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
+			return;
+		}
 		this.router.navigate(['/history']);
 	}
 
 	navigateToOptions() {
+		if (this.isDownloading && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
+			return;
+		}
 		this.router.navigate(['/options']);
 	}
 

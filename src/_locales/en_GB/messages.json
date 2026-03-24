@@ -300,6 +300,10 @@
 		"message": "View Options",
 		"description": "Button text to view options/settings"
 	},
+	"Gallery_DownloadInProgress_ConfirmLeave": {
+		"message": "A download is in progress. Navigating away will cancel it. Are you sure?",
+		"description": "Confirmation prompt when the user tries to navigate away whilst a ZIP download is in progress"
+	},
 	"Gallery_SwitchToLightMode": {
 		"message": "Switch to Light Mode",
 		"description": "Theme toggle tooltip for switching to light mode"

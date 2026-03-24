@@ -75,6 +75,8 @@ export class BaseComponentTestHelper {
 				Gallery_DownloadFailed: 'Download failed',
 				Gallery_ImageNotFound: 'Image not found',
 				Gallery_ViewHistory: 'View Gallery History',
+				Gallery_DownloadInProgress_ConfirmLeave:
+					'A download is in progress. Navigating away will cancel it. Are you sure?',
 				History_Title: 'Gallery History',
 				History_Description: 'Quick access to your previously generated galleries',
 				History_NewGallery: 'New Gallery',

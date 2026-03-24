@@ -637,6 +637,141 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('Navigation guard during download', () => {
+		it('should navigate to history when not downloading', () => {
+			component.isDownloading = false;
+
+			component.navigateToHistory();
+
+			expect(mockRouter.navigate).toHaveBeenCalledWith(['/history']);
+		});
+
+		it('should navigate to options when not downloading', () => {
+			component.isDownloading = false;
+
+			component.navigateToOptions();
+
+			expect(mockRouter.navigate).toHaveBeenCalledWith(['/options']);
+		});
+
+		it('should block navigation to history and prompt when download is in progress', () => {
+			component.isDownloading = true;
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			component.navigateToHistory();
+
+			expect(window.confirm).toHaveBeenCalled();
+			expect(mockRouter.navigate).not.toHaveBeenCalled();
+		});
+
+		it('should block navigation to options and prompt when download is in progress', () => {
+			component.isDownloading = true;
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			component.navigateToOptions();
+
+			expect(window.confirm).toHaveBeenCalled();
+			expect(mockRouter.navigate).not.toHaveBeenCalled();
+		});
+
+		it('should allow navigation to history when user confirms despite active download', () => {
+			component.isDownloading = true;
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			component.navigateToHistory();
+
+			expect(mockRouter.navigate).toHaveBeenCalledWith(['/history']);
+		});
+
+		it('should allow navigation to options when user confirms despite active download', () => {
+			component.isDownloading = true;
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+
+			component.navigateToOptions();
+
+			expect(mockRouter.navigate).toHaveBeenCalledWith(['/options']);
+		});
+
+		it('should set beforeunload handler when download is in progress', () => {
+			component.isDownloading = true;
+			const event = new Event('beforeunload') as BeforeUnloadEvent;
+			vi.spyOn(event, 'preventDefault');
+
+			component.handleBeforeUnload(event);
+
+			expect(event.preventDefault).toHaveBeenCalled();
+		});
+
+		it('should not interfere with beforeunload when not downloading', () => {
+			component.isDownloading = false;
+			const event = new Event('beforeunload') as BeforeUnloadEvent;
+			vi.spyOn(event, 'preventDefault');
+
+			component.handleBeforeUnload(event);
+
+			expect(event.preventDefault).not.toHaveBeenCalled();
+		});
+
+		it('should not show a confirm dialog when navigating to history whilst idle', () => {
+			component.isDownloading = false;
+			vi.spyOn(window, 'confirm');
+
+			component.navigateToHistory();
+
+			expect(window.confirm).not.toHaveBeenCalled();
+		});
+
+		it('should not show a confirm dialog when navigating to options whilst idle', () => {
+			component.isDownloading = false;
+			vi.spyOn(window, 'confirm');
+
+			component.navigateToOptions();
+
+			expect(window.confirm).not.toHaveBeenCalled();
+		});
+
+		it('should allow navigation to history once isDownloading resets to false', () => {
+			component.isDownloading = true;
+			component.isDownloading = false;
+
+			component.navigateToHistory();
+
+			// No confirm dialog, navigation proceeds directly
+			expect(mockRouter.navigate).toHaveBeenCalledWith(['/history']);
+		});
+
+		it('should allow navigation to options once isDownloading resets to false', () => {
+			component.isDownloading = true;
+			component.isDownloading = false;
+
+			component.navigateToOptions();
+
+			expect(mockRouter.navigate).toHaveBeenCalledWith(['/options']);
+		});
+
+		it('should not navigate when user cancels both history and options prompts', () => {
+			component.isDownloading = true;
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			component.navigateToHistory();
+			component.navigateToOptions();
+
+			expect(mockRouter.navigate).not.toHaveBeenCalled();
+			expect(window.confirm).toHaveBeenCalledTimes(2);
+		});
+
+		it('should show the download-in-progress confirmation message', () => {
+			component.isDownloading = true;
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			component.navigateToHistory();
+
+			expect(window.confirm).toHaveBeenCalledWith(
+				expect.stringContaining('download is in progress')
+			);
+		});
+	});
+
 	describe('toggleBrokenImagesVisibility', () => {
 		it('should update styles on broken images when toggled', async () => {
 			component.showBrokenImages = false;
