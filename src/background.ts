@@ -6,7 +6,7 @@ import { ChromeStorageData } from './app/models/chrome-storage/chrome-storage-da
 // Background script for Chrome extension
 // This runs as a service worker in Manifest V3
 
-class BackgroundScript {
+export class BackgroundScript {
 	private fuskrService = new FuskrService();
 	private historyIds: [string, string][] = [];
 	private recentId: string | null = null;
@@ -613,5 +613,9 @@ class BackgroundScript {
 	}
 }
 
-// Initialize the background script
-new BackgroundScript();
+// Initialise the background script.
+// The guard prevents errors when this module is imported in a test environment
+// where the chrome global is not yet available.
+if (typeof chrome !== 'undefined') {
+	new BackgroundScript();
+}
