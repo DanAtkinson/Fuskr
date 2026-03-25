@@ -17,7 +17,7 @@ export class BaseComponentTestHelper {
 		} as unknown as Mocked<ChromeService>;
 
 		// Setup getMessage mock to return translated text
-		chromeServiceSpy.getMessage.mockImplementation((key: string) => {
+		chromeServiceSpy.getMessage.mockImplementation((key: string, substitutions?: string[]) => {
 			const translations: Record<string, string> = {
 				Options_Title: 'Fuskr Options',
 				Options_Appearance: 'Appearance',
@@ -45,6 +45,10 @@ export class BaseComponentTestHelper {
 				Options_SettingsSaved: 'Options saved!',
 				Options_ErrorSaving: 'Error saving options',
 				Gallery_Title: 'Fuskr Gallery',
+				Gallery_SkipToGallery: 'Skip to gallery',
+				Gallery_CopiedUrl: 'URL copied to clipboard',
+				Gallery_CopiedAllUrls: 'Copied $1 URLs to clipboard',
+				Gallery_CopyFailed: 'Failed to copy to clipboard',
 				Gallery_SwitchToLightMode: 'Switch to Light Mode',
 				Gallery_SwitchToDarkMode: 'Switch to Dark Mode',
 				Gallery_GenerateGallery: 'Generate Gallery',
@@ -96,7 +100,13 @@ export class BaseComponentTestHelper {
 				History_CreatedOn: 'Created',
 				ContextMenu_History: 'History',
 			};
-			return translations[key] || key;
+			let msg = translations[key] || key;
+			if (substitutions) {
+				substitutions.forEach((val, i) => {
+					msg = msg.replace(new RegExp(`\\$${i + 1}`, 'g'), val);
+				});
+			}
+			return msg;
 		});
 
 		// Setup other method defaults

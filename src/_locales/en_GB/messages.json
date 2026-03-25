@@ -288,6 +288,28 @@
 	"Options_Debug": {
 		"message": "Debug & Diagnostics"
 	},
+	"Gallery_SkipToGallery": {
+		"message": "Skip to gallery",
+		"description": "Screen reader skip link to jump past navigation to the gallery content"
+	},
+	"Gallery_CopiedUrl": {
+		"message": "URL copied to clipboard",
+		"description": "Toast notification shown after copying a single URL to the clipboard"
+	},
+	"Gallery_CopiedAllUrls": {
+		"message": "Copied $COUNT$ URLs to clipboard",
+		"description": "Toast notification shown after copying all URLs to the clipboard",
+		"placeholders": {
+			"count": {
+				"content": "$1",
+				"example": "42"
+			}
+		}
+	},
+	"Gallery_CopyFailed": {
+		"message": "Failed to copy to clipboard",
+		"description": "Toast notification shown when copying to the clipboard fails"
+	},
 	"Gallery_Title": {
 		"message": "Fuskr Gallery",
 		"description": "Main title of the gallery page"

@@ -492,6 +492,66 @@ describe('GalleryComponent', () => {
 
 			expect(loggerSpy).toHaveBeenCalledWith('gallery.copyUrls.failed', 'Failed to copy URLs', expect.any(Error));
 		});
+
+		it('should show toast after copying a single URL', async () => {
+			const testUrl = 'https://example.com/test.jpg';
+			const mockEvent = new Event('click');
+			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.resolve());
+
+			await component.copyUrl(testUrl, mockEvent);
+
+			expect(component.toastVisible).toBe(true);
+			expect(component.toastMessage).toBe('URL copied to clipboard');
+		});
+
+		it('should show toast with count after copying all URLs', async () => {
+			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.resolve());
+
+			await component.copyAllUrls();
+
+			expect(component.toastVisible).toBe(true);
+			expect(component.toastMessage).toContain('3');
+		});
+
+		it('should show error toast when clipboard copy fails', async () => {
+			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.reject(new Error('Clipboard error')));
+
+			await component.copyAllUrls();
+
+			expect(component.toastVisible).toBe(true);
+			expect(component.toastMessage).toBe('Failed to copy to clipboard');
+		});
+
+		it('should auto-dismiss toast after timeout', () => {
+			vi.useFakeTimers();
+
+			component['showToast']('Test message');
+
+			expect(component.toastVisible).toBe(true);
+
+			vi.advanceTimersByTime(2500);
+
+			expect(component.toastVisible).toBe(false);
+
+			vi.useRealTimers();
+		});
+
+		it('should reset toast timer when called again before dismissal', () => {
+			vi.useFakeTimers();
+
+			component['showToast']('First message');
+			vi.advanceTimersByTime(1000);
+			component['showToast']('Second message');
+
+			expect(component.toastMessage).toBe('Second message');
+			expect(component.toastVisible).toBe(true);
+
+			vi.advanceTimersByTime(2500);
+
+			expect(component.toastVisible).toBe(false);
+
+			vi.useRealTimers();
+		});
 	});
 
 	describe('Image Alt Text', () => {

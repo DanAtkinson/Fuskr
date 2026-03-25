@@ -43,6 +43,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	showBrokenImages = false;
 	showImageViewer = false;
 	showUrlList = false;
+	toastMessage = '';
+	toastVisible = false;
 	totalImages = 0;
 
 	// Computed properties for template
@@ -58,6 +60,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private brokenUrls = new Set<string>(); // Track URLs that failed to load persistently
 	private hasInitialized = false;
 	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
+	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
 	// Injected services
@@ -83,17 +86,18 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			const urlText = this.getAllUrlsText();
 			await navigator.clipboard.writeText(urlText);
 			this.logger.info('gallery.allUrlsCopied', 'All URLs copied to clipboard');
-			// Could show a toast notification here
+			this.showToast(this.translate('Gallery_CopiedAllUrls', [this.visibleMediaItems.length.toString()]));
 		} catch (error) {
 			this.logger.error('gallery.copyUrls.failed', 'Failed to copy URLs', error);
+			this.showToast(this.translate('Gallery_CopyFailed'), true);
 		}
 	}
 
 	copyUrl(url: string, event: Event) {
 		event.stopPropagation();
 		navigator.clipboard.writeText(url).then(() => {
-			// Could show a toast notification here
 			this.logger.info('gallery.urlCopied', 'URL copied to clipboard');
+			this.showToast(this.translate('Gallery_CopiedUrl'));
 		});
 	}
 
@@ -1417,5 +1421,21 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private getZipCompressionMode(totalItems: number): 'STORE' | 'DEFLATE' {
 		// Threshold chosen pragmatically; can be refined or made configurable later
 		return totalItems >= 300 ? 'STORE' : 'DEFLATE';
+	}
+
+	/** Displays a brief toast notification that auto-dismisses after 2.5 seconds. */
+	private showToast(message: string, isError = false): void {
+		if (this.toastTimeout !== null) {
+			clearTimeout(this.toastTimeout);
+		}
+		this.toastMessage = message;
+		this.toastVisible = true;
+		if (isError) {
+			this.toastMessage = message;
+		}
+		this.toastTimeout = setTimeout(() => {
+			this.toastVisible = false;
+			this.toastTimeout = null;
+		}, 2500);
 	}
 }
