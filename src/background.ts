@@ -461,8 +461,8 @@ export class BackgroundScript {
 		}
 
 		if (targetUrl && targetUrl.trim()) {
-			// Pass the target URL to createTab which will handle the extension URL construction
-			this.createTab(targetUrl, tab);
+			// Prefill the URL bar without auto-generating, so the user can review and adjust
+			this.createEditorTab(tab, { prefillUrl: targetUrl });
 		} else {
 			// If no valid URL available, open gallery in manual mode without pre-filling
 			// Query current active tab to ensure we get the correct window context

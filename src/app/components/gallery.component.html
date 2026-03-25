@@ -41,13 +41,22 @@
 		</div>
 	}
 
+	@if (isGenerating) {
+		<div class="generating-progress" role="status" aria-live="polite">
+			<p class="generating-label">{{ translate('Gallery_BuildingGallery', [mediaItems.length.toString(), totalImages.toString()]) }}</p>
+			<div class="progress" [attr.aria-valuenow]="mediaItems.length" aria-valuemin="0" [attr.aria-valuemax]="totalImages">
+				<div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="totalImages > 0 ? (mediaItems.length / totalImages) * 100 : 0"></div>
+			</div>
+		</div>
+	}
+
 	@if (errorMessage) {
 		<div class="error">
 			<p>{{ errorMessage }}</p>
 		</div>
 	}
 
-	@if (visibleMediaItems.length > 0 && !loading) {
+	@if (visibleMediaItems.length > 0) {
 		<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode === 'thumbnails'">
 			@for (mediaItem of visibleMediaItems; track mediaItem.url; let i = $index) {
 				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
@@ -93,14 +102,14 @@
 	}
 
 	<!-- Bottom Controls -->
-	@if (visibleMediaItems.length > 0 && !loading) {
+	@if (visibleMediaItems.length > 0) {
 		<div class="gallery-footer">
 			<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
 		</div>
 	}
 
 	<!-- URL List Section -->
-	@if (visibleMediaItems.length > 0 && !loading) {
+	@if (visibleMediaItems.length > 0) {
 		<div class="url-list-section">
 			<div class="url-list-header">
 				<button class="btn btn-outline-secondary btn-sm" type="button" (click)="toggleUrlList()" [attr.aria-expanded]="showUrlList">

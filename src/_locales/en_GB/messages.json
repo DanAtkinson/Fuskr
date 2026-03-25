@@ -382,6 +382,20 @@
 		"message": "Generating gallery...",
 		"description": "Loading text while generating gallery"
 	},
+	"Gallery_BuildingGallery": {
+		"message": "Building gallery… $CURRENT$ of $TOTAL$",
+		"description": "Progress text shown while progressively adding images to the gallery",
+		"placeholders": {
+			"current": {
+				"content": "$1",
+				"example": "25"
+			},
+			"total": {
+				"content": "$2",
+				"example": "100"
+			}
+		}
+	},
 	"Gallery_CopyUrl": {
 		"message": "Copy URL",
 		"description": "Button text to copy image URL"

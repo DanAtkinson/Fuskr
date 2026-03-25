@@ -177,7 +177,7 @@ describe('GalleryComponent', () => {
 			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled(); // Should not proceed
 		});
 
-		it('should proceed when user confirms overload protection warning', () => {
+		it('should proceed when user confirms overload protection warning', async () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[001-1000].jpg',
 				urls: Array.from(
@@ -189,11 +189,18 @@ describe('GalleryComponent', () => {
 			vi.spyOn(window, 'confirm').mockReturnValue(true); // User chooses to proceed
 			mockFuskrService.countPotentialUrls.mockReturnValue(1000);
 			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
+			mockMediaTypeService.createMediaItem.mockImplementation((url: string) => ({
+				url,
+				type: 'unknown',
+				mimeType: 'application/octet-stream',
+				loadingState: 'pending',
+			}));
+			mockMediaTypeService.fallbackTypeDetection.mockReturnValue({ type: 'image', mimeType: 'image/jpeg' });
 
 			component.originalUrl = 'https://example.com/image[001-1000].jpg';
 			component.enableOverloadProtection = true;
 			component.overloadProtectionLimit = 500;
-			component.generateGallery();
+			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
 			expect(window.confirm).toHaveBeenCalled();
@@ -202,7 +209,7 @@ describe('GalleryComponent', () => {
 			);
 		});
 
-		it('should bypass overload protection when disabled', () => {
+		it('should bypass overload protection when disabled', async () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[001-1000].jpg',
 				urls: Array.from(
@@ -212,10 +219,17 @@ describe('GalleryComponent', () => {
 			};
 
 			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
+			mockMediaTypeService.createMediaItem.mockImplementation((url: string) => ({
+				url,
+				type: 'unknown',
+				mimeType: 'application/octet-stream',
+				loadingState: 'pending',
+			}));
+			mockMediaTypeService.fallbackTypeDetection.mockReturnValue({ type: 'image', mimeType: 'image/jpeg' });
 
 			component.originalUrl = 'https://example.com/image[001-1000].jpg';
 			component.enableOverloadProtection = false; // Disabled
-			component.generateGallery();
+			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).not.toHaveBeenCalled(); // Should skip count check
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith(

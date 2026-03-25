@@ -177,6 +177,29 @@
 	padding: 40px;
 }
 
+.generating-progress {
+	padding: 12px 20px 16px;
+	margin-bottom: 12px;
+
+	.generating-label {
+		margin-bottom: 8px;
+		font-size: 0.9rem;
+		color: var(--text-muted-color, #6c757d);
+	}
+
+	.progress {
+		height: 6px;
+		border-radius: 3px;
+		background-color: var(--border-color);
+
+		.progress-bar {
+			background-color: var(--primary-color);
+			border-radius: 3px;
+			transition: width 0.1s ease-out;
+		}
+	}
+}
+
 .spinner {
 	width: 40px;
 	height: 40px;

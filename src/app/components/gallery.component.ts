@@ -34,6 +34,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	errorMessage = '';
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
 	isDownloading = false;
+	isGenerating = false;
 	loadedImages = 0;
 	loading = false;
 	mediaItems: MediaItem[] = [];
@@ -264,7 +265,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.chromeService.downloadFile(url, filename);
 	}
 
-	generateGallery() {
+	async generateGallery(): Promise<void> {
 		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl });
 		this.errorMessage = '';
 
@@ -287,14 +288,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				willTrigger: urlCount > this.overloadProtectionLimit,
 			});
 			if (urlCount > this.overloadProtectionLimit) {
-				this.showOverloadWarning(urlCount);
-				return;
+				const proceed = await this.showOverloadWarning(urlCount);
+				if (!proceed) return;
 			}
 		} else {
 			this.logger.debug('GalleryComponent', 'Overload protection is disabled');
 		}
 
-		this.performGalleryGeneration();
+		await this.performGalleryGeneration();
 	}
 
 	getAllUrlsText(): string {
@@ -1159,8 +1160,12 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	private async performGalleryGeneration() {
 		this.loading = true;
+		this.isGenerating = false;
 		this.errorMessage = '';
 		this.mediaItems = [];
+
+		// Yield to the event loop so Angular renders the spinner before work begins.
+		await Promise.resolve();
 
 		try {
 			const result = this.fuskrService.generateImageGallery(this.originalUrl);
@@ -1168,45 +1173,48 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.loadedImages = 0;
 			this.brokenImages = 0;
 
-			// Create MediaItems immediately with fallback extension-based detection
 			if (result.urls.length > 0) {
-				this.logger.info('GalleryComponent', 'Creating media items with fallback detection', {
+				this.logger.info('GalleryComponent', 'Building gallery progressively', {
 					totalUrls: result.urls.length,
 				});
 
-				// Create media items immediately using fallback extension-based detection
-				this.mediaItems = result.urls.map((url) => {
-					const mediaItem = this.mediaTypeService.createMediaItem(url);
-					// Use fallback detection to get immediate type/MIME info
-					const fallbackResult = this.mediaTypeService.fallbackTypeDetection(url);
-					return {
-						...mediaItem,
-						type: fallbackResult.type,
-						mimeType: fallbackResult.mimeType,
-						loadingState: 'loaded' as const, // Mark as loaded so UI renders immediately
-					};
-				});
+				// Switch from the initial spinner to the in-progress build view.
+				this.loading = false;
+				this.isGenerating = true;
 
-				// Update computed properties immediately
+				// Add items in small batches, yielding between each so Angular can
+				// render the growing list and the user sees the gallery build up.
+				const BATCH_SIZE = 50;
+				for (let i = 0; i < result.urls.length; i += BATCH_SIZE) {
+					const batch = result.urls.slice(i, i + BATCH_SIZE).map((url) => {
+						const mediaItem = this.mediaTypeService.createMediaItem(url);
+						const fallbackResult = this.mediaTypeService.fallbackTypeDetection(url);
+						return {
+							...mediaItem,
+							type: fallbackResult.type,
+							mimeType: fallbackResult.mimeType,
+							loadingState: 'loaded' as const,
+						};
+					});
+					this.mediaItems = [...this.mediaItems, ...batch];
+					// Yield to event loop after each batch so Angular renders new items
+					await Promise.resolve();
+				}
+
+				this.isGenerating = false;
 				this.updateAllUrlsText();
-
-				// Initialize keyboard navigation
 				this.initializeKeyboardNavigation();
 
-				// Hide loading state immediately so gallery renders
-				this.loading = false;
-
-				this.logger.info('GalleryComponent', 'Gallery rendered immediately with fallback detection', {
+				this.logger.info('GalleryComponent', 'Gallery built progressively', {
 					totalItems: this.mediaItems.length,
 					imageCount: this.mediaItems.filter((item) => item.type === 'image').length,
 					videoCount: this.mediaItems.filter((item) => item.type === 'video').length,
 					unknownCount: this.mediaItems.filter((item) => item.type === 'unknown').length,
 				});
 
-				// Now start progressive HTTP-based type detection in the background
+				// Start progressive HTTP-based type detection in the background.
 				this.startProgressiveTypeDetection();
 			} else {
-				// No URLs generated, hide loading state
 				this.loading = false;
 			}
 
@@ -1235,10 +1243,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		} catch (error) {
 			this.errorMessage = this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message;
 			this.loading = false;
+			this.isGenerating = false;
 		}
 	}
 
-	private showOverloadWarning(urlCount: number) {
+	private async showOverloadWarning(urlCount: number): Promise<boolean> {
 		const message = this.translate('Gallery_OverloadWarning', [
 			urlCount.toString(),
 			this.overloadProtectionLimit.toString(),
@@ -1256,10 +1265,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		if (proceed) {
 			this.logger.info('GalleryComponent', 'User chose to proceed with gallery generation despite warning');
-			this.performGalleryGeneration();
 		} else {
 			this.logger.info('GalleryComponent', 'User chose to cancel gallery generation');
 		}
+
+		return proceed;
 	}
 
 	private updateBrowserUrl(url: string) {

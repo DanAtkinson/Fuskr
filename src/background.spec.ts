@@ -45,6 +45,7 @@ interface PrivateBackgroundScript {
 	): void;
 	choiceOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
 	createRecentMenu(historyArray: string[]): void;
+	manualOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
 	recentOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
 	options: ChromeStorageData;
 	historyIds: [string, string][];
@@ -374,6 +375,53 @@ describe('BackgroundScript', () => {
 			const info = { menuItemId: 'FuskrHistory_0' } as unknown as chrome.contextMenus.OnClickData;
 			priv.recentOnClick(info, makeTab());
 			expect(warnSpy).toHaveBeenCalled();
+		});
+	});
+
+	// -------------------------------------------------------------------------
+	describe('manualOnClick', () => {
+		beforeEach(() => {
+			mockChrome.tabs.query.mockImplementation((_: unknown, cb: (tabs: chrome.tabs.Tab[]) => void) => {
+				cb([makeTab()]);
+			});
+			mockChrome.runtime.getURL.mockImplementation((path: string) => `chrome-extension://fake-id/${path}`);
+		});
+
+		it('should open gallery in prefill mode (not auto-generate) when a link URL is available', () => {
+			const info = {
+				menuItemId: 'FuskrManual',
+				linkUrl: 'https://example.com/img001.jpg',
+			} as unknown as chrome.contextMenus.OnClickData;
+			priv.manualOnClick(info, makeTab());
+			expect(mockChrome.tabs.create).toHaveBeenCalledWith(
+				expect.objectContaining({
+					url: expect.stringContaining('prefill='),
+				})
+			);
+			// Must NOT use the auto-generate ?url= param
+			expect(mockChrome.tabs.create).not.toHaveBeenCalledWith(
+				expect.objectContaining({ url: expect.stringContaining('?url=') })
+			);
+		});
+
+		it('should open gallery in prefill mode when a src URL is available', () => {
+			const info = {
+				menuItemId: 'FuskrManual',
+				srcUrl: 'https://example.com/photo002.jpg',
+			} as unknown as chrome.contextMenus.OnClickData;
+			priv.manualOnClick(info, makeTab());
+			expect(mockChrome.tabs.create).toHaveBeenCalledWith(
+				expect.objectContaining({ url: expect.stringContaining('prefill=') })
+			);
+		});
+
+		it('should open a bare gallery page (no URL params) when no valid URL is available', () => {
+			const info = { menuItemId: 'FuskrManual' } as unknown as chrome.contextMenus.OnClickData;
+			const tab = { ...makeTab(), url: '' } as chrome.tabs.Tab;
+			priv.manualOnClick(info, tab);
+			const callUrl: string = mockChrome.tabs.create.mock.calls[0][0].url as string;
+			expect(callUrl).not.toContain('prefill=');
+			expect(callUrl).not.toContain('?url=');
 		});
 	});
 });
