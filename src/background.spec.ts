@@ -35,7 +35,7 @@ const mockChrome = {
 	},
 };
 
-type PrivateBackgroundScript = {
+interface PrivateBackgroundScript {
 	isValidWebUrl(url: string): boolean;
 	l18nify(name: string): string;
 	handleStorageChanges(changes: Record<string, chrome.storage.StorageChange>): void;
@@ -50,7 +50,7 @@ type PrivateBackgroundScript = {
 	historyIds: [string, string][];
 	recentId: string | null;
 	openExtensionPage(tab: chrome.tabs.Tab, extensionPath: string): void;
-};
+}
 
 function makeTab(overrides: Partial<chrome.tabs.Tab> = {}): chrome.tabs.Tab {
 	return {
@@ -359,7 +359,7 @@ describe('BackgroundScript', () => {
 		});
 
 		it('should warn and not open a tab for an out-of-range index', () => {
-			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 			const info = { menuItemId: 'FuskrHistory_99' } as unknown as chrome.contextMenus.OnClickData;
 			priv.recentOnClick(info, makeTab());
 			expect(warnSpy).toHaveBeenCalled();
@@ -368,7 +368,7 @@ describe('BackgroundScript', () => {
 
 		it('should warn when historyIds is empty', () => {
 			priv.historyIds = [];
-			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+			const warnSpy = vi.spyOn(console, 'warn').mockImplementation(vi.fn());
 			const info = { menuItemId: 'FuskrHistory_0' } as unknown as chrome.contextMenus.OnClickData;
 			priv.recentOnClick(info, makeTab());
 			expect(warnSpy).toHaveBeenCalled();
