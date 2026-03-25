@@ -61,10 +61,7 @@ jobs:
      run: npm ci
 
    - name: 🔍 Run linter
-     run: |
-      echo "Running lint check..."
-      npm run lint || echo "⚠️ Lint issues found - see output above. This does not fail the build."
-      echo "✅ Lint check completed"
+     run: npm run lint
 
    - name: 🎨 Check code formatting
      run: |
@@ -107,6 +104,9 @@ jobs:
       else
         echo "Firefox packaging script not found, skipping"
       fi
+
+   - name: 🔍 Validate Firefox extension
+     run: npm run build:firefox:validate
 
    - name: 📤 Upload build artifacts
      uses: actions/upload-artifact@v7

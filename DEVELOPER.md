@@ -93,26 +93,22 @@ src/
 │   ├── models/                # Data models
 │   │   └── chrome-storage/    # Storage model implementations
 │   ├── app.component.ts       # Root standalone component
-│   └── app-routing.module.ts  # Legacy route module (not the active bootstrap path)
 ├── build/                     # Build scripts
 │   ├── organise-build.js      # File organisation
 │   ├── zip-build.js           # Package creation
 │   └── sync-version.js        # Version synchronisation
 ├── config/                    # Build configuration
-│   ├── webpack.background.js  # Service worker build
-│   ├── webpack.config.js      # Main webpack config
-│   └── karma.conf.js          # Test configuration
+│   └── webpack.background.js  # Service worker build (Vite handles app bundling)
 ├── assets/                    # Static assets
 ├── environments/              # Environment configs
-├── background.ts              # Background script source (webpack builds browser-specific output)
-├── fuskr-core.ts              # Core logic for service worker
+├── background.ts              # Extension service worker source (Webpack builds browser-specific output)
 ├── main.ts                    # Standalone Angular bootstrap and active route definitions
 ├── manifest.json              # Chrome manifest (V3)
 ├── manifest-firefox.json     # Firefox manifest (V3, gecko strict_min_version 128.0)
 └── _locales/                  # Internationalisation files
 ```
 
-Angular now boots with `bootstrapApplication()` in `src/main.ts`. There is no active `AppModule`; routing is provided at bootstrap time and the checked-in `src/app/app-routing.module.ts` is legacy code rather than the live entry point.
+Angular boots with `bootstrapApplication()` in `src/main.ts`. There is no active `AppModule`; routing is provided at bootstrap time.
 
 ### Key Services
 
@@ -216,9 +212,8 @@ The project uses GitHub Actions for continuous integration and deployment. The w
 **Automated Testing:**
 
 - Node.js 24.x in all CI jobs
-- Unit tests with Jasmine/Karma
-- Code coverage reporting with Codecov
-- Chrome headless browser testing
+- Unit tests with Vitest + `@analogjs/vite-plugin-angular`
+- Code coverage reporting with Codecov (v8 provider, `lcov.info`)
 - Playwright extension e2e coverage in the dedicated `e2e-chrome` job
 
 **Code Quality Checks:**
@@ -246,9 +241,9 @@ View the current build status: [![CI/CD Pipeline](https://github.com/DanAtkinson
 
 ### Test Setup
 
-- **Framework:** Jasmine with Karma runner
-- **Coverage:** Istanbul for code coverage reports
-- **Angular Testing:** Angular Testing Utilities for component testing
+- **Framework:** Vitest with `@analogjs/vite-plugin-angular`
+- **Coverage:** v8 provider (reports in `coverage/fuskr/`)
+- **Angular Testing:** Angular TestBed with `@analogjs/vitest-angular`
 - **E2E:** Playwright with a Chromium extension fixture
 
 ### Test Commands
@@ -271,25 +266,30 @@ npm run test:e2e:report # Open the Playwright HTML report
 ### Test Structure
 
 ```
-src/app/
-├── components/
-│   ├── gallery.component.spec.ts
-│   ├── options.component.spec.ts
-│   └── base.component.spec.ts
-├── services/
-│   ├── fuskr.service.spec.ts
-│   ├── chrome.service.spec.ts
-│   └── logger.service.spec.ts
-└── models/
-    └── chrome-storage.model.spec.ts
+src/
+├── background.spec.ts          # Background script (service worker) tests
+└── app/
+    ├── components/
+    │   ├── gallery.component.spec.ts
+    │   ├── history.component.spec.ts
+    │   ├── options.component.spec.ts
+    │   └── base.component.spec.ts
+    ├── services/
+    │   ├── fuskr.service.spec.ts
+    │   ├── chrome.service.spec.ts
+    │   └── logger.service.spec.ts
+    └── models/
+        └── chrome-storage.model.spec.ts
 ```
 
-### Test Coverage Goals
+### Test Coverage Thresholds
 
-- **Statements:** >80%
-- **Branches:** >75%
-- **Functions:** >80%
-- **Lines:** >80%
+Thresholds are enforced by Vitest in `vite.config.mts` as a regression guard against the current coverage baseline. These values should be ratcheted up as coverage improves.
+
+- **Statements:** ≥60%
+- **Branches:** ≥50%
+- **Functions:** ≥65%
+- **Lines:** ≥60%
 
 ## 🎨 Styling Architecture
 
@@ -363,15 +363,18 @@ src/app/
 ```json
 {
   "permissions": [
-    "tabs", // Access tab information
-    "downloads", // Download images
-    "storage", // Save user preferences
-    "contextMenus", // Context menu integration
-    "activeTab" // Access current tab
+    "tabs",        // Access tab information and create new tabs
+    "downloads",   // Download images and ZIP files
+    "storage",     // Save user preferences via chrome.storage.sync
+    "contextMenus", // Right-click context menu integration
+    "activeTab"    // Access current tab URL and index
   ],
   "host_permissions": [
-    "http://*/*", // Access HTTP content
-    "https://*/*" // Access HTTPS content
+    // Required for cross-origin image loading.
+    // The gallery fetches images from arbitrary third-party domains;
+    // without broad host access the browser blocks those requests.
+    "http://*/*",
+    "https://*/*"
   ]
 }
 ```
@@ -479,7 +482,7 @@ Fixes #issue-number
 #### Test Issues
 
 - **Problem:** Tests fail in headless mode
-- **Solution:** Check `karma.conf.js` browser configuration
+- **Solution:** Check `vite.config.mts` environment settings and ensure `jsdom` is configured
 
 ### Logging and Monitoring
 

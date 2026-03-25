@@ -25,6 +25,7 @@
 		"keyword": "fuskr"
 	},
 	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage"],
+	"_comment_host_permissions": "host_permissions is required for cross-origin image loading — the gallery fetches images from arbitrary third-party domains. Without broad host access the browser blocks requests to URLs that do not match the extension origin.",
 	"host_permissions": ["http://*/*", "https://*/*"],
 	"incognito": "split",
 	"icons": {
