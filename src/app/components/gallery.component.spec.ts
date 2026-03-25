@@ -363,6 +363,91 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('Image Viewer Focus Management', () => {
+		beforeEach(() => {
+			component.mediaItems = [
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			];
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+		});
+
+		it('should save the active element as the trigger when opening the viewer', () => {
+			const trigger = document.createElement('button');
+			document.body.appendChild(trigger);
+			trigger.focus();
+
+			component.openImageViewer('url1.jpg', 0);
+
+			expect((component as unknown as { viewerTriggerElement: HTMLElement | null }).viewerTriggerElement).toBe(
+				trigger
+			);
+			document.body.removeChild(trigger);
+		});
+
+		it('should restore focus to the trigger element after closing the viewer', () => {
+			vi.useFakeTimers();
+			const trigger = document.createElement('button');
+			document.body.appendChild(trigger);
+			const focusSpy = vi.spyOn(trigger, 'focus');
+
+			(component as unknown as { viewerTriggerElement: HTMLElement | null }).viewerTriggerElement = trigger;
+			component.showImageViewer = true;
+
+			component.closeImageViewer();
+			vi.runAllTimers();
+
+			expect(focusSpy).toHaveBeenCalled();
+			document.body.removeChild(trigger);
+		});
+
+		it('should trap Tab focus and wrap from last to first focusable element', () => {
+			component.showImageViewer = true;
+
+			// Create a minimal viewer-content element with two buttons
+			const modal = document.createElement('div');
+			modal.className = 'viewer-content';
+			const btn1 = document.createElement('button');
+			btn1.textContent = 'First';
+			const btn2 = document.createElement('button');
+			btn2.textContent = 'Last';
+			modal.appendChild(btn1);
+			modal.appendChild(btn2);
+			document.body.appendChild(modal);
+
+			// Simulate focus on last element, then Tab
+			btn2.focus();
+			const tabEvent = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
+			const preventSpy = vi.spyOn(tabEvent, 'preventDefault');
+			component.handleKeyboardEvent(tabEvent);
+			expect(preventSpy).toHaveBeenCalled();
+
+			document.body.removeChild(modal);
+		});
+
+		it('should trap Shift+Tab focus and wrap from first to last focusable element', () => {
+			component.showImageViewer = true;
+
+			const modal = document.createElement('div');
+			modal.className = 'viewer-content';
+			const btn1 = document.createElement('button');
+			btn1.textContent = 'First';
+			const btn2 = document.createElement('button');
+			btn2.textContent = 'Last';
+			modal.appendChild(btn1);
+			modal.appendChild(btn2);
+			document.body.appendChild(modal);
+
+			btn1.focus();
+			const shiftTabEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
+			const preventSpy = vi.spyOn(shiftTabEvent, 'preventDefault');
+			component.handleKeyboardEvent(shiftTabEvent);
+			expect(preventSpy).toHaveBeenCalled();
+
+			document.body.removeChild(modal);
+		});
+	});
+
 	describe('URL List Features', () => {
 		beforeEach(() => {
 			component.mediaItems = [
@@ -410,12 +495,41 @@ describe('GalleryComponent', () => {
 	});
 
 	describe('Image Alt Text', () => {
-		it('should generate correct alt text', () => {
-			const result = component.getImageAltText(0);
-			expect(result).toBe('Image 1');
+		beforeEach(() => {
+			component.mediaItems = [
+				{
+					url: 'https://example.com/image001.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/image002.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+			];
+			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			// Configure mock to return the filename portion of a URL
+			mockFuskrService.getImageFilename.mockImplementation((url: string) =>
+				url.substring(url.lastIndexOf('/') + 1)
+			);
+		});
 
-			const result2 = component.getImageAltText(5);
-			expect(result2).toBe('Image 6');
+		it('should return the filename from the URL as alt text', () => {
+			const result = component.getImageAltText(0);
+			expect(result).toBe('image001.jpg');
+		});
+
+		it('should return the correct filename for other indices', () => {
+			const result = component.getImageAltText(1);
+			expect(result).toBe('image002.jpg');
+		});
+
+		it('should fall back to numbered alt text when index is out of range', () => {
+			const result = component.getImageAltText(99);
+			expect(result).toBe('Image 100');
 		});
 	});
 

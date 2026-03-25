@@ -39,7 +39,10 @@ type PrivateBackgroundScript = {
 	isValidWebUrl(url: string): boolean;
 	l18nify(name: string): string;
 	handleStorageChanges(changes: Record<string, chrome.storage.StorageChange>): void;
-	createEditorTab(tab: chrome.tabs.Tab, options: { customCountDirection?: -1 | 0 | 1; errorKey?: string; prefillUrl?: string }): void;
+	createEditorTab(
+		tab: chrome.tabs.Tab,
+		options: { customCountDirection?: -1 | 0 | 1; errorKey?: string; prefillUrl?: string }
+	): void;
 	choiceOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
 	createRecentMenu(historyArray: string[]): void;
 	recentOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
@@ -77,12 +80,16 @@ describe('BackgroundScript', () => {
 		// removeAll immediately invokes its callback so createContextMenus() completes synchronously
 		mockChrome.contextMenus.removeAll.mockImplementation((cb?: () => void) => cb?.());
 		// loadOptions() calls chrome.storage.sync.get — return empty object by default
-		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) => cb?.({}));
+		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) =>
+			cb?.({})
+		);
 
 		vi.clearAllMocks();
 		// Re-apply implementations after clearAllMocks()
 		mockChrome.contextMenus.removeAll.mockImplementation((cb?: () => void) => cb?.());
-		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) => cb?.({}));
+		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) =>
+			cb?.({})
+		);
 
 		instance = new BackgroundScript();
 		priv = instance as unknown as PrivateBackgroundScript;
@@ -190,7 +197,9 @@ describe('BackgroundScript', () => {
 		});
 
 		it('should handle null/undefined changes object gracefully', () => {
-			expect(() => priv.handleStorageChanges(null as unknown as Record<string, chrome.storage.StorageChange>)).not.toThrow();
+			expect(() =>
+				priv.handleStorageChanges(null as unknown as Record<string, chrome.storage.StorageChange>)
+			).not.toThrow();
 		});
 	});
 
@@ -265,20 +274,30 @@ describe('BackgroundScript', () => {
 		});
 
 		it('should open editor tab with error when no URL is in context info', () => {
-			const info = { menuItemId: 'Fuskr_IncDec_10_One', linkUrl: undefined, srcUrl: undefined } as unknown as chrome.contextMenus.OnClickData;
+			const info = {
+				menuItemId: 'Fuskr_IncDec_10_One',
+				linkUrl: undefined,
+				srcUrl: undefined,
+			} as unknown as chrome.contextMenus.OnClickData;
 			priv.choiceOnClick(info, makeTab());
 			expect(capturedPath).toContain('errorKey=Application_Prompt_NotAValidFusk');
 		});
 
 		it('should open editor in custom-count mode when menu item is "Other"', () => {
-			const info = { menuItemId: 'Fuskr_IncDec_Other_One', linkUrl: 'https://example.com/image001.jpg' } as unknown as chrome.contextMenus.OnClickData;
+			const info = {
+				menuItemId: 'Fuskr_IncDec_Other_One',
+				linkUrl: 'https://example.com/image001.jpg',
+			} as unknown as chrome.contextMenus.OnClickData;
 			priv.choiceOnClick(info, makeTab());
 			expect(capturedPath).toContain('customCount=1');
 			expect(capturedPath).toContain('direction=1');
 		});
 
 		it('should open editor with error for unparseable menu item ID', () => {
-			const info = { menuItemId: 'InvalidMenuId', linkUrl: 'https://example.com/image001.jpg' } as unknown as chrome.contextMenus.OnClickData;
+			const info = {
+				menuItemId: 'InvalidMenuId',
+				linkUrl: 'https://example.com/image001.jpg',
+			} as unknown as chrome.contextMenus.OnClickData;
 			priv.choiceOnClick(info, makeTab());
 			expect(capturedPath).toContain('errorKey');
 		});
@@ -335,7 +354,7 @@ describe('BackgroundScript', () => {
 			const info = { menuItemId: 'FuskrHistory_1' } as unknown as chrome.contextMenus.OnClickData;
 			priv.recentOnClick(info, makeTab());
 			expect(mockChrome.tabs.create).toHaveBeenCalledWith(
-				expect.objectContaining({ url: expect.stringContaining(btoa('https://example.com/b[1-10].jpg')) }),
+				expect.objectContaining({ url: expect.stringContaining(btoa('https://example.com/b[1-10].jpg')) })
 			);
 		});
 

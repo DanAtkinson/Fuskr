@@ -58,6 +58,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private brokenUrls = new Set<string>(); // Track URLs that failed to load persistently
 	private hasInitialized = false;
 	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
+	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
 	// Injected services
 	private route = inject(ActivatedRoute);
@@ -73,6 +74,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Public methods (alphabetically)
 	closeImageViewer() {
 		this.showImageViewer = false;
+		// Return focus to the element that triggered the viewer
+		setTimeout(() => this.viewerTriggerElement?.focus(), 0);
 	}
 
 	async copyAllUrls() {
@@ -345,6 +348,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	getImageAltText(index: number): string {
+		const url = this.visibleMediaItems[index]?.url;
+		if (url) {
+			return this.getFilename(url);
+		}
 		return `${this.translate('Gallery_ImageAlt')} ${index + 1}`;
 	}
 
@@ -531,11 +538,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	openImageViewer(url: string, index: number) {
+		this.viewerTriggerElement = document.activeElement as HTMLElement;
 		this.currentViewerImage = url;
 		this.currentViewerIndex = index;
 		// Find the media item in visibleMediaItems using the visible index
 		this.currentMediaItem = this.visibleMediaItems[index] || null;
 		this.showImageViewer = true;
+		// Move focus into the modal after Angular renders it
+		setTimeout(() => {
+			const closeBtn = document.querySelector<HTMLElement>('.viewer-content .close-btn');
+			closeBtn?.focus();
+		}, 0);
 	}
 
 	previousImage() {
@@ -666,6 +679,12 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Keyboard navigation methods
 	@HostListener('document:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent) {
+		// Trap Tab focus within the viewer modal when it is open
+		if (this.showImageViewer && event.key === 'Tab') {
+			this.trapViewerFocus(event);
+			return;
+		}
+
 		// Don't handle if focus is on a form element
 		if (this.isFormElementFocused()) {
 			return;
@@ -738,6 +757,28 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		const formElements = ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'];
 		return formElements.includes(activeElement.tagName) || activeElement.hasAttribute('contenteditable');
+	}
+
+	/** Keeps Tab focus cycling within the image viewer modal. */
+	private trapViewerFocus(event: KeyboardEvent): void {
+		const modal = document.querySelector<HTMLElement>('.viewer-content');
+		if (!modal) return;
+
+		const focusableSelectors =
+			'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+		const focusable = Array.from(modal.querySelectorAll<HTMLElement>(focusableSelectors));
+		if (focusable.length === 0) return;
+
+		const first = focusable[0];
+		const last = focusable[focusable.length - 1];
+
+		if (event.shiftKey && document.activeElement === first) {
+			event.preventDefault();
+			last.focus();
+		} else if (!event.shiftKey && document.activeElement === last) {
+			event.preventDefault();
+			first.focus();
+		}
 	}
 
 	private navigateToNextImage() {
