@@ -1,4 +1,4 @@
-import type { Mock, MockedObject } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock, type MockedObject } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { OptionsComponent } from './options.component';

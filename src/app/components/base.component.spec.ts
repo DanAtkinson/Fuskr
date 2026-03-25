@@ -1,4 +1,4 @@
-import type { MockedObject } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type MockedObject } from 'vitest';
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BaseComponent } from './base.component';

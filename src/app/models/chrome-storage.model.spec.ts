@@ -1,5 +1,6 @@
 import { DisplaySettings, BehaviourSettings, SafetySettings, ChromeStorageData } from '@models/chrome-storage';
 import { IDisplaySettings, IBehaviourSettings, ISafetySettings, IChromeStorageData } from '@interfaces/chrome-storage';
+import { describe, it, expect } from 'vitest';
 
 describe('Chrome Storage Models', () => {
 	describe('DisplaySettings', () => {

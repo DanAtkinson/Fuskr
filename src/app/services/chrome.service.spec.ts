@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ChromeService } from './chrome.service';
 import { IChromeStorageData } from '@interfaces/chrome-storage';
 import { ChromeStorageData } from '@models/chrome-storage';
+import { vi, describe, beforeEach, afterEach, it, expect } from 'vitest';
 
 // Mock chrome API
 const mockChrome = {
