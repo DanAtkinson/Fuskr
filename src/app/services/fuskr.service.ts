@@ -65,16 +65,23 @@ export class FuskrService {
 	}
 
 	createFuskUrl(url: string, count: number, direction: number): string {
+		// Sanitise percent-encoded sequences (%XX) so the digit search below does not
+		// accidentally treat hex digits inside them as part of the file number.
+		// Each %XX token is exactly 3 characters; replacing it with 3 non-digit, non-%
+		// characters keeps all string positions identical so we can slice the original URL.
+		const sanitized = url.replace(/%[0-9A-Fa-f]{2}/g, '\x00\x00\x00');
 		const findDigitsRegexp = /^(.*?)(\d+)([^\d]*)$/;
-		const digitsCheck = findDigitsRegexp.exec(url);
+		const digitsCheck = findDigitsRegexp.exec(sanitized);
 
 		if (!digitsCheck) {
 			return url;
 		}
 
-		const begin = digitsCheck[1];
-		const number = digitsCheck[2];
-		const end = digitsCheck[3];
+		const prefixLen = digitsCheck[1].length;
+		const numberLen = digitsCheck[2].length;
+		const begin = url.slice(0, prefixLen);
+		const number = url.slice(prefixLen, prefixLen + numberLen);
+		const end = url.slice(prefixLen + numberLen);
 
 		const originalNum = parseInt(number, 10);
 		let firstNum = originalNum;

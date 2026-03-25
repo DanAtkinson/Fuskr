@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { FuskrService } from './fuskr.service';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 describe('FuskrService', () => {
 	let service: FuskrService;
@@ -160,6 +161,33 @@ describe('FuskrService', () => {
 		it('should handle different padding and offsets', () => {
 			const fuskUrl = service.createFuskUrl('http://example.com/test005.jpg', 3, 1);
 			expect(fuskUrl).toBe('http://example.com/test[005-008].jpg');
+		});
+
+		it('should not treat digits inside %XX percent-encoded sequences as the file number', () => {
+			// %20 is a space; '001' is the real file number — not '20001'.
+			// 001 - 20 = -19, which clamps to 0 (zero-padded to '000').
+			const fuskUrl = service.createFuskUrl('https://example.com/path%20to/Picture%20001.jpg', 20, 0);
+			expect(fuskUrl).toBe('https://example.com/path%20to/Picture%20[000-021].jpg');
+		});
+
+		it('should handle URLs where the filename number follows multiple %XX sequences', () => {
+			// 001 - 5 = -4, which clamps to 0 (zero-padded to '000').
+			const fuskUrl = service.createFuskUrl(
+				'https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg',
+				5,
+				0
+			);
+			expect(fuskUrl).toBe('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20[000-006].jpg');
+		});
+
+		it('should handle URLs where the filename number follows multiple %XX sequences and not change those values', () => {
+			// 001 - 1000 = -999, which clamps to 0 (zero-padded to '000').
+			const fuskUrl = service.createFuskUrl(
+				'https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg',
+				1000,
+				0
+			);
+			expect(fuskUrl).toBe('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20[000-1001].jpg');
 		});
 	});
 

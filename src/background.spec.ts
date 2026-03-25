@@ -354,7 +354,9 @@ describe('BackgroundScript', () => {
 			const info = { menuItemId: 'FuskrHistory_1' } as unknown as chrome.contextMenus.OnClickData;
 			priv.recentOnClick(info, makeTab());
 			expect(mockChrome.tabs.create).toHaveBeenCalledWith(
-				expect.objectContaining({ url: expect.stringContaining(btoa('https://example.com/b[1-10].jpg')) })
+				expect.objectContaining({
+					url: expect.stringContaining(encodeURIComponent(btoa('https://example.com/b[1-10].jpg'))),
+				})
 			);
 		});
 

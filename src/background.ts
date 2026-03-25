@@ -268,7 +268,9 @@ export class BackgroundScript {
 		}
 
 		this.addUrlToHistory(url, tab);
-		const encodedUrl = btoa(url);
+		// btoa() can produce '+' and '/' which are special in URL query strings.
+		// encodeURIComponent ensures the base64 is safely embedded in the fragment.
+		const encodedUrl = encodeURIComponent(btoa(url));
 		this.openExtensionPage(tab, `index.html#gallery?url=${encodedUrl}`);
 	}
 
