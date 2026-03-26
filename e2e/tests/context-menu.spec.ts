@@ -37,13 +37,13 @@ testWithExtension.describe('Context menu', () => {
 
 			// Use a simple data URL page with an image
 			await page.setContent(`
-        <html>
-          <body>
-            <img id="test-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="100" height="100" />
-            <p>Right-click the image to see the Fuskr context menu</p>
-          </body>
-        </html>
-      `);
+				<html>
+					<body>
+						<img id="test-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" width="100" height="100" />
+						<p>Right-click the image to see the Fuskr context menu</p>
+					</body>
+				</html>
+			`);
 
 			// Extension should be loaded — verify popup URL is reachable
 			const img = page.locator('#test-img');

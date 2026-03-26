@@ -22,27 +22,27 @@ const extensionIdBytes = hashBuffer.subarray(0, 16);
 
 // Convert to Chrome extension ID format (a-p instead of 0-f)
 const extensionId = Array.from(extensionIdBytes)
-  .map(byte => {
-    const hex = byte.toString(16).padStart(2, '0');
-    return hex
-      .replace(/0/g, 'a')
-      .replace(/1/g, 'b')
-      .replace(/2/g, 'c')
-      .replace(/3/g, 'd')
-      .replace(/4/g, 'e')
-      .replace(/5/g, 'f')
-      .replace(/6/g, 'g')
-      .replace(/7/g, 'h')
-      .replace(/8/g, 'i')
-      .replace(/9/g, 'j')
-      .replace(/a/g, 'k')
-      .replace(/b/g, 'l')
-      .replace(/c/g, 'm')
-      .replace(/d/g, 'n')
-      .replace(/e/g, 'o')
-      .replace(/f/g, 'p');
-  })
-  .join('');
+	.map(byte => {
+		const hex = byte.toString(16).padStart(2, '0');
+		return hex
+			.replace(/0/g, 'a')
+			.replace(/1/g, 'b')
+			.replace(/2/g, 'c')
+			.replace(/3/g, 'd')
+			.replace(/4/g, 'e')
+			.replace(/5/g, 'f')
+			.replace(/6/g, 'g')
+			.replace(/7/g, 'h')
+			.replace(/8/g, 'i')
+			.replace(/9/g, 'j')
+			.replace(/a/g, 'k')
+			.replace(/b/g, 'l')
+			.replace(/c/g, 'm')
+			.replace(/d/g, 'n')
+			.replace(/e/g, 'o')
+			.replace(/f/g, 'p');
+	})
+	.join('');
 
 console.log('🆔 Chrome Extension ID:');
 console.log(extensionId);
