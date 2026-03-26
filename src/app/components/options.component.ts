@@ -62,16 +62,19 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 
 	async ngOnInit() {
 		await this.loadOptions();
+		// Restore logging state from persistent storage, then sync logger service.
+		const hasLoggingPermissions = await this.chromeService.hasLoggingPermission();
+		if (this.options.logging.enabled && !hasLoggingPermissions) {
+			// Permission was revoked since last save — disable silently.
+			this.options.logging.enabled = false;
+			await this.chromeService.setStorageData(this.options);
+		}
+		this.logger.configure({ enabled: this.options.logging.enabled, logLevel: this.options.logging.logLevel });
 		this.loggerConfig = this.logger.getConfig();
 
-		// If logging is enabled in storage but the user has since revoked the
-		// data-collection permission, disable it silently on load.
+		// Auto-expand the debug panel when logging is already enabled.
 		if (this.loggerConfig.enabled) {
-			const permitted = await this.chromeService.hasLoggingPermission();
-			if (!permitted) {
-				this.logger.configure({ enabled: false });
-				this.loggerConfig = this.logger.getConfig();
-			}
+			this.showDebugPanel.set(true);
 		}
 	}
 
@@ -98,6 +101,8 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 
 		this.logger.configure({ enabled: isEnabled });
 		this.loggerConfig = this.logger.getConfig();
+		this.options.logging.enabled = isEnabled;
+		await this.chromeService.setStorageData(this.options);
 
 		const message = isEnabled ? 'Debug logging enabled' : 'Debug logging disabled';
 		this.showStatus(message);

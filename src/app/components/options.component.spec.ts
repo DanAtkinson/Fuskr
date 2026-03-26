@@ -409,6 +409,7 @@ describe('OptionsComponent', () => {
 			const event = makeCheckboxEvent(true);
 			await component.onLoggingToggle(event);
 			expect(component.loggerConfig.enabled).toBe(true);
+			expect(mockChromeService.setStorageData).toHaveBeenCalled();
 		});
 
 		it('should not enable logging and reverts checkbox when permission is denied', async () => {
@@ -428,19 +429,35 @@ describe('OptionsComponent', () => {
 	});
 
 	describe('ngOnInit logging permission check', () => {
+		const makeStorageWithLogging = (enabled: boolean) => new ChromeStorageData({ logging: { enabled, logLevel: 1 } } as Parameters<typeof ChromeStorageData>[0]);
+
 		it('should disable logging on init when permission has been revoked', async () => {
 			(mockChromeService.hasLoggingPermission as Mock).mockResolvedValue(false);
-			// Enable logging on the real logger so the permission check is triggered
-			component['logger'].configure({ enabled: true });
+			(mockChromeService.getStorageData as Mock).mockResolvedValue(makeStorageWithLogging(true));
 			await component.ngOnInit();
 			expect(component.loggerConfig.enabled).toBe(false);
+			expect(mockChromeService.setStorageData).toHaveBeenCalled();
 		});
 
 		it('should leave logging enabled on init when permission is still granted', async () => {
 			(mockChromeService.hasLoggingPermission as Mock).mockResolvedValue(true);
-			component['logger'].configure({ enabled: true });
+			(mockChromeService.getStorageData as Mock).mockResolvedValue(makeStorageWithLogging(true));
 			await component.ngOnInit();
 			expect(component.loggerConfig.enabled).toBe(true);
+		});
+
+		it('should auto-expand the debug panel when logging is enabled', async () => {
+			(mockChromeService.hasLoggingPermission as Mock).mockResolvedValue(true);
+			(mockChromeService.getStorageData as Mock).mockResolvedValue(makeStorageWithLogging(true));
+			await component.ngOnInit();
+			expect(component.showDebugPanel()).toBe(true);
+		});
+
+		it('should not expand the debug panel when logging is disabled', async () => {
+			(mockChromeService.hasLoggingPermission as Mock).mockResolvedValue(true);
+			(mockChromeService.getStorageData as Mock).mockResolvedValue(makeStorageWithLogging(false));
+			await component.ngOnInit();
+			expect(component.showDebugPanel()).toBe(false);
 		});
 	});
 });
