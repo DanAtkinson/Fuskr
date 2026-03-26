@@ -395,4 +395,52 @@ describe('OptionsComponent', () => {
 			vi.useRealTimers();
 		});
 	});
+
+	describe('onLoggingToggle', () => {
+		const makeCheckboxEvent = (checked: boolean): Event => {
+			const input = document.createElement('input');
+			input.type = 'checkbox';
+			input.checked = checked;
+			return { target: input } as unknown as Event;
+		};
+
+		it('should enable logging when permission is granted', async () => {
+			(mockChromeService.requestLoggingPermission as Mock).mockResolvedValue(true);
+			const event = makeCheckboxEvent(true);
+			await component.onLoggingToggle(event);
+			expect(component.loggerConfig.enabled).toBe(true);
+		});
+
+		it('should not enable logging and reverts checkbox when permission is denied', async () => {
+			(mockChromeService.requestLoggingPermission as Mock).mockResolvedValue(false);
+			const event = makeCheckboxEvent(true);
+			await component.onLoggingToggle(event);
+			expect(component.loggerConfig.enabled).toBe(false);
+			expect((event.target as HTMLInputElement).checked).toBe(false);
+		});
+
+		it('should disable logging without requesting permission when unchecking', async () => {
+			const event = makeCheckboxEvent(false);
+			await component.onLoggingToggle(event);
+			expect(mockChromeService.requestLoggingPermission).not.toHaveBeenCalled();
+			expect(component.loggerConfig.enabled).toBe(false);
+		});
+	});
+
+	describe('ngOnInit logging permission check', () => {
+		it('should disable logging on init when permission has been revoked', async () => {
+			(mockChromeService.hasLoggingPermission as Mock).mockResolvedValue(false);
+			// Enable logging on the real logger so the permission check is triggered
+			component['logger'].configure({ enabled: true });
+			await component.ngOnInit();
+			expect(component.loggerConfig.enabled).toBe(false);
+		});
+
+		it('should leave logging enabled on init when permission is still granted', async () => {
+			(mockChromeService.hasLoggingPermission as Mock).mockResolvedValue(true);
+			component['logger'].configure({ enabled: true });
+			await component.ngOnInit();
+			expect(component.loggerConfig.enabled).toBe(true);
+		});
+	});
 });

@@ -63,6 +63,16 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 	async ngOnInit() {
 		await this.loadOptions();
 		this.loggerConfig = this.logger.getConfig();
+
+		// If logging is enabled in storage but the user has since revoked the
+		// data-collection permission, disable it silently on load.
+		if (this.loggerConfig.enabled) {
+			const permitted = await this.chromeService.hasLoggingPermission();
+			if (!permitted) {
+				this.logger.configure({ enabled: false });
+				this.loggerConfig = this.logger.getConfig();
+			}
+		}
 	}
 
 	onDarkModeChange() {
@@ -70,9 +80,21 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
 	}
 
-	onLoggingToggle(event: Event) {
+	async onLoggingToggle(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const isEnabled = target.checked;
+
+		if (isEnabled) {
+			// On Firefox 139+, request the optional technicalAndInteraction
+			// data-collection permission before enabling logging.
+			const granted = await this.chromeService.requestLoggingPermission();
+			if (!granted) {
+				// User declined the permission prompt — revert the checkbox.
+				target.checked = false;
+				this.showStatus('Logging permission denied');
+				return;
+			}
+		}
 
 		this.logger.configure({ enabled: isEnabled });
 		this.loggerConfig = this.logger.getConfig();

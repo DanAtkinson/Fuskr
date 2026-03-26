@@ -1,1 +1,46 @@
-WE DO NOT TRACK YOUR USE OF THE FUSKR EXTENSION.
+PRIVACY STATEMENT FOR THE FUSKR BROWSER EXTENSION
+==================================================
+
+1. NO TRACKING OR TELEMETRY
+   Fuskr does not collect, transmit, or share any information about you or
+   your use of the extension.  No analytics, crash reporters, or telemetry
+   services of any kind are included.  Your browsing activity is never sent
+   anywhere by this extension.
+
+2. LOCAL STORAGE ONLY
+   The extension stores your preferences (display settings, gallery history,
+   and logging configuration) exclusively in your browser's local extension
+   storage.  This data never leaves your device.
+
+3. OPTIONAL DIAGNOSTIC LOGGING
+   Fuskr includes an opt-in diagnostic logging feature.  It is disabled by
+   default and must be explicitly enabled in the Options page.
+
+   On Firefox 139 and later, enabling logging will display a browser-native
+   consent prompt asking whether you agree to the extension collecting
+   technical and interaction data.  You may grant or revoke this consent at
+   any time via the "Permissions and data" tab in about:addons.
+
+   On Chrome, the same opt-in checkbox applies; no browser-level prompt is
+   shown as Chrome does not yet implement the data-collection permissions API.
+
+   When enabled, log entries are stored locally in your browser and are never
+   transmitted anywhere automatically.
+
+4. SHARING LOGS (ENTIRELY OPTIONAL)
+   If you are experiencing a problem with Fuskr and wish to help diagnose it,
+   you may use the "Export Logs" button in the Options page to download a log
+   file and attach it to a bug report on the Fuskr GitHub repository.
+
+   Before sharing any log file, please review its contents to ensure you are
+   comfortable with the information it contains.  Logs may include URLs of
+   images you attempted to gallery-ise and technical details about your
+   browser environment.  Never share logs that contain information you
+   consider sensitive.
+
+   Sharing logs is entirely voluntary and is never required.
+
+5. SUMMARY
+   - No tracking.  No telemetry.  No data leaves your device automatically.
+   - Logging is opt-in, local-only, and fully under your control.
+   - You choose if and when to share a log file, and with whom.

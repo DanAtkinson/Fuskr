@@ -12,6 +12,22 @@ interface TabInfo {
 	windowId?: number;
 }
 
+/** Shape of the object returned by browser.permissions.getAll(). */
+interface BrowserPermissions {
+	permissions: string[];
+	origins: string[];
+	/** Firefox 139+ only: granted optional data-collection categories. */
+	data_collection?: string[];
+}
+
+/** Argument accepted by browser.permissions.request(). */
+interface BrowserPermissionsRequest {
+	permissions?: string[];
+	origins?: string[];
+	/** Firefox 139+ only: data-collection categories to request. */
+	data_collection?: string[];
+}
+
 interface BrowserAPI {
 	tabs?: {
 		query: (queryInfo: { active: boolean; currentWindow: boolean }, callback: (tabs: TabInfo[]) => void) => void;
@@ -32,6 +48,10 @@ interface BrowserAPI {
 	};
 	i18n?: {
 		getMessage: (messageName: string, substitutions?: string | string[]) => string;
+	};
+	permissions?: {
+		getAll: () => Promise<BrowserPermissions>;
+		request: (permissions: BrowserPermissionsRequest) => Promise<boolean>;
 	};
 	runtime?: {
 		id?: string;
@@ -264,6 +284,54 @@ export class ChromeService {
 
 	isExtensionContext(): boolean {
 		return !!(this.browserAPI && this.browserAPI.runtime && this.browserAPI.runtime.id);
+	}
+
+	/**
+	 * Checks whether the user has already granted the optional
+	 * `technicalAndInteraction` data-collection permission.
+	 *
+	 * On Firefox 139+ this reflects the value stored in
+	 * `browser.permissions.getAll().data_collection`.  On Chrome, and on
+	 * any browser that does not yet support the `data_collection` field,
+	 * the method returns `true` so that logging behaviour is unchanged.
+	 */
+	async hasLoggingPermission(): Promise<boolean> {
+		if (!this.browserAPI?.permissions) {
+			return true;
+		}
+		try {
+			const perms = await this.browserAPI.permissions.getAll();
+			if (perms.data_collection === undefined) {
+				// Browser doesn't support data_collection permissions (e.g. Chrome)
+				return true;
+			}
+			return perms.data_collection.includes('technicalAndInteraction');
+		} catch {
+			return true;
+		}
+	}
+
+	/**
+	 * Requests the optional `technicalAndInteraction` data-collection
+	 * permission from the user.
+	 *
+	 * On Firefox 139+ this surfaces a browser-native consent prompt.
+	 * On Chrome, and on browsers that do not support the `data_collection`
+	 * request property, it returns `true` immediately so that logging can
+	 * proceed without modification.
+	 */
+	async requestLoggingPermission(): Promise<boolean> {
+		if (!this.browserAPI?.permissions) {
+			return true;
+		}
+		try {
+			return await this.browserAPI.permissions.request({
+				data_collection: ['technicalAndInteraction'],
+			});
+		} catch {
+			// Browser doesn't support data_collection in permissions.request()
+			return true;
+		}
 	}
 
 	async openTab(url: string, active = true): Promise<void> {

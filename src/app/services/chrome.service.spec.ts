@@ -223,6 +223,118 @@ describe('ChromeService', () => {
 		});
 	});
 
+	describe('hasLoggingPermission', () => {
+		it('should return true when browserAPI has no permissions property', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {};
+			expect(await testService.hasLoggingPermission()).toBe(true);
+		});
+
+		it('should return true when browserAPI is null', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = null;
+			expect(await testService.hasLoggingPermission()).toBe(true);
+		});
+
+		it('should return true when getAll() does not include data_collection (Chrome behaviour)', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: {
+					getAll: vi.fn().mockResolvedValue({ permissions: [], origins: [] }),
+				},
+			};
+			expect(await testService.hasLoggingPermission()).toBe(true);
+		});
+
+		it('should return true when data_collection includes technicalAndInteraction (Firefox granted)', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: {
+					getAll: vi.fn().mockResolvedValue({
+						permissions: [],
+						origins: [],
+						data_collection: ['technicalAndInteraction'],
+					}),
+				},
+			};
+			expect(await testService.hasLoggingPermission()).toBe(true);
+		});
+
+		it('should return false when data_collection is present but does not include technicalAndInteraction', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: {
+					getAll: vi.fn().mockResolvedValue({
+						permissions: [],
+						origins: [],
+						data_collection: [],
+					}),
+				},
+			};
+			expect(await testService.hasLoggingPermission()).toBe(false);
+		});
+
+		it('should return true when getAll() throws', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: { getAll: vi.fn().mockRejectedValue(new Error('not supported')) },
+			};
+			expect(await testService.hasLoggingPermission()).toBe(true);
+		});
+	});
+
+	describe('requestLoggingPermission', () => {
+		it('should return true when browserAPI has no permissions property', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {};
+			expect(await testService.requestLoggingPermission()).toBe(true);
+		});
+
+		it('should return true when browserAPI is null', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = null;
+			expect(await testService.requestLoggingPermission()).toBe(true);
+		});
+
+		it('should return true when the user grants the permission', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: {
+					request: vi.fn().mockResolvedValue(true),
+				},
+			};
+			expect(await testService.requestLoggingPermission()).toBe(true);
+		});
+
+		it('should return false when the user denies the permission', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: {
+					request: vi.fn().mockResolvedValue(false),
+				},
+			};
+			expect(await testService.requestLoggingPermission()).toBe(false);
+		});
+
+		it('should return true when request() throws (browser does not support data_collection)', async () => {
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = {
+				permissions: {
+					request: vi.fn().mockRejectedValue(new Error('not supported')),
+				},
+			};
+			expect(await testService.requestLoggingPermission()).toBe(true);
+		});
+
+		it('should call request with data_collection technicalAndInteraction', async () => {
+			const requestMock = vi.fn().mockResolvedValue(true);
+			const testService = Object.create(ChromeService.prototype);
+			testService.browserAPI = { permissions: { request: requestMock } };
+			await testService.requestLoggingPermission();
+			expect(requestMock).toHaveBeenCalledWith({ data_collection: ['technicalAndInteraction'] });
+		});
+	});
+
 	describe('resetOptionsToDefaults', () => {
 		it('should reset options to defaults while preserving history', async () => {
 			const currentData: IChromeStorageData = {

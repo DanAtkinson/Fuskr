@@ -14,6 +14,8 @@ export class BaseComponentTestHelper {
 			isExtensionContext: vi.fn(),
 			openTab: vi.fn(),
 			downloadFile: vi.fn(),
+			hasLoggingPermission: vi.fn().mockResolvedValue(true),
+			requestLoggingPermission: vi.fn().mockResolvedValue(true),
 		} as unknown as Mocked<ChromeService>;
 
 		// Setup getMessage mock to return translated text
