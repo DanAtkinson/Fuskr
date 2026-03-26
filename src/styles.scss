@@ -213,6 +213,11 @@ input[type='checkbox'] {
 	padding: 3rem;
 }
 
+// Ensure that icons (<span aria-hidden="true">) are properly sized (font-size should be 20px by default).
+span[aria-hidden='true'] {
+	font-size: 20px;
+}
+
 // Grid system
 .container {
 	max-width: 1200px;
