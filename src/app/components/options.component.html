@@ -157,10 +157,18 @@
 									<li>
 										<strong>{{ translate('Options_LoggerEnabled') }}</strong> {{ loggerConfig.enabled ? 'Yes' : 'No' }}
 									</li>
-									<li>
-										<strong>{{ translate('Options_LogLevel') }}</strong> {{ getLogLevelName(loggerConfig.logLevel) }}
+									<li class="mt-2">
+										<label for="logLevel"
+											><strong>{{ translate('Options_LogLevel') }}</strong></label
+										>
+										<select id="logLevel" class="form-select form-select-sm mt-1" [ngModel]="loggerConfig.logLevel" (ngModelChange)="onLogLevelChange($event)" [disabled]="!loggerConfig.enabled">
+											<option [value]="0">DEBUG</option>
+											<option [value]="1">INFO</option>
+											<option [value]="2">WARN</option>
+											<option [value]="3">ERROR</option>
+										</select>
 									</li>
-									<li>
+									<li class="mt-2">
 										<strong>{{ translate('Options_StoredLogs') }}</strong> {{ loggerConfig.logCount }}/{{ loggerConfig.maxLogs }}
 									</li>
 								</ul>

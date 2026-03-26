@@ -83,6 +83,13 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
 	}
 
+	async onLogLevelChange(level: number) {
+		this.logger.configure({ logLevel: level });
+		this.loggerConfig = this.logger.getConfig();
+		this.options.logging.logLevel = level;
+		await this.chromeService.setStorageData(this.options);
+	}
+
 	async onLoggingToggle(event: Event) {
 		const target = event.target as HTMLInputElement;
 		const isEnabled = target.checked;
