@@ -6,7 +6,7 @@ import { ChromeStorageData } from './app/models/chrome-storage/chrome-storage-da
 const mockChrome = {
 	contextMenus: {
 		create: vi.fn().mockReturnValue('menu-id'),
-		remove: vi.fn(),
+		remove: vi.fn().mockResolvedValue(undefined),
 		removeAll: vi.fn(),
 		onClicked: { addListener: vi.fn() },
 	},

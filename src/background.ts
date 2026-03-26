@@ -58,7 +58,9 @@ export class BackgroundScript {
 
 	private createRecentMenu(historyArray: string[]): void {
 		if (this.recentId) {
-			chrome.contextMenus.remove(this.recentId);
+			chrome.contextMenus.remove(this.recentId).catch(() => {
+				// Menu may have already been removed by a concurrent removeAll call
+			});
 			this.recentId = null;
 		}
 
@@ -130,6 +132,11 @@ export class BackgroundScript {
 
 		// Clear existing menus first
 		chrome.contextMenus.removeAll(() => {
+			// Reset cached IDs so createRecentMenu doesn't try to remove items
+			// that were already cleared by this removeAll call
+			this.recentId = null;
+			this.historyIds = [];
+
 			// Create new menus after clearing
 			try {
 				this.parentId = this.createContextMenu({
