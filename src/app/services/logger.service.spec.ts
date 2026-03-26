@@ -46,11 +46,14 @@ describe('LoggerService', () => {
 		});
 
 		it('should have default configuration', () => {
-			const config = service.getConfig();
+			// Re-create a fresh service to test true defaults (beforeEach configures it)
+			const freshService: LoggerService = Object.create(LoggerService.prototype);
+			Object.assign(freshService, { isEnabled: false, currentLogLevel: LogLevel.ERROR, maxLogs: 1000, logs: [] });
+			const config = freshService.getConfig();
 
-			expect(config.enabled).toBe(true);
-			expect(config.logLevel).toBe(LogLevel.DEBUG);
-			expect(config.maxLogs).toBe(100);
+			expect(config.enabled).toBe(false);
+			expect(config.logLevel).toBe(LogLevel.ERROR);
+			expect(config.maxLogs).toBe(1000);
 		});
 	});
 

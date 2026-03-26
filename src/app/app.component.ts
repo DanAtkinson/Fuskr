@@ -23,8 +23,11 @@ export class AppComponent implements OnInit {
 			const data = await this.chromeService.getStorageData();
 			this.logger.configure({
 				enabled: data.logging.enabled,
-				logLevel: data.logging.logLevel,
+				logLevel: Number(data.logging.logLevel),
 			});
+			// Merge any logs written by other extension contexts (e.g. the gallery
+			// popup) into this context's in-memory store.
+			await this.logger.loadLogsFromStorage();
 		} catch {
 			// Non-fatal: logger stays at its default (disabled) state.
 		}

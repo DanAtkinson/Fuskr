@@ -3,7 +3,7 @@ import { ILoggingSettings } from '@interfaces/chrome-storage/logging-settings.in
 export class LoggingSettings implements ILoggingSettings {
 	// Public properties (alphabetically)
 	enabled = false;
-	logLevel = 1; // LogLevel.INFO
+	logLevel = 3; // LogLevel.ERROR
 
 	constructor(data?: Partial<ILoggingSettings>) {
 		if (data?.enabled !== undefined) {

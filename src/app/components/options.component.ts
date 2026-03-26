@@ -69,7 +69,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 			this.options.logging.enabled = false;
 			await this.chromeService.setStorageData(this.options);
 		}
-		this.logger.configure({ enabled: this.options.logging.enabled, logLevel: this.options.logging.logLevel });
+		this.logger.configure({ enabled: this.options.logging.enabled, logLevel: Number(this.options.logging.logLevel) });
 		this.loggerConfig = this.logger.getConfig();
 
 		// Auto-expand the debug panel when logging is already enabled.
@@ -83,10 +83,11 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		document.body.classList.toggle('dark-mode', this.options.display.darkMode);
 	}
 
-	async onLogLevelChange(level: number) {
-		this.logger.configure({ logLevel: level });
+	async onLogLevelChange(level: number | string) {
+		const numLevel = Number(level);
+		this.logger.configure({ logLevel: numLevel });
 		this.loggerConfig = this.logger.getConfig();
-		this.options.logging.logLevel = level;
+		this.options.logging.logLevel = numLevel;
 		await this.chromeService.setStorageData(this.options);
 	}
 

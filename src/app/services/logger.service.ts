@@ -15,6 +15,8 @@ export interface LogEntry {
 	data?: unknown;
 }
 
+const STORAGE_KEY = 'fuskr_debug_logs';
+
 @Injectable({
 	providedIn: 'root',
 })
@@ -24,14 +26,15 @@ export class LoggerService {
 		const count = this.logs.length;
 		this.logs = [];
 		this.info('LoggerService', `Cleared ${count} log entries`);
+		this.persistLogsToStorage();
 	}
 
-	configure(settings: { enabled?: boolean; logLevel?: LogLevel; maxLogs?: number }): void {
+	configure(settings: { enabled?: boolean; logLevel?: LogLevel | number; maxLogs?: number }): void {
 		if (settings.enabled !== undefined) {
 			this.isEnabled = settings.enabled;
 		}
 		if (settings.logLevel !== undefined) {
-			this.currentLogLevel = settings.logLevel;
+			this.currentLogLevel = Number(settings.logLevel) as LogLevel;
 		}
 		if (settings.maxLogs !== undefined) {
 			this.maxLogs = settings.maxLogs;
@@ -59,7 +62,7 @@ export class LoggerService {
 			})
 			.join('\n');
 
-		const metadata = ['Fuskr Debug Log Export', `Generated: ${new Date().toISOString()}`, `Total Entries: ${logs.length}`, `Browser: ${navigator.userAgent}`, `URL: ${window.location.href}`, '', '='.repeat(80), ''].join('\n');
+		const metadata = ['Fuskr Debug Log Export', `Version: ${this.getExtensionVersion()}`, `Generated: ${new Date().toISOString()}`, `Total Entries: ${logs.length}`, `Browser: ${navigator.userAgent}`, `URL: ${window.location.href}`, '', '='.repeat(80), ''].join('\n');
 
 		const fullLog = metadata + logText;
 
@@ -94,17 +97,48 @@ export class LoggerService {
 		this.log(LogLevel.INFO, component, message, data);
 	}
 
+	/** Loads persisted logs from chrome.storage.local into the in-memory store.
+	 *  Call this once on app startup to make logs from all extension contexts visible. */
+	async loadLogsFromStorage(): Promise<void> {
+		if (typeof chrome === 'undefined' || !chrome.storage?.local) {
+			return;
+		}
+		try {
+			const result = await chrome.storage.local.get(STORAGE_KEY);
+			const stored = result[STORAGE_KEY];
+			if (Array.isArray(stored)) {
+				this.logs = stored.map((entry) => ({
+					...entry,
+					timestamp: new Date(entry.timestamp as string),
+				}));
+			}
+		} catch {
+			// Non-fatal: proceed with empty in-memory log.
+		}
+	}
+
 	warn(component: string, message: string, data?: unknown): void {
 		this.log(LogLevel.WARN, component, message, data);
 	}
 
 	// Private properties (alphabetically)
-	private currentLogLevel = LogLevel.DEBUG; // Can be configured in options
+	private currentLogLevel = LogLevel.ERROR; // Default to ERROR — only critical issues captured
 	private isEnabled = false; // Can be toggled in options - disabled by default
 	private logs: LogEntry[] = [];
 	private maxLogs = 1000; // Keep last 1000 logs
 
 	// Private methods (alphabetically)
+	private getExtensionVersion(): string {
+		try {
+			if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
+				return chrome.runtime.getManifest().version;
+			}
+		} catch {
+			// Non-extension context (e.g. unit tests).
+		}
+		return 'unknown';
+	}
+
 	private log(level: LogLevel, component: string, message: string, data?: unknown): void {
 		if (!this.isEnabled || level < this.currentLogLevel) {
 			return;
@@ -126,6 +160,9 @@ export class LoggerService {
 			this.logs = this.logs.slice(-this.maxLogs);
 		}
 
+		// Persist to storage so logs are visible across extension page contexts.
+		this.persistLogsToStorage();
+
 		// Also log to console for immediate debugging
 		const levelName = LogLevel[level];
 		const timestamp = entry.timestamp.toISOString();
@@ -145,5 +182,15 @@ export class LoggerService {
 				console.error(logMessage, data || '');
 				break;
 		}
+	}
+
+	/** Writes the current in-memory log array to chrome.storage.local (fire-and-forget). */
+	private persistLogsToStorage(): void {
+		if (typeof chrome === 'undefined' || !chrome.storage?.local) {
+			return;
+		}
+		chrome.storage.local.set({ [STORAGE_KEY]: this.logs }).catch(() => {
+			// Non-fatal: storage may be unavailable.
+		});
 	}
 }
