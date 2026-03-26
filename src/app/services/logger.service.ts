@@ -51,7 +51,12 @@ export class LoggerService {
 		this.log(LogLevel.ERROR, component, message, data);
 	}
 
-	exportLogs(filename = 'fuskr-debug-logs.txt'): void {
+	async exportLogs(filename = 'fuskr-debug-logs.txt'): Promise<void> {
+		// Reload from storage so the export includes logs written by all
+		// extension contexts (gallery popup, background, etc.), not just this
+		// page's in-memory copy.
+		await this.loadLogsFromStorage();
+
 		const logs = this.getLogs();
 		const logText = logs
 			.map((log) => {

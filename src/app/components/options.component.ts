@@ -39,8 +39,8 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		this.showStatus('Debug logs cleared!');
 	}
 
-	exportLogs() {
-		this.logger.exportLogs();
+	async exportLogs() {
+		await this.logger.exportLogs();
 		this.logger.info('options.debugPanel.exported', 'User exported debug logs');
 		this.showStatus('Debug logs exported!');
 	}

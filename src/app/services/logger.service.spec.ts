@@ -243,11 +243,11 @@ describe('LoggerService', () => {
 			vi.spyOn(document.body, 'removeChild').mockImplementation(() => mockLink as unknown as Node);
 		});
 
-		it('should export logs as text file', () => {
+		it('should export logs as text file', async () => {
 			service.info('test.export', 'Export test message', { data: 'test' });
 			service.warn('test.export', 'Export warning');
 
-			service.exportLogs();
+			await service.exportLogs();
 
 			expect(document.createElement).toHaveBeenCalledWith('a');
 			expect(window.URL.createObjectURL).toHaveBeenCalledWith(expect.any(Blob));
@@ -257,17 +257,17 @@ describe('LoggerService', () => {
 			expect(mockLink.click).toHaveBeenCalled();
 		});
 
-		it('should handle export when no logs exist', () => {
+		it('should handle export when no logs exist', async () => {
 			service.clearLogs();
 
-			service.exportLogs();
+			await service.exportLogs();
 
 			expect(document.createElement).toHaveBeenCalledWith('a');
 			expect(window.URL.createObjectURL).toHaveBeenCalled();
 		});
 
-		it('should use custom filename when provided', () => {
-			service.exportLogs('custom-logs.txt');
+		it('should use custom filename when provided', async () => {
+			await service.exportLogs('custom-logs.txt');
 
 			expect(mockLink.download).toBe('custom-logs.txt');
 		});
