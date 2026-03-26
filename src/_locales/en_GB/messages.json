@@ -267,6 +267,22 @@
 		"message": "Show Broken",
 		"description": "Button text to show broken images"
 	},
+	"Gallery_EnableInfiniteMode": {
+		"message": "Enable infinite gallery mode",
+		"description": "Tooltip for enabling bidirectional infinite scrolling"
+	},
+	"Gallery_DisableInfiniteMode": {
+		"message": "Disable infinite gallery mode",
+		"description": "Tooltip for disabling bidirectional infinite scrolling"
+	},
+	"Gallery_InfiniteModeOn": {
+		"message": "Infinite On",
+		"description": "Button text when infinite mode is active"
+	},
+	"Gallery_InfiniteModeOff": {
+		"message": "Infinite Off",
+		"description": "Button text when infinite mode is inactive"
+	},
 	"Gallery_GeneratingGallery": {
 		"message": "Generating gallery...",
 		"description": "Loading text while generating gallery"

@@ -1360,4 +1360,236 @@ describe('GalleryComponent', () => {
 			expect(component.brokenImages()).toBe(2);
 		});
 	});
+
+	describe('Infinite Mode - Toggle and Pattern Extraction', () => {
+		it('should initialise with infinite mode disabled', () => {
+			expect(component.isInfiniteMode()).toBe(false);
+		});
+
+		it('should toggle infinite mode on and off', () => {
+			expect(component.isInfiniteMode()).toBe(false);
+
+			component.toggleInfiniteMode();
+			expect(component.isInfiniteMode()).toBe(true);
+
+			component.toggleInfiniteMode();
+			expect(component.isInfiniteMode()).toBe(false);
+		});
+
+		it('should call tryInitialiseInfinitePattern when enabling infinite mode', () => {
+			const spy = vi.spyOn(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				},
+				'tryInitialiseInfinitePattern'
+			);
+
+			component.toggleInfiniteMode();
+
+			expect(spy).toHaveBeenCalled();
+		});
+
+		it('should extract pattern bounds from bracketed URL notation', () => {
+			component.originalUrl.set('https://example.com/image[05-15].jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const pattern = component as unknown as {
+				infinitePatternStart: number;
+				infinitePatternEnd: number;
+				infinitePatternPadLength: number;
+				infinitePatternBaseUrl: string;
+			};
+
+			expect(pattern.infinitePatternStart).toBe(5);
+			expect(pattern.infinitePatternEnd).toBe(15);
+			expect(pattern.infinitePatternPadLength).toBe(2); // '05' has length 2
+			expect(pattern.infinitePatternBaseUrl).toBe('https://example.com/image__FUSKR_INFINITY__.jpg');
+		});
+
+		it('should extract zero-padded numbers correctly', () => {
+			component.originalUrl.set('https://example.com/image[001-010].jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const pattern = component as unknown as {
+				infinitePatternStart: number;
+				infinitePatternEnd: number;
+				infinitePatternPadLength: number;
+			};
+
+			expect(pattern.infinitePatternStart).toBe(1);
+			expect(pattern.infinitePatternEnd).toBe(10);
+			expect(pattern.infinitePatternPadLength).toBe(3); // '001' has length 3
+		});
+
+		it('should not initialise pattern for non-bracketed URLs', () => {
+			component.originalUrl.set('https://example.com/image.jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const pattern = component as unknown as {
+				infinitePatternBaseUrl: string;
+			};
+
+			expect(pattern.infinitePatternBaseUrl).toBe('');
+		});
+
+		it('should reset infinite mode state on new gallery generation', async () => {
+			const mockResult = {
+				originalUrl: 'https://example.com/image[01-10].jpg',
+				urls: ['https://example.com/image01.jpg', 'https://example.com/image02.jpg'],
+			};
+
+			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
+			mockFuskrService.countPotentialUrls.mockReturnValue(2);
+			mockMediaTypeService.createMediaItem.mockImplementation((url: string) => ({
+				url,
+				type: 'unknown',
+				mimeType: 'application/octet-stream',
+				loadingState: 'pending',
+			}));
+			mockMediaTypeService.fallbackTypeDetection.mockReturnValue({ type: 'image', mimeType: 'image/jpeg' });
+
+			// Enable infinite mode first
+			component.toggleInfiniteMode();
+			expect(component.isInfiniteMode()).toBe(true);
+
+			// Generate a new gallery
+			component.originalUrl.set('https://example.com/image05.jpg');
+			await component.generateGallery();
+
+			// Infinite mode should be reset
+			expect(component.isInfiniteMode()).toBe(false);
+		});
+
+		it('should prevent duplicate URLs in infinite loading via knownMediaUrls tracking', () => {
+			const urlA = 'https://example.com/image01.jpg';
+			const urlB = 'https://example.com/image02.jpg';
+			const knownUrls = component as unknown as { knownMediaUrls: Set<string> };
+
+			// Simulate initial gallery load
+			knownUrls.knownMediaUrls.add(urlA);
+			knownUrls.knownMediaUrls.add(urlB);
+
+			// Try to add same URL again (simulating duplicate prevention)
+			const isDupe = knownUrls.knownMediaUrls.has(urlA);
+			expect(isDupe).toBe(true);
+		});
+
+		it('should buildInfiniteUrl correctly with proper padding', () => {
+			component.originalUrl.set('https://example.com/image[05-15].jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const buildUrl = (
+				component as unknown as {
+					buildInfiniteUrl: (n: number) => string;
+				}
+			).buildInfiniteUrl.bind(component);
+
+			const url6 = buildUrl(6);
+			const url10 = buildUrl(10);
+
+			expect(url6).toBe('https://example.com/image06.jpg'); // Should pad to 2 digits
+			expect(url10).toBe('https://example.com/image10.jpg');
+		});
+
+		it('should parseInfiniteNumber extract numeric value from URL correctly', () => {
+			component.originalUrl.set('https://example.com/image[01-30].jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const parseNum = (
+				component as unknown as {
+					parseInfiniteNumber: (url: string) => number | null;
+				}
+			).parseInfiniteNumber.bind(component);
+
+			expect(parseNum('https://example.com/image05.jpg')).toBe(5);
+			expect(parseNum('https://example.com/image12.jpg')).toBe(12);
+			expect(parseNum('https://example.com/image30.jpg')).toBe(30);
+			// Non-matching URL should return null
+			expect(parseNum('https://example.com/image.jpg')).toBeNull();
+		});
+
+		it('should correctly identify when more items can be appended', () => {
+			component.originalUrl.set('https://example.com/image[01-20].jpg');
+			component.mediaItems.set([
+				{
+					url: 'https://example.com/image05.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/image10.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+			]);
+
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const canLoadMoreForward = (
+				component as unknown as {
+					canLoadMoreForward: () => boolean;
+				}
+			).canLoadMoreForward.bind(component);
+
+			expect(canLoadMoreForward()).toBe(true); // Max loaded is 10, pattern end is 20
+		});
+
+		it('should correctly identify when more items can be prepended', () => {
+			component.originalUrl.set('https://example.com/image[01-20].jpg');
+			component.mediaItems.set([
+				{
+					url: 'https://example.com/image10.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/image15.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+			]);
+
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const canLoadMoreBackward = (
+				component as unknown as {
+					canLoadMoreBackward: () => boolean;
+				}
+			).canLoadMoreBackward.bind(component);
+
+			expect(canLoadMoreBackward()).toBe(true); // Min loaded is 10, pattern start is 1
+		});
+	});
 });

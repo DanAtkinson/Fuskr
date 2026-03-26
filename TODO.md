@@ -4,7 +4,7 @@
 
 - **Allow fusks from URL lists** - Create fusks from a list of URLs rather than sequential patterns. Example: Imgur albums where filenames are not sequential. NB: This should also be able to parse the Fuskr.txt file being loaded in.
 - **Chrome Sync integration** - Make use of Chrome Sync ([chrome.storage](https://developer.chrome.com/extensions/storage) or rather the WebExtensions Storage API) to store settings and allow synchronisation across devices.
-- **'Infinite' fusk mode** - Provide a single starting point and continue loading in blocks of 100 until the user requests it stops. For example, fusk url is https://www.example.com/images/5.jpg. Start by creating a range from 0 to 100 and continue going in blocks of 100 until the user stops us.
+- **'Infinite' fusk mode** *(in progress)* - Provide bidirectional infinite gallery extension as user scrolls. See [INFINITE_MODE.md](docs/INFINITE_MODE.md) for detailed implementation plan and phases. Example: fusk url is https://www.example.com/images/5.jpg. Start by creating a range from 0 to 100 and continue going in both directions in blocks of 50 until the user disables it.
 - **Advanced URL builder UI** - Change the url building UI so that we can break it into different parts and allow the user to change it as needed, rather than a simple string that gets evaluated.
 
 ## 🔧 User Experience Improvements

@@ -18,6 +18,8 @@ import { saveAs } from 'file-saver';
 	imports: [CommonModule, FormsModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit {
+	private static readonly INFINITE_BATCH_SIZE = 50;
+
 	// Public signals (alphabetically)
 	autoRemoveBrokenImages = signal(false);
 	brokenImages = signal(0);
@@ -36,6 +38,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	imageDisplayMode = signal<'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails'>('fitOnPage');
 	isDownloading = signal(false);
 	isGenerating = signal(false);
+	isInfiniteMode = signal(false);
 	loadedImages = signal(0);
 	loading = signal(false);
 	mediaItems = signal<MediaItem[]>([]);
@@ -61,6 +64,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
 	private brokenUrls = signal(new Set<string>());
 	private hasInitialized = false;
+	private infinitePatternBaseUrl = '';
+	private infinitePatternEnd = 0;
+	private infinitePatternPadLength = 0;
+	private infinitePatternStart = 0;
+	private infinitePatternStep = 1;
+	private isLoadingBackward = false;
+	private isLoadingForward = false;
+	private knownMediaUrls = new Set<string>();
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
@@ -269,6 +280,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			return;
 		}
 
+		this.resetInfiniteModeSessionState();
+
 		// Check for overload protection before generating
 		if (this.enableOverloadProtection()) {
 			const urlCount = this.fuskrService.countPotentialUrls(this.originalUrl());
@@ -433,6 +446,67 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			originalUrl: this.originalUrl(),
 		});
 		this.initialiseFromRouteParams(currentParams, 'snapshot');
+	}
+
+	async maybeLoadMoreBackward() {
+		if (!this.isInfiniteMode() || this.isLoadingBackward || this.loading() || this.isGenerating()) {
+			return;
+		}
+
+		if (!this.canLoadMoreBackward()) {
+			return;
+		}
+
+		this.isLoadingBackward = true;
+		const firstBefore = this.visibleMediaItems()[0]?.url || '';
+		const previousYOffset = window.scrollY;
+
+		try {
+			const urls = this.collectNextBackwardUrls();
+			if (urls.length === 0) {
+				return;
+			}
+
+			const items = this.createMediaItemsFromUrls(urls);
+			this.mediaItems.update((current) => [...items, ...current]);
+			this.totalImages.set(this.mediaItems().length);
+			this.initializeKeyboardNavigation();
+			this.startProgressiveTypeDetectionForUrls(urls);
+
+			setTimeout(() => {
+				const firstAfter = this.visibleMediaItems()[0]?.url || '';
+				if (firstBefore && firstAfter !== firstBefore) {
+					window.scrollTo({ top: previousYOffset + 900, behavior: 'auto' });
+				}
+			}, 0);
+		} finally {
+			this.isLoadingBackward = false;
+		}
+	}
+
+	async maybeLoadMoreForward() {
+		if (!this.isInfiniteMode() || this.isLoadingForward || this.loading() || this.isGenerating()) {
+			return;
+		}
+
+		if (!this.canLoadMoreForward()) {
+			return;
+		}
+
+		this.isLoadingForward = true;
+		try {
+			const urls = this.collectNextForwardUrls();
+			if (urls.length === 0) {
+				return;
+			}
+
+			const items = this.createMediaItemsFromUrls(urls);
+			this.mediaItems.update((current) => [...current, ...items]);
+			this.totalImages.set(this.mediaItems().length);
+			this.startProgressiveTypeDetectionForUrls(urls);
+		} finally {
+			this.isLoadingForward = false;
+		}
 	}
 
 	onImageError(event: Event) {
@@ -673,6 +747,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode() });
 		} catch (error) {
 			this.logger.error('gallery.darkMode.saveFailed', 'Error saving dark mode setting', error);
+		}
+	}
+
+	toggleInfiniteMode() {
+		this.isInfiniteMode.update((enabled) => !enabled);
+		if (this.isInfiniteMode()) {
+			this.tryInitialiseInfinitePattern();
 		}
 	}
 
@@ -1182,6 +1263,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		try {
 			const result = this.fuskrService.generateImageGallery(this.originalUrl());
+			this.knownMediaUrls = new Set(result.urls);
 			this.totalImages.set(result.urls.length);
 			this.loadedImages.set(0);
 			this.brokenImages.set(0);
@@ -1197,18 +1279,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 				// Add items in small batches, yielding between each so Angular can
 				// render the growing list and the user sees the gallery build up.
-				const BATCH_SIZE = 50;
-				for (let i = 0; i < result.urls.length; i += BATCH_SIZE) {
-					const batch = result.urls.slice(i, i + BATCH_SIZE).map((url) => {
-						const mediaItem = this.mediaTypeService.createMediaItem(url);
-						const fallbackResult = this.mediaTypeService.fallbackTypeDetection(url);
-						return {
-							...mediaItem,
-							type: fallbackResult.type,
-							mimeType: fallbackResult.mimeType,
-							loadingState: 'loaded' as const,
-						};
-					});
+				for (let i = 0; i < result.urls.length; i += GalleryComponent.INFINITE_BATCH_SIZE) {
+					const batch = this.createMediaItemsFromUrls(result.urls.slice(i, i + GalleryComponent.INFINITE_BATCH_SIZE));
 					this.mediaItems.update((items) => [...items, ...batch]);
 					// Yield to event loop after each batch so Angular renders new items
 					await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -1251,12 +1323,188 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			if (this.mediaItems().length === 0) {
 				this.errorMessage.set(this.translate('Gallery_ErrorNoPattern'));
 				this.loading.set(false);
+			} else {
+				this.tryInitialiseInfinitePattern();
 			}
 		} catch (error) {
 			this.errorMessage.set(this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message);
 			this.loading.set(false);
 			this.isGenerating.set(false);
 		}
+	}
+
+	private canLoadMoreBackward(): boolean {
+		if (this.infinitePatternBaseUrl === '') {
+			return false;
+		}
+		const minLoaded = this.getLoadedBoundary('min');
+		if (minLoaded === null) {
+			return false;
+		}
+		return minLoaded > this.infinitePatternStart;
+	}
+
+	private canLoadMoreForward(): boolean {
+		if (this.infinitePatternBaseUrl === '') {
+			return false;
+		}
+		const maxLoaded = this.getLoadedBoundary('max');
+		if (maxLoaded === null) {
+			return false;
+		}
+		return maxLoaded < this.infinitePatternEnd;
+	}
+
+	private collectNextBackwardUrls(): string[] {
+		const minLoaded = this.getLoadedBoundary('min');
+		if (minLoaded === null) {
+			return [];
+		}
+
+		const from = Math.max(this.infinitePatternStart, minLoaded - GalleryComponent.INFINITE_BATCH_SIZE);
+		const urls: string[] = [];
+		for (let n = from; n < minLoaded; n += this.infinitePatternStep) {
+			const url = this.buildInfiniteUrl(n);
+			if (url && !this.knownMediaUrls.has(url)) {
+				urls.push(url);
+			}
+		}
+		return urls;
+	}
+
+	private collectNextForwardUrls(): string[] {
+		const maxLoaded = this.getLoadedBoundary('max');
+		if (maxLoaded === null) {
+			return [];
+		}
+
+		const to = Math.min(this.infinitePatternEnd + this.infinitePatternStep, maxLoaded + GalleryComponent.INFINITE_BATCH_SIZE + this.infinitePatternStep);
+		const urls: string[] = [];
+		for (let n = maxLoaded + this.infinitePatternStep; n < to; n += this.infinitePatternStep) {
+			const url = this.buildInfiniteUrl(n);
+			if (url && !this.knownMediaUrls.has(url)) {
+				urls.push(url);
+			}
+		}
+		return urls;
+	}
+
+	private createMediaItemsFromUrls(urls: string[]): MediaItem[] {
+		return urls.map((url) => {
+			this.knownMediaUrls.add(url);
+			const mediaItem = this.mediaTypeService.createMediaItem(url);
+			const fallbackResult = this.mediaTypeService.fallbackTypeDetection(url);
+			return {
+				...mediaItem,
+				type: fallbackResult.type,
+				mimeType: fallbackResult.mimeType,
+				loadingState: 'loaded' as const,
+			};
+		});
+	}
+
+	private getLoadedBoundary(boundary: 'min' | 'max'): number | null {
+		const numericValues = this.mediaItems()
+			.map((item) => this.parseInfiniteNumber(item.url))
+			.filter((value): value is number => value !== null);
+		if (numericValues.length === 0) {
+			return null;
+		}
+		return boundary === 'min' ? Math.min(...numericValues) : Math.max(...numericValues);
+	}
+
+	private buildInfiniteUrl(value: number): string {
+		if (this.infinitePatternBaseUrl === '') {
+			return '';
+		}
+		const formatted = this.infinitePatternPadLength > 0 ? value.toString().padStart(this.infinitePatternPadLength, '0') : value.toString();
+		return this.infinitePatternBaseUrl.replace('__FUSKR_INFINITY__', formatted);
+	}
+
+	private parseInfiniteNumber(url: string): number | null {
+		if (!this.infinitePatternBaseUrl || !this.infinitePatternBaseUrl.includes('__FUSKR_INFINITY__')) {
+			return null;
+		}
+
+		const [prefix, suffix] = this.infinitePatternBaseUrl.split('__FUSKR_INFINITY__');
+		if (!url.startsWith(prefix) || !url.endsWith(suffix)) {
+			return null;
+		}
+
+		const value = url.slice(prefix.length, url.length - suffix.length);
+		if (!/^\d+$/.test(value)) {
+			return null;
+		}
+
+		return Number.parseInt(value, 10);
+	}
+
+	private resetInfiniteModeSessionState() {
+		this.isInfiniteMode.set(false);
+		this.infinitePatternBaseUrl = '';
+		this.infinitePatternStart = 0;
+		this.infinitePatternEnd = 0;
+		this.infinitePatternPadLength = 0;
+		this.infinitePatternStep = 1;
+		this.isLoadingBackward = false;
+		this.isLoadingForward = false;
+		this.knownMediaUrls = new Set();
+	}
+
+	private startProgressiveTypeDetectionForUrls(urls: string[]) {
+		if (urls.length === 0) {
+			return;
+		}
+
+		void Promise.all(
+			urls.map(async (url) => {
+				try {
+					const result = await this.mediaTypeService.determineMediaType(url);
+					this.mediaItems.update((current) => {
+						const index = current.findIndex((item) => item.url === url);
+						if (index === -1) {
+							return current;
+						}
+						const item = current[index];
+						if (item.type === result.type && item.mimeType === result.mimeType) {
+							return current;
+						}
+						const next = [...current];
+						next[index] = {
+							...item,
+							type: result.type,
+							mimeType: result.mimeType,
+							contentLength: result.contentLength,
+							loadedAt: new Date(),
+						};
+						return next;
+					});
+				} catch {
+					// Keep fallback type if HTTP detection fails.
+				}
+			})
+		);
+	}
+
+	private tryInitialiseInfinitePattern() {
+		const match = this.originalUrl().match(/^(.*?)(\[)(\d+)(-(\d+))(\])(.*)$/);
+		if (!match) {
+			this.infinitePatternBaseUrl = '';
+			return;
+		}
+
+		const start = Number.parseInt(match[3], 10);
+		const end = Number.parseInt(match[5], 10);
+		const padLength = match[3].length;
+		if (Number.isNaN(start) || Number.isNaN(end) || end < start) {
+			this.infinitePatternBaseUrl = '';
+			return;
+		}
+
+		this.infinitePatternStart = start;
+		this.infinitePatternEnd = end;
+		this.infinitePatternPadLength = padLength;
+		this.infinitePatternBaseUrl = `${match[1]}__FUSKR_INFINITY__${match[7]}`;
 	}
 
 	private async showOverloadWarning(urlCount: number): Promise<boolean> {
