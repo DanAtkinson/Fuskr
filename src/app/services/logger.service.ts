@@ -55,7 +55,7 @@ export class LoggerService {
 		const logs = this.getLogs();
 		const logText = logs
 			.map((log) => {
-				const timestamp = log.timestamp.toISOString();
+				const timestamp = log.timestamp instanceof Date && !isNaN(log.timestamp.getTime()) ? log.timestamp.toISOString() : '[invalid date]';
 				const level = LogLevel[log.level];
 				const dataStr = log.data ? ` | Data: ${JSON.stringify(log.data)}` : '';
 				return `[${timestamp}] ${level} [${log.component}] ${log.message}${dataStr}`;
@@ -107,10 +107,22 @@ export class LoggerService {
 			const result = await chrome.storage.local.get(STORAGE_KEY);
 			const stored = result[STORAGE_KEY];
 			if (Array.isArray(stored)) {
-				this.logs = stored.map((entry) => ({
-					...entry,
-					timestamp: new Date(entry.timestamp as string),
-				}));
+				this.logs = (stored as LogEntry[]).map((entry) => {
+					const raw = entry.timestamp;
+					let date: Date;
+					if (raw instanceof Date) {
+						date = raw;
+					} else if (typeof raw === 'string' || typeof raw === 'number') {
+						date = new Date(raw);
+					} else {
+						date = new Date();
+					}
+					// Guard against malformed/missing timestamps.
+					if (isNaN(date.getTime())) {
+						date = new Date(0);
+					}
+					return { ...entry, timestamp: date };
+				});
 			}
 		} catch {
 			// Non-fatal: proceed with empty in-memory log.
