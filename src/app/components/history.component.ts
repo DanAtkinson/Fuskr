@@ -175,7 +175,17 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 
 	private async loadSettings() {
 		try {
-			this.darkMode.set(await this.chromeService.getDarkMode());
+			const settings = await this.chromeService.getStorageData();
+
+			// Configure the logger immediately so all logging calls in this
+			// context are captured, regardless of AppComponent initialisation order.
+			this.logger.configure({
+				enabled: settings.logging.enabled,
+				logLevel: Number(settings.logging.logLevel),
+			});
+			await this.logger.loadLogsFromStorage();
+
+			this.darkMode.set(settings.display.darkMode);
 			this.applyTheme();
 		} catch (error) {
 			this.logger.error('history.settingsLoadFailed', 'Failed to load settings', error);

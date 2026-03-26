@@ -29,19 +29,28 @@ describe('HistoryComponent', () => {
 		maxEntries: 10,
 	};
 
+	const mockChromeStorageData = {
+		display: { darkMode: false, autoRemoveBrokenImages: false, imageDisplayMode: 'fitOnPage', toggleBrokenImages: false },
+		logging: { enabled: false, logLevel: 3 },
+		safety: { enableOverloadProtection: true, overloadProtectionLimit: 50 },
+		behaviour: { openInTab: false },
+	};
+
 	beforeEach(async () => {
 		const chromeServiceSpy = {
 			getGalleryHistory: vi.fn().mockName('ChromeService.getGalleryHistory'),
 			clearGalleryHistory: vi.fn().mockName('ChromeService.clearGalleryHistory'),
 			removeGalleryFromHistory: vi.fn().mockName('ChromeService.removeGalleryFromHistory'),
 			updateDisplaySettings: vi.fn().mockName('ChromeService.updateDisplaySettings'),
-			getDarkMode: vi.fn().mockName('ChromeService.getDarkMode'),
+			getStorageData: vi.fn().mockName('ChromeService.getStorageData'),
 			isExtensionContext: vi.fn().mockName('ChromeService.isExtensionContext'),
 			openTab: vi.fn().mockName('ChromeService.openTab'),
 			getMessage: vi.fn().mockName('ChromeService.getMessage'),
 		};
 
 		const loggerServiceSpy = {
+			configure: vi.fn().mockName('LoggerService.configure'),
+			loadLogsFromStorage: vi.fn().mockName('LoggerService.loadLogsFromStorage'),
 			debug: vi.fn().mockName('LoggerService.debug'),
 			error: vi.fn().mockName('LoggerService.error'),
 			warn: vi.fn().mockName('LoggerService.warn'),
@@ -71,12 +80,13 @@ describe('HistoryComponent', () => {
 	beforeEach(() => {
 		// Setup default mock returns
 		mockChromeService.getGalleryHistory.mockReturnValue(Promise.resolve(mockHistory));
-		mockChromeService.getDarkMode.mockReturnValue(Promise.resolve(false));
+		mockChromeService.getStorageData.mockReturnValue(Promise.resolve(mockChromeStorageData));
 		mockChromeService.clearGalleryHistory.mockReturnValue(Promise.resolve());
 		mockChromeService.removeGalleryFromHistory.mockReturnValue(Promise.resolve());
 		mockChromeService.updateDisplaySettings.mockReturnValue(Promise.resolve());
 		mockChromeService.isExtensionContext.mockReturnValue(false);
 		mockChromeService.getMessage.mockReturnValue('Confirm clear all?');
+		(mockLoggerService.loadLogsFromStorage as Mock).mockReturnValue(Promise.resolve());
 	});
 
 	it('should create', () => {
@@ -95,7 +105,11 @@ describe('HistoryComponent', () => {
 			await component.ngOnInit();
 
 			expect(mockChromeService.getGalleryHistory).toHaveBeenCalled();
-			expect(mockChromeService.getDarkMode).toHaveBeenCalled();
+			expect(mockChromeService.getStorageData).toHaveBeenCalled();
+			expect(mockLoggerService.configure).toHaveBeenCalledWith({
+				enabled: mockChromeStorageData.logging.enabled,
+				logLevel: mockChromeStorageData.logging.logLevel,
+			});
 			expect(component.history()).toEqual(mockHistory);
 			expect(component.loading()).toBe(false);
 		});
