@@ -24,8 +24,7 @@ export class BaseComponentTestHelper {
 				Options_ImageDisplay: 'Image Display',
 				Options_Behaviour: 'Behaviour',
 				Options_DarkMode: 'Show Fuskr with a dark background',
-				Options_DarkMode_Description:
-					'Changes the background of image sets to a darker colour. Will take effect once you refresh pages.',
+				Options_DarkMode_Description: 'Changes the background of image sets to a darker colour. Will take effect once you refresh pages.',
 				Options_DefaultImageDisplayMode: 'Default Image Display Mode:',
 				Options_DisplayModeDescription: 'Choose how images are displayed by default in the gallery',
 				Options_ResizeImagesFitOnPage: 'Resize images to fit on page',
@@ -37,11 +36,9 @@ export class BaseComponentTestHelper {
 				Options_ShowBrokenImagesDefault: 'Show broken images by default',
 				Options_ShowBrokenImagesDescription: 'Display placeholder images for missing/broken images',
 				Options_OpenNewFusksInForeground: 'Open new fusks in the foreground',
-				Options_OpenNewFusksInForeground_Description:
-					'When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead.',
+				Options_OpenNewFusksInForeground_Description: 'When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead.',
 				Options_History_Keep: 'Keep a recent history of fusks',
-				Options_History_Keep_Description:
-					'Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery.',
+				Options_History_Keep_Description: 'Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery.',
 				Options_SettingsSaved: 'Options saved!',
 				Options_ErrorSaving: 'Error saving options',
 				Gallery_Title: 'Fuskr Gallery',
@@ -75,8 +72,7 @@ export class BaseComponentTestHelper {
 				Gallery_DownloadFailed: 'Download failed',
 				Gallery_ImageNotFound: 'Image not found',
 				Gallery_ViewHistory: 'View Gallery History',
-				Gallery_DownloadInProgress_ConfirmLeave:
-					'A download is in progress. Navigating away will cancel it. Are you sure?',
+				Gallery_DownloadInProgress_ConfirmLeave: 'A download is in progress. Navigating away will cancel it. Are you sure?',
 				History_Title: 'Gallery History',
 				History_NewGallery: 'New Gallery',
 				History_ClearAll: 'Clear All',

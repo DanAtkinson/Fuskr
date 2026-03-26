@@ -43,11 +43,9 @@ describe('ChromeService', () => {
 
 	describe('getStorageData', () => {
 		it('should return default data when chrome storage is empty', async () => {
-			mockChrome.storage.sync.get.mockImplementation(
-				(_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
-					callback({});
-				}
-			);
+			mockChrome.storage.sync.get.mockImplementation((_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
+				callback({});
+			});
 
 			const result = await service.getStorageData();
 
@@ -82,11 +80,9 @@ describe('ChromeService', () => {
 				},
 			};
 
-			mockChrome.storage.sync.get.mockImplementation(
-				(_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
-					callback(storedData);
-				}
-			);
+			mockChrome.storage.sync.get.mockImplementation((_keys: unknown, callback: (result: Record<string, unknown>) => void) => {
+				callback(storedData);
+			});
 
 			const result = await service.getStorageData();
 

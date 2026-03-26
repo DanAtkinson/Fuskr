@@ -24,13 +24,7 @@ export class FuskrCore {
 		return numStr;
 	}
 
-	private static getAlphabeticalUrls(
-		prefix: string,
-		suffix: string,
-		startString: string,
-		endString: string,
-		groupNumber: number
-	): string[] {
+	private static getAlphabeticalUrls(prefix: string, suffix: string, startString: string, endString: string, groupNumber: number): string[] {
 		const retUrls: string[] = [];
 		let startNumber = this.convertCharToInt(startString);
 		const endNumber = this.convertCharToInt(endString);
@@ -56,13 +50,7 @@ export class FuskrCore {
 		return retUrls;
 	}
 
-	private static getNumericUrls(
-		prefix: string,
-		suffix: string,
-		startNumString: string,
-		endNumString: string,
-		groupNumber: number
-	): string[] {
+	private static getNumericUrls(prefix: string, suffix: string, startNumString: string, endNumString: string, groupNumber: number): string[] {
 		const retUrls: string[] = [];
 		let startNumber = parseInt(startNumString, 10);
 		const endNumber = parseInt(endNumString, 10);

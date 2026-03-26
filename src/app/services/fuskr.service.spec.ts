@@ -172,21 +172,13 @@ describe('FuskrService', () => {
 
 		it('should handle URLs where the filename number follows multiple %XX sequences', () => {
 			// 001 - 5 = -4, which clamps to 0 (zero-padded to '000').
-			const fuskUrl = service.createFuskUrl(
-				'https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg',
-				5,
-				0
-			);
+			const fuskUrl = service.createFuskUrl('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg', 5, 0);
 			expect(fuskUrl).toBe('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20[000-006].jpg');
 		});
 
 		it('should handle URLs where the filename number follows multiple %XX sequences and not change those values', () => {
 			// 001 - 1000 = -999, which clamps to 0 (zero-padded to '000').
-			const fuskUrl = service.createFuskUrl(
-				'https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg',
-				1000,
-				0
-			);
+			const fuskUrl = service.createFuskUrl('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg', 1000, 0);
 			expect(fuskUrl).toBe('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20[000-1001].jpg');
 		});
 	});

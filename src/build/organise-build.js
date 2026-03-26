@@ -81,10 +81,7 @@ cssFiles.forEach((cssFile) => {
 	let css = fs.readFileSync(cssPath, 'utf8');
 
 	// Update FontAwesome font paths to point to ../assets/fonts/ without duplicating the prefix.
-	css = css.replace(
-		/url\((?!\.\.\/assets\/fonts\/)([^)]*)(fa-[^)]+\.(woff2?|ttf|eot))\)/g,
-		'url(../assets/fonts/$2)'
-	);
+	css = css.replace(/url\((?!\.\.\/assets\/fonts\/)([^)]*)(fa-[^)]+\.(woff2?|ttf|eot))\)/g, 'url(../assets/fonts/$2)');
 
 	fs.writeFileSync(cssPath, css);
 	console.log(`Updated font paths in: css/${cssFile}`);

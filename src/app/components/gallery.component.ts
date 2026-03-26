@@ -139,13 +139,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			const imageCount = validMediaItems.filter((item) => item.type === 'image').length;
 			const videoCount = validMediaItems.filter((item) => item.type === 'video').length;
 
-			this.downloadStatus.set(
-				this.translate('Gallery_DownloadingMedia', [
-					validMediaItems.length.toString(),
-					imageCount.toString(),
-					videoCount.toString(),
-				])
-			);
+			this.downloadStatus.set(this.translate('Gallery_DownloadingMedia', [validMediaItems.length.toString(), imageCount.toString(), videoCount.toString()]));
 
 			// Track used names to avoid overwriting within the zip
 			const usedNames = new Map<string, number>();
@@ -172,13 +166,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				const padWidth = basePadWidth.get(filename) ?? 0;
 
 				try {
-					this.downloadStatus.set(
-						this.translate('Gallery_DownloadingItem', [
-							filename,
-							(i + 1).toString(),
-							validMediaItems.length.toString(),
-						])
-					);
+					this.downloadStatus.set(this.translate('Gallery_DownloadingItem', [filename, (i + 1).toString(), validMediaItems.length.toString()]));
 					this.downloadProgress.set(Math.round((i / validMediaItems.length) * 70)); // Reserve 30% for ZIP generation and metadata
 
 					const mediaBlob = await this.fetchMediaAsBlob(mediaItem.url);
@@ -186,8 +174,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 					// Build a deterministic, collision-safe zip path with standard suffix formatting
 					const zipPath = this.buildUniqueZipPath(filename, mediaItem.url, usedNames, occ, padWidth);
 					zip.file(zipPath, mediaBlob, {
-						compression:
-							mediaItem.type === 'image' || mediaItem.type === 'video' ? compressionMode : 'DEFLATE',
+						compression: mediaItem.type === 'image' || mediaItem.type === 'video' ? compressionMode : 'DEFLATE',
 						binary: true,
 					});
 
@@ -809,8 +796,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		const modal = document.querySelector<HTMLElement>('.viewer-content');
 		if (!modal) return;
 
-		const focusableSelectors =
-			'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+		const focusableSelectors = 'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
 		const focusable = Array.from(modal.querySelectorAll<HTMLElement>(focusableSelectors));
 		if (focusable.length === 0) return;
 
@@ -985,9 +971,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private focusUrlInput() {
-		const urlInput = document.querySelector(
-			this.customCountRequested() ? '#customCountInput' : 'input[type="url"]'
-		) as HTMLInputElement | null;
+		const urlInput = document.querySelector(this.customCountRequested() ? '#customCountInput' : 'input[type="url"]') as HTMLInputElement | null;
 		if (urlInput) {
 			urlInput.focus();
 			urlInput.select(); // Select any existing text
@@ -1061,13 +1045,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private generateMetadataContent(mediaItems: MediaItem[]): string {
-		const lines: string[] = [
-			'These media files were downloaded using Fuskr.',
-			'',
-			`Fusk Url: ${this.originalUrl() || 'Unknown'}`,
-			'',
-			'Media Files:',
-		];
+		const lines: string[] = ['These media files were downloaded using Fuskr.', '', `Fusk Url: ${this.originalUrl() || 'Unknown'}`, '', 'Media Files:'];
 
 		// Add each media item with type information
 		mediaItems.forEach((item) => {
@@ -1102,21 +1080,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				// Additional DOM validation to ensure the media is actually displayed and loaded
 				if (item.type === 'image') {
 					const imgElement = document.querySelector(`img[src="${item.url}"]`) as HTMLImageElement;
-					return (
-						imgElement &&
-						imgElement.complete &&
-						imgElement.naturalHeight !== 0 &&
-						!imgElement.classList.contains('error') &&
-						this.isValidMediaUrl(item.url)
-					);
+					return imgElement && imgElement.complete && imgElement.naturalHeight !== 0 && !imgElement.classList.contains('error') && this.isValidMediaUrl(item.url);
 				} else if (item.type === 'video') {
 					const videoElement = document.querySelector(`video[src="${item.url}"]`) as HTMLVideoElement;
-					return (
-						videoElement &&
-						videoElement.readyState >= 2 &&
-						!videoElement.classList.contains('error') &&
-						this.isValidMediaUrl(item.url)
-					);
+					return videoElement && videoElement.readyState >= 2 && !videoElement.classList.contains('error') && this.isValidMediaUrl(item.url);
 				}
 
 				// For unknown types, just check if the URL is valid
@@ -1284,10 +1251,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private async showOverloadWarning(urlCount: number): Promise<boolean> {
-		const message = this.translate('Gallery_OverloadWarning', [
-			urlCount.toString(),
-			this.overloadProtectionLimit().toString(),
-		]);
+		const message = this.translate('Gallery_OverloadWarning', [urlCount.toString(), this.overloadProtectionLimit().toString()]);
 		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', {
 			urlCount,
 			limit: this.overloadProtectionLimit(),
@@ -1421,13 +1385,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	// Helper: build unique zip path with suffix numbering for duplicates (e.g., "name (002).jpg")
-	private buildUniqueZipPath(
-		baseFilename: string,
-		originalUrl: string,
-		usedNames: Map<string, number>,
-		occurrenceIndex: number,
-		padWidth: number
-	): string {
+	private buildUniqueZipPath(baseFilename: string, originalUrl: string, usedNames: Map<string, number>, occurrenceIndex: number, padWidth: number): string {
 		const dot = baseFilename.lastIndexOf('.');
 		const name = dot > -1 ? baseFilename.slice(0, dot) : baseFilename;
 		const ext = dot > -1 ? baseFilename.slice(dot) : '';

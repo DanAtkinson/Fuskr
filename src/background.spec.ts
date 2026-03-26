@@ -39,10 +39,7 @@ interface PrivateBackgroundScript {
 	isValidWebUrl(url: string): boolean;
 	l18nify(name: string): string;
 	handleStorageChanges(changes: Record<string, chrome.storage.StorageChange>): void;
-	createEditorTab(
-		tab: chrome.tabs.Tab,
-		options: { customCountDirection?: -1 | 0 | 1; errorKey?: string; prefillUrl?: string }
-	): void;
+	createEditorTab(tab: chrome.tabs.Tab, options: { customCountDirection?: -1 | 0 | 1; errorKey?: string; prefillUrl?: string }): void;
 	choiceOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
 	createRecentMenu(historyArray: string[]): void;
 	manualOnClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab): void;
@@ -81,16 +78,12 @@ describe('BackgroundScript', () => {
 		// removeAll immediately invokes its callback so createContextMenus() completes synchronously
 		mockChrome.contextMenus.removeAll.mockImplementation((cb?: () => void) => cb?.());
 		// loadOptions() calls chrome.storage.sync.get — return empty object by default
-		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) =>
-			cb?.({})
-		);
+		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) => cb?.({}));
 
 		vi.clearAllMocks();
 		// Re-apply implementations after clearAllMocks()
 		mockChrome.contextMenus.removeAll.mockImplementation((cb?: () => void) => cb?.());
-		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) =>
-			cb?.({})
-		);
+		mockChrome.storage.sync.get.mockImplementation((_: unknown, cb?: (items: Record<string, unknown>) => void) => cb?.({}));
 
 		instance = new BackgroundScript();
 		priv = instance as unknown as PrivateBackgroundScript;
@@ -198,9 +191,7 @@ describe('BackgroundScript', () => {
 		});
 
 		it('should handle null/undefined changes object gracefully', () => {
-			expect(() =>
-				priv.handleStorageChanges(null as unknown as Record<string, chrome.storage.StorageChange>)
-			).not.toThrow();
+			expect(() => priv.handleStorageChanges(null as unknown as Record<string, chrome.storage.StorageChange>)).not.toThrow();
 		});
 	});
 
@@ -399,9 +390,7 @@ describe('BackgroundScript', () => {
 				})
 			);
 			// Must NOT use the auto-generate ?url= param
-			expect(mockChrome.tabs.create).not.toHaveBeenCalledWith(
-				expect.objectContaining({ url: expect.stringContaining('?url=') })
-			);
+			expect(mockChrome.tabs.create).not.toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('?url=') }));
 		});
 
 		it('should open gallery in prefill mode when a src URL is available', () => {
@@ -410,9 +399,7 @@ describe('BackgroundScript', () => {
 				srcUrl: 'https://example.com/photo002.jpg',
 			} as unknown as chrome.contextMenus.OnClickData;
 			priv.manualOnClick(info, makeTab());
-			expect(mockChrome.tabs.create).toHaveBeenCalledWith(
-				expect.objectContaining({ url: expect.stringContaining('prefill=') })
-			);
+			expect(mockChrome.tabs.create).toHaveBeenCalledWith(expect.objectContaining({ url: expect.stringContaining('prefill=') }));
 		});
 
 		it('should open a bare gallery page (no URL params) when no valid URL is available', () => {

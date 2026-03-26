@@ -319,9 +319,7 @@ describe('LoggerService', () => {
 
 		it('should filter logs by minimum level', () => {
 			const warnAndAbove = service.getLogs(LogLevel.WARN);
-			const errorMessages = warnAndAbove.filter(
-				(log) => log.message === 'Warn message' || log.message === 'Error message'
-			);
+			const errorMessages = warnAndAbove.filter((log) => log.message === 'Warn message' || log.message === 'Error message');
 			expect(errorMessages).toHaveLength(2);
 		});
 

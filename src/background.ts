@@ -101,18 +101,8 @@ export class BackgroundScript {
 		}
 	}
 
-	private createContextMenu(obj: {
-		Context?: string[];
-		Id: string;
-		ItemType?: 'normal' | 'checkbox' | 'radio' | 'separator';
-		ParentId?: string | null;
-		TargetUrlPatterns?: string[];
-		Title?: string;
-	}): string {
-		const contexts =
-			obj.Context && obj.Context.length > 0
-				? (obj.Context as [`${chrome.contextMenus.ContextType}`, ...`${chrome.contextMenus.ContextType}`[]])
-				: (['all'] as [`${chrome.contextMenus.ContextType}`]);
+	private createContextMenu(obj: { Context?: string[]; Id: string; ItemType?: 'normal' | 'checkbox' | 'radio' | 'separator'; ParentId?: string | null; TargetUrlPatterns?: string[]; Title?: string }): string {
+		const contexts = obj.Context && obj.Context.length > 0 ? (obj.Context as [`${chrome.contextMenus.ContextType}`, ...`${chrome.contextMenus.ContextType}`[]]) : (['all'] as [`${chrome.contextMenus.ContextType}`]);
 		return chrome.contextMenus.create({
 			contexts,
 			id: obj.Id,
@@ -169,15 +159,7 @@ export class BackgroundScript {
 					Title: '-',
 				});
 
-				const numbers = [
-					this.l18nify('ContextMenu_10'),
-					this.l18nify('ContextMenu_20'),
-					this.l18nify('ContextMenu_50'),
-					this.l18nify('ContextMenu_100'),
-					this.l18nify('ContextMenu_200'),
-					this.l18nify('ContextMenu_500'),
-					this.l18nify('ContextMenu_Other'),
-				];
+				const numbers = [this.l18nify('ContextMenu_10'), this.l18nify('ContextMenu_20'), this.l18nify('ContextMenu_50'), this.l18nify('ContextMenu_100'), this.l18nify('ContextMenu_200'), this.l18nify('ContextMenu_500'), this.l18nify('ContextMenu_Other')];
 
 				for (const number of numbers) {
 					this.createContextMenu({

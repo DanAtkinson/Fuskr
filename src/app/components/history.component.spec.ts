@@ -20,13 +20,7 @@ describe('HistoryComponent', () => {
 		totalImages: 5,
 		loadedImages: 4,
 		brokenImages: 1,
-		imageUrls: [
-			'https://example.com/image001.jpg',
-			'https://example.com/image002.jpg',
-			'https://example.com/image003.jpg',
-			'https://example.com/image004.jpg',
-			'https://example.com/image005.jpg',
-		],
+		imageUrls: ['https://example.com/image001.jpg', 'https://example.com/image002.jpg', 'https://example.com/image003.jpg', 'https://example.com/image004.jpg', 'https://example.com/image005.jpg'],
 		displayMode: 'fitOnPage',
 	};
 
@@ -111,11 +105,7 @@ describe('HistoryComponent', () => {
 
 			await component.ngOnInit();
 
-			expect(mockLoggerService.error).toHaveBeenCalledWith(
-				'history.loadFailed',
-				'Failed to load gallery history',
-				expect.any(Error)
-			);
+			expect(mockLoggerService.error).toHaveBeenCalledWith('history.loadFailed', 'Failed to load gallery history', expect.any(Error));
 			expect(component.loading()).toBe(false);
 		});
 	});
@@ -140,11 +130,7 @@ describe('HistoryComponent', () => {
 			const result = component.formatDate('invalid-date');
 
 			expect(result).toBe('Invalid Date');
-			expect(mockLoggerService.warn).toHaveBeenCalledWith(
-				'history.formatDate',
-				'Invalid date provided',
-				expect.any(Object)
-			);
+			expect(mockLoggerService.warn).toHaveBeenCalledWith('history.formatDate', 'Invalid date provided', expect.any(Object));
 		});
 
 		it('should handle null/undefined input', () => {
@@ -257,9 +243,7 @@ describe('HistoryComponent', () => {
 		});
 
 		it('should handle data URLs gracefully', () => {
-			const result = component.getFilename(
-				'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='
-			);
+			const result = component.getFilename('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==');
 			// Data URLs will be parsed and the last part after '/' will be extracted
 			expect(result.length).toBeGreaterThan(0);
 			expect(typeof result).toBe('string');
@@ -396,11 +380,7 @@ describe('HistoryComponent', () => {
 
 			await component.openGalleryInNewTab(mockHistoryEntry);
 
-			expect(mockLoggerService.error).toHaveBeenCalledWith(
-				'history.openTabFailed',
-				'Failed to open gallery in new tab',
-				expect.any(Error)
-			);
+			expect(mockLoggerService.error).toHaveBeenCalledWith('history.openTabFailed', 'Failed to open gallery in new tab', expect.any(Error));
 		});
 	});
 
@@ -420,10 +400,7 @@ describe('HistoryComponent', () => {
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
 			expect(mockChromeService.removeGalleryFromHistory).toHaveBeenCalledWith(mockHistoryEntry.id);
 			expect(component.history().entries).toEqual([]);
-			expect(mockLoggerService.debug).toHaveBeenCalledWith(
-				'history.entryRemoved',
-				expect.stringContaining(mockHistoryEntry.id)
-			);
+			expect(mockLoggerService.debug).toHaveBeenCalledWith('history.entryRemoved', expect.stringContaining(mockHistoryEntry.id));
 		});
 
 		it('should handle removal errors', async () => {
@@ -431,11 +408,7 @@ describe('HistoryComponent', () => {
 
 			await component.removeEntry(mockHistoryEntry, mockEvent);
 
-			expect(mockLoggerService.error).toHaveBeenCalledWith(
-				'history.removeFailed',
-				'Failed to remove history entry',
-				expect.any(Error)
-			);
+			expect(mockLoggerService.error).toHaveBeenCalledWith('history.removeFailed', 'Failed to remove history entry', expect.any(Error));
 		});
 	});
 
@@ -470,11 +443,7 @@ describe('HistoryComponent', () => {
 
 			await component.clearAllHistory();
 
-			expect(mockLoggerService.error).toHaveBeenCalledWith(
-				'history.clearFailed',
-				'Failed to clear history',
-				expect.any(Error)
-			);
+			expect(mockLoggerService.error).toHaveBeenCalledWith('history.clearFailed', 'Failed to clear history', expect.any(Error));
 		});
 	});
 

@@ -132,21 +132,15 @@ describe('OptionsComponent', () => {
 			expect(component.options.display.resizeImagesToFillPage).toBe(testOptions.display.resizeImagesToFillPage);
 			expect(component.options.display.resizeImagesToFitOnPage).toBe(testOptions.display.resizeImagesToFitOnPage);
 			expect(component.options.display.resizeImagesToFullWidth).toBe(testOptions.display.resizeImagesToFullWidth);
-			expect(component.options.display.resizeImagesToThumbnails).toBe(
-				testOptions.display.resizeImagesToThumbnails
-			);
+			expect(component.options.display.resizeImagesToThumbnails).toBe(testOptions.display.resizeImagesToThumbnails);
 			expect(component.options.display.showImagesInViewer).toBe(testOptions.display.showImagesInViewer);
 			expect(component.options.display.toggleBrokenImages).toBe(testOptions.display.toggleBrokenImages);
 
 			expect(component.options.behaviour.keepRecentFusks).toBe(testOptions.behaviour.keepRecentFusks);
 			expect(component.options.behaviour.openInForeground).toBe(testOptions.behaviour.openInForeground);
 			expect(component.options.behaviour.recentFusks).toEqual(testOptions.behaviour.recentFusks);
-			expect(component.options.behaviour.galleryHistory.entries).toEqual(
-				testOptions.behaviour.galleryHistory.entries
-			);
-			expect(component.options.behaviour.galleryHistory.maxEntries).toBe(
-				testOptions.behaviour.galleryHistory.maxEntries
-			);
+			expect(component.options.behaviour.galleryHistory.entries).toEqual(testOptions.behaviour.galleryHistory.entries);
+			expect(component.options.behaviour.galleryHistory.maxEntries).toBe(testOptions.behaviour.galleryHistory.maxEntries);
 
 			expect(component.options.safety.enableOverloadProtection).toBe(testOptions.safety.enableOverloadProtection);
 			expect(component.options.safety.overloadProtectionLimit).toBe(testOptions.safety.overloadProtectionLimit);

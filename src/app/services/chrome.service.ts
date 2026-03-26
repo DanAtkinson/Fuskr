@@ -59,9 +59,7 @@ export class ChromeService {
 		const history = currentData.behaviour.galleryHistory;
 
 		// Check if an entry with this URL already exists
-		const existingEntryIndex = history.entries.findIndex(
-			(existingEntry) => this.decodeUrlFromStorage(existingEntry.originalUrl) === entry.originalUrl
-		);
+		const existingEntryIndex = history.entries.findIndex((existingEntry) => this.decodeUrlFromStorage(existingEntry.originalUrl) === entry.originalUrl);
 
 		// Create entry data with base-64 encoded URL to prevent corruption during storage
 		const entryData = {
@@ -365,12 +363,7 @@ export class ChromeService {
 			const decoded = atob(storedUrl);
 
 			// Basic validation - decoded URL should start with http/https or be a relative path
-			if (
-				decoded.startsWith('http') ||
-				decoded.startsWith('/') ||
-				decoded.includes('[') ||
-				decoded.includes(']')
-			) {
+			if (decoded.startsWith('http') || decoded.startsWith('/') || decoded.includes('[') || decoded.includes(']')) {
 				return decoded;
 			} else {
 				// If decoded value doesn't look like a URL, assume it's already plain text

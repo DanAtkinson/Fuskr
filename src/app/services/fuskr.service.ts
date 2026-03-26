@@ -175,13 +175,7 @@ export class FuskrService {
 	private readonly numericRegex = /^(.*?)\[(\d+)-(\d+)\](.*)$/;
 
 	// Private methods (alphabetically)
-	private getAlphabeticalUrls(
-		prefix: string,
-		suffix: string,
-		startString: string,
-		endString: string,
-		groupNumber: number
-	): string[] {
+	private getAlphabeticalUrls(prefix: string, suffix: string, startString: string, endString: string, groupNumber: number): string[] {
 		const retUrls: string[] = [];
 		let startNumber = this.convertCharToInt(startString);
 		const endNumber = this.convertCharToInt(endString);
@@ -207,13 +201,7 @@ export class FuskrService {
 		return retUrls;
 	}
 
-	private getNumericUrls(
-		prefix: string,
-		suffix: string,
-		startNumString: string,
-		endNumString: string,
-		groupNumber: number
-	): string[] {
+	private getNumericUrls(prefix: string, suffix: string, startNumString: string, endNumString: string, groupNumber: number): string[] {
 		const retUrls: string[] = [];
 		let startNumber = parseInt(startNumString, 10);
 		const endNumber = parseInt(endNumString, 10);

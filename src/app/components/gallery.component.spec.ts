@@ -180,10 +180,7 @@ describe('GalleryComponent', () => {
 		it('should proceed when user confirms overload protection warning', async () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[001-1000].jpg',
-				urls: Array.from(
-					{ length: 1000 },
-					(_, i) => `https://example.com/image${String(i + 1).padStart(3, '0')}.jpg`
-				),
+				urls: Array.from({ length: 1000 }, (_, i) => `https://example.com/image${String(i + 1).padStart(3, '0')}.jpg`),
 			};
 
 			vi.spyOn(window, 'confirm').mockReturnValue(true); // User chooses to proceed
@@ -204,18 +201,13 @@ describe('GalleryComponent', () => {
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
 			expect(window.confirm).toHaveBeenCalled();
-			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith(
-				'https://example.com/image[001-1000].jpg'
-			);
+			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
 		});
 
 		it('should bypass overload protection when disabled', async () => {
 			const mockResult = {
 				originalUrl: 'https://example.com/image[001-1000].jpg',
-				urls: Array.from(
-					{ length: 1000 },
-					(_, i) => `https://example.com/image${String(i + 1).padStart(3, '0')}.jpg`
-				),
+				urls: Array.from({ length: 1000 }, (_, i) => `https://example.com/image${String(i + 1).padStart(3, '0')}.jpg`),
 			};
 
 			mockFuskrService.generateImageGallery.mockReturnValue(mockResult);
@@ -232,9 +224,7 @@ describe('GalleryComponent', () => {
 			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).not.toHaveBeenCalled(); // Should skip count check
-			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith(
-				'https://example.com/image[001-1000].jpg'
-			);
+			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
 		});
 
 		it('should open image in browser for non-extension context', () => {
@@ -532,9 +522,7 @@ describe('GalleryComponent', () => {
 
 			component.openImageViewer('url1.jpg', 0);
 
-			expect((component as unknown as { viewerTriggerElement: HTMLElement | null }).viewerTriggerElement).toBe(
-				trigger
-			);
+			expect((component as unknown as { viewerTriggerElement: HTMLElement | null }).viewerTriggerElement).toBe(trigger);
 			document.body.removeChild(trigger);
 		});
 
@@ -725,9 +713,7 @@ describe('GalleryComponent', () => {
 			]);
 			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set());
 			// Configure mock to return the filename portion of a URL
-			mockFuskrService.getImageFilename.mockImplementation((url: string) =>
-				url.substring(url.lastIndexOf('/') + 1)
-			);
+			mockFuskrService.getImageFilename.mockImplementation((url: string) => url.substring(url.lastIndexOf('/') + 1));
 		});
 
 		it('should return the filename from the URL as alt text', () => {
@@ -891,13 +877,7 @@ describe('GalleryComponent', () => {
 	});
 
 	describe('Zip filename de-duplication', () => {
-		type BuildFn = (
-			base: string,
-			url: string,
-			used: Map<string, number>,
-			occurrenceIndex: number,
-			padWidth: number
-		) => string;
+		type BuildFn = (base: string, url: string, used: Map<string, number>, occurrenceIndex: number, padWidth: number) => string;
 		const getBuilder = (): BuildFn =>
 			(
 				component as unknown as {
@@ -1138,9 +1118,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('End key does nothing when all images are broken and hidden', () => {
-			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(
-				new Set(['a.jpg', 'b.jpg', 'c.jpg'])
-			);
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set(['a.jpg', 'b.jpg', 'c.jpg']));
 			component.currentGalleryIndex.set(-1);
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
