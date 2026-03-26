@@ -14,7 +14,7 @@
     "build:firefox:validate": "web-ext lint --source-dir=dist/firefox",
     "build": "npm run clean && npm run sync:version && npm run format && npm run lint && npm run test:ci && npm run build:extensions",
     "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', {recursive: true, force: true})\"",
-    "copy:files": "node -e \"const fs = require('fs'); fs.cpSync('src/_locales', 'dist/chromium/_locales', {recursive: true}); fs.cpSync('src/_locales', 'dist/firefox/_locales', {recursive: true}); fs.copyFileSync('src/manifest-firefox.json', 'dist/firefox/manifest.json'); fs.copyFileSync('dist/chromium/fuskr-core.js', 'dist/firefox/fuskr-core.js')\"",
+    "copy:files": "node -e \"const fs = require('fs'); fs.cpSync('src/_locales', 'dist/chromium/_locales', {recursive: true}); fs.cpSync('src/_locales', 'dist/firefox/_locales', {recursive: true}); fs.copyFileSync('src/manifest-firefox.json', 'dist/firefox/manifest.json'); fs.copyFileSync('dist/chromium/background.js', 'dist/firefox/background.js'); fs.copyFileSync('dist/chromium/fuskr-core.js', 'dist/firefox/fuskr-core.js')\"",
     "extension:id": "node scripts/get-extension-id.js",
     "format:check": "prettier --check \"src/**/*.{ts,js,html,scss,css,json}\"",
     "format": "prettier --write \"src/**/*.{ts,js,html,scss,css,json}\"",

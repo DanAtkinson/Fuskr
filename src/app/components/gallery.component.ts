@@ -21,9 +21,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Public signals (alphabetically)
 	autoRemoveBrokenImages = signal(false);
 	brokenImages = signal(0);
+	currentGalleryIndex = signal(-1); // For keyboard navigation in main gallery
+	currentMediaItem = signal<MediaItem | null>(null);
 	currentViewerImage = signal('');
 	currentViewerIndex = signal(0);
-	currentGalleryIndex = signal(-1); // For keyboard navigation in main gallery
 	customCountDirection = signal<-1 | 0 | 1>(0);
 	customCountRequested = signal(false);
 	customCountValue = signal('10');
@@ -47,7 +48,6 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	toastMessage = signal('');
 	toastVisible = signal(false);
 	totalImages = signal(0);
-	currentMediaItem = signal<MediaItem | null>(null);
 
 	// Computed signals
 	visibleMediaItems = computed(() => this.mediaItems().filter((item) => !this.brokenUrls().has(item.url)));
@@ -58,18 +58,18 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	);
 
 	// Private signals
+	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
 	private brokenUrls = signal(new Set<string>());
 	private hasInitialized = false;
-	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
 	// Injected services
-	private route = inject(ActivatedRoute);
-	private router = inject(Router);
 	private fuskrService = inject(FuskrService);
 	private logger = inject(LoggerService);
 	private mediaTypeService = inject(MediaTypeService);
+	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 
 	constructor() {
 		super();
