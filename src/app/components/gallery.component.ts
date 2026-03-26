@@ -694,12 +694,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			return;
 		}
 
-		// Don't handle if focus is on a form element
-		if (this.isFormElementFocused()) {
-			return;
-		}
-
-		// Handle modal viewer navigation
+		// Handle modal viewer navigation — must come before the form-element guard
+		// so that keys like Home/End are always captured and never reach the page.
 		if (this.showImageViewer() && this.visibleMediaItems().length > 0) {
 			switch (event.key) {
 				case 'ArrowLeft':
@@ -725,6 +721,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 					this.goToLastImageInViewer();
 					break;
 			}
+			return;
+		}
+
+		// Don't handle main gallery navigation if focus is on a form element
+		if (this.isFormElementFocused()) {
 			return;
 		}
 

@@ -375,6 +375,58 @@ describe('GalleryComponent', () => {
 			expect(component.currentViewerIndex()).toBe(0);
 			expect(component.currentViewerImage()).toBe('url1.jpg');
 		});
+
+		it('Home key navigates to first image in viewer', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(2);
+			component.currentViewerImage.set('url3.jpg');
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'Home' }));
+
+			expect(component.currentViewerIndex()).toBe(0);
+			expect(component.currentViewerImage()).toBe('url1.jpg');
+		});
+
+		it('End key navigates to last image in viewer', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(0);
+			component.currentViewerImage.set('url1.jpg');
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
+
+			expect(component.currentViewerIndex()).toBe(2);
+			expect(component.currentViewerImage()).toBe('url3.jpg');
+		});
+
+		it('Home/End keys are captured by the viewer even when a button has focus', () => {
+			// Regression: buttons are treated as form elements; previously the form-element
+			// guard fired before the viewer handler, so Home/End were never intercepted.
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(2);
+
+			const btn = document.createElement('button');
+			document.body.appendChild(btn);
+			btn.focus();
+
+			const homeEvent = new KeyboardEvent('keydown', { key: 'Home', cancelable: true });
+			component.handleKeyboardEvent(homeEvent);
+
+			expect(component.currentViewerIndex()).toBe(0);
+			expect(homeEvent.defaultPrevented).toBe(true);
+			document.body.removeChild(btn);
+		});
+
+		it('ArrowLeft/ArrowRight navigate the viewer', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(1);
+			component.currentViewerImage.set('url2.jpg');
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+			expect(component.currentViewerIndex()).toBe(0);
+
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+			expect(component.currentViewerIndex()).toBe(1);
+		});
 	});
 
 	describe('Image Viewer Focus Management', () => {
