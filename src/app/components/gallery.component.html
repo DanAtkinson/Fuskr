@@ -132,7 +132,7 @@
 	<!-- Image Viewer Modal -->
 	@if (showImageViewer()) {
 		<div class="image-viewer-modal" (click)="closeImageViewer()" (keydown.escape)="closeImageViewer()" tabindex="0" role="dialog" aria-modal="true" [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage())">
-			<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" role="document">
+			<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="handleViewerKeydown($event)" role="document">
 				<div class="viewer-header">
 					<span class="viewer-title">{{ getFilename(currentViewerImage()) }}</span>
 					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ totalImages() }}</span>

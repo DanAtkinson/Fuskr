@@ -429,6 +429,93 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('handleViewerKeydown (template-bound viewer handler)', () => {
+		beforeEach(() => {
+			component.showImageViewer.set(true);
+			component.mediaItems.set([
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			]);
+			component.currentViewerIndex.set(1);
+			component.currentViewerImage.set('url2.jpg');
+		});
+
+		it('calls stopPropagation on every keydown event', () => {
+			const event = new KeyboardEvent('keydown', { key: 'x', bubbles: true });
+			const spy = vi.spyOn(event, 'stopPropagation');
+			component.handleViewerKeydown(event);
+			expect(spy).toHaveBeenCalled();
+		});
+
+		it('ArrowLeft navigates to the previous image and calls preventDefault', () => {
+			const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+			const spy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(spy).toHaveBeenCalled();
+			expect(component.currentViewerIndex()).toBe(0);
+		});
+
+		it('ArrowUp navigates to the previous image', () => {
+			const event = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+			component.handleViewerKeydown(event);
+			expect(component.currentViewerIndex()).toBe(0);
+		});
+
+		it('ArrowRight navigates to the next image and calls preventDefault', () => {
+			const event = new KeyboardEvent('keydown', { key: 'ArrowRight' });
+			const spy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(spy).toHaveBeenCalled();
+			expect(component.currentViewerIndex()).toBe(2);
+		});
+
+		it('ArrowDown navigates to the next image', () => {
+			const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+			component.handleViewerKeydown(event);
+			expect(component.currentViewerIndex()).toBe(2);
+		});
+
+		it('Home navigates to the first image and calls preventDefault', () => {
+			const event = new KeyboardEvent('keydown', { key: 'Home' });
+			const spy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(spy).toHaveBeenCalled();
+			expect(component.currentViewerIndex()).toBe(0);
+		});
+
+		it('End navigates to the last image and calls preventDefault', () => {
+			const event = new KeyboardEvent('keydown', { key: 'End' });
+			const spy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(spy).toHaveBeenCalled();
+			expect(component.currentViewerIndex()).toBe(2);
+		});
+
+		it('Escape closes the viewer and calls preventDefault', () => {
+			const event = new KeyboardEvent('keydown', { key: 'Escape' });
+			const spy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(spy).toHaveBeenCalled();
+			expect(component.showImageViewer()).toBe(false);
+		});
+
+		it('does nothing for navigation keys when there are no visible items', () => {
+			component.mediaItems.set([]);
+			const event = new KeyboardEvent('keydown', { key: 'ArrowLeft' });
+			const preventSpy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(preventSpy).not.toHaveBeenCalled();
+		});
+
+		it('does not call preventDefault for unrecognised keys', () => {
+			const event = new KeyboardEvent('keydown', { key: 'a' });
+			const preventSpy = vi.spyOn(event, 'preventDefault');
+			component.handleViewerKeydown(event);
+			expect(preventSpy).not.toHaveBeenCalled();
+		});
+	});
+
 	describe('Image Viewer Focus Management', () => {
 		beforeEach(() => {
 			component.mediaItems.set([

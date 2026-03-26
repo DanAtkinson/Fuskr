@@ -686,6 +686,42 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	// Keyboard navigation methods
+
+	/**
+	 * Handles keyboard navigation within the image viewer modal.
+	 * Called directly from the template so events are captured even when
+	 * stopPropagation would otherwise prevent them reaching the document listener.
+	 */
+	handleViewerKeydown(event: KeyboardEvent): void {
+		event.stopPropagation();
+		if (this.visibleMediaItems().length === 0) return;
+
+		switch (event.key) {
+			case 'ArrowLeft':
+			case 'ArrowUp':
+				event.preventDefault();
+				this.previousImage();
+				break;
+			case 'ArrowRight':
+			case 'ArrowDown':
+				event.preventDefault();
+				this.nextImage();
+				break;
+			case 'Escape':
+				event.preventDefault();
+				this.closeImageViewer();
+				break;
+			case 'Home':
+				event.preventDefault();
+				this.goToFirstImageInViewer();
+				break;
+			case 'End':
+				event.preventDefault();
+				this.goToLastImageInViewer();
+				break;
+		}
+	}
+
 	@HostListener('document:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent) {
 		// Trap Tab focus within the viewer modal when it is open
