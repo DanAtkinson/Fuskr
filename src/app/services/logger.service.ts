@@ -62,7 +62,7 @@ export class LoggerService {
 			})
 			.join('\n');
 
-		const metadata = ['Fuskr Debug Log Export', `Version: ${this.getExtensionVersion()}`, `Generated: ${new Date().toISOString()}`, `Total Entries: ${logs.length}`, `Browser: ${navigator.userAgent}`, `URL: ${window.location.href}`, '', '='.repeat(80), ''].join('\n');
+		const metadata = ['Fuskr Debug Log Export', `Version: ${this.getExtensionVersion()}`, `Generated: ${new Date().toISOString()}`, `Log Level: ${LogLevel[this.currentLogLevel]}`, `Total Entries: ${logs.length}`, `Browser: ${navigator.userAgent}`, `URL: ${window.location.href}`, '', '='.repeat(80), ''].join('\n');
 
 		const fullLog = metadata + logText;
 
