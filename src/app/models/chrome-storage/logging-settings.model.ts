@@ -1,10 +1,9 @@
-import { LogLevel } from '@services/logger.service';
 import { ILoggingSettings } from '@interfaces/chrome-storage/logging-settings.interface';
 
 export class LoggingSettings implements ILoggingSettings {
 	// Public properties (alphabetically)
 	enabled = false;
-	logLevel = LogLevel.INFO;
+	logLevel = 1; // LogLevel.INFO
 
 	constructor(data?: Partial<ILoggingSettings>) {
 		if (data?.enabled !== undefined) {
