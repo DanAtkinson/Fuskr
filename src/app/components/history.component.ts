@@ -177,13 +177,13 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 		try {
 			const settings = await this.chromeService.getStorageData();
 
-			// Configure the logger immediately so all logging calls in this
-			// context are captured, regardless of AppComponent initialisation order.
+			// Load existing logs BEFORE configuring — configure() internally logs
+			// an INFO entry which would otherwise overwrite other contexts' logs.
+			await this.logger.loadLogsFromStorage();
 			this.logger.configure({
 				enabled: settings.logging.enabled,
 				logLevel: Number(settings.logging.logLevel),
 			});
-			await this.logger.loadLogsFromStorage();
 
 			this.darkMode.set(settings.display.darkMode);
 			this.applyTheme();

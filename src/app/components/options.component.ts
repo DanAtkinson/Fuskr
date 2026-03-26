@@ -69,6 +69,9 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 			this.options.logging.enabled = false;
 			await this.chromeService.setStorageData(this.options);
 		}
+		// Load existing logs BEFORE configuring — configure() internally logs
+		// an INFO entry which would otherwise overwrite other contexts' logs.
+		await this.logger.loadLogsFromStorage();
 		this.logger.configure({ enabled: this.options.logging.enabled, logLevel: Number(this.options.logging.logLevel) });
 		this.loggerConfig = this.logger.getConfig();
 

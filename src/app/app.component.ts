@@ -21,13 +21,13 @@ export class AppComponent implements OnInit {
 	async ngOnInit() {
 		try {
 			const data = await this.chromeService.getStorageData();
+			// Load existing logs BEFORE configuring — configure() internally logs
+			// an INFO entry which would otherwise overwrite other contexts' logs.
+			await this.logger.loadLogsFromStorage();
 			this.logger.configure({
 				enabled: data.logging.enabled,
 				logLevel: Number(data.logging.logLevel),
 			});
-			// Merge any logs written by other extension contexts (e.g. the gallery
-			// popup) into this context's in-memory store.
-			await this.logger.loadLogsFromStorage();
 		} catch {
 			// Non-fatal: logger stays at its default (disabled) state.
 		}
