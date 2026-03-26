@@ -90,10 +90,10 @@ describe('HistoryComponent', () => {
 	});
 
 	it('should initialise with default values', () => {
-		expect(component.darkMode).toBe(false);
-		expect(component.loading).toBe(true);
-		expect(component.history.entries).toEqual([]);
-		expect(component.history.maxEntries).toBe(10);
+		expect(component.darkMode()).toBe(false);
+		expect(component.loading()).toBe(true);
+		expect(component.history().entries).toEqual([]);
+		expect(component.history().maxEntries).toBe(10);
 	});
 
 	describe('ngOnInit', () => {
@@ -102,8 +102,8 @@ describe('HistoryComponent', () => {
 
 			expect(mockChromeService.getGalleryHistory).toHaveBeenCalled();
 			expect(mockChromeService.getDarkMode).toHaveBeenCalled();
-			expect(component.history).toEqual(mockHistory);
-			expect(component.loading).toBe(false);
+			expect(component.history()).toEqual(mockHistory);
+			expect(component.loading()).toBe(false);
 		});
 
 		it('should handle history loading error', async () => {
@@ -116,7 +116,7 @@ describe('HistoryComponent', () => {
 				'Failed to load gallery history',
 				expect.any(Error)
 			);
-			expect(component.loading).toBe(false);
+			expect(component.loading()).toBe(false);
 		});
 	});
 
@@ -411,7 +411,7 @@ describe('HistoryComponent', () => {
 			mockEvent = {
 				stopPropagation: vi.fn().mockName('Event.stopPropagation'),
 			};
-			component.history = { ...mockHistory };
+			component.history.set({ ...mockHistory });
 		});
 
 		it('should remove entry and update local array', async () => {
@@ -419,7 +419,7 @@ describe('HistoryComponent', () => {
 
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
 			expect(mockChromeService.removeGalleryFromHistory).toHaveBeenCalledWith(mockHistoryEntry.id);
-			expect(component.history.entries).toEqual([]);
+			expect(component.history().entries).toEqual([]);
 			expect(mockLoggerService.debug).toHaveBeenCalledWith(
 				'history.entryRemoved',
 				expect.stringContaining(mockHistoryEntry.id)
@@ -442,7 +442,7 @@ describe('HistoryComponent', () => {
 	describe('clearAllHistory', () => {
 		beforeEach(() => {
 			vi.spyOn(window, 'confirm');
-			component.history = { ...mockHistory };
+			component.history.set({ ...mockHistory });
 		});
 
 		it('should clear history when confirmed', async () => {
@@ -451,7 +451,7 @@ describe('HistoryComponent', () => {
 			await component.clearAllHistory();
 
 			expect(mockChromeService.clearGalleryHistory).toHaveBeenCalled();
-			expect(component.history.entries).toEqual([]);
+			expect(component.history().entries).toEqual([]);
 			expect(mockLoggerService.debug).toHaveBeenCalledWith('history.cleared', 'All history cleared');
 		});
 
@@ -461,7 +461,7 @@ describe('HistoryComponent', () => {
 			await component.clearAllHistory();
 
 			expect(mockChromeService.clearGalleryHistory).not.toHaveBeenCalled();
-			expect(component.history.entries).toEqual(mockHistory.entries);
+			expect(component.history().entries).toEqual(mockHistory.entries);
 		});
 
 		it('should handle clear errors', async () => {
@@ -480,11 +480,11 @@ describe('HistoryComponent', () => {
 
 	describe('toggleDarkMode', () => {
 		it('should toggle dark mode and update settings', async () => {
-			component.darkMode = false;
+			component.darkMode.set(false);
 
 			await component.toggleDarkMode();
 
-			expect(component.darkMode).toBe(true);
+			expect(component.darkMode()).toBe(true);
 			expect(mockChromeService.updateDisplaySettings).toHaveBeenCalledWith({ darkMode: true });
 		});
 	});

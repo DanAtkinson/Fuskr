@@ -174,7 +174,7 @@ describe('OptionsComponent', () => {
 			await component.saveOptions();
 
 			expect(mockChromeService.setStorageData).toHaveBeenCalledWith(component.options);
-			expect(component.statusMessage).toBe('Options saved!');
+			expect(component.statusMessage()).toBe('Options saved!');
 		});
 
 		it('should clear status message after 2 seconds', async () => {
@@ -182,10 +182,10 @@ describe('OptionsComponent', () => {
 			vi.useFakeTimers();
 
 			await component.saveOptions();
-			expect(component.statusMessage).toBe('Options saved!');
+			expect(component.statusMessage()).toBe('Options saved!');
 
 			vi.advanceTimersByTime(2001);
-			expect(component.statusMessage).toBe('');
+			expect(component.statusMessage()).toBe('');
 
 			vi.useRealTimers();
 		});
@@ -197,7 +197,7 @@ describe('OptionsComponent', () => {
 			await component.saveOptions();
 
 			expect(loggerSpy).toHaveBeenCalledWith('options.saveFailed', 'Failed to save options', expect.any(Error));
-			expect(component.statusMessage).toBe('Error saving options');
+			expect(component.statusMessage()).toBe('Error saving options');
 		});
 	});
 
@@ -219,7 +219,7 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should display status message when present', () => {
-			component.statusMessage = 'Test message';
+			component.statusMessage.set('Test message');
 			fixture.detectChanges();
 
 			const statusElement = fixture.nativeElement.querySelector('.alert');
@@ -227,7 +227,7 @@ describe('OptionsComponent', () => {
 		});
 
 		it('should hide status message when empty', () => {
-			component.statusMessage = '';
+			component.statusMessage.set('');
 			fixture.detectChanges();
 
 			const statusElement = fixture.nativeElement.querySelector('.alert');
@@ -362,7 +362,7 @@ describe('OptionsComponent', () => {
 			expect(window.confirm).toHaveBeenCalledWith(component.translate('Options_ResetConfirmation'));
 			expect(mockChromeService.resetOptionsToDefaults).toHaveBeenCalled();
 			expect(component.loadOptions).toHaveBeenCalled();
-			expect(component.statusMessage).toBe(component.translate('Options_ResetSuccessful'));
+			expect(component.statusMessage()).toBe(component.translate('Options_ResetSuccessful'));
 		});
 
 		it('should not reset options when user cancels confirmation', async () => {
@@ -373,7 +373,7 @@ describe('OptionsComponent', () => {
 			expect(window.confirm).toHaveBeenCalledWith(component.translate('Options_ResetConfirmation'));
 			expect(mockChromeService.resetOptionsToDefaults).not.toHaveBeenCalled();
 			expect(component.loadOptions).not.toHaveBeenCalled();
-			expect(component.statusMessage).toBe('');
+			expect(component.statusMessage()).toBe('');
 		});
 
 		it('should handle reset errors gracefully', async () => {
@@ -384,7 +384,7 @@ describe('OptionsComponent', () => {
 
 			expect(mockChromeService.resetOptionsToDefaults).toHaveBeenCalled();
 			expect(component.loadOptions).not.toHaveBeenCalled();
-			expect(component.statusMessage).toBe(component.translate('Options_ResetFailed'));
+			expect(component.statusMessage()).toBe(component.translate('Options_ResetFailed'));
 		});
 
 		it('should show status message that clears after 2 seconds', async () => {
@@ -392,11 +392,11 @@ describe('OptionsComponent', () => {
 
 			await component.resetToDefaults();
 
-			expect(component.statusMessage).toBe(component.translate('Options_ResetSuccessful'));
+			expect(component.statusMessage()).toBe(component.translate('Options_ResetSuccessful'));
 
 			vi.advanceTimersByTime(2001);
 
-			expect(component.statusMessage).toBe('');
+			expect(component.statusMessage()).toBe('');
 
 			vi.useRealTimers();
 		});

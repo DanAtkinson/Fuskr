@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ChromeService } from '@services/chrome.service';
@@ -15,9 +15,9 @@ import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history
 })
 export class HistoryComponent extends BaseComponent implements OnInit {
 	// Public properties (alphabetically)
-	darkMode = false;
-	history: GalleryHistory = { entries: [], maxEntries: 10 };
-	loading = true;
+	darkMode = signal(false);
+	history = signal<GalleryHistory>({ entries: [], maxEntries: 10 });
+	loading = signal(true);
 
 	// Injected services
 	public router = inject(Router);
@@ -33,7 +33,7 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 		if (confirm(this.translate('History_ConfirmClearAll'))) {
 			try {
 				await this.chromeService.clearGalleryHistory();
-				this.history.entries = [];
+				this.history.set({ ...this.history(), entries: [] });
 				this.logger.debug('history.cleared', 'All history cleared');
 			} catch (error) {
 				this.logger.error('history.clearFailed', 'Failed to clear history', error);
@@ -129,8 +129,7 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 
 		try {
 			await this.chromeService.removeGalleryFromHistory(entry.id);
-			// Remove from local array
-			this.history.entries = this.history.entries.filter((e) => e.id !== entry.id);
+			this.history.set({ ...this.history(), entries: this.history().entries.filter((e) => e.id !== entry.id) });
 			this.logger.debug('history.entryRemoved', `Removed history entry: ${entry.id}`);
 		} catch (error) {
 			this.logger.error('history.removeFailed', 'Failed to remove history entry', error);
@@ -138,14 +137,14 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 	}
 
 	async toggleDarkMode() {
-		this.darkMode = !this.darkMode;
-		await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode });
+		this.darkMode.set(!this.darkMode());
+		await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode() });
 		this.applyTheme();
 	}
 
 	// Private methods (alphabetically)
 	private applyTheme() {
-		if (this.darkMode) {
+		if (this.darkMode()) {
 			document.body.classList.add('dark-mode');
 		} else {
 			document.body.classList.remove('dark-mode');
@@ -154,12 +153,12 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 
 	private async loadHistory() {
 		try {
-			this.history = await this.chromeService.getGalleryHistory();
+			this.history.set(await this.chromeService.getGalleryHistory());
 
 			// Debug timestamp data
-			if (this.history.entries.length > 0) {
-				const firstEntry = this.history.entries[0];
-				this.logger.debug('history.loaded', `Loaded ${this.history.entries.length} history entries`, {
+			if (this.history().entries.length > 0) {
+				const firstEntry = this.history().entries[0];
+				this.logger.debug('history.loaded', `Loaded ${this.history().entries.length} history entries`, {
 					firstEntryTimestamp: firstEntry.timestamp,
 					timestampType: typeof firstEntry.timestamp,
 					isDate: firstEntry.timestamp instanceof Date,
@@ -170,13 +169,13 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 		} catch (error) {
 			this.logger.error('history.loadFailed', 'Failed to load gallery history', error);
 		} finally {
-			this.loading = false;
+			this.loading.set(false);
 		}
 	}
 
 	private async loadSettings() {
 		try {
-			this.darkMode = await this.chromeService.getDarkMode();
+			this.darkMode.set(await this.chromeService.getDarkMode());
 			this.applyTheme();
 		} catch (error) {
 			this.logger.error('history.settingsLoadFailed', 'Failed to load settings', error);

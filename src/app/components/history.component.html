@@ -3,8 +3,8 @@
 		<div class="header-top">
 			<h1>{{ translate('History_Title') }}</h1>
 			<div class="header-controls">
-				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
-					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode() ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
+					<i [class]="darkMode() ? 'fas fa-sun' : 'fas fa-moon'"></i>
 				</button>
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('History_ViewOptions')">
 					<i class="fas fa-cog"></i>
@@ -15,20 +15,20 @@
 		<div class="header-actions">
 			<button class="btn btn-outline-secondary" type="button" (click)="router.navigate(['/gallery'])"><i class="fas fa-images me-1"></i>{{ translate('History_NewGallery') }}</button>
 
-			@if (history.entries.length > 0) {
+			@if (history().entries.length > 0) {
 				<button class="btn btn-outline-danger" type="button" (click)="clearAllHistory()"><i class="fas fa-trash me-1"></i>{{ translate('History_ClearAll') }}</button>
 			}
 		</div>
 	</div>
 
-	@if (loading) {
+	@if (loading()) {
 		<div class="loading">
 			<div class="spinner"></div>
 			<p>{{ translate('History_Loading') }}</p>
 		</div>
 	}
 
-	@if (!loading && history.entries.length === 0) {
+	@if (!loading() && history().entries.length === 0) {
 		<div class="empty-state">
 			<i class="fas fa-history fa-4x mb-3"></i>
 			<h2>{{ translate('History_NoEntries') }}</h2>
@@ -37,14 +37,14 @@
 		</div>
 	}
 
-	@if (!loading && history.entries.length > 0) {
+	@if (!loading() && history().entries.length > 0) {
 		<div class="history-list">
 			<div class="history-stats">
-				<span class="stat">{{ history.entries.length }} {{ translate('History_TotalEntries') }}</span>
+				<span class="stat">{{ history().entries.length }} {{ translate('History_TotalEntries') }}</span>
 			</div>
 
 			<div class="history-entries">
-				@for (entry of history.entries; track entry.id) {
+				@for (entry of history().entries; track entry.id) {
 					<div class="history-entry" (click)="openGallery(entry)" (keydown.enter)="openGallery(entry)" (keydown.space)="openGallery(entry)" tabindex="0" role="button" [attr.aria-label]="'Open gallery for ' + getFilename(entry.originalUrl)">
 						<div class="entry-header">
 							<div class="entry-info">

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChromeStorageData } from '@models/chrome-storage';
@@ -21,8 +21,8 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		logCount: 0,
 	};
 	options: ChromeStorageData = new ChromeStorageData();
-	showDebugPanel = false;
-	statusMessage = '';
+	showDebugPanel = signal(false);
+	statusMessage = signal('');
 
 	// Injected services
 	private logger = inject(LoggerService);
@@ -111,18 +111,18 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 	}
 
 	toggleDebugPanel() {
-		this.showDebugPanel = !this.showDebugPanel;
-		this.logger.debug('options.debugPanel.toggled', `Panel visibility: ${this.showDebugPanel}`);
-		if (this.showDebugPanel) {
+		this.showDebugPanel.set(!this.showDebugPanel());
+		this.logger.debug('options.debugPanel.toggled', `Panel visibility: ${this.showDebugPanel()}`);
+		if (this.showDebugPanel()) {
 			this.loggerConfig = this.logger.getConfig();
 		}
 	}
 
 	// Private methods (alphabetically)
 	private showStatus(message: string) {
-		this.statusMessage = message;
+		this.statusMessage.set(message);
 		setTimeout(() => {
-			this.statusMessage = '';
+			this.statusMessage.set('');
 		}, 2000);
 	}
 }

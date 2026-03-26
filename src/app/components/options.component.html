@@ -129,13 +129,13 @@
 			<div class="card mb-4">
 				<div class="card-header">
 					<h5 class="mb-0">
-						<button class="btn btn-link text-decoration-none p-0 text-start w-100" type="button" (click)="toggleDebugPanel()" [attr.aria-expanded]="showDebugPanel">
+						<button class="btn btn-link text-decoration-none p-0 text-start w-100" type="button" (click)="toggleDebugPanel()" [attr.aria-expanded]="showDebugPanel()">
 							<i class="fas fa-bug me-2"></i>{{ translate('Options_Debug') }}
-							<i [class]="showDebugPanel ? 'fas fa-chevron-up float-end' : 'fas fa-chevron-down float-end'"></i>
+							<i [class]="showDebugPanel() ? 'fas fa-chevron-up float-end' : 'fas fa-chevron-down float-end'"></i>
 						</button>
 					</h5>
 				</div>
-				@if (showDebugPanel) {
+				@if (showDebugPanel()) {
 					<div class="card-body">
 						<div class="alert alert-info">
 							<i class="fas fa-info-circle me-1"></i>
@@ -202,7 +202,7 @@
 		</div>
 	</div>
 
-	@if (statusMessage) {
-		<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="fas fa-check-circle me-1"></i>{{ statusMessage }}</div>
+	@if (statusMessage()) {
+		<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="fas fa-check-circle me-1"></i>{{ statusMessage() }}</div>
 	}
 </div>
