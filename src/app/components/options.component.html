@@ -145,7 +145,7 @@
 						<div class="mb-3">
 							<div class="form-check">
 								<input class="form-check-input" type="checkbox" id="enableLogging" [checked]="loggerConfig.enabled" (change)="onLoggingToggle($event)" />
-								<label class="form-check-label" for="enableLogging"> <i class="fas fa-toggle-on me-1"></i>{{ translate('Options_EnableLogging') }} </label>
+								<label class="form-check-label" for="enableLogging"> 👀 {{ translate('Options_EnableLogging') }} </label>
 								<div class="form-text">{{ translate('Options_EnableLogging_Description') }}</div>
 							</div>
 						</div>
@@ -166,7 +166,7 @@
 								</ul>
 							</div>
 							<div class="col-md-6">
-								<h6>{{ translate('Options_Actions') }}</h6>
+								<h6 class="text-center">{{ translate('Options_Actions') }}</h6>
 								<div class="btn-group-vertical d-grid gap-2">
 									<button class="btn btn-primary" type="button" (click)="exportLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-download me-1"></i>{{ translate('Options_ExportLogs') }}</button>
 									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-trash me-1"></i>{{ translate('Options_ClearLogs') }}</button>
