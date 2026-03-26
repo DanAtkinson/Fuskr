@@ -47,15 +47,9 @@
 								"input": "src",
 								"output": "."
 							},
-							{
-								"glob": "**/*.{woff,woff2,ttf,eot}",
-								"input": "node_modules/@fortawesome/fontawesome-free/webfonts",
-								"output": "assets/fonts"
-							}
 						],
 						"styles": [
 							"node_modules/bootstrap/dist/css/bootstrap.min.css",
-							"node_modules/@fortawesome/fontawesome-free/css/all.min.css",
 							"src/styles.scss"
 						],
 						"scripts": []

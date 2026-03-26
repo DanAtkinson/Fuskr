@@ -5,13 +5,13 @@
 			<h1>{{ translate('Gallery_Title') }}</h1>
 			<div class="header-controls">
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToHistory()" [title]="translate('Gallery_ViewHistory')">
-					<i class="fas fa-history"></i>
+					<span aria-hidden="true">🕐</span>
 				</button>
 				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode() ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
-					<i [class]="darkMode() ? 'fas fa-sun' : 'fas fa-moon'"></i>
+					<span aria-hidden="true">{{ darkMode() ? '☀️' : '🌙' }}</span>
 				</button>
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('Gallery_ViewOptions')">
-					<i class="fas fa-cog"></i>
+					<span aria-hidden="true">⚙️</span>
 				</button>
 			</div>
 		</div>
@@ -26,7 +26,7 @@
 			}
 			<div class="input-group mb-3">
 				<input id="originalUrlInput" class="form-control" type="url" (keyup.enter)="generateGallery()" [ngModel]="originalUrl()" (ngModelChange)="originalUrl.set($event)" [placeholder]="translate('Gallery_UrlPlaceholder')" />
-				<button class="btn btn-primary" (click)="generateGallery()"><i class="fas fa-images me-1"></i>{{ translate('Gallery_GenerateGallery') }}</button>
+				<button class="btn btn-primary" (click)="generateGallery()"><span class="me-1" aria-hidden="true">🖼️</span>{{ translate('Gallery_GenerateGallery') }}</button>
 			</div>
 		</div>
 
@@ -75,7 +75,7 @@
 					}
 					@if (mediaItem.loadingState === 'error') {
 						<div class="media-error-indicator">
-							<i class="fas fa-exclamation-triangle"></i>
+							<span aria-hidden="true">⚠️</span>
 							<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
 						</div>
 					}
@@ -83,16 +83,16 @@
 						<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
 						<div class="image-actions">
 							<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
-								<i class="fas fa-download"></i>
+								<span aria-hidden="true">⬇️</span>
 							</button>
 							<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
-								<i class="fas fa-clipboard"></i>
+								<span aria-hidden="true">📋</span>
 							</button>
 							<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
-								<i class="fas fa-external-link-alt"></i>
+								<span aria-hidden="true">↗️</span>
 							</button>
 							<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
-								<i class="fas fa-search-plus"></i>
+								<span aria-hidden="true">🔍</span>
 							</button>
 						</div>
 					</div>
@@ -113,15 +113,15 @@
 		<div class="url-list-section">
 			<div class="url-list-header">
 				<button class="btn btn-outline-secondary btn-sm" type="button" (click)="toggleUrlList()" [attr.aria-expanded]="showUrlList()">
-					<i [class]="showUrlList() ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+					<span aria-hidden="true">{{ showUrlList() ? '▲' : '▼' }}</span>
 					<span class="ms-1">{{ translate('Images_ShowImageUrls') }}</span>
 				</button>
 			</div>
 			@if (showUrlList()) {
 				<div class="url-list-content">
 					<div class="url-list-controls mb-2">
-						<button class="btn btn-secondary btn-sm me-2" type="button" (click)="copyAllUrls()"><i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrls') }}</button>
-						<button class="btn btn-outline-secondary btn-sm" type="button" (click)="selectAllUrls()"><i class="fas fa-check-square me-1"></i>{{ translate('Gallery_SelectAllUrls') }}</button>
+						<button class="btn btn-secondary btn-sm me-2" type="button" (click)="copyAllUrls()"><span class="me-1" aria-hidden="true">📋</span>{{ translate('Gallery_CopyUrls') }}</button>
+						<button class="btn btn-outline-secondary btn-sm" type="button" (click)="selectAllUrls()"><span class="me-1" aria-hidden="true">☑️</span>{{ translate('Gallery_SelectAllUrls') }}</button>
 					</div>
 					<textarea class="form-control url-textarea" placeholder="{{ translate('Gallery_UrlListPlaceholder') }}" readonly rows="10" [value]="allUrlsText()" #urlTextarea> </textarea>
 				</div>
@@ -137,12 +137,12 @@
 					<span class="viewer-title">{{ getFilename(currentViewerImage()) }}</span>
 					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ totalImages() }}</span>
 					<button class="btn btn-sm btn-outline-secondary close-btn" type="button" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
-						<i class="fas fa-times"></i>
+						<span aria-hidden="true">✕</span>
 					</button>
 				</div>
 				<div class="viewer-body">
 					<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="currentViewerIndex() === 0">
-						<i class="fas fa-chevron-left"></i>
+						<span aria-hidden="true">◀</span>
 					</button>
 					@if (currentMediaItem()?.type === 'video') {
 						<video class="viewer-video" [src]="currentViewerImage()" controls preload="metadata" [attr.data-video-type]="currentMediaItem()?.mimeType || 'video/mp4'">
@@ -152,13 +152,13 @@
 						<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" />
 					}
 					<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="currentViewerIndex() === visibleMediaItems().length - 1">
-						<i class="fas fa-chevron-right"></i>
+						<span aria-hidden="true">▶</span>
 					</button>
 				</div>
 				<div class="viewer-footer">
-					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage(), $event)"><i class="fas fa-download me-1"></i>{{ currentMediaItem()?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}</button>
-					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage(), $event)"><i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrl') }}</button>
-					<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage())"><i class="fas fa-external-link-alt me-1"></i>{{ translate('Gallery_OpenInTab') }}</button>
+					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage(), $event)"><span class="me-1" aria-hidden="true">⬇️</span>{{ currentMediaItem()?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}</button>
+					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage(), $event)"><span class="me-1" aria-hidden="true">📋</span>{{ translate('Gallery_CopyUrl') }}</button>
+					<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage())"><span class="me-1" aria-hidden="true">↗️</span>{{ translate('Gallery_OpenInTab') }}</button>
 				</div>
 			</div>
 		</div>
@@ -194,7 +194,7 @@
 				@if (brokenImages() > 0) {
 					<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
 				}
-				<span class="stat keyboard-hint"> <i class="fas fa-keyboard me-1"></i>{{ translate('Gallery_KeyboardNavigation') }} </span>
+				<span class="stat keyboard-hint"> <span class="me-1" aria-hidden="true">⌨️</span>{{ translate('Gallery_KeyboardNavigation') }} </span>
 			</div>
 			<div class="stats-actions">
 				<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading()">
@@ -203,7 +203,7 @@
 							<span class="visually-hidden">{{ translate('Gallery_Loading') }}</span>
 						</div>
 					} @else {
-						<i class="fas fa-download me-1"></i>
+						<span class="me-1" aria-hidden="true">⬇️</span>
 					}
 					{{ isDownloading() ? downloadStatus() : translate('Gallery_DownloadAll') }}
 				</button>

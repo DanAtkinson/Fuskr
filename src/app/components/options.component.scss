@@ -229,12 +229,6 @@ input[type='radio'] {
 		}
 	}
 
-	// Icons
-	.fas,
-	.fa {
-		color: var(--text-color) !important;
-	}
-
 	// Ensure all text elements use the correct color
 	p,
 	span,
@@ -396,12 +390,6 @@ body.dark-mode {
 		&::placeholder {
 			color: var(--text-secondary) !important;
 		}
-	}
-
-	// Icons
-	.fas,
-	.fa {
-		color: var(--text-color) !important;
 	}
 
 	// Ensure all text elements use the correct color

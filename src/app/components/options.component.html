@@ -1,7 +1,7 @@
 <div class="container-fluid options-container">
 	<div class="row">
 		<div class="col-12">
-			<h1 class="mb-4"><i class="fas fa-cog me-2"></i>{{ translate('Options_Title') }}</h1>
+			<h1 class="mb-4"><span class="me-2" aria-hidden="true">⚙️</span>{{ translate('Options_Title') }}</h1>
 		</div>
 	</div>
 
@@ -9,12 +9,12 @@
 		<div class="col-12">
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="mb-0"><i class="fas fa-palette me-2"></i>{{ translate('Options_Appearance') }}</h5>
+					<h5 class="mb-0"><span class="me-2" aria-hidden="true">🎨</span>{{ translate('Options_Appearance') }}</h5>
 				</div>
 				<div class="card-body">
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="darkMode" [(ngModel)]="options.display.darkMode" (change)="onDarkModeChange(); saveOptions()" />
-						<label class="form-check-label" for="darkMode"> <i class="fas fa-moon me-1"></i>{{ translate('Options_DarkMode') }} </label>
+						<label class="form-check-label" for="darkMode"> <span class="me-1" aria-hidden="true">🌙</span>{{ translate('Options_DarkMode') }} </label>
 						<div class="form-text">{{ translate('Options_DarkMode_Description') }}</div>
 					</div>
 				</div>
@@ -26,7 +26,7 @@
 		<div class="col-12">
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="mb-0"><i class="fas fa-image me-2"></i>{{ translate('Options_ImageDisplay') }}</h5>
+					<h5 class="mb-0"><span class="me-2" aria-hidden="true">🖼️</span>{{ translate('Options_ImageDisplay') }}</h5>
 				</div>
 				<div class="card-body">
 					<div class="mb-3">
@@ -36,38 +36,38 @@
 
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fitOnPage" id="fitOnPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-								<label class="form-check-label" for="fitOnPage"> <i class="fas fa-compress-alt me-1"></i>{{ translate('Options_ResizeImagesFitOnPage') }} </label>
+								<label class="form-check-label" for="fitOnPage"> <span class="me-1" aria-hidden="true">⊟</span>{{ translate('Options_ResizeImagesFitOnPage') }} </label>
 							</div>
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fullWidth" id="fullWidth" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-								<label class="form-check-label" for="fullWidth"> <i class="fas fa-arrows-alt-h me-1"></i>{{ translate('Options_ResizeImagesFullWidth') }} </label>
+								<label class="form-check-label" for="fullWidth"> <span class="me-1" aria-hidden="true">↔️</span>{{ translate('Options_ResizeImagesFullWidth') }} </label>
 							</div>
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="imageDisplayMode" value="fillPage" id="fillPage" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-								<label class="form-check-label" for="fillPage"> <i class="fas fa-expand-alt me-1"></i>{{ translate('Options_ResizeImagesFillPage') }} </label>
+								<label class="form-check-label" for="fillPage"> <span class="me-1" aria-hidden="true">⛶</span>{{ translate('Options_ResizeImagesFillPage') }} </label>
 							</div>
 							<div class="form-check">
 								<input class="form-check-input" type="radio" name="imageDisplayMode" value="thumbnails" id="thumbnails" [(ngModel)]="options.display.imageDisplayMode" (change)="saveOptions()" />
-								<label class="form-check-label" for="thumbnails"> <i class="fas fa-th me-1"></i>{{ translate('Options_ResizeImagesThumbnails') }} </label>
+								<label class="form-check-label" for="thumbnails"> <span class="me-1" aria-hidden="true">⊞</span>{{ translate('Options_ResizeImagesThumbnails') }} </label>
 							</div>
 						</fieldset>
 					</div>
 
 					<div class="form-check mb-3">
 						<input class="form-check-input" type="checkbox" id="showImagesInViewer" [(ngModel)]="options.display.showImagesInViewer" (change)="saveOptions()" />
-						<label class="form-check-label" for="showImagesInViewer"> <i class="fas fa-search-plus me-1"></i>{{ translate('Options_ShowImagesInViewerDefault') }} </label>
+						<label class="form-check-label" for="showImagesInViewer"> <span class="me-1" aria-hidden="true">🔍</span>{{ translate('Options_ShowImagesInViewerDefault') }} </label>
 						<div class="form-text">{{ translate('Options_ShowImagesInViewerDescription') }}</div>
 					</div>
 
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="toggleBrokenImages" [(ngModel)]="options.display.toggleBrokenImages" (change)="saveOptions()" />
-						<label class="form-check-label" for="toggleBrokenImages"> <i class="fas fa-exclamation-triangle me-1"></i>{{ translate('Options_ShowBrokenImagesDefault') }} </label>
+						<label class="form-check-label" for="toggleBrokenImages"> <span class="me-1" aria-hidden="true">⚠️</span>{{ translate('Options_ShowBrokenImagesDefault') }} </label>
 						<div class="form-text">{{ translate('Options_ShowBrokenImagesDescription') }}</div>
 					</div>
 
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="autoRemoveBrokenImages" [(ngModel)]="options.display.autoRemoveBrokenImages" (change)="saveOptions()" />
-						<label class="form-check-label" for="autoRemoveBrokenImages"> <i class="fas fa-trash-alt me-1"></i>{{ translate('Options_AutoRemoveBrokenImagesDefault') }} </label>
+						<label class="form-check-label" for="autoRemoveBrokenImages"> <span class="me-1" aria-hidden="true">🗑️</span>{{ translate('Options_AutoRemoveBrokenImagesDefault') }} </label>
 						<div class="form-text">{{ translate('Options_AutoRemoveBrokenImagesDescription') }}</div>
 					</div>
 				</div>
@@ -79,18 +79,18 @@
 		<div class="col-12">
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="mb-0"><i class="fas fa-cogs me-2"></i>{{ translate('Options_Behaviour') }}</h5>
+					<h5 class="mb-0"><span class="me-2" aria-hidden="true">⚙️</span>{{ translate('Options_Behaviour') }}</h5>
 				</div>
 				<div class="card-body">
 					<div class="form-check mb-3">
 						<input class="form-check-input" type="checkbox" id="openInForeground" [(ngModel)]="options.behaviour.openInForeground" (change)="saveOptions()" />
-						<label class="form-check-label" for="openInForeground"> <i class="fas fa-window-restore me-1"></i>{{ translate('Options_OpenNewFusksInForeground') }} </label>
+						<label class="form-check-label" for="openInForeground"> <span class="me-1" aria-hidden="true">🪟</span>{{ translate('Options_OpenNewFusksInForeground') }} </label>
 						<div class="form-text">{{ translate('Options_OpenNewFusksInForeground_Description') }}</div>
 					</div>
 
 					<div class="form-check">
 						<input class="form-check-input" type="checkbox" id="keepRecentFusks" [(ngModel)]="options.behaviour.keepRecentFusks" (change)="saveOptions()" />
-						<label class="form-check-label" for="keepRecentFusks"> <i class="fas fa-history me-1"></i>{{ translate('Options_History_Keep') }} </label>
+						<label class="form-check-label" for="keepRecentFusks"> <span class="me-1" aria-hidden="true">🕐</span>{{ translate('Options_History_Keep') }} </label>
 						<div class="form-text">{{ translate('Options_History_Keep_Description') }}</div>
 					</div>
 				</div>
@@ -102,12 +102,12 @@
 		<div class="col-12">
 			<div class="card mb-4">
 				<div class="card-header">
-					<h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>{{ translate('Options_OverloadProtection') }}</h5>
+					<h5 class="mb-0"><span class="me-2" aria-hidden="true">🛡️</span>{{ translate('Options_OverloadProtection') }}</h5>
 				</div>
 				<div class="card-body">
 					<div class="form-check mb-3">
 						<input class="form-check-input" type="checkbox" id="enableOverloadProtection" [(ngModel)]="options.safety.enableOverloadProtection" (change)="saveOptions()" />
-						<label class="form-check-label" for="enableOverloadProtection"> <i class="fas fa-exclamation-triangle me-1"></i>{{ translate('Options_EnableOverloadProtection') }} </label>
+						<label class="form-check-label" for="enableOverloadProtection"> <span class="me-1" aria-hidden="true">⚠️</span>{{ translate('Options_EnableOverloadProtection') }} </label>
 						<div class="form-text">{{ translate('Options_EnableOverloadProtection_Description') }}</div>
 					</div>
 
@@ -130,15 +130,15 @@
 				<div class="card-header">
 					<h5 class="mb-0">
 						<button class="btn btn-link text-decoration-none p-0 text-start w-100" type="button" (click)="toggleDebugPanel()" [attr.aria-expanded]="showDebugPanel()">
-							<i class="fas fa-bug me-2"></i>{{ translate('Options_Debug') }}
-							<i [class]="showDebugPanel() ? 'fas fa-chevron-up float-end' : 'fas fa-chevron-down float-end'"></i>
+							<span class="me-2" aria-hidden="true">🐛</span>{{ translate('Options_Debug') }}
+							<span class="float-end" aria-hidden="true">{{ showDebugPanel() ? '▲' : '▼' }}</span>
 						</button>
 					</h5>
 				</div>
 				@if (showDebugPanel()) {
 					<div class="card-body">
 						<div class="alert alert-info">
-							<i class="fas fa-info-circle me-1"></i>
+							<span class="me-1" aria-hidden="true">ℹ️</span>
 							{{ translate('Options_Debug_Description') }}
 						</div>
 
@@ -168,14 +168,14 @@
 							<div class="col-md-6">
 								<h6 class="text-center">{{ translate('Options_Actions') }}</h6>
 								<div class="btn-group-vertical d-grid gap-2">
-									<button class="btn btn-primary" type="button" (click)="exportLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-download me-1"></i>{{ translate('Options_ExportLogs') }}</button>
-									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()" [disabled]="loggerConfig.logCount === 0"><i class="fas fa-trash me-1"></i>{{ translate('Options_ClearLogs') }}</button>
+									<button class="btn btn-primary" type="button" (click)="exportLogs()" [disabled]="loggerConfig.logCount === 0"><span class="me-1" aria-hidden="true">⬇️</span>{{ translate('Options_ExportLogs') }}</button>
+									<button class="btn btn-outline-warning" type="button" (click)="clearLogs()" [disabled]="loggerConfig.logCount === 0"><span class="me-1" aria-hidden="true">🗑️</span>{{ translate('Options_ClearLogs') }}</button>
 								</div>
 							</div>
 						</div>
 
 						<div class="alert alert-warning">
-							<i class="fas fa-exclamation-triangle me-1"></i>
+							<span class="me-1" aria-hidden="true">⚠️</span>
 							<strong>{{ translate('Options_PrivacyNote') }}</strong> {{ translate('Options_PrivacyNote_Description') }}
 						</div>
 					</div>
@@ -189,20 +189,20 @@
 		<div class="col-12">
 			<div class="card mb-4 border-warning">
 				<div class="card-header bg-warning text-dark">
-					<h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>{{ translate('Options_ResetToDefaults') }}</h5>
+					<h5 class="mb-0"><span class="me-2" aria-hidden="true">⚠️</span>{{ translate('Options_ResetToDefaults') }}</h5>
 				</div>
 				<div class="card-body">
 					<p class="mb-3">
-						<i class="fas fa-info-circle me-1"></i>
+						<span class="me-1" aria-hidden="true">ℹ️</span>
 						{{ translate('Options_ResetDescription') }}
 					</p>
-					<button class="btn btn-outline-warning" type="button" (click)="resetToDefaults()"><i class="fas fa-undo me-1"></i>{{ translate('Options_ResetToDefaults') }}</button>
+					<button class="btn btn-outline-warning" type="button" (click)="resetToDefaults()"><span class="me-1" aria-hidden="true">↩️</span>{{ translate('Options_ResetToDefaults') }}</button>
 				</div>
 			</div>
 		</div>
 	</div>
 
 	@if (statusMessage()) {
-		<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="fas fa-check-circle me-1"></i>{{ statusMessage() }}</div>
+		<div class="alert alert-success alert-dismissible fade show" role="alert"><span class="me-1" aria-hidden="true">✅</span>{{ statusMessage() }}</div>
 	}
 </div>

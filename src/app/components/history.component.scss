@@ -70,6 +70,13 @@
 		opacity: 0.5;
 	}
 
+	.empty-state-icon {
+		display: block;
+		font-size: 4rem;
+		color: var(--text-secondary);
+		opacity: 0.5;
+	}
+
 	h2 {
 		color: var(--text-color);
 		margin: 20px 0 10px;
