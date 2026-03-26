@@ -1,5 +1,5 @@
 <a href="#image-gallery" class="skip-link">{{ translate('Gallery_SkipToGallery') }}</a>
-<div class="gallery-container" [attr.data-display-mode]="imageDisplayMode">
+<div class="gallery-container" [attr.data-display-mode]="imageDisplayMode()">
 	<div class="gallery-header">
 		<div class="header-top">
 			<h1>{{ translate('Gallery_Title') }}</h1>
@@ -7,8 +7,8 @@
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToHistory()" [title]="translate('Gallery_ViewHistory')">
 					<i class="fas fa-history"></i>
 				</button>
-				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
-					<i [class]="darkMode ? 'fas fa-sun' : 'fas fa-moon'"></i>
+				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode() ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
+					<i [class]="darkMode() ? 'fas fa-sun' : 'fas fa-moon'"></i>
 				</button>
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('Gallery_ViewOptions')">
 					<i class="fas fa-cog"></i>
@@ -18,14 +18,14 @@
 
 		<div class="url-info">
 			<label for="originalUrlInput" class="form-label">{{ translate('Gallery_OriginalUrl') }}</label>
-			@if (customCountRequested) {
+			@if (customCountRequested()) {
 				<div class="input-group mb-3">
 					<span class="input-group-text">{{ translate('Application_Prompt_HowMany') }}</span>
-					<input id="customCountInput" class="form-control" type="number" min="0" step="1" [(ngModel)]="customCountValue" />
+					<input id="customCountInput" class="form-control" type="number" min="0" step="1" [ngModel]="customCountValue()" (ngModelChange)="customCountValue.set($event)" />
 				</div>
 			}
 			<div class="input-group mb-3">
-				<input id="originalUrlInput" class="form-control" type="url" (keyup.enter)="generateGallery()" [(ngModel)]="originalUrl" [placeholder]="translate('Gallery_UrlPlaceholder')" />
+				<input id="originalUrlInput" class="form-control" type="url" (keyup.enter)="generateGallery()" [ngModel]="originalUrl()" (ngModelChange)="originalUrl.set($event)" [placeholder]="translate('Gallery_UrlPlaceholder')" />
 				<button class="btn btn-primary" (click)="generateGallery()"><i class="fas fa-images me-1"></i>{{ translate('Gallery_GenerateGallery') }}</button>
 			</div>
 		</div>
@@ -34,31 +34,31 @@
 		<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
 	</div>
 
-	@if (loading) {
+	@if (loading()) {
 		<div class="loading">
 			<div class="spinner"></div>
 			<p>{{ translate('Gallery_GeneratingGallery') }}</p>
 		</div>
 	}
 
-	@if (isGenerating) {
+	@if (isGenerating()) {
 		<div class="generating-progress" role="status" aria-live="polite">
-			<p class="generating-label">{{ translate('Gallery_BuildingGallery', [mediaItems.length.toString(), totalImages.toString()]) }}</p>
-			<div class="progress" [attr.aria-valuenow]="mediaItems.length" aria-valuemin="0" [attr.aria-valuemax]="totalImages">
-				<div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="totalImages > 0 ? (mediaItems.length / totalImages) * 100 : 0"></div>
+			<p class="generating-label">{{ translate('Gallery_BuildingGallery', [mediaItems().length.toString(), totalImages().toString()]) }}</p>
+			<div class="progress" [attr.aria-valuenow]="mediaItems().length" aria-valuemin="0" [attr.aria-valuemax]="totalImages()">
+				<div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="totalImages() > 0 ? (mediaItems().length / totalImages()) * 100 : 0"></div>
 			</div>
 		</div>
 	}
 
-	@if (errorMessage) {
+	@if (errorMessage()) {
 		<div class="error">
-			<p>{{ errorMessage }}</p>
+			<p>{{ errorMessage() }}</p>
 		</div>
 	}
 
-	@if (visibleMediaItems.length > 0) {
-		<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode === 'thumbnails'">
-			@for (mediaItem of visibleMediaItems; track mediaItem.url; let i = $index) {
+	@if (visibleMediaItems().length > 0) {
+		<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode() === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode() === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode() === 'thumbnails'">
+			@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
 				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
 					@if (mediaItem.type === 'video') {
 						<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
@@ -102,69 +102,69 @@
 	}
 
 	<!-- Bottom Controls -->
-	@if (visibleMediaItems.length > 0) {
+	@if (visibleMediaItems().length > 0) {
 		<div class="gallery-footer">
 			<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
 		</div>
 	}
 
 	<!-- URL List Section -->
-	@if (visibleMediaItems.length > 0) {
+	@if (visibleMediaItems().length > 0) {
 		<div class="url-list-section">
 			<div class="url-list-header">
-				<button class="btn btn-outline-secondary btn-sm" type="button" (click)="toggleUrlList()" [attr.aria-expanded]="showUrlList">
-					<i [class]="showUrlList ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
+				<button class="btn btn-outline-secondary btn-sm" type="button" (click)="toggleUrlList()" [attr.aria-expanded]="showUrlList()">
+					<i [class]="showUrlList() ? 'fas fa-chevron-up' : 'fas fa-chevron-down'"></i>
 					<span class="ms-1">{{ translate('Images_ShowImageUrls') }}</span>
 				</button>
 			</div>
-			@if (showUrlList) {
+			@if (showUrlList()) {
 				<div class="url-list-content">
 					<div class="url-list-controls mb-2">
 						<button class="btn btn-secondary btn-sm me-2" type="button" (click)="copyAllUrls()"><i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrls') }}</button>
 						<button class="btn btn-outline-secondary btn-sm" type="button" (click)="selectAllUrls()"><i class="fas fa-check-square me-1"></i>{{ translate('Gallery_SelectAllUrls') }}</button>
 					</div>
-					<textarea class="form-control url-textarea" placeholder="{{ translate('Gallery_UrlListPlaceholder') }}" readonly rows="10" [value]="allUrlsText" #urlTextarea> </textarea>
+					<textarea class="form-control url-textarea" placeholder="{{ translate('Gallery_UrlListPlaceholder') }}" readonly rows="10" [value]="allUrlsText()" #urlTextarea> </textarea>
 				</div>
 			}
 		</div>
 	}
 
 	<!-- Image Viewer Modal -->
-	@if (showImageViewer) {
-		<div class="image-viewer-modal" (click)="closeImageViewer()" (keydown.escape)="closeImageViewer()" tabindex="0" role="dialog" aria-modal="true" [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage)">
+	@if (showImageViewer()) {
+		<div class="image-viewer-modal" (click)="closeImageViewer()" (keydown.escape)="closeImageViewer()" tabindex="0" role="dialog" aria-modal="true" [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage())">
 			<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" role="document">
 				<div class="viewer-header">
-					<span class="viewer-title">{{ getFilename(currentViewerImage) }}</span>
-					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex + 1 }} / {{ totalImages }}</span>
+					<span class="viewer-title">{{ getFilename(currentViewerImage()) }}</span>
+					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ totalImages() }}</span>
 					<button class="btn btn-sm btn-outline-secondary close-btn" type="button" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
 						<i class="fas fa-times"></i>
 					</button>
 				</div>
 				<div class="viewer-body">
-					<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="currentViewerIndex === 0">
+					<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="currentViewerIndex() === 0">
 						<i class="fas fa-chevron-left"></i>
 					</button>
-					@if (currentMediaItem?.type === 'video') {
-						<video class="viewer-video" [src]="currentViewerImage" controls preload="metadata" [attr.data-video-type]="currentMediaItem?.mimeType || 'video/mp4'">
+					@if (currentMediaItem()?.type === 'video') {
+						<video class="viewer-video" [src]="currentViewerImage()" controls preload="metadata" [attr.data-video-type]="currentMediaItem()?.mimeType || 'video/mp4'">
 							{{ translate('Gallery_VideoNotSupported') }}
 						</video>
 					} @else {
-						<img [src]="currentViewerImage" [alt]="getImageAltText(currentViewerIndex)" />
+						<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" />
 					}
-					<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="currentViewerIndex === visibleMediaItems.length - 1">
+					<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="currentViewerIndex() === visibleMediaItems().length - 1">
 						<i class="fas fa-chevron-right"></i>
 					</button>
 				</div>
 				<div class="viewer-footer">
-					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage, $event)"><i class="fas fa-download me-1"></i>{{ currentMediaItem?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}</button>
-					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage, $event)"><i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrl') }}</button>
-					<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage)"><i class="fas fa-external-link-alt me-1"></i>{{ translate('Gallery_OpenInTab') }}</button>
+					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage(), $event)"><i class="fas fa-download me-1"></i>{{ currentMediaItem()?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}</button>
+					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage(), $event)"><i class="fas fa-clipboard me-1"></i>{{ translate('Gallery_CopyUrl') }}</button>
+					<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage())"><i class="fas fa-external-link-alt me-1"></i>{{ translate('Gallery_OpenInTab') }}</button>
 				</div>
 			</div>
 		</div>
 	}
 
-	@if (visibleMediaItems.length === 0 && !loading && !errorMessage) {
+	@if (visibleMediaItems().length === 0 && !loading() && !errorMessage()) {
 		<div class="empty-state">
 			<h2>{{ translate('Gallery_Welcome') }}</h2>
 			<p>{{ translate('Gallery_WelcomeText') }}</p>
@@ -178,38 +178,38 @@
 </div>
 
 <!-- Toast notification -->
-@if (toastVisible) {
+@if (toastVisible()) {
 	<div class="fuskr-toast" role="status" aria-live="polite" aria-atomic="true">
-		{{ toastMessage }}
+		{{ toastMessage() }}
 	</div>
 }
 
 <!-- Gallery Stats and Controls Template -->
 <ng-template #galleryControls>
-	@if (visibleMediaItems.length > 0) {
+	@if (visibleMediaItems().length > 0) {
 		<div class="gallery-stats">
 			<div class="stats-info">
-				<span class="stat">{{ totalImages }} {{ translate('Gallery_Stats_Total') }}</span>
-				<span class="stat">{{ loadedImages }} {{ translate('Gallery_Stats_Loaded') }}</span>
-				@if (brokenImages > 0) {
-					<span class="stat">{{ brokenImages }} {{ translate('Gallery_Stats_Broken') }}</span>
+				<span class="stat">{{ totalImages() }} {{ translate('Gallery_Stats_Total') }}</span>
+				<span class="stat">{{ loadedImages() }} {{ translate('Gallery_Stats_Loaded') }}</span>
+				@if (brokenImages() > 0) {
+					<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
 				}
 				<span class="stat keyboard-hint"> <i class="fas fa-keyboard me-1"></i>{{ translate('Gallery_KeyboardNavigation') }} </span>
 			</div>
 			<div class="stats-actions">
-				<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading">
-					@if (isDownloading) {
+				<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading()">
+					@if (isDownloading()) {
 						<div class="spinner-border spinner-border-sm me-2" role="status">
 							<span class="visually-hidden">{{ translate('Gallery_Loading') }}</span>
 						</div>
 					} @else {
 						<i class="fas fa-download me-1"></i>
 					}
-					{{ isDownloading ? downloadStatus : translate('Gallery_DownloadAll') }}
+					{{ isDownloading() ? downloadStatus() : translate('Gallery_DownloadAll') }}
 				</button>
-				@if (isDownloading && downloadProgress > 0) {
+				@if (isDownloading() && downloadProgress() > 0) {
 					<div class="progress mt-2" style="height: 4px">
-						<div aria-valuemax="100" aria-valuemin="0" class="progress-bar" role="progressbar" [attr.aria-valuenow]="downloadProgress" [style.width.%]="downloadProgress"></div>
+						<div aria-valuemax="100" aria-valuemin="0" class="progress-bar" role="progressbar" [attr.aria-valuenow]="downloadProgress()" [style.width.%]="downloadProgress()"></div>
 					</div>
 				}
 			</div>
@@ -220,28 +220,28 @@
 			<div class="control-group">
 				<label for="displayModeControls">{{ translate('Gallery_DisplayMode') }}</label>
 				<div id="displayModeControls" class="button-group" role="group" [attr.aria-labelledby]="'displayModeControls'">
-					<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
+					<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode() === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
 						{{ translate('Gallery_FitPage') }}
 					</button>
-					<button type="button" (click)="setImageDisplayMode('fullWidth')" [class]="imageDisplayMode === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFullWidth')">
+					<button type="button" (click)="setImageDisplayMode('fullWidth')" [class]="imageDisplayMode() === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFullWidth')">
 						{{ translate('Gallery_FullWidth') }}
 					</button>
-					<button type="button" (click)="setImageDisplayMode('fillPage')" [class]="imageDisplayMode === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFillPage')">
+					<button type="button" (click)="setImageDisplayMode('fillPage')" [class]="imageDisplayMode() === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFillPage')">
 						{{ translate('Gallery_FillPage') }}
 					</button>
-					<button type="button" (click)="setImageDisplayMode('thumbnails')" [class]="imageDisplayMode === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToThumbnails')">
+					<button type="button" (click)="setImageDisplayMode('thumbnails')" [class]="imageDisplayMode() === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToThumbnails')">
 						{{ translate('Gallery_Thumbnails') }}
 					</button>
 				</div>
 			</div>
-			@if (brokenImages > 0 || loading) {
+			@if (brokenImages() > 0 || loading()) {
 				<div class="control-group">
 					<label for="galleryOptionsControls">{{ translate('Gallery_Options') }}</label>
 					<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
-						<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
-							{{ translate(showBrokenImages ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
+						<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
+							{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
 						</button>
-						@if (brokenImages > 0) {
+						@if (brokenImages() > 0) {
 							<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
 								{{ translate('Images_RemoveBrokenImages') }}
 							</button>

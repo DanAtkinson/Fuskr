@@ -36,7 +36,7 @@ describe('GalleryComponent', () => {
 			navigate: vi.fn().mockName('Router.navigate'),
 		};
 		mockActivatedRoute = {
-			queryParams: of({ url: 'https://example.com/test.jpg' }),
+			queryParams: of({}),
 			snapshot: { queryParams: {} },
 		} as unknown as ActivatedRoute;
 
@@ -64,9 +64,9 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should initialise with default values', () => {
-			expect(component.originalUrl).toBe('');
-			expect(component.mediaItems).toEqual([]);
-			expect(component.loading).toBeFalsy();
+			expect(component.originalUrl()).toBe('');
+			expect(component.mediaItems()).toEqual([]);
+			expect(component.loading()).toBeFalsy();
 		});
 	});
 
@@ -94,17 +94,17 @@ describe('GalleryComponent', () => {
 				})
 			);
 
-			component.originalUrl = 'https://example.com/image05.jpg';
+			component.originalUrl.set('https://example.com/image05.jpg');
 			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith('https://example.com/image05.jpg');
 			expect(mockMediaTypeService.createMediaItem).toHaveBeenCalledTimes(2);
 			expect(mockMediaTypeService.fallbackTypeDetection).toHaveBeenCalledTimes(2);
-			expect(component.mediaItems.map((m) => m.url)).toEqual(mockResult.urls);
-			expect(component.mediaItems.length).toBe(2);
-			expect(component.mediaItems[0].type).toBe('image');
-			expect(component.originalUrl).toBe(mockResult.originalUrl);
+			expect(component.mediaItems().map((m) => m.url)).toEqual(mockResult.urls);
+			expect(component.mediaItems().length).toBe(2);
+			expect(component.mediaItems()[0].type).toBe('image');
+			expect(component.originalUrl()).toBe(mockResult.originalUrl);
 		});
 
 		it('should convert a custom count request before generating the gallery', async () => {
@@ -129,37 +129,37 @@ describe('GalleryComponent', () => {
 				mimeType: 'image/jpeg',
 			});
 
-			component.originalUrl = 'https://example.com/image05.jpg';
-			component.customCountRequested = true;
-			component.customCountDirection = 1;
-			component.customCountValue = '3';
+			component.originalUrl.set('https://example.com/image05.jpg');
+			component.customCountRequested.set(true);
+			component.customCountDirection.set(1);
+			component.customCountValue.set('3');
 
 			await component.generateGallery();
 
 			expect(mockFuskrService.createFuskUrl).toHaveBeenCalledWith('https://example.com/image05.jpg', 3, 1);
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith(generatedUrl);
 			expect(mockFuskrService.generateImageGallery).toHaveBeenCalledWith(generatedUrl);
-			expect(component.customCountRequested).toBe(false);
-			expect(component.originalUrl).toBe(generatedUrl);
+			expect(component.customCountRequested()).toBe(false);
+			expect(component.originalUrl()).toBe(generatedUrl);
 		});
 
 		it('should show an inline error for an invalid custom count', () => {
-			component.originalUrl = 'https://example.com/image05.jpg';
-			component.customCountRequested = true;
-			component.customCountValue = 'nope';
+			component.originalUrl.set('https://example.com/image05.jpg');
+			component.customCountRequested.set(true);
+			component.customCountValue.set('nope');
 
 			component.generateGallery();
 
-			expect(component.errorMessage).toBe('This is not a valid number.');
+			expect(component.errorMessage()).toBe('This is not a valid number.');
 			expect(mockFuskrService.createFuskUrl).not.toHaveBeenCalled();
 			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled();
 		});
 
 		it('should handle empty URL', () => {
-			component.originalUrl = '';
+			component.originalUrl.set('');
 			component.generateGallery();
 
-			expect(component.errorMessage).toBe('Please enter a valid URL');
+			expect(component.errorMessage()).toBe('Please enter a valid URL');
 			expect(mockFuskrService.generateImageGallery).not.toHaveBeenCalled();
 		});
 
@@ -167,9 +167,9 @@ describe('GalleryComponent', () => {
 			vi.spyOn(window, 'confirm').mockReturnValue(false); // User chooses not to proceed
 			mockFuskrService.countPotentialUrls.mockReturnValue(1000); // Above default limit of 500
 
-			component.originalUrl = 'https://example.com/image[001-1000].jpg';
-			component.enableOverloadProtection = true;
-			component.overloadProtectionLimit = 500;
+			component.originalUrl.set('https://example.com/image[001-1000].jpg');
+			component.enableOverloadProtection.set(true);
+			component.overloadProtectionLimit.set(500);
 			component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
@@ -197,9 +197,9 @@ describe('GalleryComponent', () => {
 			}));
 			mockMediaTypeService.fallbackTypeDetection.mockReturnValue({ type: 'image', mimeType: 'image/jpeg' });
 
-			component.originalUrl = 'https://example.com/image[001-1000].jpg';
-			component.enableOverloadProtection = true;
-			component.overloadProtectionLimit = 500;
+			component.originalUrl.set('https://example.com/image[001-1000].jpg');
+			component.enableOverloadProtection.set(true);
+			component.overloadProtectionLimit.set(500);
 			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).toHaveBeenCalledWith('https://example.com/image[001-1000].jpg');
@@ -227,8 +227,8 @@ describe('GalleryComponent', () => {
 			}));
 			mockMediaTypeService.fallbackTypeDetection.mockReturnValue({ type: 'image', mimeType: 'image/jpeg' });
 
-			component.originalUrl = 'https://example.com/image[001-1000].jpg';
-			component.enableOverloadProtection = false; // Disabled
+			component.originalUrl.set('https://example.com/image[001-1000].jpg');
+			component.enableOverloadProtection.set(false); // Disabled
 			await component.generateGallery();
 
 			expect(mockFuskrService.countPotentialUrls).not.toHaveBeenCalled(); // Should skip count check
@@ -304,17 +304,17 @@ describe('GalleryComponent', () => {
 
 	describe('Image Viewer', () => {
 		beforeEach(() => {
-			component.mediaItems = [
+			component.mediaItems.set([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
-			];
+			]);
 			// Initialize brokenUrls as empty set using component accessor
 			(
 				component as unknown as {
-					brokenUrls: Set<string>;
+					brokenUrls: { set(v: Set<string>): void };
 				}
-			).brokenUrls = new Set();
+			).brokenUrls.set(new Set());
 		});
 
 		it('should open image viewer', () => {
@@ -323,67 +323,67 @@ describe('GalleryComponent', () => {
 
 			component.openImageViewer(testUrl, testIndex);
 
-			expect(component.showImageViewer).toBe(true);
-			expect(component.currentViewerImage).toBe(testUrl);
-			expect(component.currentViewerIndex).toBe(testIndex);
+			expect(component.showImageViewer()).toBe(true);
+			expect(component.currentViewerImage()).toBe(testUrl);
+			expect(component.currentViewerIndex()).toBe(testIndex);
 		});
 
 		it('should close image viewer', () => {
-			component.showImageViewer = true;
+			component.showImageViewer.set(true);
 
 			component.closeImageViewer();
 
-			expect(component.showImageViewer).toBe(false);
+			expect(component.showImageViewer()).toBe(false);
 		});
 
 		it('should navigate to next image', () => {
-			component.currentViewerIndex = 1;
-			component.currentViewerImage = 'url2.jpg';
+			component.currentViewerIndex.set(1);
+			component.currentViewerImage.set('url2.jpg');
 
 			component.nextImage();
 
-			expect(component.currentViewerIndex).toBe(2);
-			expect(component.currentViewerImage).toBe('url3.jpg');
+			expect(component.currentViewerIndex()).toBe(2);
+			expect(component.currentViewerImage()).toBe('url3.jpg');
 		});
 
 		it('should not navigate past last image', () => {
-			component.currentViewerIndex = 2;
-			component.currentViewerImage = 'url3.jpg';
+			component.currentViewerIndex.set(2);
+			component.currentViewerImage.set('url3.jpg');
 
 			component.nextImage();
 
-			expect(component.currentViewerIndex).toBe(2);
-			expect(component.currentViewerImage).toBe('url3.jpg');
+			expect(component.currentViewerIndex()).toBe(2);
+			expect(component.currentViewerImage()).toBe('url3.jpg');
 		});
 
 		it('should navigate to previous image', () => {
-			component.currentViewerIndex = 2;
-			component.currentViewerImage = 'url3.jpg';
+			component.currentViewerIndex.set(2);
+			component.currentViewerImage.set('url3.jpg');
 
 			component.previousImage();
 
-			expect(component.currentViewerIndex).toBe(1);
-			expect(component.currentViewerImage).toBe('url2.jpg');
+			expect(component.currentViewerIndex()).toBe(1);
+			expect(component.currentViewerImage()).toBe('url2.jpg');
 		});
 
 		it('should not navigate before first image', () => {
-			component.currentViewerIndex = 0;
-			component.currentViewerImage = 'url1.jpg';
+			component.currentViewerIndex.set(0);
+			component.currentViewerImage.set('url1.jpg');
 
 			component.previousImage();
 
-			expect(component.currentViewerIndex).toBe(0);
-			expect(component.currentViewerImage).toBe('url1.jpg');
+			expect(component.currentViewerIndex()).toBe(0);
+			expect(component.currentViewerImage()).toBe('url1.jpg');
 		});
 	});
 
 	describe('Image Viewer Focus Management', () => {
 		beforeEach(() => {
-			component.mediaItems = [
+			component.mediaItems.set([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
-			];
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			]);
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set());
 		});
 
 		it('should save the active element as the trigger when opening the viewer', () => {
@@ -406,7 +406,7 @@ describe('GalleryComponent', () => {
 			const focusSpy = vi.spyOn(trigger, 'focus');
 
 			(component as unknown as { viewerTriggerElement: HTMLElement | null }).viewerTriggerElement = trigger;
-			component.showImageViewer = true;
+			component.showImageViewer.set(true);
 
 			component.closeImageViewer();
 			vi.runAllTimers();
@@ -416,7 +416,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should trap Tab focus and wrap from last to first focusable element', () => {
-			component.showImageViewer = true;
+			component.showImageViewer.set(true);
 
 			// Create a minimal viewer-content element with two buttons
 			const modal = document.createElement('div');
@@ -440,7 +440,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should trap Shift+Tab focus and wrap from first to last focusable element', () => {
-			component.showImageViewer = true;
+			component.showImageViewer.set(true);
 
 			const modal = document.createElement('div');
 			modal.className = 'viewer-content';
@@ -464,23 +464,23 @@ describe('GalleryComponent', () => {
 
 	describe('URL List Features', () => {
 		beforeEach(() => {
-			component.mediaItems = [
+			component.mediaItems.set([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
-			];
+			]);
 		});
 
 		it('should toggle URL list visibility', () => {
-			expect(component.showUrlList).toBe(false);
+			expect(component.showUrlList()).toBe(false);
 
 			component.toggleUrlList();
 
-			expect(component.showUrlList).toBe(true);
+			expect(component.showUrlList()).toBe(true);
 
 			component.toggleUrlList();
 
-			expect(component.showUrlList).toBe(false);
+			expect(component.showUrlList()).toBe(false);
 		});
 
 		it('should get all URLs as text', () => {
@@ -514,8 +514,8 @@ describe('GalleryComponent', () => {
 
 			await component.copyUrl(testUrl, mockEvent);
 
-			expect(component.toastVisible).toBe(true);
-			expect(component.toastMessage).toBe('URL copied to clipboard');
+			expect(component.toastVisible()).toBe(true);
+			expect(component.toastMessage()).toBe('URL copied to clipboard');
 		});
 
 		it('should show toast with count after copying all URLs', async () => {
@@ -523,8 +523,8 @@ describe('GalleryComponent', () => {
 
 			await component.copyAllUrls();
 
-			expect(component.toastVisible).toBe(true);
-			expect(component.toastMessage).toContain('3');
+			expect(component.toastVisible()).toBe(true);
+			expect(component.toastMessage()).toContain('3');
 		});
 
 		it('should show error toast when clipboard copy fails', async () => {
@@ -532,8 +532,8 @@ describe('GalleryComponent', () => {
 
 			await component.copyAllUrls();
 
-			expect(component.toastVisible).toBe(true);
-			expect(component.toastMessage).toBe('Failed to copy to clipboard');
+			expect(component.toastVisible()).toBe(true);
+			expect(component.toastMessage()).toBe('Failed to copy to clipboard');
 		});
 
 		it('should auto-dismiss toast after timeout', () => {
@@ -541,11 +541,11 @@ describe('GalleryComponent', () => {
 
 			component['showToast']('Test message');
 
-			expect(component.toastVisible).toBe(true);
+			expect(component.toastVisible()).toBe(true);
 
 			vi.advanceTimersByTime(2500);
 
-			expect(component.toastVisible).toBe(false);
+			expect(component.toastVisible()).toBe(false);
 
 			vi.useRealTimers();
 		});
@@ -557,12 +557,12 @@ describe('GalleryComponent', () => {
 			vi.advanceTimersByTime(1000);
 			component['showToast']('Second message');
 
-			expect(component.toastMessage).toBe('Second message');
-			expect(component.toastVisible).toBe(true);
+			expect(component.toastMessage()).toBe('Second message');
+			expect(component.toastVisible()).toBe(true);
 
 			vi.advanceTimersByTime(2500);
 
-			expect(component.toastVisible).toBe(false);
+			expect(component.toastVisible()).toBe(false);
 
 			vi.useRealTimers();
 		});
@@ -570,7 +570,7 @@ describe('GalleryComponent', () => {
 
 	describe('Image Alt Text', () => {
 		beforeEach(() => {
-			component.mediaItems = [
+			component.mediaItems.set([
 				{
 					url: 'https://example.com/image001.jpg',
 					type: 'image',
@@ -583,8 +583,8 @@ describe('GalleryComponent', () => {
 					mimeType: 'image/jpeg',
 					loadingState: 'loaded',
 				},
-			];
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			]);
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set());
 			// Configure mock to return the filename portion of a URL
 			mockFuskrService.getImageFilename.mockImplementation((url: string) =>
 				url.substring(url.lastIndexOf('/') + 1)
@@ -609,15 +609,15 @@ describe('GalleryComponent', () => {
 
 	describe('Auto-Remove Broken Images', () => {
 		beforeEach(() => {
-			component.mediaItems = [
+			component.mediaItems.set([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
-			];
+			]);
 		});
 
 		it('should auto-remove broken images when setting is enabled', () => {
-			component.autoRemoveBrokenImages = true;
+			component.autoRemoveBrokenImages.set(true);
 
 			// Create a mock img element
 			const mockImg = document.createElement('img');
@@ -648,16 +648,18 @@ describe('GalleryComponent', () => {
 			expect(
 				(
 					component as unknown as {
-						brokenUrls: Set<string>;
+						brokenUrls: () => Set<string>;
 					}
-				).brokenUrls.has('url2.jpg')
+				)
+					.brokenUrls()
+					.has('url2.jpg')
 			).toBe(true);
 
 			// Verify container.remove() was called
 			expect(mockContainer.remove).toHaveBeenCalled();
 
 			// Verify the mediaItems array was updated
-			expect(component.mediaItems).toEqual([
+			expect(component.mediaItems()).toEqual([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 			]);
@@ -669,7 +671,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should not auto-remove broken images when setting is disabled', () => {
-			component.autoRemoveBrokenImages = false;
+			component.autoRemoveBrokenImages.set(false);
 
 			// Create a mock img element
 			const mockImg = document.createElement('img');
@@ -686,27 +688,29 @@ describe('GalleryComponent', () => {
 			expect(
 				(
 					component as unknown as {
-						brokenUrls: Set<string>;
+						brokenUrls: () => Set<string>;
 					}
-				).brokenUrls.has('url2.jpg')
+				)
+					.brokenUrls()
+					.has('url2.jpg')
 			).toBe(true);
-			expect(component.mediaItems.length).toBe(3); // Still has all items
+			expect(component.mediaItems().length).toBe(3); // Still has all items
 		});
 	});
 
 	describe('Broken image session auto-removal', () => {
 		beforeEach(() => {
-			component.mediaItems = [
+			component.mediaItems.set([
 				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
 				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
-			];
+			]);
 			// Ensure brokenUrls Set exists
 			(
 				component as unknown as {
-					brokenUrls: Set<string>;
+					brokenUrls: { set(v: Set<string>): void };
 				}
-			).brokenUrls = new Set();
+			).brokenUrls.set(new Set());
 		});
 
 		it('should auto-remove newly failing images after calling removeBrokenImages()', () => {
@@ -731,7 +735,7 @@ describe('GalleryComponent', () => {
 
 			// Container removed and mediaItems updated (url2 removed)
 			expect(container.remove).toHaveBeenCalled();
-			expect(component.mediaItems.map((m) => m.url)).toEqual(['url1.jpg', 'url3.jpg']);
+			expect(component.mediaItems().map((m) => m.url)).toEqual(['url1.jpg', 'url3.jpg']);
 		});
 	});
 
@@ -804,7 +808,7 @@ describe('GalleryComponent', () => {
 
 	describe('Video error styling', () => {
 		it('should dim broken videos when showBrokenImages is false', () => {
-			component.showBrokenImages = false;
+			component.showBrokenImages.set(false);
 			const video = document.createElement('video');
 			video.setAttribute('data-original-url', 'broken.mp4');
 			const container = document.createElement('div');
@@ -824,7 +828,7 @@ describe('GalleryComponent', () => {
 
 	describe('Navigation guard during download', () => {
 		it('should navigate to history when not downloading', () => {
-			component.isDownloading = false;
+			component.isDownloading.set(false);
 
 			component.navigateToHistory();
 
@@ -832,7 +836,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should navigate to options when not downloading', () => {
-			component.isDownloading = false;
+			component.isDownloading.set(false);
 
 			component.navigateToOptions();
 
@@ -840,7 +844,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should block navigation to history and prompt when download is in progress', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			vi.spyOn(window, 'confirm').mockReturnValue(false);
 
 			component.navigateToHistory();
@@ -850,7 +854,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should block navigation to options and prompt when download is in progress', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			vi.spyOn(window, 'confirm').mockReturnValue(false);
 
 			component.navigateToOptions();
@@ -860,7 +864,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should allow navigation to history when user confirms despite active download', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			vi.spyOn(window, 'confirm').mockReturnValue(true);
 
 			component.navigateToHistory();
@@ -869,7 +873,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should allow navigation to options when user confirms despite active download', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			vi.spyOn(window, 'confirm').mockReturnValue(true);
 
 			component.navigateToOptions();
@@ -878,7 +882,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should set beforeunload handler when download is in progress', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			const event = new Event('beforeunload') as BeforeUnloadEvent;
 			vi.spyOn(event, 'preventDefault');
 
@@ -888,7 +892,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should not interfere with beforeunload when not downloading', () => {
-			component.isDownloading = false;
+			component.isDownloading.set(false);
 			const event = new Event('beforeunload') as BeforeUnloadEvent;
 			vi.spyOn(event, 'preventDefault');
 
@@ -898,7 +902,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should not show a confirm dialog when navigating to history whilst idle', () => {
-			component.isDownloading = false;
+			component.isDownloading.set(false);
 			vi.spyOn(window, 'confirm');
 
 			component.navigateToHistory();
@@ -907,7 +911,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should not show a confirm dialog when navigating to options whilst idle', () => {
-			component.isDownloading = false;
+			component.isDownloading.set(false);
 			vi.spyOn(window, 'confirm');
 
 			component.navigateToOptions();
@@ -916,8 +920,8 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should allow navigation to history once isDownloading resets to false', () => {
-			component.isDownloading = true;
-			component.isDownloading = false;
+			component.isDownloading.set(true);
+			component.isDownloading.set(false);
 
 			component.navigateToHistory();
 
@@ -926,8 +930,8 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should allow navigation to options once isDownloading resets to false', () => {
-			component.isDownloading = true;
-			component.isDownloading = false;
+			component.isDownloading.set(true);
+			component.isDownloading.set(false);
 
 			component.navigateToOptions();
 
@@ -935,7 +939,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should not navigate when user cancels both history and options prompts', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			vi.spyOn(window, 'confirm').mockReturnValue(false);
 
 			component.navigateToHistory();
@@ -946,7 +950,7 @@ describe('GalleryComponent', () => {
 		});
 
 		it('should show the download-in-progress confirmation message', () => {
-			component.isDownloading = true;
+			component.isDownloading.set(true);
 			vi.spyOn(window, 'confirm').mockReturnValue(false);
 
 			component.navigateToHistory();
@@ -965,8 +969,8 @@ describe('GalleryComponent', () => {
 			}));
 
 		beforeEach(() => {
-			component.mediaItems = makeItems(['a.jpg', 'b.jpg', 'c.jpg']);
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set();
+			component.mediaItems.set(makeItems(['a.jpg', 'b.jpg', 'c.jpg']));
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set());
 			// jsdom does not implement scrollIntoView
 			Element.prototype.scrollIntoView = vi.fn();
 		});
@@ -974,83 +978,85 @@ describe('GalleryComponent', () => {
 		it('End key navigates to the last visible item', () => {
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
 
-			expect(component.currentGalleryIndex).toBe(2);
+			expect(component.currentGalleryIndex()).toBe(2);
 		});
 
 		it('Home key navigates to the first visible item', () => {
-			component.currentGalleryIndex = 2;
+			component.currentGalleryIndex.set(2);
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'Home' }));
 
-			expect(component.currentGalleryIndex).toBe(0);
+			expect(component.currentGalleryIndex()).toBe(0);
 		});
 
 		it('End key navigates to last VISIBLE item when broken images are hidden', () => {
 			// Mark the last item as broken (hidden from view)
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['c.jpg']);
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set(['c.jpg']));
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
 
 			// Only 2 visible items (a.jpg, b.jpg) — index should be 1, not 2
-			expect(component.currentGalleryIndex).toBe(1);
+			expect(component.currentGalleryIndex()).toBe(1);
 		});
 
 		it('End key does nothing when all images are broken and hidden', () => {
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['a.jpg', 'b.jpg', 'c.jpg']);
-			component.currentGalleryIndex = -1;
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(
+				new Set(['a.jpg', 'b.jpg', 'c.jpg'])
+			);
+			component.currentGalleryIndex.set(-1);
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
 
-			expect(component.currentGalleryIndex).toBe(-1);
+			expect(component.currentGalleryIndex()).toBe(-1);
 		});
 
 		it('ArrowRight wraps to first item after last visible item', () => {
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['c.jpg']);
-			component.currentGalleryIndex = 1; // Last visible item (b.jpg)
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set(['c.jpg']));
+			component.currentGalleryIndex.set(1); // Last visible item (b.jpg)
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
 
-			expect(component.currentGalleryIndex).toBe(0);
+			expect(component.currentGalleryIndex()).toBe(0);
 		});
 
 		it('ArrowLeft wraps to last visible item from the first', () => {
-			(component as unknown as { brokenUrls: Set<string> }).brokenUrls = new Set(['c.jpg']);
-			component.currentGalleryIndex = 0;
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set(['c.jpg']));
+			component.currentGalleryIndex.set(0);
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
 
-			expect(component.currentGalleryIndex).toBe(1); // Last visible (b.jpg)
+			expect(component.currentGalleryIndex()).toBe(1); // Last visible (b.jpg)
 		});
 
 		it('ArrowRight advances within visible items', () => {
-			component.currentGalleryIndex = 0;
+			component.currentGalleryIndex.set(0);
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
 
-			expect(component.currentGalleryIndex).toBe(1);
+			expect(component.currentGalleryIndex()).toBe(1);
 		});
 
 		it('keyboard events are ignored when a form element has focus', () => {
-			component.currentGalleryIndex = 0;
+			component.currentGalleryIndex.set(0);
 			const input = document.createElement('input');
 			document.body.appendChild(input);
 			input.focus();
 
 			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
 
-			expect(component.currentGalleryIndex).toBe(0);
+			expect(component.currentGalleryIndex()).toBe(0);
 			document.body.removeChild(input);
 		});
 	});
 
 	describe('toggleBrokenImagesVisibility', () => {
 		it('should update styles on broken images when toggled', async () => {
-			component.showBrokenImages = false;
+			component.showBrokenImages.set(false);
 			const img = document.createElement('img');
 			img.classList.add('error');
 			document.body.appendChild(img);
 
 			await component.toggleBrokenImagesVisibility();
-			expect(component.showBrokenImages).toBe(true);
+			expect(component.showBrokenImages()).toBe(true);
 			expect(img.style.opacity).toBe('1');
 			expect(img.style.filter).toBe('none');
 		});
@@ -1058,7 +1064,7 @@ describe('GalleryComponent', () => {
 
 	describe('generateMetadataContent', () => {
 		it('should include counts and URLs by type', () => {
-			component.originalUrl = 'https://example.com/a[01-02].jpg';
+			component.originalUrl.set('https://example.com/a[01-02].jpg');
 			const items: MediaItem[] = [
 				{ url: 'a1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' as const },
 				{ url: 'v1.mp4', type: 'video', mimeType: 'video/mp4', loadingState: 'loaded' as const },
@@ -1121,7 +1127,7 @@ describe('GalleryComponent', () => {
 	describe('Progressive type detection', () => {
 		it('should update media items based on HTTP detection and keep fallback on failure', async () => {
 			// Arrange: two items to detect
-			component.mediaItems = [
+			component.mediaItems.set([
 				{
 					url: 'https://example.com/a.jpg',
 					type: 'unknown',
@@ -1134,7 +1140,7 @@ describe('GalleryComponent', () => {
 					mimeType: 'application/octet-stream',
 					loadingState: 'loaded',
 				},
-			];
+			]);
 
 			mockMediaTypeService.determineMediaType.mockImplementation(async (url: string) => {
 				if (url.endsWith('.jpg')) {
@@ -1151,9 +1157,9 @@ describe('GalleryComponent', () => {
 			).startProgressiveTypeDetection();
 
 			// Assert: first becomes image, second remains unknown
-			expect(component.mediaItems[0].type).toBe('image');
-			expect(component.mediaItems[0].mimeType).toBe('image/jpeg');
-			expect(component.mediaItems[1].type).toBe('unknown');
+			expect(component.mediaItems()[0].type).toBe('image');
+			expect(component.mediaItems()[0].mimeType).toBe('image/jpeg');
+			expect(component.mediaItems()[1].type).toBe('unknown');
 		});
 	});
 
@@ -1233,8 +1239,8 @@ describe('GalleryComponent', () => {
 					updateImageCounts: () => void;
 				}
 			).updateImageCounts();
-			expect(component.loadedImages).toBe(2);
-			expect(component.brokenImages).toBe(2);
+			expect(component.loadedImages()).toBe(2);
+			expect(component.brokenImages()).toBe(2);
 		});
 	});
 });

@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject } from '@angular/core';
+import { Component, OnInit, HostListener, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,47 +18,47 @@ import { saveAs } from 'file-saver';
 	imports: [CommonModule, FormsModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit {
-	// Public properties (alphabetically)
-	autoRemoveBrokenImages = false;
-	brokenImages = 0;
-	currentViewerImage = '';
-	currentViewerIndex = 0;
-	currentGalleryIndex = -1; // For keyboard navigation in main gallery
-	customCountDirection: -1 | 0 | 1 = 0;
-	customCountRequested = false;
-	customCountValue = '10';
-	darkMode = false;
-	downloadProgress = 0;
-	downloadStatus = '';
-	enableOverloadProtection = true;
-	errorMessage = '';
-	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
-	isDownloading = false;
-	isGenerating = false;
-	loadedImages = 0;
-	loading = false;
-	mediaItems: MediaItem[] = [];
-	mediaTypeLoadingProgress = 0;
-	originalUrl = '';
-	overloadProtectionLimit = 50;
-	showBrokenImages = false;
-	showImageViewer = false;
-	showUrlList = false;
-	toastMessage = '';
-	toastVisible = false;
-	totalImages = 0;
+	// Public signals (alphabetically)
+	autoRemoveBrokenImages = signal(false);
+	brokenImages = signal(0);
+	currentViewerImage = signal('');
+	currentViewerIndex = signal(0);
+	currentGalleryIndex = signal(-1); // For keyboard navigation in main gallery
+	customCountDirection = signal<-1 | 0 | 1>(0);
+	customCountRequested = signal(false);
+	customCountValue = signal('10');
+	darkMode = signal(false);
+	downloadProgress = signal(0);
+	downloadStatus = signal('');
+	enableOverloadProtection = signal(true);
+	errorMessage = signal('');
+	imageDisplayMode = signal<'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails'>('fitOnPage');
+	isDownloading = signal(false);
+	isGenerating = signal(false);
+	loadedImages = signal(0);
+	loading = signal(false);
+	mediaItems = signal<MediaItem[]>([]);
+	mediaTypeLoadingProgress = signal(0);
+	originalUrl = signal('');
+	overloadProtectionLimit = signal(50);
+	showBrokenImages = signal(false);
+	showImageViewer = signal(false);
+	showUrlList = signal(false);
+	toastMessage = signal('');
+	toastVisible = signal(false);
+	totalImages = signal(0);
+	currentMediaItem = signal<MediaItem | null>(null);
 
-	// Computed properties for template
-	allUrlsText = '';
-	currentMediaItem: MediaItem | null = null;
+	// Computed signals
+	visibleMediaItems = computed(() => this.mediaItems().filter((item) => !this.brokenUrls().has(item.url)));
+	allUrlsText = computed(() =>
+		this.mediaItems()
+			.map((item) => item.url)
+			.join('\n')
+	);
 
-	// Getters for filtered data
-	get visibleMediaItems(): MediaItem[] {
-		return this.mediaItems.filter((item) => !this.brokenUrls.has(item.url));
-	}
-
-	// Private properties (alphabetically)
-	private brokenUrls = new Set<string>(); // Track URLs that failed to load persistently
+	// Private signals
+	private brokenUrls = signal(new Set<string>());
 	private hasInitialized = false;
 	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -77,17 +77,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	// Public methods (alphabetically)
 	closeImageViewer() {
-		this.showImageViewer = false;
+		this.showImageViewer.set(false);
 		// Return focus to the element that triggered the viewer
 		setTimeout(() => this.viewerTriggerElement?.focus(), 0);
 	}
 
 	async copyAllUrls() {
 		try {
-			const urlText = this.getAllUrlsText();
+			const urlText = this.allUrlsText();
 			await navigator.clipboard.writeText(urlText);
 			this.logger.info('gallery.allUrlsCopied', 'All URLs copied to clipboard');
-			this.showToast(this.translate('Gallery_CopiedAllUrls', [this.visibleMediaItems.length.toString()]));
+			this.showToast(this.translate('Gallery_CopiedAllUrls', [this.visibleMediaItems().length.toString()]));
 		} catch (error) {
 			this.logger.error('gallery.copyUrls.failed', 'Failed to copy URLs', error);
 			this.showToast(this.translate('Gallery_CopyFailed'), true);
@@ -103,7 +103,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	async downloadAll() {
-		const totalItems = this.mediaItems.length;
+		const totalItems = this.mediaItems().length;
 		if (totalItems === 0) return;
 
 		// Prompt user for zip filename with timestamp default
@@ -119,17 +119,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		// Ensure filename has .zip extension
 		const finalFilename = zipFilename.endsWith('.zip') ? zipFilename : `${zipFilename}.zip`;
 
-		this.isDownloading = true;
-		this.downloadProgress = 0;
-		this.downloadStatus = this.translate('Gallery_DownloadPreparing');
+		this.isDownloading.set(true);
+		this.downloadProgress.set(0);
+		this.downloadStatus.set(this.translate('Gallery_DownloadPreparing'));
 
 		try {
 			const zip = new JSZip();
 			const validMediaItems = this.getValidMediaItems();
 
 			if (validMediaItems.length === 0) {
-				this.downloadStatus = this.translate('Gallery_DownloadNoImages');
-				this.isDownloading = false;
+				this.downloadStatus.set(this.translate('Gallery_DownloadNoImages'));
+				this.isDownloading.set(false);
 				return;
 			}
 
@@ -139,11 +139,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			const imageCount = validMediaItems.filter((item) => item.type === 'image').length;
 			const videoCount = validMediaItems.filter((item) => item.type === 'video').length;
 
-			this.downloadStatus = this.translate('Gallery_DownloadingMedia', [
-				validMediaItems.length.toString(),
-				imageCount.toString(),
-				videoCount.toString(),
-			]);
+			this.downloadStatus.set(
+				this.translate('Gallery_DownloadingMedia', [
+					validMediaItems.length.toString(),
+					imageCount.toString(),
+					videoCount.toString(),
+				])
+			);
 
 			// Track used names to avoid overwriting within the zip
 			const usedNames = new Map<string, number>();
@@ -170,13 +172,15 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				const padWidth = basePadWidth.get(filename) ?? 0;
 
 				try {
-					this.downloadStatus = this.translate('Gallery_DownloadingItem', [
-						filename,
-						(i + 1).toString(),
-						validMediaItems.length.toString(),
-						mediaItem.type,
-					]);
-					this.downloadProgress = Math.round((i / validMediaItems.length) * 70); // Reserve 30% for ZIP generation and metadata
+					this.downloadStatus.set(
+						this.translate('Gallery_DownloadingItem', [
+							filename,
+							(i + 1).toString(),
+							validMediaItems.length.toString(),
+							mediaItem.type,
+						])
+					);
+					this.downloadProgress.set(Math.round((i / validMediaItems.length) * 70)); // Reserve 30% for ZIP generation and metadata
 
 					const mediaBlob = await this.fetchMediaAsBlob(mediaItem.url);
 
@@ -199,8 +203,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				}
 			}
 
-			this.downloadStatus = this.translate('Gallery_DownloadAddingMetadata');
-			this.downloadProgress = 75;
+			this.downloadStatus.set(this.translate('Gallery_DownloadAddingMetadata'));
+			this.downloadProgress.set(75);
 
 			// Add Fuskr.txt metadata file
 			const metadataContent = this.generateMetadataContent(validMediaItems);
@@ -215,8 +219,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			};
 			zip.file('manifest.json', JSON.stringify(manifest, null, 2), { compression: 'DEFLATE' });
 
-			this.downloadStatus = this.translate('Gallery_DownloadCreatingZip');
-			this.downloadProgress = 85;
+			this.downloadStatus.set(this.translate('Gallery_DownloadCreatingZip'));
+			this.downloadProgress.set(85);
 
 			// Generate ZIP file
 			const zipBlob = await zip.generateAsync({
@@ -225,14 +229,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				compressionOptions: compressionMode === 'DEFLATE' ? { level: 6 } : undefined,
 			});
 
-			this.downloadStatus = this.translate('Gallery_DownloadSaving');
-			this.downloadProgress = 95;
+			this.downloadStatus.set(this.translate('Gallery_DownloadSaving'));
+			this.downloadProgress.set(95);
 
 			// Save the ZIP file
 			saveAs(zipBlob, finalFilename);
 
-			this.downloadStatus = this.translate('Gallery_DownloadComplete');
-			this.downloadProgress = 100;
+			this.downloadStatus.set(this.translate('Gallery_DownloadComplete'));
+			this.downloadProgress.set(100);
 
 			this.logger.info('gallery.download.success', 'ZIP download completed successfully', {
 				filename: finalFilename,
@@ -244,17 +248,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 			// Reset status after 3 seconds
 			setTimeout(() => {
-				this.isDownloading = false;
-				this.downloadStatus = '';
-				this.downloadProgress = 0;
+				this.isDownloading.set(false);
+				this.downloadStatus.set('');
+				this.downloadProgress.set(0);
 			}, 3000);
 		} catch (error) {
 			this.logger.error('gallery.download.zipFailed', 'Error creating ZIP download', error);
-			this.downloadStatus = this.translate('Gallery_DownloadFailed');
+			this.downloadStatus.set(this.translate('Gallery_DownloadFailed'));
 			setTimeout(() => {
-				this.isDownloading = false;
-				this.downloadStatus = '';
-				this.downloadProgress = 0;
+				this.isDownloading.set(false);
+				this.downloadStatus.set('');
+				this.downloadProgress.set(0);
 			}, 3000);
 		}
 	}
@@ -266,28 +270,28 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	async generateGallery(): Promise<void> {
-		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl });
-		this.errorMessage = '';
+		this.logger.info('GalleryComponent', 'generateGallery() called', { url: this.originalUrl() });
+		this.errorMessage.set('');
 
-		if (!this.originalUrl.trim()) {
-			this.errorMessage = this.translate('Gallery_ErrorValidUrl');
+		if (!this.originalUrl().trim()) {
+			this.errorMessage.set(this.translate('Gallery_ErrorValidUrl'));
 			this.logger.warn('GalleryComponent', 'Gallery generation failed: empty URL');
 			return;
 		}
 
-		if (this.customCountRequested && !this.applyCustomCountRequest()) {
+		if (this.customCountRequested() && !this.applyCustomCountRequest()) {
 			return;
 		}
 
 		// Check for overload protection before generating
-		if (this.enableOverloadProtection) {
-			const urlCount = this.fuskrService.countPotentialUrls(this.originalUrl);
+		if (this.enableOverloadProtection()) {
+			const urlCount = this.fuskrService.countPotentialUrls(this.originalUrl());
 			this.logger.info('GalleryComponent', 'Overload protection check', {
 				urlCount,
-				limit: this.overloadProtectionLimit,
-				willTrigger: urlCount > this.overloadProtectionLimit,
+				limit: this.overloadProtectionLimit(),
+				willTrigger: urlCount > this.overloadProtectionLimit(),
 			});
-			if (urlCount > this.overloadProtectionLimit) {
+			if (urlCount > this.overloadProtectionLimit()) {
 				const proceed = await this.showOverloadWarning(urlCount);
 				if (!proceed) return;
 			}
@@ -299,11 +303,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	getAllUrlsText(): string {
-		return this.mediaItems.map((item) => item.url).join('\n');
-	}
-
-	private updateAllUrlsText(): void {
-		this.allUrlsText = this.getAllUrlsText();
+		return this.allUrlsText();
 	}
 
 	/**
@@ -353,7 +353,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	getImageAltText(index: number): string {
-		const url = this.visibleMediaItems[index]?.url;
+		const url = this.visibleMediaItems()[index]?.url;
 		if (url) {
 			return this.getFilename(url);
 		}
@@ -364,15 +364,15 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		try {
 			const settings = await this.chromeService.getStorageData();
 			this.logger.debug('GalleryComponent', 'Settings loaded successfully', settings);
-			this.autoRemoveBrokenImages = settings.display.autoRemoveBrokenImages;
-			this.darkMode = settings.display.darkMode;
-			this.imageDisplayMode = settings.display.imageDisplayMode;
-			this.showBrokenImages = settings.display.toggleBrokenImages;
-			this.enableOverloadProtection = settings.safety.enableOverloadProtection;
-			this.overloadProtectionLimit = settings.safety.overloadProtectionLimit;
+			this.autoRemoveBrokenImages.set(settings.display.autoRemoveBrokenImages);
+			this.darkMode.set(settings.display.darkMode);
+			this.imageDisplayMode.set(settings.display.imageDisplayMode);
+			this.showBrokenImages.set(settings.display.toggleBrokenImages);
+			this.enableOverloadProtection.set(settings.safety.enableOverloadProtection);
+			this.overloadProtectionLimit.set(settings.safety.overloadProtectionLimit);
 			this.logger.info('GalleryComponent', 'Overload protection configured', {
-				enabled: this.enableOverloadProtection,
-				limit: this.overloadProtectionLimit,
+				enabled: this.enableOverloadProtection(),
+				limit: this.overloadProtectionLimit(),
 			});
 
 			// Dark mode will be applied by applyDarkModeStyles() after settings are loaded
@@ -383,31 +383,33 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	@HostListener('window:beforeunload', ['$event'])
 	handleBeforeUnload(event: BeforeUnloadEvent) {
-		if (this.isDownloading) {
+		if (this.isDownloading()) {
 			event.preventDefault();
 		}
 	}
 
 	navigateToHistory() {
-		if (this.isDownloading && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
+		if (this.isDownloading() && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
 			return;
 		}
 		this.router.navigate(['/history']);
 	}
 
 	navigateToOptions() {
-		if (this.isDownloading && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
+		if (this.isDownloading() && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
 			return;
 		}
 		this.router.navigate(['/options']);
 	}
 
 	nextImage() {
-		const visibleItems = this.visibleMediaItems;
-		if (this.currentViewerIndex < visibleItems.length - 1) {
-			this.currentViewerIndex++;
-			this.currentViewerImage = visibleItems[this.currentViewerIndex].url;
-			this.currentMediaItem = visibleItems[this.currentViewerIndex];
+		const visibleItems = this.visibleMediaItems();
+		const idx = this.currentViewerIndex();
+		if (idx < visibleItems.length - 1) {
+			const newIdx = idx + 1;
+			this.currentViewerIndex.set(newIdx);
+			this.currentViewerImage.set(visibleItems[newIdx].url);
+			this.currentMediaItem.set(visibleItems[newIdx]);
 		}
 	}
 
@@ -433,7 +435,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.logger.debug('GalleryComponent', 'Checking snapshot params', {
 			currentParams,
 			hasInitialized: this.hasInitialized,
-			originalUrl: this.originalUrl,
+			originalUrl: this.originalUrl(),
 		});
 		this.initialiseFromRouteParams(currentParams, 'snapshot');
 	}
@@ -448,26 +450,26 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			// Track the URL as broken persistently
 			const originalUrl = element.getAttribute('data-original-url');
 			if (originalUrl) {
-				this.brokenUrls.add(originalUrl);
+				this.brokenUrls.update((s) => new Set([...s, originalUrl]));
 			}
 
 			this.updateImageCounts();
 
 			// Auto-remove broken image/video if setting is enabled
-			if (this.autoRemoveBrokenImages || this.autoRemoveBrokenImagesSession) {
+			if (this.autoRemoveBrokenImages() || this.autoRemoveBrokenImagesSession) {
 				// Remove the container from DOM immediately
 				const container = element.closest('.image-item');
 				if (container && originalUrl) {
 					container.remove();
 
 					// Update arrays to remove broken URL
-					this.mediaItems = this.mediaItems.filter((item) => item.url !== originalUrl);
-					this.totalImages = this.mediaItems.length;
+					this.mediaItems.update((items) => items.filter((item) => item.url !== originalUrl));
+					this.totalImages.set(this.mediaItems().length);
 
 					this.logger.debug('GalleryComponent', 'Auto-removed broken media', {
 						url: originalUrl,
 						type: element.tagName.toLowerCase(),
-						remainingItems: this.mediaItems.length,
+						remainingItems: this.mediaItems().length,
 					});
 
 					// Update counts after removal
@@ -492,7 +494,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		</svg>
 				`)}`;
 
-				if (!this.showBrokenImages) {
+				if (!this.showBrokenImages()) {
 					// Instead of hiding completely, reduce opacity
 					element.style.opacity = '0.3';
 					element.style.filter = 'grayscale(100%)';
@@ -504,7 +506,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}
 			// For videos, just apply styling (no placeholder replacement possible)
 			else if (element instanceof HTMLVideoElement) {
-				if (!this.showBrokenImages) {
+				if (!this.showBrokenImages()) {
 					element.style.opacity = '0.3';
 					element.style.filter = 'grayscale(100%)';
 				}
@@ -544,11 +546,11 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	openImageViewer(url: string, index: number) {
 		this.viewerTriggerElement = document.activeElement as HTMLElement;
-		this.currentViewerImage = url;
-		this.currentViewerIndex = index;
+		this.currentViewerImage.set(url);
+		this.currentViewerIndex.set(index);
 		// Find the media item in visibleMediaItems using the visible index
-		this.currentMediaItem = this.visibleMediaItems[index] || null;
-		this.showImageViewer = true;
+		this.currentMediaItem.set(this.visibleMediaItems()[index] || null);
+		this.showImageViewer.set(true);
 		// Move focus into the modal after Angular renders it
 		setTimeout(() => {
 			const closeBtn = document.querySelector<HTMLElement>('.viewer-content .close-btn');
@@ -557,11 +559,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	previousImage() {
-		if (this.currentViewerIndex > 0) {
-			this.currentViewerIndex--;
-			const visibleItems = this.visibleMediaItems;
-			this.currentViewerImage = visibleItems[this.currentViewerIndex].url;
-			this.currentMediaItem = visibleItems[this.currentViewerIndex];
+		const idx = this.currentViewerIndex();
+		if (idx > 0) {
+			const newIdx = idx - 1;
+			const visibleItems = this.visibleMediaItems();
+			this.currentViewerIndex.set(newIdx);
+			this.currentViewerImage.set(visibleItems[newIdx].url);
+			this.currentMediaItem.set(visibleItems[newIdx]);
 		}
 	}
 
@@ -579,7 +583,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			if (originalUrl) {
 				brokenUrls.add(originalUrl);
 				// Add to persistent broken URLs list
-				this.brokenUrls.add(originalUrl);
+				this.brokenUrls.update((s) => new Set([...s, originalUrl]));
 			}
 
 			// Remove the container from DOM
@@ -597,7 +601,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			if (originalUrl) {
 				brokenUrls.add(originalUrl);
 				// Add to persistent broken URLs list
-				this.brokenUrls.add(originalUrl);
+				this.brokenUrls.update((s) => new Set([...s, originalUrl]));
 			}
 
 			// Remove the container from DOM
@@ -608,14 +612,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		});
 
 		// Update both arrays to remove broken URLs
-		this.mediaItems = this.mediaItems.filter((item) => !brokenUrls.has(item.url));
-		this.totalImages = this.mediaItems.length;
-		this.brokenImages = 0;
+		this.mediaItems.update((items) => items.filter((item) => !brokenUrls.has(item.url)));
+		this.totalImages.set(this.mediaItems().length);
+		this.brokenImages.set(0);
 
 		this.logger.debug('GalleryComponent', 'Removed broken images', {
 			removedCount: brokenUrls.size,
-			remainingItems: this.mediaItems.length,
-			totalBrokenUrls: this.brokenUrls.size,
+			remainingItems: this.mediaItems().length,
+			totalBrokenUrls: this.brokenUrls().size,
 		});
 
 		// Enable session-based auto removal for any future failures in this gallery
@@ -631,7 +635,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	async setImageDisplayMode(mode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails') {
-		this.imageDisplayMode = mode;
+		this.imageDisplayMode.set(mode);
 
 		// Save to storage
 		try {
@@ -642,13 +646,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	async toggleBrokenImagesVisibility() {
-		this.showBrokenImages = !this.showBrokenImages;
+		this.showBrokenImages.update((v) => !v);
 
 		// Update visibility of broken images
 		const brokenImages = document.querySelectorAll('img.error');
 		brokenImages.forEach((img: Element) => {
 			const htmlImg = img as HTMLImageElement;
-			if (this.showBrokenImages) {
+			if (this.showBrokenImages()) {
 				htmlImg.style.opacity = '1';
 				htmlImg.style.filter = 'none';
 			} else {
@@ -659,33 +663,33 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		// Save to storage
 		try {
-			await this.chromeService.updateDisplaySettings({ toggleBrokenImages: this.showBrokenImages });
+			await this.chromeService.updateDisplaySettings({ toggleBrokenImages: this.showBrokenImages() });
 		} catch (error) {
 			this.logger.error('gallery.brokenImages.saveFailed', 'Error saving broken images setting', error);
 		}
 	}
 
 	async toggleDarkMode() {
-		this.darkMode = !this.darkMode;
-		document.body.classList.toggle('dark-mode', this.darkMode);
+		this.darkMode.update((v) => !v);
+		document.body.classList.toggle('dark-mode', this.darkMode());
 
 		// Save to storage
 		try {
-			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode });
+			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode() });
 		} catch (error) {
 			this.logger.error('gallery.darkMode.saveFailed', 'Error saving dark mode setting', error);
 		}
 	}
 
 	toggleUrlList() {
-		this.showUrlList = !this.showUrlList;
+		this.showUrlList.update((v) => !v);
 	}
 
 	// Keyboard navigation methods
 	@HostListener('document:keydown', ['$event'])
 	handleKeyboardEvent(event: KeyboardEvent) {
 		// Trap Tab focus within the viewer modal when it is open
-		if (this.showImageViewer && event.key === 'Tab') {
+		if (this.showImageViewer() && event.key === 'Tab') {
 			this.trapViewerFocus(event);
 			return;
 		}
@@ -696,7 +700,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 
 		// Handle modal viewer navigation
-		if (this.showImageViewer && this.visibleMediaItems.length > 0) {
+		if (this.showImageViewer() && this.visibleMediaItems().length > 0) {
 			switch (event.key) {
 				case 'ArrowLeft':
 				case 'ArrowUp':
@@ -725,7 +729,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 
 		// Handle main gallery navigation
-		if (this.visibleMediaItems.length === 0) {
+		if (this.visibleMediaItems().length === 0) {
 			return;
 		}
 
@@ -787,72 +791,68 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private navigateToNextImage() {
-		const lastIndex = this.visibleMediaItems.length - 1;
-		if (this.currentGalleryIndex < lastIndex) {
-			this.currentGalleryIndex++;
-		} else {
-			this.currentGalleryIndex = 0; // Wrap to first image
-		}
+		const lastIndex = this.visibleMediaItems().length - 1;
+		const idx = this.currentGalleryIndex();
+		this.currentGalleryIndex.set(idx < lastIndex ? idx + 1 : 0);
 		this.scrollToCurrentImage();
 		this.highlightCurrentImage();
 	}
 
 	private navigateToPreviousImage() {
-		const lastIndex = this.visibleMediaItems.length - 1;
-		if (this.currentGalleryIndex > 0) {
-			this.currentGalleryIndex--;
-		} else {
-			this.currentGalleryIndex = lastIndex; // Wrap to last image
-		}
+		const lastIndex = this.visibleMediaItems().length - 1;
+		const idx = this.currentGalleryIndex();
+		this.currentGalleryIndex.set(idx > 0 ? idx - 1 : lastIndex);
 		this.scrollToCurrentImage();
 		this.highlightCurrentImage();
 	}
 
 	private navigateToFirstImage() {
-		this.currentGalleryIndex = 0;
+		this.currentGalleryIndex.set(0);
 		this.scrollToCurrentImage();
 		this.highlightCurrentImage();
 	}
 
 	private navigateToLastImage() {
-		this.currentGalleryIndex = this.visibleMediaItems.length - 1;
+		this.currentGalleryIndex.set(this.visibleMediaItems().length - 1);
 		this.scrollToCurrentImage();
 		this.highlightCurrentImage();
 	}
 
 	private openCurrentImage() {
-		const visible = this.visibleMediaItems;
-		if (this.currentGalleryIndex >= 0 && this.currentGalleryIndex < visible.length) {
-			const mediaItem = visible[this.currentGalleryIndex];
-			this.openImageViewer(mediaItem.url, this.currentGalleryIndex);
+		const visible = this.visibleMediaItems();
+		const idx = this.currentGalleryIndex();
+		if (idx >= 0 && idx < visible.length) {
+			const mediaItem = visible[idx];
+			this.openImageViewer(mediaItem.url, idx);
 		}
 	}
 
 	private goToFirstImageInViewer() {
-		const visible = this.visibleMediaItems;
-		this.currentViewerIndex = 0;
+		const visible = this.visibleMediaItems();
+		this.currentViewerIndex.set(0);
 		if (visible.length > 0) {
-			this.currentViewerImage = visible[0].url;
-			this.currentMediaItem = visible[0];
+			this.currentViewerImage.set(visible[0].url);
+			this.currentMediaItem.set(visible[0]);
 		}
 	}
 
 	private goToLastImageInViewer() {
-		const visible = this.visibleMediaItems;
+		const visible = this.visibleMediaItems();
 		const lastIndex = visible.length - 1;
-		this.currentViewerIndex = lastIndex;
+		this.currentViewerIndex.set(lastIndex);
 		if (lastIndex >= 0) {
-			this.currentViewerImage = visible[lastIndex].url;
-			this.currentMediaItem = visible[lastIndex];
+			this.currentViewerImage.set(visible[lastIndex].url);
+			this.currentMediaItem.set(visible[lastIndex]);
 		}
 	}
 
 	private scrollToCurrentImage() {
-		if (this.currentGalleryIndex < 0) return;
+		const idx = this.currentGalleryIndex();
+		if (idx < 0) return;
 
 		// Find the image element by its index
 		const imageElements = document.querySelectorAll('.image-item');
-		const targetElement = imageElements[this.currentGalleryIndex] as HTMLElement;
+		const targetElement = imageElements[idx] as HTMLElement;
 
 		if (targetElement) {
 			// Scroll the element into view with smooth behavior
@@ -871,9 +871,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		});
 
 		// Add highlight to current image
-		if (this.currentGalleryIndex >= 0) {
+		const idx = this.currentGalleryIndex();
+		if (idx >= 0) {
 			const imageElements = document.querySelectorAll('.image-item');
-			const targetElement = imageElements[this.currentGalleryIndex];
+			const targetElement = imageElements[idx];
 			if (targetElement) {
 				targetElement.classList.add('keyboard-focused');
 			}
@@ -883,8 +884,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	// Private methods (alphabetically)
 	private initializeKeyboardNavigation() {
 		// Set initial focus to first image if gallery has items
-		if (this.mediaItems.length > 0) {
-			this.currentGalleryIndex = 0;
+		if (this.mediaItems().length > 0) {
+			this.currentGalleryIndex.set(0);
 			// Small delay to ensure DOM is updated
 			setTimeout(() => {
 				this.highlightCurrentImage();
@@ -896,19 +897,19 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		// Add gallery to history after images have had time to load
 		setTimeout(async () => {
 			const entry = {
-				originalUrl: this.originalUrl,
-				totalImages: this.totalImages,
-				loadedImages: this.loadedImages,
-				brokenImages: this.brokenImages,
+				originalUrl: this.originalUrl(),
+				totalImages: this.totalImages(),
+				loadedImages: this.loadedImages(),
+				brokenImages: this.brokenImages(),
 				imageUrls: [], // No longer store individual URLs - use originalUrl pattern instead
-				displayMode: this.imageDisplayMode,
+				displayMode: this.imageDisplayMode(),
 			};
 
 			try {
 				await this.chromeService.addGalleryToHistory(entry);
 				this.logger.info('GalleryComponent', 'Gallery added to history successfully', {
-					url: this.originalUrl,
-					totalImages: this.totalImages,
+					url: this.originalUrl(),
+					totalImages: this.totalImages(),
 				});
 			} catch (error) {
 				this.logger.error('GalleryComponent', 'Failed to add gallery to history', error);
@@ -917,25 +918,25 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private applyDarkModeStyles() {
-		document.body.classList.toggle('dark-mode', this.darkMode);
-		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode });
+		document.body.classList.toggle('dark-mode', this.darkMode());
+		this.logger.debug('GalleryComponent', 'Dark mode styles applied', { darkMode: this.darkMode() });
 	}
 
 	private applyCustomCountRequest(): boolean {
-		const count = Number.parseInt(this.customCountValue, 10);
+		const count = Number.parseInt(this.customCountValue(), 10);
 		if (Number.isNaN(count) || count < 0) {
-			this.errorMessage = this.translate('Application_Prompt_NotAValidNumber');
+			this.errorMessage.set(this.translate('Application_Prompt_NotAValidNumber'));
 			return false;
 		}
 
-		const updatedUrl = this.fuskrService.createFuskUrl(this.originalUrl, count, this.customCountDirection);
-		if (updatedUrl === this.originalUrl && !this.fuskrService.isFuskable(updatedUrl)) {
-			this.errorMessage = this.translate('Application_Prompt_NotAValidFusk');
+		const updatedUrl = this.fuskrService.createFuskUrl(this.originalUrl(), count, this.customCountDirection());
+		if (updatedUrl === this.originalUrl() && !this.fuskrService.isFuskable(updatedUrl)) {
+			this.errorMessage.set(this.translate('Application_Prompt_NotAValidFusk'));
 			return false;
 		}
 
-		this.originalUrl = updatedUrl;
-		this.customCountRequested = false;
+		this.originalUrl.set(updatedUrl);
+		this.customCountRequested.set(false);
 		return true;
 	}
 
@@ -949,7 +950,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	private focusUrlInput() {
 		const urlInput = document.querySelector(
-			this.customCountRequested ? '#customCountInput' : 'input[type="url"]'
+			this.customCountRequested() ? '#customCountInput' : 'input[type="url"]'
 		) as HTMLInputElement | null;
 		if (urlInput) {
 			urlInput.focus();
@@ -964,23 +965,23 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		const errorKey = typeof params['errorKey'] === 'string' ? params['errorKey'] : '';
 		if (errorKey) {
-			this.errorMessage = this.translate(errorKey);
+			this.errorMessage.set(this.translate(errorKey));
 		}
 
 		const direction = this.parseDirectionParam(params['direction']);
-		this.customCountRequested = params['customCount'] === '1' && direction !== null;
+		this.customCountRequested.set(params['customCount'] === '1' && direction !== null);
 		if (direction !== null) {
-			this.customCountDirection = direction;
+			this.customCountDirection.set(direction);
 		}
 
 		const prefillParam = typeof params['prefill'] === 'string' ? params['prefill'] : '';
 		if (prefillParam) {
-			this.originalUrl = this.decodeUrlParameter(prefillParam);
+			this.originalUrl.set(this.decodeUrlParameter(prefillParam));
 			this.hasInitialized = true;
 			this.logger.debug('GalleryComponent', 'Entering manual mode from route params', {
 				source,
-				customCountRequested: this.customCountRequested,
-				url: this.originalUrl,
+				customCountRequested: this.customCountRequested(),
+				url: this.originalUrl(),
 			});
 			setTimeout(() => {
 				this.focusUrlInput();
@@ -990,10 +991,10 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		const urlParam = typeof params['url'] === 'string' ? params['url'] : '';
 		if (urlParam) {
-			this.originalUrl = this.decodeUrlParameter(urlParam);
+			this.originalUrl.set(this.decodeUrlParameter(urlParam));
 			this.hasInitialized = true;
 			this.logger.info('GalleryComponent', `Starting gallery generation from ${source}`, {
-				url: this.originalUrl,
+				url: this.originalUrl(),
 			});
 			setTimeout(() => {
 				this.generateGallery();
@@ -1003,7 +1004,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 		this.hasInitialized = true;
 		this.logger.debug('GalleryComponent', `Entering manual mode (no URL in ${source})`, {
-			customCountRequested: this.customCountRequested,
+			customCountRequested: this.customCountRequested(),
 		});
 		setTimeout(() => {
 			this.focusUrlInput();
@@ -1027,7 +1028,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		const lines: string[] = [
 			'These media files were downloaded using Fuskr.',
 			'',
-			`Fusk Url: ${this.originalUrl || 'Unknown'}`,
+			`Fusk Url: ${this.originalUrl() || 'Unknown'}`,
 			'',
 			'Media Files:',
 		];
@@ -1055,8 +1056,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 	private getValidMediaItems(): MediaItem[] {
 		// If we have mediaItems, filter them based on loaded state and DOM validation
-		if (this.mediaItems.length > 0) {
-			return this.mediaItems.filter((item) => {
+		if (this.mediaItems().length > 0) {
+			return this.mediaItems().filter((item) => {
 				// Only include items that are successfully loaded
 				if (item.loadingState !== 'loaded') {
 					return false;
@@ -1159,19 +1160,19 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	}
 
 	private async performGalleryGeneration() {
-		this.loading = true;
-		this.isGenerating = false;
-		this.errorMessage = '';
-		this.mediaItems = [];
+		this.loading.set(true);
+		this.isGenerating.set(false);
+		this.errorMessage.set('');
+		this.mediaItems.set([]);
 
 		// Yield to the event loop so Angular renders the spinner before work begins.
-		await Promise.resolve();
+		await new Promise<void>((resolve) => setTimeout(resolve, 0));
 
 		try {
-			const result = this.fuskrService.generateImageGallery(this.originalUrl);
-			this.totalImages = result.urls.length;
-			this.loadedImages = 0;
-			this.brokenImages = 0;
+			const result = this.fuskrService.generateImageGallery(this.originalUrl());
+			this.totalImages.set(result.urls.length);
+			this.loadedImages.set(0);
+			this.brokenImages.set(0);
 
 			if (result.urls.length > 0) {
 				this.logger.info('GalleryComponent', 'Building gallery progressively', {
@@ -1179,8 +1180,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 				});
 
 				// Switch from the initial spinner to the in-progress build view.
-				this.loading = false;
-				this.isGenerating = true;
+				this.loading.set(false);
+				this.isGenerating.set(true);
 
 				// Add items in small batches, yielding between each so Angular can
 				// render the growing list and the user sees the gallery build up.
@@ -1196,26 +1197,25 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 							loadingState: 'loaded' as const,
 						};
 					});
-					this.mediaItems = [...this.mediaItems, ...batch];
+					this.mediaItems.update((items) => [...items, ...batch]);
 					// Yield to event loop after each batch so Angular renders new items
-					await Promise.resolve();
+					await new Promise<void>((resolve) => setTimeout(resolve, 0));
 				}
 
-				this.isGenerating = false;
-				this.updateAllUrlsText();
+				this.isGenerating.set(false);
 				this.initializeKeyboardNavigation();
 
 				this.logger.info('GalleryComponent', 'Gallery built progressively', {
-					totalItems: this.mediaItems.length,
-					imageCount: this.mediaItems.filter((item) => item.type === 'image').length,
-					videoCount: this.mediaItems.filter((item) => item.type === 'video').length,
-					unknownCount: this.mediaItems.filter((item) => item.type === 'unknown').length,
+					totalItems: this.mediaItems().length,
+					imageCount: this.mediaItems().filter((item) => item.type === 'image').length,
+					videoCount: this.mediaItems().filter((item) => item.type === 'video').length,
+					unknownCount: this.mediaItems().filter((item) => item.type === 'unknown').length,
 				});
 
 				// Start progressive HTTP-based type detection in the background.
 				this.startProgressiveTypeDetection();
 			} else {
-				this.loading = false;
+				this.loading.set(false);
 			}
 
 			// Do a final count after images have had time to load
@@ -1224,37 +1224,37 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}, 2000);
 
 			// Update the URL in the browser to show the bracketed version
-			if (result.originalUrl !== this.originalUrl) {
-				this.originalUrl = result.originalUrl;
+			if (result.originalUrl !== this.originalUrl()) {
+				this.originalUrl.set(result.originalUrl);
 			}
 
 			// Update the browser URL to reflect the generated gallery
-			this.updateBrowserUrl(this.originalUrl);
+			this.updateBrowserUrl(this.originalUrl());
 
 			// Add the gallery to history if it was successfully generated
-			if (this.mediaItems.length > 0) {
+			if (this.mediaItems().length > 0) {
 				this.addToHistory();
 			}
 
-			if (this.mediaItems.length === 0) {
-				this.errorMessage = this.translate('Gallery_ErrorNoPattern');
-				this.loading = false;
+			if (this.mediaItems().length === 0) {
+				this.errorMessage.set(this.translate('Gallery_ErrorNoPattern'));
+				this.loading.set(false);
 			}
 		} catch (error) {
-			this.errorMessage = this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message;
-			this.loading = false;
-			this.isGenerating = false;
+			this.errorMessage.set(this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message);
+			this.loading.set(false);
+			this.isGenerating.set(false);
 		}
 	}
 
 	private async showOverloadWarning(urlCount: number): Promise<boolean> {
 		const message = this.translate('Gallery_OverloadWarning', [
 			urlCount.toString(),
-			this.overloadProtectionLimit.toString(),
+			this.overloadProtectionLimit().toString(),
 		]);
 		this.logger.warn('GalleryComponent', 'Showing overload warning dialog', {
 			urlCount,
-			limit: this.overloadProtectionLimit,
+			limit: this.overloadProtectionLimit(),
 			message,
 		});
 		const proceed = confirm(message);
@@ -1311,21 +1311,22 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			}
 		});
 
-		this.loadedImages = loaded;
-		this.brokenImages = broken;
+		this.loadedImages.set(loaded);
+		this.brokenImages.set(broken);
 	}
 
 	private async startProgressiveTypeDetection() {
 		// Start progressive HTTP-based type detection in the background
 		// This will update media items one by one as HTTP requests complete
 		this.logger.info('GalleryComponent', 'Starting progressive media type detection', {
-			totalItems: this.mediaItems.length,
+			totalItems: this.mediaItems().length,
 		});
 
 		const concurrencyLimit = 3; // Lower concurrency to be more respectful and faster
+		const items = this.mediaItems();
 
-		for (let i = 0; i < this.mediaItems.length; i += concurrencyLimit) {
-			const batch = this.mediaItems.slice(i, i + concurrencyLimit);
+		for (let i = 0; i < items.length; i += concurrencyLimit) {
+			const batch = items.slice(i, i + concurrencyLimit);
 
 			// Process batch in parallel
 			const updatePromises = batch.map(async (mediaItem, batchIndex) => {
@@ -1337,13 +1338,17 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 					// Update the mediaItem in place only if the type changed
 					if (result.type !== mediaItem.type || result.mimeType !== mediaItem.mimeType) {
-						this.mediaItems[globalIndex] = {
-							...mediaItem,
-							type: result.type,
-							mimeType: result.mimeType,
-							contentLength: result.contentLength,
-							loadedAt: new Date(),
-						};
+						this.mediaItems.update((current) => {
+							const next = [...current];
+							next[globalIndex] = {
+								...mediaItem,
+								type: result.type,
+								mimeType: result.mimeType,
+								contentLength: result.contentLength,
+								loadedAt: new Date(),
+							};
+							return next;
+						});
 
 						this.logger.debug('GalleryComponent', 'Updated media type via HTTP', {
 							url: mediaItem.url.substring(0, 50) + '...',
@@ -1366,19 +1371,16 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			await Promise.all(updatePromises);
 
 			// Small delay between batches to be respectful to servers
-			if (i + concurrencyLimit < this.mediaItems.length) {
+			if (i + concurrencyLimit < items.length) {
 				await new Promise((resolve) => setTimeout(resolve, 50));
 			}
 		}
 
-		// Update computed properties after all updates
-		this.updateAllUrlsText();
-
 		this.logger.info('GalleryComponent', 'Progressive media type detection completed', {
-			totalItems: this.mediaItems.length,
-			imageCount: this.mediaItems.filter((item) => item.type === 'image').length,
-			videoCount: this.mediaItems.filter((item) => item.type === 'video').length,
-			unknownCount: this.mediaItems.filter((item) => item.type === 'unknown').length,
+			totalItems: this.mediaItems().length,
+			imageCount: this.mediaItems().filter((item) => item.type === 'image').length,
+			videoCount: this.mediaItems().filter((item) => item.type === 'video').length,
+			unknownCount: this.mediaItems().filter((item) => item.type === 'unknown').length,
 		});
 	}
 
@@ -1438,13 +1440,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		if (this.toastTimeout !== null) {
 			clearTimeout(this.toastTimeout);
 		}
-		this.toastMessage = message;
-		this.toastVisible = true;
+		this.toastMessage.set(message);
+		this.toastVisible.set(true);
 		if (isError) {
-			this.toastMessage = message;
+			this.toastMessage.set(message);
 		}
 		this.toastTimeout = setTimeout(() => {
-			this.toastVisible = false;
+			this.toastVisible.set(false);
 			this.toastTimeout = null;
 		}, 2500);
 	}
