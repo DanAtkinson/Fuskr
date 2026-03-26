@@ -177,7 +177,6 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 							filename,
 							(i + 1).toString(),
 							validMediaItems.length.toString(),
-							mediaItem.type,
 						])
 					);
 					this.downloadProgress.set(Math.round((i / validMediaItems.length) * 70)); // Reserve 30% for ZIP generation and metadata

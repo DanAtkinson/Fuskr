@@ -35,17 +35,11 @@
 	"Application_ContextMenu_Other": {
 		"message": "Other"
 	},
-	"Application_ContextMenu_Infinite": {
-		"message": "Infinite"
-	},
 	"Application_ContextMenu_CreateFromSelection": {
 		"message": "Create from selection"
 	},
 	"Application_ContextMenu_Manual": {
 		"message": "Manual"
-	},
-	"Application_ContextMenu_Help": {
-		"message": "Help"
 	},
 	"Application_ContextMenu_Recent": {
 		"message": "Recent"
@@ -58,9 +52,6 @@
 	},
 	"Application_ContextMenu_History": {
 		"message": "History"
-	},
-	"Application_ContextMenu_Saved": {
-		"message": "Saved"
 	},
 	"History_Loading": {
 		"message": "Loading history...",
@@ -126,9 +117,6 @@
 		"message": "Display Mode",
 		"description": "Label for gallery display mode"
 	},
-	"Application_Prompt_PleaseEnterTheUrl": {
-		"message": "Please enter the url:"
-	},
 	"Application_Prompt_HowMany": {
 		"message": "How many?:"
 	},
@@ -138,38 +126,8 @@
 	"Application_Prompt_NotAValidNumber": {
 		"message": "This is not a valid number."
 	},
-	"Images_Done": {
-		"message": "Done!"
-	},
-	"Images_Images": {
-		"message": "{} Images"
-	},
-	"Images_Loaded": {
-		"message": "{} Loaded"
-	},
-	"Images_Failed": {
-		"message": "{} Failed"
-	},
 	"Images_DownloadImage": {
 		"message": "Download Image"
-	},
-	"Images_SaveFusk": {
-		"message": "Save Fusk"
-	},
-	"Images_Top": {
-		"message": "Top"
-	},
-	"Images_Bottom": {
-		"message": "Bottom"
-	},
-	"Images_Resubmit": {
-		"message": "Resubmit"
-	},
-	"Images_ClickToOpenInNewTab": {
-		"message": "Click to open this image in a new tab"
-	},
-	"Images_ClickForNextPicture": {
-		"message": "Click image for next picture"
 	},
 	"Images_ResizeImagesToFullWidth": {
 		"message": "Resize images to full width"
@@ -183,12 +141,6 @@
 	"Images_ResizeImagesToThumbnails": {
 		"message": "Resize images to thumbnails"
 	},
-	"Images_GoToTop": {
-		"message": "Go to the top of the page"
-	},
-	"Images_GoToBottom": {
-		"message": "Go to the bottom of the page"
-	},
 	"Images_ShowImageUrls": {
 		"message": "Show generated urls"
 	},
@@ -201,56 +153,8 @@
 	"Images_RemoveBrokenImages": {
 		"message": "Remove broken images"
 	},
-	"Images_DownloadDialog_Title": {
-		"message": "Download Images"
-	},
-	"Images_DownloadDialog_Unique": {
-		"message": "Unique"
-	},
-	"Images_DownloadDialog_UniqueInfo": {
-		"message": "To avoid duplication, the filename will be appended with a number eg "
-	},
-	"Images_DownloadDialog_UniqueInfoFilename": {
-		"message": "filename1 (1).jpg"
-	},
-	"Images_DownloadDialog_Overwrite": {
-		"message": "Overwrite"
-	},
-	"Images_DownloadDialog_OverwriteInfo": {
-		"message": "The existing file will be overwritten with the new file."
-	},
-	"Images_DownloadDialog_Prompt": {
-		"message": "Prompt"
-	},
-	"Images_DownloadDialog_PromptInfo": {
-		"message": "You will be prompted to choose a filename."
-	},
-	"Images_DownloadDialog_ConflictQuestion": {
-		"message": "In case of a conflict of filenames, what do you want to do?"
-	},
-	"Images_SaveDialog_Title": {
-		"message": "Save Fusk"
-	},
-	"Images_SaveDialog_Question": {
-		"message": "What name do you wish to give this fusk (defaults to this url if empty)?"
-	},
 	"Options_Title": {
 		"message": "Fuskr Options"
-	},
-	"Options_Tab_Settings": {
-		"message": "Settings"
-	},
-	"Options_Tab_Foreground": {
-		"message": "Foreground"
-	},
-	"Options_Tab_History": {
-		"message": "History"
-	},
-	"Options_Tab_VersionHistory": {
-		"message": "Version History"
-	},
-	"Options_Tab_About": {
-		"message": "About Fuskr"
 	},
 	"Options_DarkMode": {
 		"message": "Show Fuskr with a dark background"
@@ -269,21 +173,6 @@
 	},
 	"Options_History_Keep_Description": {
 		"message": "Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery."
-	},
-	"Options_History_Keep_Limit": {
-		"message": "<p class='bold'>Last <span class='totalFusks'></span> fusks. Fuskr only displays the last 10. Click to revisit.</p>"
-	},
-	"Options_History_NoRecent": {
-		"message": "There are currently no records of any galleries created. When you start using Fuskr, the gallery links will appear below!"
-	},
-	"Options_Credits_Title": {
-		"message": "Credits"
-	},
-	"Options_Credits_Description": {
-		"message": "<p>Fuskr (originally called ChromeFusk) was created in 2011 by <a href='https://twitter.com/danbo' title='Dan on Twitter'>Dan Atkinson</a> with oodles of help from <a href='https://bolsterweb.com' title='Jonathon Bolster'>Jonathon Bolster</a>.</p><p>The Fuskr logos were created by <a href='https://twitter.com/richardstelmach' title='Richard on Twitter'>Richard Stelmach</a> of <a href='http://www.creativebinge.co.uk' title='Creative Binge'>Creative Binge</a>.</p>"
-	},
-	"Options_About_Description": {
-		"message": "<p>Fuskr was borne of a frustation that my favourite Firefox plugin <a href='https://addons.mozilla.org/en-US/firefox/addon/2087/' title='Firefusk on Mozilla Addons'>Firefusk</a> (dead link) created by <a href='http://jonathansoma.com/' title='Jonathan Soma'>Jonathan Soma</a> was not available for Chrome.</p><p>Once I had stopped crying, I remembered that I was a developer and could do almost anything if I put my mind to it.</p><p><i>Then</i>, I remembered that I was actually a pretty rubbish developer and asked for help from <a href='https://bolsterweb.com' title='Jonathon Bolster'>Jonathon Bolster</a>.</p><p>Jonathon gratefully helped and actually rewrote pretty much all of the code for Fuskr to make it so damned extensible and also provided lots of unit tests for it.</p>"
 	},
 	"Options_Debug": {
 		"message": "Debug & Diagnostics"
@@ -516,14 +405,6 @@
 		"message": "Automatically remove broken images from the gallery as they fail to load",
 		"description": "Description for auto-remove broken images setting"
 	},
-	"Options_KeepRecentFusks": {
-		"message": "Keep Recent Fusks",
-		"description": "Checkbox label for keeping recent fusks"
-	},
-	"Options_KeepRecentFusksDescription": {
-		"message": "Save recent Fusk URLs for quick access",
-		"description": "Description for recent fusks setting"
-	},
 	"Options_SettingsSaved": {
 		"message": "Settings saved!",
 		"description": "Status message when settings are saved successfully"
@@ -564,10 +445,6 @@
 		"message": "Resize images to thumbnails",
 		"description": "Radio button option for thumbnails display mode"
 	},
-	"Options_OpenNewFusksDescription": {
-		"message": "New tabs created from Fusk operations will be opened in the foreground",
-		"description": "Description for opening new fusks in foreground setting"
-	},
 	"Gallery_CopyUrls": {
 		"message": "Copy URLs",
 		"description": "Button text to copy all image URLs to clipboard"
@@ -583,14 +460,6 @@
 	"Gallery_UrlList": {
 		"message": "URL List",
 		"description": "Header for the URL list section"
-	},
-	"Gallery_ShowUrlList": {
-		"message": "Show URL List",
-		"description": "Button text to show the list of image URLs"
-	},
-	"Gallery_HideUrlList": {
-		"message": "Hide URL List",
-		"description": "Button text to hide the list of image URLs"
 	},
 	"Gallery_Loading": {
 		"message": "Loading...",
@@ -615,14 +484,6 @@
 	"Gallery_DownloadNoImages": {
 		"message": "No valid images to download",
 		"description": "Status message when no valid images found for download"
-	},
-	"Gallery_DownloadingImages": {
-		"message": "Downloading $1 images...",
-		"description": "Status message when downloading multiple images"
-	},
-	"Gallery_DownloadingImage": {
-		"message": "Downloading $1 ($2/$3)...",
-		"description": "Status message when downloading individual image with progress"
 	},
 	"Gallery_DownloadAddingMetadata": {
 		"message": "Adding metadata...",
@@ -653,12 +514,8 @@
 		"description": "Status message when downloading mixed media (images and videos)"
 	},
 	"Gallery_DownloadingItem": {
-		"message": "Downloading $1 ($2/$3/$4)...",
-		"description": "Status message when downloading individual media item with progress and type"
-	},
-	"Gallery_KeyboardShortcuts": {
-		"message": "Keyboard Shortcuts",
-		"description": "Header for keyboard shortcuts help section"
+		"message": "Downloading $1 ($2 of $3)...",
+		"description": "Status message when downloading an individual media item with progress"
 	},
 	"Gallery_KeyboardNavigation": {
 		"message": "Use arrow keys to navigate, Enter/Space to open, Home/End to jump",
