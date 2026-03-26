@@ -116,12 +116,15 @@
 	gap: 20px;
 
 	.stat {
-		font-weight: 600;
-		padding: 5px 10px;
+		align-items: center;
 		background-color: var(--border-color);
-		color: var(--text-color);
 		border-radius: 15px;
+		color: var(--text-color);
+		display: flex;
 		font-size: 14px;
+		font-weight: 600;
+		justify-content: center;
+		padding: 5px 10px;
 
 		&.keyboard-hint {
 			background-color: var(--primary-color, #0d6efd);
@@ -137,15 +140,15 @@
 }
 
 .display-controls {
-	display: flex;
-	gap: 30px;
 	align-items: center;
-	margin-bottom: 20px;
-	padding: 15px;
 	background-color: var(--bg-secondary);
 	border-radius: 8px;
 	border: 1px solid var(--border-color);
+	display: flex;
 	flex-wrap: wrap;
+	gap: 30px;
+	margin-bottom: 20px;
+	padding: 15px;
 }
 
 .control-group {
