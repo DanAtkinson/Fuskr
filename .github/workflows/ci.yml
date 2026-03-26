@@ -38,7 +38,7 @@ jobs:
      if: matrix.node-version == '24.x'
      uses: codecov/codecov-action@v5
      with:
-      file: ./coverage/fuskr/lcov.info
+      files: ./coverage/fuskr/lcov.info
       flags: unittests
       name: codecov-umbrella
       fail_ci_if_error: false
