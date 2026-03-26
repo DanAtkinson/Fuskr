@@ -30,13 +30,14 @@ PRIVACY STATEMENT FOR THE FUSKR BROWSER EXTENSION
 4. SHARING LOGS (ENTIRELY OPTIONAL)
    If you are experiencing a problem with Fuskr and wish to help diagnose it,
    you may use the "Export Logs" button in the Options page to download a log
-   file and attach it to a bug report on the Fuskr GitHub repository.
+   file and attach it to a bug report on the Fuskr GitHub repository (bearing
+   in mind that this is a PUBLIC repository).
 
    Before sharing any log file, please review its contents to ensure you are
    comfortable with the information it contains.  Logs may include URLs of
    images you attempted to gallery-ise and technical details about your
-   browser environment.  Never share logs that contain information you
-   consider sensitive.
+   browser environment.
+   NEVER SHARE LOGS THAT CONTAIN INFORMATION YOU CONSIDER SENSITIVE!
 
    Sharing logs is entirely voluntary and is never required.
 
