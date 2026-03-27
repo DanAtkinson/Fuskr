@@ -85,6 +85,23 @@
 		<div class="col-12">
 			<div class="card mb-4">
 				<div class="card-header">
+					<h5 class="mb-0"><span class="me-2" aria-hidden="true">📌</span>{{ translate('Options_StickyControls') }}</h5>
+				</div>
+				<div class="card-body">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="stickyControlsEnabled" [(ngModel)]="options.display.stickyControlsEnabled" (change)="saveOptions()" />
+						<label class="form-check-label" for="stickyControlsEnabled"> <span class="me-1" aria-hidden="true">📌</span>{{ translate('Options_EnableStickyControls') }} </label>
+						<div class="form-text">{{ translate('Options_EnableStickyControls_Description') }}</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<div class="card mb-4">
+				<div class="card-header">
 					<h5 class="mb-0"><span class="me-2" aria-hidden="true">⚙️</span>{{ translate('Options_Behaviour') }}</h5>
 				</div>
 				<div class="card-body">

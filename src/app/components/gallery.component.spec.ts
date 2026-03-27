@@ -25,23 +25,23 @@ describe('GalleryComponent', () => {
 			generateImageGallery: vi.fn().mockName('FuskrService.generateImageGallery'),
 			getImageFilename: vi.fn().mockName('FuskrService.getImageFilename'),
 			countPotentialUrls: vi.fn().mockName('FuskrService.countPotentialUrls'),
-		};
+		} as unknown as MockedObject<FuskrService>;
 		mockMediaTypeService = {
 			batchDetermineMediaTypes: vi.fn().mockName('MediaTypeService.batchDetermineMediaTypes'),
 			createMediaItem: vi.fn().mockName('MediaTypeService.createMediaItem'),
 			fallbackTypeDetection: vi.fn().mockName('MediaTypeService.fallbackTypeDetection'),
 			determineMediaType: vi.fn().mockName('MediaTypeService.determineMediaType'),
-		};
+		} as unknown as MockedObject<MediaTypeService>;
 		mockRouter = {
 			navigate: vi.fn().mockName('Router.navigate'),
-		};
+		} as unknown as MockedObject<Router>;
 		mockActivatedRoute = {
 			queryParams: of({}),
 			snapshot: { queryParams: {} },
 		} as unknown as ActivatedRoute;
 
 		// Setup the ChromeService mock using BaseComponentTestHelper
-		mockChromeService = BaseComponentTestHelper.setupChromeServiceMock();
+		mockChromeService = BaseComponentTestHelper.setupChromeServiceMock() as MockedObject<ChromeService>;
 
 		await TestBed.configureTestingModule({
 			imports: [GalleryComponent],

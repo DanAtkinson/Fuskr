@@ -33,232 +33,234 @@
 			</div>
 		</div>
 
-		<!-- Top Controls -->
-		<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
+		<!-- Sticky Gallery Controls -->
+		@if (visibleMediaItems().length > 0) {
+			<div class="sticky-gallery-controls" [attr.data-sticky-enabled]="stickyControlsEnabled()">
+				<div class="sticky-controls-header">
+					<button class="btn btn-sm btn-outline-secondary collapse-btn" type="button" (click)="toggleStickyControlsCollapse()" [title]="stickyControlsCollapsed() ? translate('Gallery_ExpandControls') : translate('Gallery_CollapseControls')" [attr.aria-expanded]="!stickyControlsCollapsed()" aria-controls="sticky-controls-content">
+						<span aria-hidden="true">{{ stickyControlsCollapsed() ? '▶' : '▼' }}</span>
+					</button>
+					<span class="sticky-controls-label">{{ translate('Gallery_Controls') }}</span>
+				</div>
+
+				@if (!stickyControlsCollapsed()) {
+					<div id="sticky-controls-content" class="sticky-controls-content">
+						<!-- Gallery Stats -->
+						<div class="gallery-stats">
+							<div class="stats-info">
+								<span class="stat">{{ totalImages() }} {{ translate('Gallery_Stats_Total') }}</span>
+								<span class="stat">{{ loadedImages() }} {{ translate('Gallery_Stats_Loaded') }}</span>
+								@if (brokenImages() > 0) {
+									<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
+								}
+								<span class="stat keyboard-hint"> <span class="me-1" aria-hidden="true">⌨️</span>{{ translate('Gallery_KeyboardNavigation') }} </span>
+							</div>
+							<div class="stats-actions">
+								<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading()">
+									@if (isDownloading()) {
+										<div class="spinner-border spinner-border-sm me-2" role="status">
+											<span class="visually-hidden">{{ translate('Gallery_Loading') }}</span>
+										</div>
+									} @else {
+										<span class="me-1" aria-hidden="true">⬇️</span>
+									}
+									{{ isDownloading() ? downloadStatus() : translate('Gallery_DownloadAll') }}
+								</button>
+								@if (isDownloading() && downloadProgress() > 0) {
+									<div class="progress mt-2" style="height: 4px">
+										<div aria-valuemax="100" aria-valuemin="0" class="progress-bar" role="progressbar" [attr.aria-valuenow]="downloadProgress()" [style.width.%]="downloadProgress()"></div>
+									</div>
+								}
+							</div>
+						</div>
+
+						<!-- Display Mode Controls -->
+						<div class="display-controls">
+							<div class="control-group">
+								<label for="displayModeControls">{{ translate('Gallery_DisplayMode') }}</label>
+								<div id="displayModeControls" class="button-group" role="group" [attr.aria-labelledby]="'displayModeControls'">
+									<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode() === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
+										{{ translate('Gallery_FitPage') }}
+									</button>
+									<button type="button" (click)="setImageDisplayMode('fullWidth')" [class]="imageDisplayMode() === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFullWidth')">
+										{{ translate('Gallery_FullWidth') }}
+									</button>
+									<button type="button" (click)="setImageDisplayMode('fillPage')" [class]="imageDisplayMode() === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFillPage')">
+										{{ translate('Gallery_FillPage') }}
+									</button>
+									<button type="button" (click)="setImageDisplayMode('thumbnails')" [class]="imageDisplayMode() === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToThumbnails')">
+										{{ translate('Gallery_Thumbnails') }}
+									</button>
+								</div>
+							</div>
+							<div class="control-group">
+								<label for="galleryOptionsControls">{{ translate('Gallery_Options') }}</label>
+								<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
+									@if (brokenImages() > 0 || loading()) {
+										<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
+											{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
+										</button>
+									}
+									@if (brokenImages() > 0) {
+										<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
+											{{ translate('Images_RemoveBrokenImages') }}
+										</button>
+									}
+									<button type="button" (click)="toggleInfiniteMode()" [class]="isInfiniteMode() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="isInfiniteMode() ? translate('Gallery_DisableInfiniteMode') : translate('Gallery_EnableInfiniteMode')"><span aria-hidden="true">♾️</span>{{ isInfiniteMode() ? translate('Gallery_InfiniteModeOn') : translate('Gallery_InfiniteModeOff') }}</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+
+		@if (loading()) {
+			<div class="loading">
+				<div class="spinner"></div>
+				<p>{{ translate('Gallery_GeneratingGallery') }}</p>
+			</div>
+		}
+
+		@if (isGenerating()) {
+			<div class="generating-progress" role="status" aria-live="polite">
+				<p class="generating-label">{{ translate('Gallery_BuildingGallery', [mediaItems().length.toString(), totalImages().toString()]) }}</p>
+				<div class="progress" [attr.aria-valuenow]="mediaItems().length" aria-valuemin="0" [attr.aria-valuemax]="totalImages()">
+					<div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="totalImages() > 0 ? (mediaItems().length / totalImages()) * 100 : 0"></div>
+				</div>
+			</div>
+		}
+
+		@if (errorMessage()) {
+			<div class="error">
+				<p>{{ errorMessage() }}</p>
+			</div>
+		}
+
+		@if (visibleMediaItems().length > 0) {
+			<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode() === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode() === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode() === 'thumbnails'">
+				@if (isInfiniteMode()) {
+					<div id="infinite-top-sentinel" class="infinite-sentinel infinite-sentinel-top" aria-hidden="true"></div>
+				}
+				@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
+					<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
+						@if (mediaItem.type === 'video') {
+							<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
+								<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
+								{{ translate('Gallery_VideoNotSupported') }}
+							</video>
+						} @else {
+							<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(i)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
+						}
+						@if (mediaItem.loadingState === 'loading') {
+							<div class="media-loading-indicator">
+								<div class="spinner-small"></div>
+							</div>
+						}
+						@if (mediaItem.loadingState === 'error') {
+							<div class="media-error-indicator">
+								<span aria-hidden="true">⚠️</span>
+								<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
+							</div>
+						}
+						<div class="image-overlay">
+							<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
+							<div class="image-actions">
+								<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
+									<span aria-hidden="true">⬇️</span>
+								</button>
+								<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
+									<span aria-hidden="true">📋</span>
+								</button>
+								<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
+									<span aria-hidden="true">↗️</span>
+								</button>
+								<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
+									<span aria-hidden="true">🔍</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				}
+				@if (isInfiniteMode()) {
+					<div id="infinite-bottom-sentinel" class="infinite-sentinel infinite-sentinel-bottom" aria-hidden="true"></div>
+				}
+			</div>
+		}
+
+		<!-- URL List Section -->
+		@if (visibleMediaItems().length > 0) {
+			<div class="url-list-section">
+				<div class="url-list-header">
+					<button class="btn btn-outline-secondary btn-sm" type="button" (click)="toggleUrlList()" [attr.aria-expanded]="showUrlList()">
+						<span aria-hidden="true">{{ showUrlList() ? '▲' : '▼' }}</span>
+						<span class="ms-1">{{ translate('Images_ShowImageUrls') }}</span>
+					</button>
+				</div>
+				@if (showUrlList()) {
+					<div class="url-list-content">
+						<div class="url-list-controls mb-2">
+							<button class="btn btn-secondary btn-sm me-2" type="button" (click)="copyAllUrls()"><span class="me-1" aria-hidden="true">📋</span>{{ translate('Gallery_CopyUrls') }}</button>
+							<button class="btn btn-outline-secondary btn-sm" type="button" (click)="selectAllUrls()"><span class="me-1" aria-hidden="true">☑️</span>{{ translate('Gallery_SelectAllUrls') }}</button>
+						</div>
+						<textarea class="form-control url-textarea" placeholder="{{ translate('Gallery_UrlListPlaceholder') }}" readonly rows="10" [value]="allUrlsText()" #urlTextarea> </textarea>
+					</div>
+				}
+			</div>
+		}
+
+		<!-- Image Viewer Modal -->
+		@if (showImageViewer()) {
+			<div class="image-viewer-modal" (click)="closeImageViewer()" (keydown.escape)="closeImageViewer()" tabindex="0" role="dialog" aria-modal="true" [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage())">
+				<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="handleViewerKeydown($event)" role="document">
+					<div class="viewer-header">
+						<span class="viewer-title">{{ getFilename(currentViewerImage()) }}</span>
+						<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ getViewerTotalCount() }}</span>
+						<button class="btn btn-sm btn-outline-secondary close-btn" type="button" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
+							<span aria-hidden="true">✕</span>
+						</button>
+					</div>
+					<div class="viewer-body">
+						<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="!canNavigateViewerBackward()">
+							<span aria-hidden="true">◀</span>
+						</button>
+						@if (currentMediaItem()?.type === 'video') {
+							<video class="viewer-video" [src]="currentViewerImage()" controls preload="metadata" [attr.data-video-type]="currentMediaItem()?.mimeType || 'video/mp4'">
+								{{ translate('Gallery_VideoNotSupported') }}
+							</video>
+						} @else {
+							<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" />
+						}
+						<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="!canNavigateViewerForward()">
+							<span aria-hidden="true">▶</span>
+						</button>
+					</div>
+					<div class="viewer-footer">
+						<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage(), $event)"><span class="me-1" aria-hidden="true">⬇️</span>{{ currentMediaItem()?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}</button>
+						<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage(), $event)"><span class="me-1" aria-hidden="true">📋</span>{{ translate('Gallery_CopyUrl') }}</button>
+						<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage())"><span class="me-1" aria-hidden="true">↗️</span>{{ translate('Gallery_OpenInTab') }}</button>
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (visibleMediaItems().length === 0 && !loading() && !errorMessage()) {
+			<div class="empty-state">
+				<h2>{{ translate('Gallery_Welcome') }}</h2>
+				<p>{{ translate('Gallery_WelcomeText') }}</p>
+				<div class="examples">
+					<h3>{{ translate('Gallery_ExampleUrls') }}</h3>
+					<code>{{ translate('Gallery_ExampleUrl1') }}</code>
+					<code>{{ translate('Gallery_ExampleUrl2') }}</code>
+				</div>
+			</div>
+		}
 	</div>
 
-	@if (loading()) {
-		<div class="loading">
-			<div class="spinner"></div>
-			<p>{{ translate('Gallery_GeneratingGallery') }}</p>
-		</div>
-	}
-
-	@if (isGenerating()) {
-		<div class="generating-progress" role="status" aria-live="polite">
-			<p class="generating-label">{{ translate('Gallery_BuildingGallery', [mediaItems().length.toString(), totalImages().toString()]) }}</p>
-			<div class="progress" [attr.aria-valuenow]="mediaItems().length" aria-valuemin="0" [attr.aria-valuemax]="totalImages()">
-				<div class="progress-bar progress-bar-striped progress-bar-animated" [style.width.%]="totalImages() > 0 ? (mediaItems().length / totalImages()) * 100 : 0"></div>
-			</div>
-		</div>
-	}
-
-	@if (errorMessage()) {
-		<div class="error">
-			<p>{{ errorMessage() }}</p>
-		</div>
-	}
-
-	@if (visibleMediaItems().length > 0) {
-		<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode() === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode() === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode() === 'thumbnails'">
-			@if (isInfiniteMode()) {
-				<div id="infinite-top-sentinel" class="infinite-sentinel infinite-sentinel-top" aria-hidden="true"></div>
-			}
-			@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
-				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
-					@if (mediaItem.type === 'video') {
-						<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
-							<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
-							{{ translate('Gallery_VideoNotSupported') }}
-						</video>
-					} @else {
-						<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(i)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
-					}
-					@if (mediaItem.loadingState === 'loading') {
-						<div class="media-loading-indicator">
-							<div class="spinner-small"></div>
-						</div>
-					}
-					@if (mediaItem.loadingState === 'error') {
-						<div class="media-error-indicator">
-							<span aria-hidden="true">⚠️</span>
-							<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
-						</div>
-					}
-					<div class="image-overlay">
-						<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
-						<div class="image-actions">
-							<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
-								<span aria-hidden="true">⬇️</span>
-							</button>
-							<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
-								<span aria-hidden="true">📋</span>
-							</button>
-							<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
-								<span aria-hidden="true">↗️</span>
-							</button>
-							<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
-								<span aria-hidden="true">🔍</span>
-							</button>
-						</div>
-					</div>
-				</div>
-			}
-			@if (isInfiniteMode()) {
-				<div id="infinite-bottom-sentinel" class="infinite-sentinel infinite-sentinel-bottom" aria-hidden="true"></div>
-			}
-		</div>
-	}
-
-	<!-- Bottom Controls -->
-	@if (visibleMediaItems().length > 0) {
-		<div class="gallery-footer">
-			<ng-container *ngTemplateOutlet="galleryControls"></ng-container>
-		</div>
-	}
-
-	<!-- URL List Section -->
-	@if (visibleMediaItems().length > 0) {
-		<div class="url-list-section">
-			<div class="url-list-header">
-				<button class="btn btn-outline-secondary btn-sm" type="button" (click)="toggleUrlList()" [attr.aria-expanded]="showUrlList()">
-					<span aria-hidden="true">{{ showUrlList() ? '▲' : '▼' }}</span>
-					<span class="ms-1">{{ translate('Images_ShowImageUrls') }}</span>
-				</button>
-			</div>
-			@if (showUrlList()) {
-				<div class="url-list-content">
-					<div class="url-list-controls mb-2">
-						<button class="btn btn-secondary btn-sm me-2" type="button" (click)="copyAllUrls()"><span class="me-1" aria-hidden="true">📋</span>{{ translate('Gallery_CopyUrls') }}</button>
-						<button class="btn btn-outline-secondary btn-sm" type="button" (click)="selectAllUrls()"><span class="me-1" aria-hidden="true">☑️</span>{{ translate('Gallery_SelectAllUrls') }}</button>
-					</div>
-					<textarea class="form-control url-textarea" placeholder="{{ translate('Gallery_UrlListPlaceholder') }}" readonly rows="10" [value]="allUrlsText()" #urlTextarea> </textarea>
-				</div>
-			}
-		</div>
-	}
-
-	<!-- Image Viewer Modal -->
-	@if (showImageViewer()) {
-		<div class="image-viewer-modal" (click)="closeImageViewer()" (keydown.escape)="closeImageViewer()" tabindex="0" role="dialog" aria-modal="true" [attr.aria-label]="'Image viewer for ' + getFilename(currentViewerImage())">
-			<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="handleViewerKeydown($event)" role="document">
-				<div class="viewer-header">
-					<span class="viewer-title">{{ getFilename(currentViewerImage()) }}</span>
-					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ getViewerTotalCount() }}</span>
-					<button class="btn btn-sm btn-outline-secondary close-btn" type="button" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
-						<span aria-hidden="true">✕</span>
-					</button>
-				</div>
-				<div class="viewer-body">
-					<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="!canNavigateViewerBackward()">
-						<span aria-hidden="true">◀</span>
-					</button>
-					@if (currentMediaItem()?.type === 'video') {
-						<video class="viewer-video" [src]="currentViewerImage()" controls preload="metadata" [attr.data-video-type]="currentMediaItem()?.mimeType || 'video/mp4'">
-							{{ translate('Gallery_VideoNotSupported') }}
-						</video>
-					} @else {
-						<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" />
-					}
-					<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="!canNavigateViewerForward()">
-						<span aria-hidden="true">▶</span>
-					</button>
-				</div>
-				<div class="viewer-footer">
-					<button class="btn btn-secondary btn-sm" type="button" (click)="downloadImage(currentViewerImage(), $event)"><span class="me-1" aria-hidden="true">⬇️</span>{{ currentMediaItem()?.type === 'video' ? translate('Gallery_DownloadVideo') : translate('Images_DownloadImage') }}</button>
-					<button class="btn btn-secondary btn-sm" type="button" (click)="copyUrl(currentViewerImage(), $event)"><span class="me-1" aria-hidden="true">📋</span>{{ translate('Gallery_CopyUrl') }}</button>
-					<button class="btn btn-secondary btn-sm" type="button" (click)="openImage(currentViewerImage())"><span class="me-1" aria-hidden="true">↗️</span>{{ translate('Gallery_OpenInTab') }}</button>
-				</div>
-			</div>
-		</div>
-	}
-
-	@if (visibleMediaItems().length === 0 && !loading() && !errorMessage()) {
-		<div class="empty-state">
-			<h2>{{ translate('Gallery_Welcome') }}</h2>
-			<p>{{ translate('Gallery_WelcomeText') }}</p>
-			<div class="examples">
-				<h3>{{ translate('Gallery_ExampleUrls') }}</h3>
-				<code>{{ translate('Gallery_ExampleUrl1') }}</code>
-				<code>{{ translate('Gallery_ExampleUrl2') }}</code>
-			</div>
+	<!-- Toast notification -->
+	@if (toastVisible()) {
+		<div class="fuskr-toast" role="status" aria-live="polite" aria-atomic="true">
+			{{ toastMessage() }}
 		</div>
 	}
 </div>
-
-<!-- Toast notification -->
-@if (toastVisible()) {
-	<div class="fuskr-toast" role="status" aria-live="polite" aria-atomic="true">
-		{{ toastMessage() }}
-	</div>
-}
-
-<!-- Gallery Stats and Controls Template -->
-<ng-template #galleryControls>
-	@if (visibleMediaItems().length > 0) {
-		<div class="gallery-stats">
-			<div class="stats-info">
-				<span class="stat">{{ totalImages() }} {{ translate('Gallery_Stats_Total') }}</span>
-				<span class="stat">{{ loadedImages() }} {{ translate('Gallery_Stats_Loaded') }}</span>
-				@if (brokenImages() > 0) {
-					<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
-				}
-				<span class="stat keyboard-hint"> <span class="me-1" aria-hidden="true">⌨️</span>{{ translate('Gallery_KeyboardNavigation') }} </span>
-			</div>
-			<div class="stats-actions">
-				<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading()">
-					@if (isDownloading()) {
-						<div class="spinner-border spinner-border-sm me-2" role="status">
-							<span class="visually-hidden">{{ translate('Gallery_Loading') }}</span>
-						</div>
-					} @else {
-						<span class="me-1" aria-hidden="true">⬇️</span>
-					}
-					{{ isDownloading() ? downloadStatus() : translate('Gallery_DownloadAll') }}
-				</button>
-				@if (isDownloading() && downloadProgress() > 0) {
-					<div class="progress mt-2" style="height: 4px">
-						<div aria-valuemax="100" aria-valuemin="0" class="progress-bar" role="progressbar" [attr.aria-valuenow]="downloadProgress()" [style.width.%]="downloadProgress()"></div>
-					</div>
-				}
-			</div>
-		</div>
-
-		<!-- Display Mode Controls -->
-		<div class="display-controls">
-			<div class="control-group">
-				<label for="displayModeControls">{{ translate('Gallery_DisplayMode') }}</label>
-				<div id="displayModeControls" class="button-group" role="group" [attr.aria-labelledby]="'displayModeControls'">
-					<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode() === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
-						{{ translate('Gallery_FitPage') }}
-					</button>
-					<button type="button" (click)="setImageDisplayMode('fullWidth')" [class]="imageDisplayMode() === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFullWidth')">
-						{{ translate('Gallery_FullWidth') }}
-					</button>
-					<button type="button" (click)="setImageDisplayMode('fillPage')" [class]="imageDisplayMode() === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFillPage')">
-						{{ translate('Gallery_FillPage') }}
-					</button>
-					<button type="button" (click)="setImageDisplayMode('thumbnails')" [class]="imageDisplayMode() === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToThumbnails')">
-						{{ translate('Gallery_Thumbnails') }}
-					</button>
-				</div>
-			</div>
-			<div class="control-group">
-				<label for="galleryOptionsControls">{{ translate('Gallery_Options') }}</label>
-				<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
-					@if (brokenImages() > 0 || loading()) {
-						<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
-							{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
-						</button>
-					}
-					@if (brokenImages() > 0) {
-						<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
-							{{ translate('Images_RemoveBrokenImages') }}
-						</button>
-					}
-					<button type="button" (click)="toggleInfiniteMode()" [class]="isInfiniteMode() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="isInfiniteMode() ? translate('Gallery_DisableInfiniteMode') : translate('Gallery_EnableInfiniteMode')"><span aria-hidden="true">♾️</span>{{ isInfiniteMode() ? translate('Gallery_InfiniteModeOn') : translate('Gallery_InfiniteModeOff') }}</button>
-				</div>
-			</div>
-		</div>
-	}
-</ng-template>

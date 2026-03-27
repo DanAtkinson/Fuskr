@@ -52,6 +52,8 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	showBrokenImages = signal(false);
 	showImageViewer = signal(false);
 	showUrlList = signal(false);
+	stickyControlsCollapsed = signal(false);
+	stickyControlsEnabled = signal(true);
 	toastMessage = signal('');
 	toastVisible = signal(false);
 	totalImages = signal(0);
@@ -386,6 +388,8 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			this.fullScreenGallery.set(settings.display.fullScreenGallery);
 			this.imageDisplayMode.set(settings.display.imageDisplayMode);
 			this.showBrokenImages.set(settings.display.toggleBrokenImages);
+			this.stickyControlsCollapsed.set(settings.display.stickyControlsCollapsed);
+			this.stickyControlsEnabled.set(settings.display.stickyControlsEnabled);
 			this.enableOverloadProtection.set(settings.safety.enableOverloadProtection);
 			this.overloadProtectionLimit.set(settings.safety.overloadProtectionLimit);
 			this.logger.info('GalleryComponent', 'Overload protection configured', {
@@ -397,6 +401,16 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		} catch (error) {
 			this.logger.error('GalleryComponent', 'Error loading settings', error);
 		}
+	}
+
+	async toggleStickyControlsCollapse() {
+		this.stickyControlsCollapsed.set(!this.stickyControlsCollapsed());
+		await this.chromeService.updateDisplaySettings({
+			stickyControlsCollapsed: this.stickyControlsCollapsed(),
+		});
+		this.logger.debug('GalleryComponent', 'Sticky controls collapse toggled', {
+			collapsed: this.stickyControlsCollapsed(),
+		});
 	}
 
 	@HostListener('window:beforeunload', ['$event'])

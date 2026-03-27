@@ -8,5 +8,7 @@ export interface IDisplaySettings {
 	resizeImagesToFullWidth: boolean;
 	resizeImagesToThumbnails: boolean;
 	showImagesInViewer: boolean;
+	stickyControlsCollapsed: boolean;
+	stickyControlsEnabled: boolean;
 	toggleBrokenImages: boolean;
 }

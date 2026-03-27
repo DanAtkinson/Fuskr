@@ -11,6 +11,8 @@ export class DisplaySettings implements IDisplaySettings {
 	resizeImagesToFullWidth = false;
 	resizeImagesToThumbnails = false;
 	showImagesInViewer = true;
+	stickyControlsCollapsed = false;
+	stickyControlsEnabled = true;
 	toggleBrokenImages = true;
 
 	constructor(data?: Partial<IDisplaySettings>) {

@@ -351,6 +351,14 @@
 		"message": "Close",
 		"description": "Button text to close image viewer"
 	},
+	"Gallery_CollapseControls": {
+		"message": "Collapse controls",
+		"description": "Tooltip for collapse button"
+	},
+	"Gallery_Controls": {
+		"message": "Gallery Controls",
+		"description": "Label for the sticky gallery controls bar"
+	},
 	"Gallery_PreviousImage": {
 		"message": "Previous Image",
 		"description": "Tooltip for previous image button"
@@ -362,6 +370,10 @@
 	"Gallery_DownloadVideo": {
 		"message": "Download Video",
 		"description": "Tooltip for download video button"
+	},
+	"Gallery_ExpandControls": {
+		"message": "Expand controls",
+		"description": "Tooltip for expand button"
 	},
 	"Gallery_ShowVideoInViewer": {
 		"message": "Show Video in Viewer",
@@ -458,6 +470,18 @@
 	"Options_AutoRemoveBrokenImagesDescription": {
 		"message": "Automatically remove broken images from the gallery as they fail to load",
 		"description": "Description for auto-remove broken images setting"
+	},
+	"Options_EnableStickyControls": {
+		"message": "Keep controls sticky when scrolling",
+		"description": "Label for sticky controls toggle"
+	},
+	"Options_EnableStickyControls_Description": {
+		"message": "When enabled, gallery controls remain visible at the top of the page when you scroll. Disable for compact scrolling.",
+		"description": "Description for sticky controls toggle"
+	},
+	"Options_StickyControls": {
+		"message": "Sticky Controls",
+		"description": "Options section title for sticky controls"
 	},
 	"Options_SettingsSaved": {
 		"message": "Settings saved!",
