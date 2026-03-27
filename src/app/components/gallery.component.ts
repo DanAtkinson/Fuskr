@@ -18,9 +18,9 @@ import { saveAs } from 'file-saver';
 	imports: [CommonModule, FormsModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy {
-	private static readonly INFINITE_BATCH_SIZE = 50;
-	private static readonly INFINITE_CONSECUTIVE_BROKEN_THRESHOLD = 10;
-	private static readonly INFINITE_MAX_ITEMS = 2000;
+	private static readonly infiniteBatchSize = 50;
+	private static readonly infiniteConsecutiveBrokenThreshold = 10;
+	private static readonly infiniteMaxItems = 2000;
 
 	// Public signals (alphabetically)
 	autoRemoveBrokenImages = signal(false);
@@ -1327,8 +1327,8 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 				// Add items in small batches, yielding between each so Angular can
 				// render the growing list and the user sees the gallery build up.
-				for (let i = 0; i < result.urls.length; i += GalleryComponent.INFINITE_BATCH_SIZE) {
-					const batch = this.createMediaItemsFromUrls(result.urls.slice(i, i + GalleryComponent.INFINITE_BATCH_SIZE));
+				for (let i = 0; i < result.urls.length; i += GalleryComponent.infiniteBatchSize) {
+					const batch = this.createMediaItemsFromUrls(result.urls.slice(i, i + GalleryComponent.infiniteBatchSize));
 					this.mediaItems.update((items) => [...items, ...batch]);
 					// Yield to event loop after each batch so Angular renders new items
 					await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -1385,7 +1385,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		if (this.infinitePatternBaseUrl === '') {
 			return false;
 		}
-		if (this.mediaItems().length >= GalleryComponent.INFINITE_MAX_ITEMS) {
+		if (this.mediaItems().length >= GalleryComponent.infiniteMaxItems) {
 			return false;
 		}
 		const minLoaded = this.getLoadedBoundary('min');
@@ -1399,7 +1399,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		if (this.infinitePatternBaseUrl === '') {
 			return false;
 		}
-		if (this.mediaItems().length >= GalleryComponent.INFINITE_MAX_ITEMS) {
+		if (this.mediaItems().length >= GalleryComponent.infiniteMaxItems) {
 			return false;
 		}
 		const maxLoaded = this.getLoadedBoundary('max');
@@ -1415,7 +1415,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return [];
 		}
 
-		const from = Math.max(0, minLoaded - GalleryComponent.INFINITE_BATCH_SIZE);
+		const from = Math.max(0, minLoaded - GalleryComponent.infiniteBatchSize);
 		const urls: string[] = [];
 		for (let n = from; n < minLoaded; n += this.infinitePatternStep) {
 			const url = this.buildInfiniteUrl(n);
@@ -1432,7 +1432,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return [];
 		}
 
-		const to = maxLoaded + GalleryComponent.INFINITE_BATCH_SIZE + this.infinitePatternStep;
+		const to = maxLoaded + GalleryComponent.infiniteBatchSize + this.infinitePatternStep;
 		const urls: string[] = [];
 		for (let n = maxLoaded + this.infinitePatternStep; n < to; n += this.infinitePatternStep) {
 			const url = this.buildInfiniteUrl(n);
@@ -1522,7 +1522,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return;
 		}
 
-		const threshold = GalleryComponent.INFINITE_CONSECUTIVE_BROKEN_THRESHOLD;
+		const threshold = GalleryComponent.infiniteConsecutiveBrokenThreshold;
 		// Prompt once per threshold step (10, 20, ...) to avoid spamming on every failed item.
 		const forwardBroken = this.getConsecutiveBrokenAtLoadedEdge('forward');
 		const forwardPromptLevel = Math.floor(forwardBroken / threshold);
@@ -1558,7 +1558,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return 0;
 		}
 
-		const threshold = GalleryComponent.INFINITE_CONSECUTIVE_BROKEN_THRESHOLD;
+		const threshold = GalleryComponent.infiniteConsecutiveBrokenThreshold;
 		let consecutiveBroken = 0;
 
 		for (let offset = 0; offset < threshold; offset++) {
