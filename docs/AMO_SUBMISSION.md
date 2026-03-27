@@ -12,7 +12,7 @@ This document tracks the steps required to publish Fuskr to the Firefox Add-ons 
 
 ### Build
 
-- [ ] Run `npm run build:extensions` to produce a clean build
+- [ ] Run `npm run build:extensions:prod` to produce a clean build
 - [ ] Verify `dist/firefox/` contains a valid extension structure
 - [ ] Confirm `dist/fuskr-firefox.zip` was generated
 - [ ] Run `npm run build:firefox:validate` — all lint checks pass with no errors
@@ -77,7 +77,7 @@ Include the following notes during submission:
 > Fuskr is an image gallery generator that creates sequential galleries from a single URL.
 > It uses Manifest V3 with a service-worker-style background script compiled via webpack.
 > Source code is available at https://github.com/DanAtkinson/Fuskr.
-> Build instructions: run `npm ci && npm run build:extensions` to reproduce the Firefox ZIP.
+> Build instructions: run `npm ci && npm run build:extensions:prod` to reproduce the Firefox ZIP.
 > The extension requires broad host permissions (`http://*/*`, `https://*/*`) because it must
 > download images from user-specified URLs on arbitrary domains.
 

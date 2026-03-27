@@ -29,7 +29,7 @@ npm run watch      # Watch mode — rebuilds on file changes
 
 To load the extension unpacked in Chrome:
 
-1. Run `npm run build:extensions` to produce `dist/chromium/`
+1. Run `npm run build:extensions:prod` to produce `dist/chromium/`
 2. Go to `chrome://extensions/` and enable **Developer mode**
 3. Click **Load unpacked** and select the `dist/chromium` folder
 4. Reload the extension after manifest changes
@@ -44,7 +44,7 @@ To load the extension unpacked in Chrome:
 | `npm run test:ci` | Run all unit tests (single run, headless) |
 | `npm run test:coverage` | Run unit tests with coverage report |
 | `npm run test:e2e` | Run Playwright end-to-end tests (Chrome) |
-| `npm run build:extensions` | Build Chrome + Firefox extensions (no tests) |
+| `npm run build:extensions:prod` | Build Chrome + Firefox extensions (no tests) |
 | `npm run build` | Full release build — lint, test, then package |
 
 ## Linting
@@ -69,8 +69,8 @@ npm run test:coverage  # With coverage report in coverage/fuskr/
 End-to-end tests use **Playwright** and load the unpacked Chromium extension from `dist/chromium`:
 
 ```bash
-npm run build:extensions   # Build first
-npm run test:e2e           # Then run e2e tests
+npm run build:extensions:prod   # Build first
+npm run test:e2e                # Then run e2e tests
 ```
 
 ### Writing tests

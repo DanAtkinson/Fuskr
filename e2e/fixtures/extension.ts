@@ -23,7 +23,7 @@ export async function launchExtensionContext(): Promise<{
 	if (!fs.existsSync(EXTENSION_PATH)) {
 		throw new Error(
 			`Extension not built. Expected dist at: ${EXTENSION_PATH}. ` +
-				`Run 'npm run build:extensions' first, or let globalSetup handle it.`,
+				`Run 'npm run build:extensions:prod' first, or let globalSetup handle it.`,
 		);
 	}
 

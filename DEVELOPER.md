@@ -21,8 +21,8 @@ This document contains technical information for developers who want to build, m
 
 - `npm start` - Start development server with hot reload
 - `npm run build` - Full production build with tests and packaging
-- `npm run build:extensions` - Build extensions without running tests
-- `npm run build:angular` - Build Angular application only
+- `npm run build:extensions:prod` - Build extensions without running tests
+- `npm run build:angular:prod` - Build Angular application only
 - `npm run build:background` - Build service worker only
 - `npm test` - Run unit tests
 - `npm run test:ci` - Run tests in CI mode (single run, no watch)

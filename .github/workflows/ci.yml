@@ -144,7 +144,7 @@ jobs:
      run: npx playwright install chromium --with-deps
 
    - name: 🏗️ Build Chromium extension
-     run: npm run build:extensions
+     run: npm run build:extensions:prod
 
    - name: 🧪 Run Playwright e2e tests
      run: SKIP_BUILD=1 npm run test:e2e

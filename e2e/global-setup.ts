@@ -18,7 +18,7 @@ export default async function globalSetup() {
 	}
 
 	console.log('[e2e] Building Chromium extension...');
-	execSync('npm run build:extensions', {
+	execSync('npm run build:extensions:prod', {
 		cwd: path.resolve(__dirname, '..'),
 		stdio: 'inherit',
 	});
