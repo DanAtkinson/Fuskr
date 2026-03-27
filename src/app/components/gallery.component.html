@@ -58,6 +58,9 @@
 
 	@if (visibleMediaItems().length > 0) {
 		<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode() === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode() === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode() === 'thumbnails'">
+			@if (isInfiniteMode()) {
+				<div id="infinite-top-sentinel" class="infinite-sentinel infinite-sentinel-top" aria-hidden="true"></div>
+			}
 			@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
 				<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
 					@if (mediaItem.type === 'video') {
@@ -97,6 +100,9 @@
 						</div>
 					</div>
 				</div>
+			}
+			@if (isInfiniteMode()) {
+				<div id="infinite-bottom-sentinel" class="infinite-sentinel infinite-sentinel-bottom" aria-hidden="true"></div>
 			}
 		</div>
 	}

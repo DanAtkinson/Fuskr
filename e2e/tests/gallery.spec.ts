@@ -129,6 +129,32 @@ testWithExtension.describe('Gallery', () => {
 		}
 	);
 
+	testWithExtension('should load more items when infinite mode is enabled and user scrolls', async ({ extensionContext: { context, extensionId } }) => {
+		const fuskrPattern = 'https://example.com/image[000-011].jpg';
+		const page = await context.newPage();
+
+		await loadGalleryWithItems(page, extensionId, fuskrPattern, 12);
+
+		const infiniteToggle = page
+			.locator('button')
+			.filter({ hasText: /infinite\s+(on|off)/i })
+			.first();
+		await expect(infiniteToggle).toBeVisible({ timeout: 5000 });
+		await infiniteToggle.click();
+
+		await page.evaluate(() => {
+			window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+		});
+
+		await expect
+			.poll(async () => page.locator('.image-item').count(), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(12);
+
+		await page.close();
+	});
+
 	testWithExtension(
 		'should support keyboard navigation with arrow keys in gallery',
 		async ({ extensionContext: { context, extensionId } }) => {

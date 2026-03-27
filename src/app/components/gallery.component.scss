@@ -488,6 +488,13 @@
 	gap: clamp(15px, 2vw, 20px); // Responsive gap
 	margin-top: 30px;
 
+	.infinite-sentinel {
+		grid-column: 1 / -1;
+		height: 1px;
+		pointer-events: none;
+		width: 100%;
+	}
+
 	// Adjust for high DPI displays
 	@media (min-resolution: 1.5dppx) {
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

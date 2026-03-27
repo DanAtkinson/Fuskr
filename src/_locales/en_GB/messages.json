@@ -283,6 +283,28 @@
 		"message": "Infinite Off",
 		"description": "Button text when infinite mode is inactive"
 	},
+	"Gallery_InfiniteContinuationStart": {
+		"message": "start",
+		"description": "Label for the start edge of the loaded infinite gallery range"
+	},
+	"Gallery_InfiniteContinuationEnd": {
+		"message": "end",
+		"description": "Label for the end edge of the loaded infinite gallery range"
+	},
+	"Gallery_InfiniteContinuationPrompt": {
+		"message": "Fuskr found $COUNT$ consecutive broken items at the $EDGE$ of the gallery. Continue loading?",
+		"description": "Prompt shown when infinite mode reaches multiple consecutive broken items at one edge",
+		"placeholders": {
+			"count": {
+				"content": "$1",
+				"example": "10"
+			},
+			"edge": {
+				"content": "$2",
+				"example": "end"
+			}
+		}
+	},
 	"Gallery_GeneratingGallery": {
 		"message": "Generating gallery...",
 		"description": "Loading text while generating gallery"

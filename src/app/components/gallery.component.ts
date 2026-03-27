@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, inject, signal, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -17,8 +17,10 @@ import { saveAs } from 'file-saver';
 	templateUrl: './gallery.component.html',
 	imports: [CommonModule, FormsModule],
 })
-export class GalleryComponent extends BaseComponent implements OnInit {
+export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy {
 	private static readonly INFINITE_BATCH_SIZE = 50;
+	private static readonly INFINITE_CONSECUTIVE_BROKEN_THRESHOLD = 10;
+	private static readonly INFINITE_MAX_ITEMS = 2000;
 
 	// Public signals (alphabetically)
 	autoRemoveBrokenImages = signal(false);
@@ -71,7 +73,14 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 	private infinitePatternStep = 1;
 	private isLoadingBackward = false;
 	private isLoadingForward = false;
+	private backwardSentinelObserver: IntersectionObserver | null = null;
+	private forwardSentinelObserver: IntersectionObserver | null = null;
 	private knownMediaUrls = new Set<string>();
+	private observerSetupTimeout: ReturnType<typeof setTimeout> | null = null;
+	private scrollLoadCheckTimeout: ReturnType<typeof setTimeout> | null = null;
+	private isInfiniteContinuationPromptOpen = false;
+	private lastPromptedBrokenLevelBackward = 0;
+	private lastPromptedBrokenLevelForward = 0;
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
@@ -448,6 +457,34 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.initialiseFromRouteParams(currentParams, 'snapshot');
 	}
 
+	ngOnDestroy(): void {
+		if (this.observerSetupTimeout) {
+			clearTimeout(this.observerSetupTimeout);
+			this.observerSetupTimeout = null;
+		}
+		if (this.scrollLoadCheckTimeout) {
+			clearTimeout(this.scrollLoadCheckTimeout);
+			this.scrollLoadCheckTimeout = null;
+		}
+		this.teardownInfiniteSentinelObservers();
+	}
+
+	@HostListener('window:scroll')
+	handleWindowScroll() {
+		if (!this.isInfiniteMode()) {
+			return;
+		}
+
+		if (this.scrollLoadCheckTimeout) {
+			clearTimeout(this.scrollLoadCheckTimeout);
+		}
+
+		this.scrollLoadCheckTimeout = setTimeout(() => {
+			this.scrollLoadCheckTimeout = null;
+			void this.maybeLoadMoreFromViewportEdges();
+		}, 50);
+	}
+
 	async maybeLoadMoreBackward() {
 		if (!this.isInfiniteMode() || this.isLoadingBackward || this.loading() || this.isGenerating()) {
 			return;
@@ -458,8 +495,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		}
 
 		this.isLoadingBackward = true;
-		const firstBefore = this.visibleMediaItems()[0]?.url || '';
 		const previousYOffset = window.scrollY;
+		const galleryBefore = document.getElementById('image-gallery');
+		const previousScrollHeight = galleryBefore?.scrollHeight ?? 0;
 
 		try {
 			const urls = this.collectNextBackwardUrls();
@@ -474,10 +512,13 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.startProgressiveTypeDetectionForUrls(urls);
 
 			setTimeout(() => {
-				const firstAfter = this.visibleMediaItems()[0]?.url || '';
-				if (firstBefore && firstAfter !== firstBefore) {
-					window.scrollTo({ top: previousYOffset + 900, behavior: 'auto' });
+				const galleryAfter = document.getElementById('image-gallery');
+				const newScrollHeight = galleryAfter?.scrollHeight ?? previousScrollHeight;
+				const prependHeightDelta = Math.max(0, newScrollHeight - previousScrollHeight);
+				if (prependHeightDelta > 0) {
+					window.scrollTo({ top: previousYOffset + prependHeightDelta, behavior: 'auto' });
 				}
+				this.scheduleInfiniteSentinelObserverSetup();
 			}, 0);
 		} finally {
 			this.isLoadingBackward = false;
@@ -504,6 +545,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			this.mediaItems.update((current) => [...current, ...items]);
 			this.totalImages.set(this.mediaItems().length);
 			this.startProgressiveTypeDetectionForUrls(urls);
+			this.scheduleInfiniteSentinelObserverSetup();
 		} finally {
 			this.isLoadingForward = false;
 		}
@@ -543,6 +585,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 
 					// Update counts after removal
 					this.updateImageCounts();
+					void this.evaluateInfiniteContinuationGuard();
 					return; // Skip the placeholder creation
 				}
 			}
@@ -580,6 +623,8 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 					element.style.filter = 'grayscale(100%)';
 				}
 			}
+
+			void this.evaluateInfiniteContinuationGuard();
 		}
 	}
 
@@ -754,6 +799,9 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.isInfiniteMode.update((enabled) => !enabled);
 		if (this.isInfiniteMode()) {
 			this.tryInitialiseInfinitePattern();
+			this.scheduleInfiniteSentinelObserverSetup();
+		} else {
+			this.teardownInfiniteSentinelObservers();
 		}
 	}
 
@@ -1337,22 +1385,28 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		if (this.infinitePatternBaseUrl === '') {
 			return false;
 		}
+		if (this.mediaItems().length >= GalleryComponent.INFINITE_MAX_ITEMS) {
+			return false;
+		}
 		const minLoaded = this.getLoadedBoundary('min');
 		if (minLoaded === null) {
 			return false;
 		}
-		return minLoaded > this.infinitePatternStart;
+		return minLoaded > 0;
 	}
 
 	private canLoadMoreForward(): boolean {
 		if (this.infinitePatternBaseUrl === '') {
 			return false;
 		}
+		if (this.mediaItems().length >= GalleryComponent.INFINITE_MAX_ITEMS) {
+			return false;
+		}
 		const maxLoaded = this.getLoadedBoundary('max');
 		if (maxLoaded === null) {
 			return false;
 		}
-		return maxLoaded < this.infinitePatternEnd;
+		return maxLoaded >= 0;
 	}
 
 	private collectNextBackwardUrls(): string[] {
@@ -1361,7 +1415,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			return [];
 		}
 
-		const from = Math.max(this.infinitePatternStart, minLoaded - GalleryComponent.INFINITE_BATCH_SIZE);
+		const from = Math.max(0, minLoaded - GalleryComponent.INFINITE_BATCH_SIZE);
 		const urls: string[] = [];
 		for (let n = from; n < minLoaded; n += this.infinitePatternStep) {
 			const url = this.buildInfiniteUrl(n);
@@ -1378,7 +1432,7 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 			return [];
 		}
 
-		const to = Math.min(this.infinitePatternEnd + this.infinitePatternStep, maxLoaded + GalleryComponent.INFINITE_BATCH_SIZE + this.infinitePatternStep);
+		const to = maxLoaded + GalleryComponent.INFINITE_BATCH_SIZE + this.infinitePatternStep;
 		const urls: string[] = [];
 		for (let n = maxLoaded + this.infinitePatternStep; n < to; n += this.infinitePatternStep) {
 			const url = this.buildInfiniteUrl(n);
@@ -1448,7 +1502,183 @@ export class GalleryComponent extends BaseComponent implements OnInit {
 		this.infinitePatternStep = 1;
 		this.isLoadingBackward = false;
 		this.isLoadingForward = false;
+		this.isInfiniteContinuationPromptOpen = false;
+		this.lastPromptedBrokenLevelBackward = 0;
+		this.lastPromptedBrokenLevelForward = 0;
 		this.knownMediaUrls = new Set();
+		if (this.observerSetupTimeout) {
+			clearTimeout(this.observerSetupTimeout);
+			this.observerSetupTimeout = null;
+		}
+		if (this.scrollLoadCheckTimeout) {
+			clearTimeout(this.scrollLoadCheckTimeout);
+			this.scrollLoadCheckTimeout = null;
+		}
+		this.teardownInfiniteSentinelObservers();
+	}
+
+	private async evaluateInfiniteContinuationGuard() {
+		if (!this.isInfiniteMode() || this.isInfiniteContinuationPromptOpen) {
+			return;
+		}
+
+		const threshold = GalleryComponent.INFINITE_CONSECUTIVE_BROKEN_THRESHOLD;
+		// Prompt once per threshold step (10, 20, ...) to avoid spamming on every failed item.
+		const forwardBroken = this.getConsecutiveBrokenAtLoadedEdge('forward');
+		const forwardPromptLevel = Math.floor(forwardBroken / threshold);
+
+		if (forwardPromptLevel > this.lastPromptedBrokenLevelForward) {
+			this.lastPromptedBrokenLevelForward = forwardPromptLevel;
+			const continueForward = await this.promptInfiniteContinuation('forward', forwardBroken);
+			if (continueForward) {
+				await this.maybeLoadMoreForward();
+			}
+			return;
+		}
+
+		const backwardBroken = this.getConsecutiveBrokenAtLoadedEdge('backward');
+		const backwardPromptLevel = Math.floor(backwardBroken / threshold);
+
+		if (backwardPromptLevel > this.lastPromptedBrokenLevelBackward) {
+			this.lastPromptedBrokenLevelBackward = backwardPromptLevel;
+			const continueBackward = await this.promptInfiniteContinuation('backward', backwardBroken);
+			if (continueBackward) {
+				await this.maybeLoadMoreBackward();
+			}
+		}
+	}
+
+	private getConsecutiveBrokenAtLoadedEdge(direction: 'forward' | 'backward'): number {
+		if (this.infinitePatternBaseUrl === '') {
+			return 0;
+		}
+
+		const boundary = this.getLoadedBoundary(direction === 'forward' ? 'max' : 'min');
+		if (boundary === null) {
+			return 0;
+		}
+
+		const threshold = GalleryComponent.INFINITE_CONSECUTIVE_BROKEN_THRESHOLD;
+		let consecutiveBroken = 0;
+
+		for (let offset = 0; offset < threshold; offset++) {
+			const value = direction === 'forward' ? boundary - offset : boundary + offset;
+			if (value < 0) {
+				break;
+			}
+
+			const url = this.buildInfiniteUrl(value);
+			if (!url || !this.knownMediaUrls.has(url) || !this.brokenUrls().has(url)) {
+				break;
+			}
+
+			consecutiveBroken++;
+		}
+
+		return consecutiveBroken;
+	}
+
+	private async promptInfiniteContinuation(direction: 'forward' | 'backward', brokenCount: number): Promise<boolean> {
+		this.isInfiniteContinuationPromptOpen = true;
+		try {
+			const edgeLabelKey = direction === 'forward' ? 'Gallery_InfiniteContinuationEnd' : 'Gallery_InfiniteContinuationStart';
+			const message = this.translate('Gallery_InfiniteContinuationPrompt', [brokenCount.toString(), this.translate(edgeLabelKey)]);
+			const shouldContinue = confirm(message);
+
+			if (!shouldContinue) {
+				this.isInfiniteMode.set(false);
+				this.teardownInfiniteSentinelObservers();
+			}
+
+			return shouldContinue;
+		} finally {
+			this.isInfiniteContinuationPromptOpen = false;
+		}
+	}
+
+	private async maybeLoadMoreFromViewportEdges() {
+		if (!this.isInfiniteMode() || this.loading() || this.isGenerating()) {
+			return;
+		}
+
+		const viewportHeight = window.innerHeight;
+		const scrollTop = window.scrollY;
+		const documentHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+		const edgeThreshold = 300;
+
+		if (scrollTop + viewportHeight >= documentHeight - edgeThreshold) {
+			await this.maybeLoadMoreForward();
+		}
+
+		if (scrollTop <= edgeThreshold) {
+			await this.maybeLoadMoreBackward();
+		}
+	}
+
+	private scheduleInfiniteSentinelObserverSetup() {
+		if (!this.isInfiniteMode()) {
+			return;
+		}
+
+		if (this.observerSetupTimeout) {
+			clearTimeout(this.observerSetupTimeout);
+		}
+
+		this.observerSetupTimeout = setTimeout(() => {
+			this.observerSetupTimeout = null;
+			this.setupInfiniteSentinelObservers();
+		}, 0);
+	}
+
+	private setupInfiniteSentinelObservers() {
+		this.teardownInfiniteSentinelObservers();
+
+		if (!this.isInfiniteMode() || this.visibleMediaItems().length === 0 || typeof IntersectionObserver === 'undefined') {
+			return;
+		}
+
+		const topSentinel = document.getElementById('infinite-top-sentinel');
+		const bottomSentinel = document.getElementById('infinite-bottom-sentinel');
+
+		if (topSentinel) {
+			this.backwardSentinelObserver = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) {
+							void this.maybeLoadMoreBackward();
+						}
+					}
+				},
+				{ root: null, rootMargin: '300px 0px 0px 0px', threshold: 0 }
+			);
+			this.backwardSentinelObserver.observe(topSentinel);
+		}
+
+		if (bottomSentinel) {
+			this.forwardSentinelObserver = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) {
+							void this.maybeLoadMoreForward();
+						}
+					}
+				},
+				{ root: null, rootMargin: '0px 0px 300px 0px', threshold: 0 }
+			);
+			this.forwardSentinelObserver.observe(bottomSentinel);
+		}
+	}
+
+	private teardownInfiniteSentinelObservers() {
+		if (this.backwardSentinelObserver) {
+			this.backwardSentinelObserver.disconnect();
+			this.backwardSentinelObserver = null;
+		}
+
+		if (this.forwardSentinelObserver) {
+			this.forwardSentinelObserver.disconnect();
+			this.forwardSentinelObserver = null;
+		}
 	}
 
 	private startProgressiveTypeDetectionForUrls(urls: string[]) {

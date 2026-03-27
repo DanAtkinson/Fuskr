@@ -1591,5 +1591,136 @@ describe('GalleryComponent', () => {
 
 			expect(canLoadMoreBackward()).toBe(true); // Min loaded is 10, pattern start is 1
 		});
+
+		it('should allow forward loading beyond the initial bracket end (e.g. [000-011])', () => {
+			component.originalUrl.set('https://example.com/image[000-011].jpg');
+			component.mediaItems.set([
+				{
+					url: 'https://example.com/image000.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/image011.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+			]);
+
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			const canLoadMoreForward = (
+				component as unknown as {
+					canLoadMoreForward: () => boolean;
+				}
+			).canLoadMoreForward.bind(component);
+
+			const nextForwardUrls = (
+				component as unknown as {
+					collectNextForwardUrls: () => string[];
+				}
+			).collectNextForwardUrls.bind(component);
+
+			expect(canLoadMoreForward()).toBe(true);
+			expect(nextForwardUrls()[0]).toBe('https://example.com/image012.jpg');
+		});
+
+		it('should pause infinite mode when 10 consecutive forward-edge items are broken and user cancels', async () => {
+			component.originalUrl.set('https://example.com/image[000-011].jpg');
+			component.isInfiniteMode.set(true);
+
+			const items = Array.from({ length: 21 }, (_, i) => ({
+				url: `https://example.com/image${String(i).padStart(3, '0')}.jpg`,
+				type: 'image' as const,
+				mimeType: 'image/jpeg',
+				loadingState: 'loaded' as const,
+			}));
+			component.mediaItems.set(items);
+
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+					knownMediaUrls: Set<string>;
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).tryInitialiseInfinitePattern();
+
+			(
+				component as unknown as {
+					knownMediaUrls: Set<string>;
+				}
+			).knownMediaUrls = new Set(items.map((item) => item.url));
+
+			const brokenEdgeUrls = Array.from({ length: 10 }, (_, i) => `https://example.com/image${String(20 - i).padStart(3, '0')}.jpg`);
+			(
+				component as unknown as {
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).brokenUrls.set(new Set(brokenEdgeUrls));
+
+			vi.spyOn(window, 'confirm').mockReturnValue(false);
+
+			await (
+				component as unknown as {
+					evaluateInfiniteContinuationGuard: () => Promise<void>;
+				}
+			).evaluateInfiniteContinuationGuard();
+
+			expect(window.confirm).toHaveBeenCalled();
+			expect(component.isInfiniteMode()).toBe(false);
+		});
+
+		it('should continue loading when 10 consecutive forward-edge items are broken and user confirms', async () => {
+			component.originalUrl.set('https://example.com/image[000-011].jpg');
+			component.isInfiniteMode.set(true);
+
+			const items = Array.from({ length: 21 }, (_, i) => ({
+				url: `https://example.com/image${String(i).padStart(3, '0')}.jpg`,
+				type: 'image' as const,
+				mimeType: 'image/jpeg',
+				loadingState: 'loaded' as const,
+			}));
+			component.mediaItems.set(items);
+
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+					knownMediaUrls: Set<string>;
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).tryInitialiseInfinitePattern();
+
+			(
+				component as unknown as {
+					knownMediaUrls: Set<string>;
+				}
+			).knownMediaUrls = new Set(items.map((item) => item.url));
+
+			const brokenEdgeUrls = Array.from({ length: 10 }, (_, i) => `https://example.com/image${String(20 - i).padStart(3, '0')}.jpg`);
+			(
+				component as unknown as {
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).brokenUrls.set(new Set(brokenEdgeUrls));
+
+			vi.spyOn(window, 'confirm').mockReturnValue(true);
+			const forwardSpy = vi.spyOn(component, 'maybeLoadMoreForward').mockResolvedValue();
+
+			await (
+				component as unknown as {
+					evaluateInfiniteContinuationGuard: () => Promise<void>;
+				}
+			).evaluateInfiniteContinuationGuard();
+
+			expect(window.confirm).toHaveBeenCalled();
+			expect(component.isInfiniteMode()).toBe(true);
+			expect(forwardSpy).toHaveBeenCalled();
+		});
 	});
 });
