@@ -141,13 +141,13 @@
 			<div class="viewer-content" (click)="$event.stopPropagation()" (keydown)="handleViewerKeydown($event)" role="document">
 				<div class="viewer-header">
 					<span class="viewer-title">{{ getFilename(currentViewerImage()) }}</span>
-					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ totalImages() }}</span>
+					<span class="viewer-counter" aria-live="polite" aria-atomic="true">{{ currentViewerIndex() + 1 }} / {{ getViewerTotalCount() }}</span>
 					<button class="btn btn-sm btn-outline-secondary close-btn" type="button" (click)="closeImageViewer()" [title]="translate('Gallery_Close')">
 						<span aria-hidden="true">✕</span>
 					</button>
 				</div>
 				<div class="viewer-body">
-					<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="currentViewerIndex() === 0">
+					<button class="btn btn-lg btn-outline-secondary nav-btn prev-btn" type="button" [title]="translate('Gallery_PreviousImage')" (click)="previousImage()" [disabled]="!canNavigateViewerBackward()">
 						<span aria-hidden="true">◀</span>
 					</button>
 					@if (currentMediaItem()?.type === 'video') {
@@ -157,7 +157,7 @@
 					} @else {
 						<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" />
 					}
-					<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="currentViewerIndex() === visibleMediaItems().length - 1">
+					<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="!canNavigateViewerForward()">
 						<span aria-hidden="true">▶</span>
 					</button>
 				</div>

@@ -366,6 +366,52 @@ describe('GalleryComponent', () => {
 			expect(component.currentViewerImage()).toBe('url1.jpg');
 		});
 
+		it('should trigger forward infinite loading when viewer nears the end', () => {
+			component.isInfiniteMode.set(true);
+			component.currentViewerIndex.set(1);
+			component.currentViewerImage.set('url2.jpg');
+			vi.spyOn(component, 'maybeLoadMoreForward').mockResolvedValue();
+
+			component.nextImage();
+
+			expect(component.maybeLoadMoreForward).toHaveBeenCalled();
+			expect(component.currentViewerIndex()).toBe(2);
+		});
+
+		it('should trigger backward infinite loading when viewer nears the start', () => {
+			component.isInfiniteMode.set(true);
+			component.currentViewerIndex.set(1);
+			component.currentViewerImage.set('url2.jpg');
+			vi.spyOn(component, 'maybeLoadMoreBackward').mockResolvedValue();
+
+			component.previousImage();
+
+			expect(component.maybeLoadMoreBackward).toHaveBeenCalled();
+			expect(component.currentViewerIndex()).toBe(0);
+		});
+
+		it('should report visible-item viewer count when broken images are hidden', () => {
+			component.showBrokenImages.set(false);
+			(
+				component as unknown as {
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).brokenUrls.set(new Set(['url2.jpg']));
+
+			expect(component.getViewerTotalCount()).toBe(2);
+		});
+
+		it('should report total-item viewer count when broken images are shown', () => {
+			component.showBrokenImages.set(true);
+			(
+				component as unknown as {
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).brokenUrls.set(new Set(['url2.jpg']));
+
+			expect(component.getViewerTotalCount()).toBe(3);
+		});
+
 		it('Home key navigates to first image in viewer', () => {
 			component.showImageViewer.set(true);
 			component.currentViewerIndex.set(2);
@@ -1398,14 +1444,10 @@ describe('GalleryComponent', () => {
 			).tryInitialiseInfinitePattern();
 
 			const pattern = component as unknown as {
-				infinitePatternStart: number;
-				infinitePatternEnd: number;
 				infinitePatternPadLength: number;
 				infinitePatternBaseUrl: string;
 			};
 
-			expect(pattern.infinitePatternStart).toBe(5);
-			expect(pattern.infinitePatternEnd).toBe(15);
 			expect(pattern.infinitePatternPadLength).toBe(2); // '05' has length 2
 			expect(pattern.infinitePatternBaseUrl).toBe('https://example.com/image__FUSKR_INFINITY__.jpg');
 		});
@@ -1419,13 +1461,9 @@ describe('GalleryComponent', () => {
 			).tryInitialiseInfinitePattern();
 
 			const pattern = component as unknown as {
-				infinitePatternStart: number;
-				infinitePatternEnd: number;
 				infinitePatternPadLength: number;
 			};
 
-			expect(pattern.infinitePatternStart).toBe(1);
-			expect(pattern.infinitePatternEnd).toBe(10);
 			expect(pattern.infinitePatternPadLength).toBe(3); // '001' has length 3
 		});
 
@@ -1721,6 +1759,19 @@ describe('GalleryComponent', () => {
 			expect(window.confirm).toHaveBeenCalled();
 			expect(component.isInfiniteMode()).toBe(true);
 			expect(forwardSpy).toHaveBeenCalled();
+		});
+
+		it('should increase continuation prompt thresholds from 10 to 50 to 100, then stop prompting', async () => {
+			const nextThreshold = (
+				component as unknown as {
+					getNextInfiniteContinuationThreshold: (lastPromptedThreshold: number) => number | null;
+				}
+			).getNextInfiniteContinuationThreshold.bind(component);
+
+			expect(nextThreshold(0)).toBe(10);
+			expect(nextThreshold(10)).toBe(50);
+			expect(nextThreshold(50)).toBe(100);
+			expect(nextThreshold(100)).toBeNull();
 		});
 	});
 });

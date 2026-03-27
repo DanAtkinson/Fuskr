@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { IChromeStorageData } from '@interfaces/chrome-storage';
 import { ChromeService } from '@services/chrome.service';
-import type { Mocked } from 'vitest';
+import { vi, type Mocked } from 'vitest';
 
 /**
  * Base test setup for components that extend BaseComponent
@@ -96,7 +97,7 @@ export class BaseComponentTestHelper {
 		});
 
 		// Setup other method defaults
-		chromeServiceSpy.getStorageData.mockResolvedValue({});
+		chromeServiceSpy.getStorageData.mockResolvedValue({} as IChromeStorageData);
 		chromeServiceSpy.setStorageData.mockResolvedValue();
 		chromeServiceSpy.isExtensionContext.mockReturnValue(false);
 

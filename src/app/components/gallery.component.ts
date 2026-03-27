@@ -19,8 +19,9 @@ import { saveAs } from 'file-saver';
 })
 export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy {
 	private static readonly infiniteBatchSize = 50;
-	private static readonly infiniteConsecutiveBrokenThreshold = 10;
+	private static readonly infiniteContinuationPromptThresholds = [10, 50, 100] as const;
 	private static readonly infiniteMaxItems = 2000;
+	private static readonly viewerInfinitePreloadDistance = 2;
 
 	// Public signals (alphabetically)
 	autoRemoveBrokenImages = signal(false);
@@ -64,23 +65,21 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	// Private signals
 	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
+	private backwardSentinelObserver: IntersectionObserver | null = null;
 	private brokenUrls = signal(new Set<string>());
+	private forwardSentinelObserver: IntersectionObserver | null = null;
 	private hasInitialized = false;
 	private infinitePatternBaseUrl = '';
-	private infinitePatternEnd = 0;
 	private infinitePatternPadLength = 0;
-	private infinitePatternStart = 0;
 	private infinitePatternStep = 1;
+	private isInfiniteContinuationPromptOpen = false;
 	private isLoadingBackward = false;
 	private isLoadingForward = false;
-	private backwardSentinelObserver: IntersectionObserver | null = null;
-	private forwardSentinelObserver: IntersectionObserver | null = null;
 	private knownMediaUrls = new Set<string>();
+	private lastPromptedBrokenThresholdBackward = 0;
+	private lastPromptedBrokenThresholdForward = 0;
 	private observerSetupTimeout: ReturnType<typeof setTimeout> | null = null;
 	private scrollLoadCheckTimeout: ReturnType<typeof setTimeout> | null = null;
-	private isInfiniteContinuationPromptOpen = false;
-	private lastPromptedBrokenLevelBackward = 0;
-	private lastPromptedBrokenLevelForward = 0;
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
@@ -421,12 +420,26 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	nextImage() {
 		const visibleItems = this.visibleMediaItems();
+		if (visibleItems.length === 0) {
+			return;
+		}
+
 		const idx = this.currentViewerIndex();
+		if (this.isInfiniteMode() && idx >= visibleItems.length - 1 - GalleryComponent.viewerInfinitePreloadDistance) {
+			void this.maybeLoadMoreForward();
+		}
+
 		if (idx < visibleItems.length - 1) {
 			const newIdx = idx + 1;
 			this.currentViewerIndex.set(newIdx);
 			this.currentViewerImage.set(visibleItems[newIdx].url);
 			this.currentMediaItem.set(visibleItems[newIdx]);
+			return;
+		}
+
+		if (this.isInfiniteMode() && this.canLoadMoreForward()) {
+			const currentUrl = this.currentViewerImage();
+			void this.advanceViewerAfterInfiniteLoad('forward', currentUrl);
 		}
 	}
 
@@ -673,13 +686,27 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	}
 
 	previousImage() {
+		const visibleItems = this.visibleMediaItems();
+		if (visibleItems.length === 0) {
+			return;
+		}
+
 		const idx = this.currentViewerIndex();
+		if (this.isInfiniteMode() && idx <= GalleryComponent.viewerInfinitePreloadDistance) {
+			void this.maybeLoadMoreBackward();
+		}
+
 		if (idx > 0) {
 			const newIdx = idx - 1;
-			const visibleItems = this.visibleMediaItems();
 			this.currentViewerIndex.set(newIdx);
 			this.currentViewerImage.set(visibleItems[newIdx].url);
 			this.currentMediaItem.set(visibleItems[newIdx]);
+			return;
+		}
+
+		if (this.isInfiniteMode() && this.canLoadMoreBackward()) {
+			const currentUrl = this.currentViewerImage();
+			void this.advanceViewerAfterInfiniteLoad('backward', currentUrl);
 		}
 	}
 
@@ -803,6 +830,18 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		} else {
 			this.teardownInfiniteSentinelObservers();
 		}
+	}
+
+	getViewerTotalCount(): number {
+		return this.showBrokenImages() ? this.mediaItems().length : this.visibleMediaItems().length;
+	}
+
+	canNavigateViewerBackward(): boolean {
+		return this.currentViewerIndex() > 0 || (this.isInfiniteMode() && this.canLoadMoreBackward());
+	}
+
+	canNavigateViewerForward(): boolean {
+		return this.currentViewerIndex() < this.visibleMediaItems().length - 1 || (this.isInfiniteMode() && this.canLoadMoreForward());
 	}
 
 	toggleUrlList() {
@@ -1496,15 +1535,13 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	private resetInfiniteModeSessionState() {
 		this.isInfiniteMode.set(false);
 		this.infinitePatternBaseUrl = '';
-		this.infinitePatternStart = 0;
-		this.infinitePatternEnd = 0;
 		this.infinitePatternPadLength = 0;
 		this.infinitePatternStep = 1;
 		this.isLoadingBackward = false;
 		this.isLoadingForward = false;
 		this.isInfiniteContinuationPromptOpen = false;
-		this.lastPromptedBrokenLevelBackward = 0;
-		this.lastPromptedBrokenLevelForward = 0;
+		this.lastPromptedBrokenThresholdBackward = 0;
+		this.lastPromptedBrokenThresholdForward = 0;
 		this.knownMediaUrls = new Set();
 		if (this.observerSetupTimeout) {
 			clearTimeout(this.observerSetupTimeout);
@@ -1522,13 +1559,11 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return;
 		}
 
-		const threshold = GalleryComponent.infiniteConsecutiveBrokenThreshold;
-		// Prompt once per threshold step (10, 20, ...) to avoid spamming on every failed item.
 		const forwardBroken = this.getConsecutiveBrokenAtLoadedEdge('forward');
-		const forwardPromptLevel = Math.floor(forwardBroken / threshold);
+		const nextForwardThreshold = this.getNextInfiniteContinuationThreshold(this.lastPromptedBrokenThresholdForward);
 
-		if (forwardPromptLevel > this.lastPromptedBrokenLevelForward) {
-			this.lastPromptedBrokenLevelForward = forwardPromptLevel;
+		if (nextForwardThreshold !== null && forwardBroken >= nextForwardThreshold) {
+			this.lastPromptedBrokenThresholdForward = nextForwardThreshold;
 			const continueForward = await this.promptInfiniteContinuation('forward', forwardBroken);
 			if (continueForward) {
 				await this.maybeLoadMoreForward();
@@ -1537,15 +1572,25 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		}
 
 		const backwardBroken = this.getConsecutiveBrokenAtLoadedEdge('backward');
-		const backwardPromptLevel = Math.floor(backwardBroken / threshold);
+		const nextBackwardThreshold = this.getNextInfiniteContinuationThreshold(this.lastPromptedBrokenThresholdBackward);
 
-		if (backwardPromptLevel > this.lastPromptedBrokenLevelBackward) {
-			this.lastPromptedBrokenLevelBackward = backwardPromptLevel;
+		if (nextBackwardThreshold !== null && backwardBroken >= nextBackwardThreshold) {
+			this.lastPromptedBrokenThresholdBackward = nextBackwardThreshold;
 			const continueBackward = await this.promptInfiniteContinuation('backward', backwardBroken);
 			if (continueBackward) {
 				await this.maybeLoadMoreBackward();
 			}
 		}
+	}
+
+	private getNextInfiniteContinuationThreshold(lastPromptedThreshold: number): number | null {
+		for (const threshold of GalleryComponent.infiniteContinuationPromptThresholds) {
+			if (threshold > lastPromptedThreshold) {
+				return threshold;
+			}
+		}
+
+		return null;
 	}
 
 	private getConsecutiveBrokenAtLoadedEdge(direction: 'forward' | 'backward'): number {
@@ -1558,7 +1603,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return 0;
 		}
 
-		const threshold = GalleryComponent.infiniteConsecutiveBrokenThreshold;
+		const threshold = GalleryComponent.infiniteContinuationPromptThresholds[GalleryComponent.infiniteContinuationPromptThresholds.length - 1];
 		let consecutiveBroken = 0;
 
 		for (let offset = 0; offset < threshold; offset++) {
@@ -1576,6 +1621,29 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		}
 
 		return consecutiveBroken;
+	}
+
+	private async advanceViewerAfterInfiniteLoad(direction: 'forward' | 'backward', currentUrl: string): Promise<void> {
+		if (direction === 'forward') {
+			await this.maybeLoadMoreForward();
+		} else {
+			await this.maybeLoadMoreBackward();
+		}
+
+		const visibleItems = this.visibleMediaItems();
+		const currentIndex = visibleItems.findIndex((item) => item.url === currentUrl);
+		if (currentIndex === -1) {
+			return;
+		}
+
+		const nextIndex = direction === 'forward' ? currentIndex + 1 : currentIndex - 1;
+		if (nextIndex < 0 || nextIndex >= visibleItems.length) {
+			return;
+		}
+
+		this.currentViewerIndex.set(nextIndex);
+		this.currentViewerImage.set(visibleItems[nextIndex].url);
+		this.currentMediaItem.set(visibleItems[nextIndex]);
 	}
 
 	private async promptInfiniteContinuation(direction: 'forward' | 'backward', brokenCount: number): Promise<boolean> {
@@ -1731,8 +1799,6 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return;
 		}
 
-		this.infinitePatternStart = start;
-		this.infinitePatternEnd = end;
 		this.infinitePatternPadLength = padLength;
 		this.infinitePatternBaseUrl = `${match[1]}__FUSKR_INFINITY__${match[7]}`;
 	}
