@@ -70,23 +70,19 @@
 										</button>
 									</div>
 								</div>
-								<div class="control-group">
-									<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
-										@if (brokenImages() > 0 || loading()) {
-											<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
-												{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
-											</button>
-										}
-										@if (brokenImages() > 0) {
-											<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
-												{{ translate('Images_RemoveBrokenImages') }}
-											</button>
-										}
-									</div>
-								</div>
 							</div>
 
 							<div class="sticky-controls-actions">
+								@if (brokenImages() > 0 || loading()) {
+									<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
+										{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
+									</button>
+								}
+								@if (brokenImages() > 0) {
+									<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
+										{{ translate('Images_RemoveBrokenImages') }}
+									</button>
+								}
 								<button type="button" (click)="toggleInfiniteMode()" [class]="isInfiniteMode() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="isInfiniteMode() ? translate('Gallery_DisableInfiniteMode') : translate('Gallery_EnableInfiniteMode')"><span aria-hidden="true">♾️</span>{{ isInfiniteMode() ? translate('Gallery_InfiniteModeOn') : translate('Gallery_InfiniteModeOff') }}</button>
 								<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading()">
 									@if (isDownloading()) {

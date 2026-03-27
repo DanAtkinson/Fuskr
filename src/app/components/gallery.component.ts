@@ -60,7 +60,12 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	totalImages = signal(0);
 
 	// Computed signals
-	visibleMediaItems = computed(() => this.mediaItems().filter((item) => !this.brokenUrls().has(item.url)));
+	visibleMediaItems = computed(() => {
+		if (this.showBrokenImages()) {
+			return this.mediaItems();
+		}
+		return this.mediaItems().filter((item) => !this.brokenUrls().has(item.url));
+	});
 	allUrlsText = computed(() =>
 		this.mediaItems()
 			.map((item) => item.url)
