@@ -1,121 +1,45 @@
 {
-	"ManifestName": {
-		"message": "Fuskr",
-		"description": "The title of the application, displayed in the web store."
-	},
-	"ManifestDescription": {
-		"message": "Create photo galleries from a single image based on the image name.",
-		"description": "The description of the application, displayed in the web store."
-	},
-	"ManifestLanguage": {
-		"message": "en-GB",
-		"description": "The BCP-47 language code."
-	},
-	"Application_ContextMenu_Fusk": {
-		"message": "Fusk"
-	},
 	"Application_ContextMenu_10": {
 		"message": "10"
-	},
-	"Application_ContextMenu_20": {
-		"message": "20"
-	},
-	"Application_ContextMenu_50": {
-		"message": "50"
 	},
 	"Application_ContextMenu_100": {
 		"message": "100"
 	},
+	"Application_ContextMenu_20": {
+		"message": "20"
+	},
 	"Application_ContextMenu_200": {
 		"message": "200"
+	},
+	"Application_ContextMenu_50": {
+		"message": "50"
 	},
 	"Application_ContextMenu_500": {
 		"message": "500"
 	},
-	"Application_ContextMenu_Other": {
-		"message": "Other"
+	"Application_ContextMenu_ClearRecentActivity": {
+		"message": "Clear recent activity"
 	},
 	"Application_ContextMenu_CreateFromSelection": {
 		"message": "Create from selection"
 	},
-	"Application_ContextMenu_Manual": {
-		"message": "Manual"
-	},
-	"Application_ContextMenu_Recent": {
-		"message": "Recent"
-	},
-	"Application_ContextMenu_ClearRecentActivity": {
-		"message": "Clear recent activity"
-	},
-	"Application_ContextMenu_Options": {
-		"message": "Options"
+	"Application_ContextMenu_Fusk": {
+		"message": "Fusk"
 	},
 	"Application_ContextMenu_History": {
 		"message": "History"
 	},
-	"History_Loading": {
-		"message": "Loading history...",
-		"description": "Loading message displayed while history is being fetched"
+	"Application_ContextMenu_Manual": {
+		"message": "Manual"
 	},
-	"History_NoEntries": {
-		"message": "No History Entries",
-		"description": "Title displayed when history is empty"
+	"Application_ContextMenu_Options": {
+		"message": "Options"
 	},
-	"History_NoEntriesText": {
-		"message": "You haven't created any galleries yet. Click the 'New Gallery' button above to get started!",
-		"description": "Explanatory text displayed when history is empty"
+	"Application_ContextMenu_Other": {
+		"message": "Other"
 	},
-	"History_CreateFirst": {
-		"message": "Create Your First Gallery",
-		"description": "Button text for creating first gallery when history is empty"
-	},
-	"History_TotalEntries": {
-		"message": "entries",
-		"description": "Label for total number of history entries"
-	},
-	"History_Title": {
-		"message": "Gallery History",
-		"description": "Page title for history page"
-	},
-	"History_ViewOptions": {
-		"message": "View Options",
-		"description": "Button text to view options/settings"
-	},
-	"History_NewGallery": {
-		"message": "New Gallery",
-		"description": "Button text for creating a new gallery"
-	},
-	"History_ClearAll": {
-		"message": "Clear All",
-		"description": "Button text for clearing all history"
-	},
-	"History_OpenInNewTab": {
-		"message": "Open in New Tab",
-		"description": "Button title for opening gallery in new tab"
-	},
-	"History_RemoveEntry": {
-		"message": "Remove from History",
-		"description": "Button title for removing entry from history"
-	},
-	"History_TotalImages": {
-		"message": "Total Images",
-		"description": "Label for total number of images in gallery"
-	},
-	"History_LoadedImages": {
-		"message": "Loaded Successfully",
-		"description": "Label for successfully loaded images"
-	},
-	"History_BrokenImages": {
-		"message": "Failed to Load",
-		"description": "Label for images that failed to load"
-	},
-	"History_SuccessRate": {
-		"message": "Success Rate",
-		"description": "Label for image loading success rate"
-	},
-	"History_DisplayMode": {
-		"message": "Display Mode",
-		"description": "Label for gallery display mode"
+	"Application_ContextMenu_Recent": {
+		"message": "Recent"
 	},
 	"Application_Prompt_HowMany": {
 		"message": "How many?:"
@@ -126,17 +50,413 @@
 	"Application_Prompt_NotAValidNumber": {
 		"message": "This is not a valid number."
 	},
+	"Gallery_BuildingGallery": {
+		"description": "Progress text shown while progressively adding images to the gallery",
+		"message": "Building gallery… $CURRENT$ of $TOTAL$",
+		"placeholders": {
+			"current": {
+				"content": "$1",
+				"example": "25"
+			},
+			"total": {
+				"content": "$2",
+				"example": "100"
+			}
+		}
+	},
+	"Gallery_Close": {
+		"description": "Button text to close image viewer",
+		"message": "Close"
+	},
+	"Gallery_CollapseControls": {
+		"description": "Tooltip for collapse button",
+		"message": "Collapse controls"
+	},
+	"Gallery_Controls": {
+		"description": "Label for the sticky gallery controls bar",
+		"message": "Gallery Controls"
+	},
+	"Gallery_CopiedAllUrls": {
+		"description": "Toast notification shown after copying all URLs to the clipboard",
+		"message": "Copied $COUNT$ URLs to clipboard",
+		"placeholders": {
+			"count": {
+				"content": "$1",
+				"example": "42"
+			}
+		}
+	},
+	"Gallery_CopiedUrl": {
+		"description": "Toast notification shown after copying a single URL to the clipboard",
+		"message": "URL copied to clipboard"
+	},
+	"Gallery_CopyFailed": {
+		"description": "Toast notification shown when copying to the clipboard fails",
+		"message": "Failed to copy to clipboard"
+	},
+	"Gallery_CopyUrl": {
+		"description": "Button text to copy image URL",
+		"message": "Copy URL"
+	},
+	"Gallery_CopyUrls": {
+		"description": "Button text to copy all image URLs to clipboard",
+		"message": "Copy URLs"
+	},
+	"Gallery_DisableFullScreenGallery": {
+		"description": "Tooltip for disabling a full-width gallery container",
+		"message": "Disable full-screen gallery layout"
+	},
+	"Gallery_DisableInfiniteMode": {
+		"description": "Tooltip for disabling bidirectional infinite scrolling",
+		"message": "Disable infinite gallery mode"
+	},
+	"Gallery_DisplayMode": {
+		"description": "Label for display mode controls",
+		"message": "Display Mode:"
+	},
+	"Gallery_DownloadAddingMetadata": {
+		"description": "Status message when adding metadata to ZIP",
+		"message": "Adding metadata..."
+	},
+	"Gallery_DownloadAll": {
+		"description": "Button text to download all images",
+		"message": "Download All"
+	},
+	"Gallery_DownloadComplete": {
+		"description": "Status message when download is finished",
+		"message": "Download complete!"
+	},
+	"Gallery_DownloadCreatingZip": {
+		"description": "Status message when creating ZIP file",
+		"message": "Creating ZIP file..."
+	},
+	"Gallery_DownloadFailed": {
+		"description": "Error message when download fails",
+		"message": "Download failed. Please try again."
+	},
+	"Gallery_DownloadInProgress_ConfirmLeave": {
+		"description": "Confirmation prompt when the user tries to navigate away whilst a ZIP download is in progress",
+		"message": "A download is in progress. Navigating away will cancel it. Are you sure?"
+	},
+	"Gallery_DownloadNoImages": {
+		"description": "Status message when no valid images found for download",
+		"message": "No valid images to download"
+	},
+	"Gallery_DownloadPreparing": {
+		"description": "Status message when preparing ZIP download",
+		"message": "Preparing download..."
+	},
+	"Gallery_DownloadPromptFilename": {
+		"description": "Prompt message for entering ZIP filename",
+		"message": "Enter filename for the ZIP archive:"
+	},
+	"Gallery_DownloadSaving": {
+		"description": "Status message when saving ZIP file",
+		"message": "Saving file..."
+	},
+	"Gallery_DownloadVideo": {
+		"description": "Tooltip for download video button",
+		"message": "Download Video"
+	},
+	"Gallery_DownloadingItem": {
+		"description": "Status message when downloading an individual media item with progress",
+		"message": "Downloading $1 ($2 of $3)..."
+	},
+	"Gallery_DownloadingMedia": {
+		"description": "Status message when downloading mixed media (images and videos)",
+		"message": "Downloading $1 media items ($2 images, $3 videos)..."
+	},
+	"Gallery_EnableFullScreenGallery": {
+		"description": "Tooltip for enabling a full-width gallery container",
+		"message": "Enable full-screen gallery layout"
+	},
+	"Gallery_EnableInfiniteMode": {
+		"description": "Tooltip for enabling bidirectional infinite scrolling",
+		"message": "Enable infinite gallery mode"
+	},
+	"Gallery_ErrorGenerating": {
+		"description": "Error message prefix when gallery generation fails",
+		"message": "Error generating gallery:"
+	},
+	"Gallery_ErrorNoPattern": {
+		"description": "Error message when URL has no fuskable pattern",
+		"message": "No fuskable pattern found in the URL. Try a URL with numbers in the filename."
+	},
+	"Gallery_ErrorValidUrl": {
+		"description": "Error message when no URL is provided",
+		"message": "Please enter a valid URL"
+	},
+	"Gallery_ExampleUrl1": {
+		"description": "First example URL showing numbered filename pattern",
+		"message": "https://example.com/image01.jpg"
+	},
+	"Gallery_ExampleUrl2": {
+		"description": "Second example URL showing bracket range pattern",
+		"message": "https://example.com/photo[01-10].png"
+	},
+	"Gallery_ExampleUrls": {
+		"description": "Header for example URLs section",
+		"message": "Example URLs:"
+	},
+	"Gallery_ExpandControls": {
+		"description": "Tooltip for expand button",
+		"message": "Expand controls"
+	},
+	"Gallery_FillPage": {
+		"description": "Short label for fill page display mode",
+		"message": "Fill Page"
+	},
+	"Gallery_FitPage": {
+		"description": "Short label for fit page display mode",
+		"message": "Fit Page"
+	},
+	"Gallery_FullWidth": {
+		"description": "Short label for full width display mode",
+		"message": "Full Width"
+	},
+	"Gallery_GenerateGallery": {
+		"description": "Button text to generate a new gallery",
+		"message": "Generate Gallery"
+	},
+	"Gallery_GeneratingGallery": {
+		"description": "Loading text while generating gallery",
+		"message": "Generating gallery..."
+	},
+	"Gallery_HideBroken": {
+		"description": "Button text to hide broken images",
+		"message": "Hide Broken"
+	},
+	"Gallery_ImageAlt": {
+		"description": "Alt text prefix for gallery images (e.g., 'Image 1', 'Image 2')",
+		"message": "Image"
+	},
+	"Gallery_ImageNotFound": {
+		"description": "Alt text and placeholder text for broken images",
+		"message": "Image not found"
+	},
+	"Gallery_InfiniteContinuationEnd": {
+		"description": "Label for the end edge of the loaded infinite gallery range",
+		"message": "end"
+	},
+	"Gallery_InfiniteContinuationPrompt": {
+		"description": "Prompt shown when infinite mode reaches multiple consecutive broken items at one edge",
+		"message": "Fuskr found $COUNT$ consecutive broken items at the $EDGE$ of the gallery. Continue loading?",
+		"placeholders": {
+			"count": {
+				"content": "$1",
+				"example": "10"
+			},
+			"edge": {
+				"content": "$2",
+				"example": "end"
+			}
+		}
+	},
+	"Gallery_InfiniteContinuationStart": {
+		"description": "Label for the start edge of the loaded infinite gallery range",
+		"message": "start"
+	},
+	"Gallery_InfiniteModeOff": {
+		"description": "Button text when infinite mode is inactive",
+		"message": "Infinite Off"
+	},
+	"Gallery_InfiniteModeOn": {
+		"description": "Button text when infinite mode is active",
+		"message": "Infinite On"
+	},
+	"Gallery_KeyboardNavigation": {
+		"description": "Description of keyboard navigation controls",
+		"message": "Use arrow keys to navigate, Enter/Space to open, Home/End to jump"
+	},
+	"Gallery_Loading": {
+		"description": "Generic loading text for accessibility",
+		"message": "Loading..."
+	},
+	"Gallery_MediaLoadError": {
+		"description": "Error message when media fails to load due to HTTP errors or network issues",
+		"message": "Failed to load media"
+	},
+	"Gallery_NextImage": {
+		"description": "Tooltip for next image button",
+		"message": "Next Image"
+	},
+	"Gallery_OpenImageInTab": {
+		"description": "Button text to open image in new tab",
+		"message": "Open Image in Tab"
+	},
+	"Gallery_OpenInTab": {
+		"description": "Button text to open image in new tab",
+		"message": "Open in Tab"
+	},
+	"Gallery_OpenVideoInTab": {
+		"description": "Button text to open video in new tab",
+		"message": "Open Video in Tab"
+	},
+	"Gallery_OriginalUrl": {
+		"description": "Label for the URL input field",
+		"message": "Original URL:"
+	},
+	"Gallery_OverloadWarning": {
+		"message": "This URL pattern would generate $1 images, which exceeds the safety limit of $2 images.\n\nGenerating this many images may slow down or crash your browser.\n\nDo you want to continue anyway?"
+	},
+	"Gallery_PreviousImage": {
+		"description": "Tooltip for previous image button",
+		"message": "Previous Image"
+	},
+	"Gallery_SelectAllUrls": {
+		"description": "Button text to select all URLs in the textarea",
+		"message": "Select All"
+	},
+	"Gallery_ShowBroken": {
+		"description": "Button text to show broken images",
+		"message": "Show Broken"
+	},
+	"Gallery_ShowVideoInViewer": {
+		"description": "Tooltip for show video in viewer button",
+		"message": "Show Video in Viewer"
+	},
+	"Gallery_SkipToGallery": {
+		"description": "Screen reader skip link to jump past navigation to the gallery content",
+		"message": "Skip to gallery"
+	},
+	"Gallery_Stats_Broken": {
+		"description": "Statistics label for broken images",
+		"message": "broken"
+	},
+	"Gallery_Stats_Loaded": {
+		"description": "Statistics label for loaded images",
+		"message": "loaded"
+	},
+	"Gallery_Stats_Total": {
+		"description": "Statistics label for total images",
+		"message": "total"
+	},
+	"Gallery_SwitchToDarkMode": {
+		"description": "Theme toggle tooltip for switching to dark mode",
+		"message": "Switch to Dark Mode"
+	},
+	"Gallery_SwitchToLightMode": {
+		"description": "Theme toggle tooltip for switching to light mode",
+		"message": "Switch to Light Mode"
+	},
+	"Gallery_Thumbnails": {
+		"description": "Short label for thumbnails display mode",
+		"message": "Thumbnails"
+	},
+	"Gallery_Title": {
+		"description": "Main title of the gallery page",
+		"message": "Fuskr Gallery"
+	},
+	"Gallery_UrlList": {
+		"description": "Header for the URL list section",
+		"message": "URL List"
+	},
+	"Gallery_UrlListPlaceholder": {
+		"description": "Placeholder text for the URL list textarea",
+		"message": "Image URLs will appear here..."
+	},
+	"Gallery_UrlPlaceholder": {
+		"description": "Placeholder text for the URL input field",
+		"message": "Enter URL to fusk..."
+	},
+	"Gallery_VideoNotSupported": {
+		"description": "Error message for unsupported video formats",
+		"message": "Your browser does not support this video format"
+	},
+	"Gallery_ViewHistory": {
+		"description": "Button text to view gallery history",
+		"message": "View Gallery History"
+	},
+	"Gallery_ViewOptions": {
+		"description": "Button text to view options/settings",
+		"message": "View Options"
+	},
+	"Gallery_Welcome": {
+		"description": "Welcome message title",
+		"message": "Welcome to Fuskr"
+	},
+	"Gallery_WelcomeText": {
+		"description": "Welcome message description",
+		"message": "Enter a URL with numbers in the filename to generate an image gallery."
+	},
+	"History_BrokenImages": {
+		"description": "Label for images that failed to load",
+		"message": "Failed to Load"
+	},
+	"History_ClearAll": {
+		"description": "Button text for clearing all history",
+		"message": "Clear All"
+	},
+	"History_CreateFirst": {
+		"description": "Button text for creating first gallery when history is empty",
+		"message": "Create Your First Gallery"
+	},
+	"History_DisplayMode": {
+		"description": "Label for gallery display mode",
+		"message": "Display Mode"
+	},
+	"History_LoadedImages": {
+		"description": "Label for successfully loaded images",
+		"message": "Loaded Successfully"
+	},
+	"History_Loading": {
+		"description": "Loading message displayed while history is being fetched",
+		"message": "Loading history..."
+	},
+	"History_NewGallery": {
+		"description": "Button text for creating a new gallery",
+		"message": "New Gallery"
+	},
+	"History_NoEntries": {
+		"description": "Title displayed when history is empty",
+		"message": "No History Entries"
+	},
+	"History_NoEntriesText": {
+		"description": "Explanatory text displayed when history is empty",
+		"message": "You haven't created any galleries yet. Click the 'New Gallery' button above to get started!"
+	},
+	"History_OpenInNewTab": {
+		"description": "Button title for opening gallery in new tab",
+		"message": "Open in New Tab"
+	},
+	"History_RemoveEntry": {
+		"description": "Button title for removing entry from history",
+		"message": "Remove from History"
+	},
+	"History_SuccessRate": {
+		"description": "Label for image loading success rate",
+		"message": "Success Rate"
+	},
+	"History_Title": {
+		"description": "Page title for history page",
+		"message": "Gallery History"
+	},
+	"History_TotalEntries": {
+		"description": "Label for total number of history entries",
+		"message": "entries"
+	},
+	"History_TotalImages": {
+		"description": "Label for total number of images in gallery",
+		"message": "Total Images"
+	},
+	"History_ViewOptions": {
+		"description": "Button text to view options/settings",
+		"message": "View Options"
+	},
 	"Images_DownloadImage": {
 		"message": "Download Image"
 	},
-	"Images_ResizeImagesToFullWidth": {
-		"message": "Resize images to full width"
+	"Images_RemoveBrokenImages": {
+		"message": "Remove broken images"
+	},
+	"Images_ResizeImagesToFillPage": {
+		"message": "Resize images to fill the page"
 	},
 	"Images_ResizeImagesToFitOnPage": {
 		"message": "Resize images to fit on page"
 	},
-	"Images_ResizeImagesToFillPage": {
-		"message": "Resize images to fill the page"
+	"Images_ResizeImagesToFullWidth": {
+		"message": "Resize images to full width"
 	},
 	"Images_ResizeImagesToThumbnails": {
 		"message": "Resize images to thumbnails"
@@ -150,11 +470,41 @@
 	"Images_ToggleBrokenImages": {
 		"message": "Toggle broken images"
 	},
-	"Images_RemoveBrokenImages": {
-		"message": "Remove broken images"
+	"ManifestDescription": {
+		"description": "The description of the application, displayed in the web store.",
+		"message": "Create photo galleries from a single image based on the image name."
 	},
-	"Options_Title": {
-		"message": "Fuskr Options"
+	"ManifestLanguage": {
+		"description": "The BCP-47 language code.",
+		"message": "en-GB"
+	},
+	"ManifestName": {
+		"description": "The title of the application, displayed in the web store.",
+		"message": "Fuskr"
+	},
+	"Options_Actions": {
+		"description": "Header for debug actions section",
+		"message": "Actions"
+	},
+	"Options_Appearance": {
+		"description": "Options section header for appearance settings",
+		"message": "Appearance"
+	},
+	"Options_AutoRemoveBrokenImagesDefault": {
+		"description": "Checkbox label for auto-remove broken images setting",
+		"message": "Automatically remove broken images"
+	},
+	"Options_AutoRemoveBrokenImagesDescription": {
+		"description": "Description for auto-remove broken images setting",
+		"message": "Automatically remove broken images from the gallery as they fail to load"
+	},
+	"Options_Behaviour": {
+		"description": "Options section header for behaviour settings",
+		"message": "Behaviour"
+	},
+	"Options_ClearLogs": {
+		"description": "Button text for clearing debug logs",
+		"message": "Clear Logs"
 	},
 	"Options_DarkMode": {
 		"message": "Show Fuskr with a dark background"
@@ -162,457 +512,28 @@
 	"Options_DarkMode_Description": {
 		"message": "Changes the background of image sets to a darker colour. Will take effect once you refresh pages."
 	},
-	"Options_OpenNewFusksInForeground": {
-		"message": "Open new fusks in the foreground"
-	},
-	"Options_OpenNewFusksInForeground_Description": {
-		"message": "When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead."
-	},
-	"Options_History_Keep": {
-		"message": "Keep a recent history of fusks"
-	},
-	"Options_History_Keep_Description": {
-		"message": "Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery."
-	},
 	"Options_Debug": {
 		"message": "Debug & Diagnostics"
 	},
-	"Gallery_SkipToGallery": {
-		"message": "Skip to gallery",
-		"description": "Screen reader skip link to jump past navigation to the gallery content"
-	},
-	"Gallery_CopiedUrl": {
-		"message": "URL copied to clipboard",
-		"description": "Toast notification shown after copying a single URL to the clipboard"
-	},
-	"Gallery_CopiedAllUrls": {
-		"message": "Copied $COUNT$ URLs to clipboard",
-		"description": "Toast notification shown after copying all URLs to the clipboard",
-		"placeholders": {
-			"count": {
-				"content": "$1",
-				"example": "42"
-			}
-		}
-	},
-	"Gallery_CopyFailed": {
-		"message": "Failed to copy to clipboard",
-		"description": "Toast notification shown when copying to the clipboard fails"
-	},
-	"Gallery_Title": {
-		"message": "Fuskr Gallery",
-		"description": "Main title of the gallery page"
-	},
-	"Gallery_ViewHistory": {
-		"message": "View Gallery History",
-		"description": "Button text to view gallery history"
-	},
-	"Gallery_ViewOptions": {
-		"message": "View Options",
-		"description": "Button text to view options/settings"
-	},
-	"Gallery_DownloadInProgress_ConfirmLeave": {
-		"message": "A download is in progress. Navigating away will cancel it. Are you sure?",
-		"description": "Confirmation prompt when the user tries to navigate away whilst a ZIP download is in progress"
-	},
-	"Gallery_SwitchToLightMode": {
-		"message": "Switch to Light Mode",
-		"description": "Theme toggle tooltip for switching to light mode"
-	},
-	"Gallery_SwitchToDarkMode": {
-		"message": "Switch to Dark Mode",
-		"description": "Theme toggle tooltip for switching to dark mode"
-	},
-	"Gallery_EnableFullScreenGallery": {
-		"message": "Enable full-screen gallery layout",
-		"description": "Tooltip for enabling a full-width gallery container"
-	},
-	"Gallery_DisableFullScreenGallery": {
-		"message": "Disable full-screen gallery layout",
-		"description": "Tooltip for disabling a full-width gallery container"
-	},
-	"Gallery_OriginalUrl": {
-		"message": "Original URL:",
-		"description": "Label for the URL input field"
-	},
-	"Gallery_UrlPlaceholder": {
-		"message": "Enter URL to fusk...",
-		"description": "Placeholder text for the URL input field"
-	},
-	"Gallery_GenerateGallery": {
-		"message": "Generate Gallery",
-		"description": "Button text to generate a new gallery"
-	},
-	"Gallery_Stats_Total": {
-		"message": "total",
-		"description": "Statistics label for total images"
-	},
-	"Gallery_Stats_Loaded": {
-		"message": "loaded",
-		"description": "Statistics label for loaded images"
-	},
-	"Gallery_Stats_Broken": {
-		"message": "broken",
-		"description": "Statistics label for broken images"
-	},
-	"Gallery_DownloadAll": {
-		"message": "Download All",
-		"description": "Button text to download all images"
-	},
-	"Gallery_DisplayMode": {
-		"message": "Display Mode:",
-		"description": "Label for display mode controls"
-	},
-	"Gallery_Options": {
-		"message": "Options:",
-		"description": "Label for gallery options controls"
-	},
-	"Gallery_HideBroken": {
-		"message": "Hide Broken",
-		"description": "Button text to hide broken images"
-	},
-	"Gallery_ShowBroken": {
-		"message": "Show Broken",
-		"description": "Button text to show broken images"
-	},
-	"Gallery_EnableInfiniteMode": {
-		"message": "Enable infinite gallery mode",
-		"description": "Tooltip for enabling bidirectional infinite scrolling"
-	},
-	"Gallery_DisableInfiniteMode": {
-		"message": "Disable infinite gallery mode",
-		"description": "Tooltip for disabling bidirectional infinite scrolling"
-	},
-	"Gallery_InfiniteModeOn": {
-		"message": "Infinite On",
-		"description": "Button text when infinite mode is active"
-	},
-	"Gallery_InfiniteModeOff": {
-		"message": "Infinite Off",
-		"description": "Button text when infinite mode is inactive"
-	},
-	"Gallery_InfiniteContinuationStart": {
-		"message": "start",
-		"description": "Label for the start edge of the loaded infinite gallery range"
-	},
-	"Gallery_InfiniteContinuationEnd": {
-		"message": "end",
-		"description": "Label for the end edge of the loaded infinite gallery range"
-	},
-	"Gallery_InfiniteContinuationPrompt": {
-		"message": "Fuskr found $COUNT$ consecutive broken items at the $EDGE$ of the gallery. Continue loading?",
-		"description": "Prompt shown when infinite mode reaches multiple consecutive broken items at one edge",
-		"placeholders": {
-			"count": {
-				"content": "$1",
-				"example": "10"
-			},
-			"edge": {
-				"content": "$2",
-				"example": "end"
-			}
-		}
-	},
-	"Gallery_GeneratingGallery": {
-		"message": "Generating gallery...",
-		"description": "Loading text while generating gallery"
-	},
-	"Gallery_BuildingGallery": {
-		"message": "Building gallery… $CURRENT$ of $TOTAL$",
-		"description": "Progress text shown while progressively adding images to the gallery",
-		"placeholders": {
-			"current": {
-				"content": "$1",
-				"example": "25"
-			},
-			"total": {
-				"content": "$2",
-				"example": "100"
-			}
-		}
-	},
-	"Gallery_CopyUrl": {
-		"message": "Copy URL",
-		"description": "Button text to copy image URL"
-	},
-	"Gallery_OpenInTab": {
-		"message": "Open in Tab",
-		"description": "Button text to open image in new tab"
-	},
-	"Gallery_OpenImageInTab": {
-		"message": "Open Image in Tab",
-		"description": "Button text to open image in new tab"
-	},
-	"Gallery_OpenVideoInTab": {
-		"message": "Open Video in Tab",
-		"description": "Button text to open video in new tab"
-	},
-	"Gallery_Close": {
-		"message": "Close",
-		"description": "Button text to close image viewer"
-	},
-	"Gallery_CollapseControls": {
-		"message": "Collapse controls",
-		"description": "Tooltip for collapse button"
-	},
-	"Gallery_Controls": {
-		"message": "Gallery Controls",
-		"description": "Label for the sticky gallery controls bar"
-	},
-	"Gallery_PreviousImage": {
-		"message": "Previous Image",
-		"description": "Tooltip for previous image button"
-	},
-	"Gallery_NextImage": {
-		"message": "Next Image",
-		"description": "Tooltip for next image button"
-	},
-	"Gallery_DownloadVideo": {
-		"message": "Download Video",
-		"description": "Tooltip for download video button"
-	},
-	"Gallery_ExpandControls": {
-		"message": "Expand controls",
-		"description": "Tooltip for expand button"
-	},
-	"Gallery_ShowVideoInViewer": {
-		"message": "Show Video in Viewer",
-		"description": "Tooltip for show video in viewer button"
-	},
-	"Gallery_VideoNotSupported": {
-		"message": "Your browser does not support this video format",
-		"description": "Error message for unsupported video formats"
-	},
-	"Gallery_MediaLoadError": {
-		"message": "Failed to load media",
-		"description": "Error message when media fails to load due to HTTP errors or network issues"
-	},
-	"Gallery_Welcome": {
-		"message": "Welcome to Fuskr",
-		"description": "Welcome message title"
-	},
-	"Gallery_WelcomeText": {
-		"message": "Enter a URL with numbers in the filename to generate an image gallery.",
-		"description": "Welcome message description"
-	},
-	"Gallery_ExampleUrls": {
-		"message": "Example URLs:",
-		"description": "Header for example URLs section"
-	},
-	"Gallery_FitPage": {
-		"message": "Fit Page",
-		"description": "Short label for fit page display mode"
-	},
-	"Gallery_FullWidth": {
-		"message": "Full Width",
-		"description": "Short label for full width display mode"
-	},
-	"Gallery_FillPage": {
-		"message": "Fill Page",
-		"description": "Short label for fill page display mode"
-	},
-	"Gallery_Thumbnails": {
-		"message": "Thumbnails",
-		"description": "Short label for thumbnails display mode"
-	},
-	"Gallery_ImageAlt": {
-		"message": "Image",
-		"description": "Alt text prefix for gallery images (e.g., 'Image 1', 'Image 2')"
-	},
-	"Options_Appearance": {
-		"message": "Appearance",
-		"description": "Options section header for appearance settings"
-	},
-	"Options_ImageDisplay": {
-		"message": "Image Display",
-		"description": "Options section header for image display settings"
-	},
-	"Options_Behaviour": {
-		"message": "Behaviour",
-		"description": "Options section header for behaviour settings"
+	"Options_Debug_Description": {
+		"description": "Description for debug panel",
+		"message": "Use this panel to export debug logs when reporting issues. Logs help diagnose problems and improve the extension."
 	},
 	"Options_DefaultImageDisplayMode": {
-		"message": "Default Image Display Mode:",
-		"description": "Label for default image display mode options"
+		"description": "Label for default image display mode options",
+		"message": "Default Image Display Mode:"
 	},
 	"Options_DisplayModeDescription": {
-		"message": "Choose how images are displayed by default in the gallery",
-		"description": "Description for image display mode setting"
+		"description": "Description for image display mode setting",
+		"message": "Choose how images are displayed by default in the gallery"
 	},
-	"Options_FullScreenGalleryDefault": {
-		"message": "Use full-screen gallery layout by default",
-		"description": "Checkbox label for default full-screen gallery layout setting"
+	"Options_EnableLogging": {
+		"description": "Checkbox label for enabling debug logging",
+		"message": "Enable Debug Logging"
 	},
-	"Options_FullScreenGalleryDescription": {
-		"message": "Allow the gallery to use the full page width instead of the standard 1400px layout",
-		"description": "Description for full-screen gallery layout setting"
-	},
-	"Options_ShowImagesInViewerDefault": {
-		"message": "Show images in viewer by default",
-		"description": "Checkbox label for default image viewer setting"
-	},
-	"Options_ShowImagesInViewerDescription": {
-		"message": "Open images in a full-screen viewer when clicked",
-		"description": "Description for image viewer setting"
-	},
-	"Options_ShowBrokenImagesDefault": {
-		"message": "Show broken images by default",
-		"description": "Checkbox label for broken images setting"
-	},
-	"Options_ShowBrokenImagesDescription": {
-		"message": "Display placeholder images for missing/broken images",
-		"description": "Description for broken images setting"
-	},
-	"Options_AutoRemoveBrokenImagesDefault": {
-		"message": "Automatically remove broken images",
-		"description": "Checkbox label for auto-remove broken images setting"
-	},
-	"Options_AutoRemoveBrokenImagesDescription": {
-		"message": "Automatically remove broken images from the gallery as they fail to load",
-		"description": "Description for auto-remove broken images setting"
-	},
-	"Options_EnableStickyControls": {
-		"message": "Keep controls sticky when scrolling",
-		"description": "Label for sticky controls toggle"
-	},
-	"Options_EnableStickyControls_Description": {
-		"message": "When enabled, gallery controls remain visible at the top of the page when you scroll. Disable for compact scrolling.",
-		"description": "Description for sticky controls toggle"
-	},
-	"Options_StickyControls": {
-		"message": "Sticky Controls",
-		"description": "Options section title for sticky controls"
-	},
-	"Options_SettingsSaved": {
-		"message": "Settings saved!",
-		"description": "Status message when settings are saved successfully"
-	},
-	"Options_ErrorSaving": {
-		"message": "Error saving options",
-		"description": "Error message when settings fail to save"
-	},
-	"Options_ResetToDefaults": {
-		"message": "Reset to Defaults",
-		"description": "Button text for resetting options to default values"
-	},
-	"Options_ResetConfirmation": {
-		"message": "Are you sure you want to reset all options to their default values? Your gallery history will be preserved, but all other settings will be lost.",
-		"description": "Confirmation dialog when user clicks reset to defaults"
-	},
-	"Options_ResetSuccessful": {
-		"message": "Options reset to defaults successfully!",
-		"description": "Status message when options are reset successfully"
-	},
-	"Options_ResetFailed": {
-		"message": "Error resetting options to defaults",
-		"description": "Error message when resetting options fails"
-	},
-	"Options_ResizeImagesFitOnPage": {
-		"message": "Resize images to fit on page",
-		"description": "Radio button option for fit on page display mode"
-	},
-	"Options_ResizeImagesFullWidth": {
-		"message": "Resize images to full width",
-		"description": "Radio button option for full width display mode"
-	},
-	"Options_ResizeImagesFillPage": {
-		"message": "Resize images to fill the page",
-		"description": "Radio button option for fill page display mode"
-	},
-	"Options_ResizeImagesThumbnails": {
-		"message": "Resize images to thumbnails",
-		"description": "Radio button option for thumbnails display mode"
-	},
-	"Gallery_CopyUrls": {
-		"message": "Copy URLs",
-		"description": "Button text to copy all image URLs to clipboard"
-	},
-	"Gallery_SelectAllUrls": {
-		"message": "Select All",
-		"description": "Button text to select all URLs in the textarea"
-	},
-	"Gallery_UrlListPlaceholder": {
-		"message": "Image URLs will appear here...",
-		"description": "Placeholder text for the URL list textarea"
-	},
-	"Gallery_UrlList": {
-		"message": "URL List",
-		"description": "Header for the URL list section"
-	},
-	"Gallery_Loading": {
-		"message": "Loading...",
-		"description": "Generic loading text for accessibility"
-	},
-	"Gallery_ErrorValidUrl": {
-		"message": "Please enter a valid URL",
-		"description": "Error message when no URL is provided"
-	},
-	"Gallery_ErrorNoPattern": {
-		"message": "No fuskable pattern found in the URL. Try a URL with numbers in the filename.",
-		"description": "Error message when URL has no fuskable pattern"
-	},
-	"Gallery_ErrorGenerating": {
-		"message": "Error generating gallery:",
-		"description": "Error message prefix when gallery generation fails"
-	},
-	"Gallery_DownloadPreparing": {
-		"message": "Preparing download...",
-		"description": "Status message when preparing ZIP download"
-	},
-	"Gallery_DownloadNoImages": {
-		"message": "No valid images to download",
-		"description": "Status message when no valid images found for download"
-	},
-	"Gallery_DownloadAddingMetadata": {
-		"message": "Adding metadata...",
-		"description": "Status message when adding metadata to ZIP"
-	},
-	"Gallery_DownloadCreatingZip": {
-		"message": "Creating ZIP file...",
-		"description": "Status message when creating ZIP file"
-	},
-	"Gallery_DownloadSaving": {
-		"message": "Saving file...",
-		"description": "Status message when saving ZIP file"
-	},
-	"Gallery_DownloadComplete": {
-		"message": "Download complete!",
-		"description": "Status message when download is finished"
-	},
-	"Gallery_DownloadFailed": {
-		"message": "Download failed. Please try again.",
-		"description": "Error message when download fails"
-	},
-	"Gallery_DownloadPromptFilename": {
-		"message": "Enter filename for the ZIP archive:",
-		"description": "Prompt message for entering ZIP filename"
-	},
-	"Gallery_DownloadingMedia": {
-		"message": "Downloading $1 media items ($2 images, $3 videos)...",
-		"description": "Status message when downloading mixed media (images and videos)"
-	},
-	"Gallery_DownloadingItem": {
-		"message": "Downloading $1 ($2 of $3)...",
-		"description": "Status message when downloading an individual media item with progress"
-	},
-	"Gallery_KeyboardNavigation": {
-		"message": "Use arrow keys to navigate, Enter/Space to open, Home/End to jump",
-		"description": "Description of keyboard navigation controls"
-	},
-	"Gallery_ImageNotFound": {
-		"message": "Image not found",
-		"description": "Alt text and placeholder text for broken images"
-	},
-	"Gallery_ExampleUrl1": {
-		"message": "https://example.com/image01.jpg",
-		"description": "First example URL showing numbered filename pattern"
-	},
-	"Gallery_ExampleUrl2": {
-		"message": "https://example.com/photo[01-10].png",
-		"description": "Second example URL showing bracket range pattern"
-	},
-	"Options_OverloadProtection": {
-		"message": "Overload Protection"
+	"Options_EnableLogging_Description": {
+		"description": "Description for debug logging setting",
+		"message": "When enabled, Fuskr will collect debug information to help diagnose issues. Logs are stored locally and never sent anywhere automatically."
 	},
 	"Options_EnableOverloadProtection": {
 		"message": "Enable overload protection"
@@ -620,65 +541,140 @@
 	"Options_EnableOverloadProtection_Description": {
 		"message": "When enabled, Fuskr will warn you before generating galleries with a large number of images to prevent browser slowdown or crashes."
 	},
+	"Options_EnableStickyControls": {
+		"description": "Label for sticky controls toggle",
+		"message": "Keep controls sticky when scrolling"
+	},
+	"Options_EnableStickyControls_Description": {
+		"description": "Description for sticky controls toggle",
+		"message": "When enabled, gallery controls remain visible at the top of the page when you scroll. Disable for compact scrolling."
+	},
+	"Options_ErrorSaving": {
+		"description": "Error message when settings fail to save",
+		"message": "Error saving options"
+	},
+	"Options_ExportLogs": {
+		"description": "Button text for exporting debug logs",
+		"message": "Export Debug Logs"
+	},
+	"Options_FullScreenGalleryDefault": {
+		"description": "Checkbox label for default full-screen gallery layout setting",
+		"message": "Use full-screen gallery layout by default"
+	},
+	"Options_FullScreenGalleryDescription": {
+		"description": "Description for full-screen gallery layout setting",
+		"message": "Allow the gallery to use the full page width instead of the standard 1400px layout"
+	},
+	"Options_History_Keep": {
+		"message": "Keep a recent history of fusks"
+	},
+	"Options_History_Keep_Description": {
+		"message": "Every time you create a new gallery, the extension records the created url (up to the last 10). Clicking on the url will re-generate that gallery."
+	},
+	"Options_ImageDisplay": {
+		"description": "Options section header for image display settings",
+		"message": "Image Display"
+	},
+	"Options_LogLevel": {
+		"description": "Label for current log level",
+		"message": "Log Level:"
+	},
+	"Options_LoggerEnabled": {
+		"description": "Label for logger enabled status",
+		"message": "Enabled:"
+	},
+	"Options_LoggerStatus": {
+		"description": "Header for logger status section",
+		"message": "Logger Status"
+	},
+	"Options_OpenNewFusksInForeground": {
+		"message": "Open new fusks in the foreground"
+	},
+	"Options_OpenNewFusksInForeground_Description": {
+		"message": "When you create a new gallery, you may not wish to open it in the foreground. By unchecking this option, any new gallery will appear in the background instead."
+	},
+	"Options_OverloadProtection": {
+		"message": "Overload Protection"
+	},
 	"Options_OverloadProtectionLimit": {
 		"message": "Image limit"
 	},
 	"Options_OverloadProtectionLimit_Description": {
 		"message": "Maximum number of images to generate before showing a warning. Default: 250 images."
 	},
-	"Gallery_OverloadWarning": {
-		"message": "This URL pattern would generate $1 images, which exceeds the safety limit of $2 images.\n\nGenerating this many images may slow down or crash your browser.\n\nDo you want to continue anyway?"
-	},
-	"Options_Debug_Description": {
-		"message": "Use this panel to export debug logs when reporting issues. Logs help diagnose problems and improve the extension.",
-		"description": "Description for debug panel"
-	},
-	"Options_EnableLogging": {
-		"message": "Enable Debug Logging",
-		"description": "Checkbox label for enabling debug logging"
-	},
-	"Options_EnableLogging_Description": {
-		"message": "When enabled, Fuskr will collect debug information to help diagnose issues. Logs are stored locally and never sent anywhere automatically.",
-		"description": "Description for debug logging setting"
-	},
-	"Options_LoggerStatus": {
-		"message": "Logger Status",
-		"description": "Header for logger status section"
-	},
-	"Options_LoggerEnabled": {
-		"message": "Enabled:",
-		"description": "Label for logger enabled status"
-	},
-	"Options_LogLevel": {
-		"message": "Log Level:",
-		"description": "Label for current log level"
-	},
-	"Options_StoredLogs": {
-		"message": "Stored Logs:",
-		"description": "Label for number of stored logs"
-	},
-	"Options_Actions": {
-		"message": "Actions",
-		"description": "Header for debug actions section"
-	},
-	"Options_ExportLogs": {
-		"message": "Export Debug Logs",
-		"description": "Button text for exporting debug logs"
-	},
-	"Options_ClearLogs": {
-		"message": "Clear Logs",
-		"description": "Button text for clearing debug logs"
-	},
 	"Options_PrivacyNote": {
-		"message": "Privacy Note:",
-		"description": "Header for privacy note section"
+		"description": "Header for privacy note section",
+		"message": "Privacy Note:"
 	},
 	"Options_PrivacyNote_Description": {
-		"message": "Debug logs may contain URLs and settings data. Review exported logs before sharing them for support.",
-		"description": "Privacy warning about debug logs"
+		"description": "Privacy warning about debug logs",
+		"message": "Debug logs may contain URLs and settings data. Review exported logs before sharing them for support."
+	},
+	"Options_ResetConfirmation": {
+		"description": "Confirmation dialog when user clicks reset to defaults",
+		"message": "Are you sure you want to reset all options to their default values? Your gallery history will be preserved, but all other settings will be lost."
 	},
 	"Options_ResetDescription": {
-		"message": "Reset all options to their default values. Your gallery history will be preserved.",
-		"description": "Description for reset to defaults functionality"
+		"description": "Description for reset to defaults functionality",
+		"message": "Reset all options to their default values. Your gallery history will be preserved."
+	},
+	"Options_ResetFailed": {
+		"description": "Error message when resetting options fails",
+		"message": "Error resetting options to defaults"
+	},
+	"Options_ResetSuccessful": {
+		"description": "Status message when options are reset successfully",
+		"message": "Options reset to defaults successfully!"
+	},
+	"Options_ResetToDefaults": {
+		"description": "Button text for resetting options to default values",
+		"message": "Reset to Defaults"
+	},
+	"Options_ResizeImagesFillPage": {
+		"description": "Radio button option for fill page display mode",
+		"message": "Resize images to fill the page"
+	},
+	"Options_ResizeImagesFitOnPage": {
+		"description": "Radio button option for fit on page display mode",
+		"message": "Resize images to fit on page"
+	},
+	"Options_ResizeImagesFullWidth": {
+		"description": "Radio button option for full width display mode",
+		"message": "Resize images to full width"
+	},
+	"Options_ResizeImagesThumbnails": {
+		"description": "Radio button option for thumbnails display mode",
+		"message": "Resize images to thumbnails"
+	},
+	"Options_SettingsSaved": {
+		"description": "Status message when settings are saved successfully",
+		"message": "Settings saved!"
+	},
+	"Options_ShowBrokenImagesDefault": {
+		"description": "Checkbox label for broken images setting",
+		"message": "Show broken images by default"
+	},
+	"Options_ShowBrokenImagesDescription": {
+		"description": "Description for broken images setting",
+		"message": "Display placeholder images for missing/broken images"
+	},
+	"Options_ShowImagesInViewerDefault": {
+		"description": "Checkbox label for default image viewer setting",
+		"message": "Show images in viewer by default"
+	},
+	"Options_ShowImagesInViewerDescription": {
+		"description": "Description for image viewer setting",
+		"message": "Open images in a full-screen viewer when clicked"
+	},
+	"Options_StickyControls": {
+		"description": "Options section title for sticky controls",
+		"message": "Sticky Controls"
+	},
+	"Options_StoredLogs": {
+		"description": "Label for number of stored logs",
+		"message": "Stored Logs:"
+	},
+	"Options_Title": {
+		"message": "Fuskr Options"
 	}
 }
