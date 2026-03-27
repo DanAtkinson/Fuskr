@@ -38,6 +38,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	downloadStatus = signal('');
 	enableOverloadProtection = signal(true);
 	errorMessage = signal('');
+	fullScreenGallery = signal(false);
 	imageDisplayMode = signal<'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails'>('fitOnPage');
 	isDownloading = signal(false);
 	isGenerating = signal(false);
@@ -382,6 +383,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			this.logger.debug('GalleryComponent', 'Settings loaded successfully', settings);
 			this.autoRemoveBrokenImages.set(settings.display.autoRemoveBrokenImages);
 			this.darkMode.set(settings.display.darkMode);
+			this.fullScreenGallery.set(settings.display.fullScreenGallery);
 			this.imageDisplayMode.set(settings.display.imageDisplayMode);
 			this.showBrokenImages.set(settings.display.toggleBrokenImages);
 			this.enableOverloadProtection.set(settings.safety.enableOverloadProtection);
@@ -819,6 +821,17 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			await this.chromeService.updateDisplaySettings({ darkMode: this.darkMode() });
 		} catch (error) {
 			this.logger.error('gallery.darkMode.saveFailed', 'Error saving dark mode setting', error);
+		}
+	}
+
+	async toggleFullScreenGallery() {
+		this.fullScreenGallery.update((v) => !v);
+
+		// Save to storage
+		try {
+			await this.chromeService.updateDisplaySettings({ fullScreenGallery: this.fullScreenGallery() });
+		} catch (error) {
+			this.logger.error('gallery.fullScreenGallery.saveFailed', 'Error saving full-screen gallery setting', error);
 		}
 	}
 

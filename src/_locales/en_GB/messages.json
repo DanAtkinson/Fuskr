@@ -223,6 +223,14 @@
 		"message": "Switch to Dark Mode",
 		"description": "Theme toggle tooltip for switching to dark mode"
 	},
+	"Gallery_EnableFullScreenGallery": {
+		"message": "Enable full-screen gallery layout",
+		"description": "Tooltip for enabling a full-width gallery container"
+	},
+	"Gallery_DisableFullScreenGallery": {
+		"message": "Disable full-screen gallery layout",
+		"description": "Tooltip for disabling a full-width gallery container"
+	},
 	"Gallery_OriginalUrl": {
 		"message": "Original URL:",
 		"description": "Label for the URL input field"
@@ -418,6 +426,14 @@
 	"Options_DisplayModeDescription": {
 		"message": "Choose how images are displayed by default in the gallery",
 		"description": "Description for image display mode setting"
+	},
+	"Options_FullScreenGalleryDefault": {
+		"message": "Use full-screen gallery layout by default",
+		"description": "Checkbox label for default full-screen gallery layout setting"
+	},
+	"Options_FullScreenGalleryDescription": {
+		"message": "Allow the gallery to use the full page width instead of the standard 1400px layout",
+		"description": "Description for full-screen gallery layout setting"
 	},
 	"Options_ShowImagesInViewerDefault": {
 		"message": "Show images in viewer by default",

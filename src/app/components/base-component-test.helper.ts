@@ -11,6 +11,7 @@ export class BaseComponentTestHelper {
 		const chromeServiceSpy = {
 			getStorageData: vi.fn(),
 			setStorageData: vi.fn(),
+			updateDisplaySettings: vi.fn(),
 			getMessage: vi.fn(),
 			isExtensionContext: vi.fn(),
 			openTab: vi.fn(),
@@ -34,6 +35,8 @@ export class BaseComponentTestHelper {
 				Options_ResizeImagesFullWidth: 'Resize images to full width',
 				Options_ResizeImagesFillPage: 'Resize images to fill the page',
 				Options_ResizeImagesThumbnails: 'Resize images to thumbnails',
+				Options_FullScreenGalleryDefault: 'Use full-screen gallery layout by default',
+				Options_FullScreenGalleryDescription: 'Allow the gallery to use the full page width instead of the standard 1400px layout',
 				Options_ShowImagesInViewerDefault: 'Show images in viewer by default',
 				Options_ShowImagesInViewerDescription: 'Open images in a full-screen viewer when clicked',
 				Options_ShowBrokenImagesDefault: 'Show broken images by default',
@@ -51,6 +54,8 @@ export class BaseComponentTestHelper {
 				Gallery_CopyFailed: 'Failed to copy to clipboard',
 				Gallery_SwitchToLightMode: 'Switch to Light Mode',
 				Gallery_SwitchToDarkMode: 'Switch to Dark Mode',
+				Gallery_EnableFullScreenGallery: 'Enable full-screen gallery layout',
+				Gallery_DisableFullScreenGallery: 'Disable full-screen gallery layout',
 				Gallery_GenerateGallery: 'Generate Gallery',
 				Gallery_DisplayMode: 'Display Mode',
 				Gallery_FitPage: 'Fit on page',
@@ -99,6 +104,7 @@ export class BaseComponentTestHelper {
 		// Setup other method defaults
 		chromeServiceSpy.getStorageData.mockResolvedValue({} as IChromeStorageData);
 		chromeServiceSpy.setStorageData.mockResolvedValue();
+		chromeServiceSpy.updateDisplaySettings.mockResolvedValue();
 		chromeServiceSpy.isExtensionContext.mockReturnValue(false);
 
 		return chromeServiceSpy;

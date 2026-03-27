@@ -8,6 +8,7 @@ describe('Chrome Storage Models', () => {
 			const settings = new DisplaySettings();
 
 			expect(settings.darkMode).toBe(false);
+			expect(settings.fullScreenGallery).toBe(false);
 			expect(settings.imageDisplayMode).toBe('fitOnPage');
 			expect(settings.resizeImagesToFillPage).toBe(false);
 			expect(settings.resizeImagesToFitOnPage).toBe(true);
@@ -20,6 +21,7 @@ describe('Chrome Storage Models', () => {
 		it('should create instance with provided data', () => {
 			const data: Partial<IDisplaySettings> = {
 				darkMode: true,
+				fullScreenGallery: true,
 				imageDisplayMode: 'fullWidth',
 				resizeImagesToFillPage: true,
 				showImagesInViewer: false,
@@ -28,6 +30,7 @@ describe('Chrome Storage Models', () => {
 			const settings = new DisplaySettings(data);
 
 			expect(settings.darkMode).toBe(true);
+			expect(settings.fullScreenGallery).toBe(true);
 			expect(settings.imageDisplayMode).toBe('fullWidth');
 			expect(settings.resizeImagesToFillPage).toBe(true);
 			expect(settings.showImagesInViewer).toBe(false);
@@ -49,6 +52,7 @@ describe('Chrome Storage Models', () => {
 			const data: IDisplaySettings = {
 				autoRemoveBrokenImages: true,
 				darkMode: true,
+				fullScreenGallery: true,
 				imageDisplayMode: 'thumbnails',
 				resizeImagesToFillPage: true,
 				resizeImagesToFitOnPage: false,
@@ -61,6 +65,7 @@ describe('Chrome Storage Models', () => {
 			const settings = new DisplaySettings(data);
 
 			expect(settings.darkMode).toBe(true);
+			expect(settings.fullScreenGallery).toBe(true);
 			expect(settings.imageDisplayMode).toBe('thumbnails');
 			expect(settings.resizeImagesToFillPage).toBe(true);
 			expect(settings.resizeImagesToFitOnPage).toBe(false);

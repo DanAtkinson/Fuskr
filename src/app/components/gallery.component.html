@@ -1,5 +1,5 @@
 <a href="#image-gallery" class="skip-link">{{ translate('Gallery_SkipToGallery') }}</a>
-<div class="gallery-container" [attr.data-display-mode]="imageDisplayMode()">
+<div class="gallery-container" [attr.data-display-mode]="imageDisplayMode()" [class.gallery-container--full-screen]="fullScreenGallery()">
 	<div class="gallery-header">
 		<div class="header-top">
 			<h1>{{ translate('Gallery_Title') }}</h1>
@@ -9,6 +9,9 @@
 				</button>
 				<button class="btn btn-lg btn-outline-secondary theme-toggle" type="button" (click)="toggleDarkMode()" [title]="translate(darkMode() ? 'Gallery_SwitchToLightMode' : 'Gallery_SwitchToDarkMode')">
 					<span aria-hidden="true">{{ darkMode() ? '☀️' : '🌙' }}</span>
+				</button>
+				<button class="btn btn-lg" type="button" [class.btn-primary]="fullScreenGallery()" [class.btn-outline-secondary]="!fullScreenGallery()" (click)="toggleFullScreenGallery()" [title]="translate(fullScreenGallery() ? 'Gallery_DisableFullScreenGallery' : 'Gallery_EnableFullScreenGallery')" [attr.aria-pressed]="fullScreenGallery()">
+					<span aria-hidden="true">⛶</span>
 				</button>
 				<button class="btn btn-lg btn-outline-secondary" type="button" (click)="navigateToOptions()" [title]="translate('Gallery_ViewOptions')">
 					<span aria-hidden="true">⚙️</span>

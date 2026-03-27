@@ -1225,6 +1225,46 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('toggleFullScreenGallery', () => {
+		it('should load full-screen gallery setting from storage', async () => {
+			mockChromeService.getStorageData.mockResolvedValue({
+				display: {
+					autoRemoveBrokenImages: false,
+					darkMode: false,
+					fullScreenGallery: true,
+					imageDisplayMode: 'fitOnPage',
+					resizeImagesToFillPage: false,
+					resizeImagesToFitOnPage: true,
+					resizeImagesToFullWidth: false,
+					resizeImagesToThumbnails: false,
+					showImagesInViewer: true,
+					toggleBrokenImages: true,
+				},
+				safety: {
+					enableOverloadProtection: true,
+					overloadProtectionLimit: 250,
+				},
+				logging: {
+					enabled: false,
+					logLevel: 1,
+				},
+			} as never);
+
+			await component.loadSettings();
+
+			expect(component.fullScreenGallery()).toBe(true);
+		});
+
+		it('should toggle and persist full-screen gallery setting', async () => {
+			component.fullScreenGallery.set(false);
+
+			await component.toggleFullScreenGallery();
+
+			expect(component.fullScreenGallery()).toBe(true);
+			expect(mockChromeService.updateDisplaySettings).toHaveBeenCalledWith({ fullScreenGallery: true });
+		});
+	});
+
 	describe('generateMetadataContent', () => {
 		it('should include counts and URLs by type', () => {
 			component.originalUrl.set('https://example.com/a[01-02].jpg');

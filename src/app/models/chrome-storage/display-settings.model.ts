@@ -4,6 +4,7 @@ export class DisplaySettings implements IDisplaySettings {
 	// Public properties (alphabetically)
 	autoRemoveBrokenImages = false;
 	darkMode = false;
+	fullScreenGallery = false;
 	imageDisplayMode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails' = 'fitOnPage';
 	resizeImagesToFillPage = false;
 	resizeImagesToFitOnPage = true;

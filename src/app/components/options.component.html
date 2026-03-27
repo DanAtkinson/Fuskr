@@ -54,6 +54,12 @@
 					</div>
 
 					<div class="form-check mb-3">
+						<input class="form-check-input" type="checkbox" id="fullScreenGallery" [(ngModel)]="options.display.fullScreenGallery" (change)="saveOptions()" />
+						<label class="form-check-label" for="fullScreenGallery"> <span class="me-1" aria-hidden="true">⛶</span>{{ translate('Options_FullScreenGalleryDefault') }} </label>
+						<div class="form-text">{{ translate('Options_FullScreenGalleryDescription') }}</div>
+					</div>
+
+					<div class="form-check mb-3">
 						<input class="form-check-input" type="checkbox" id="showImagesInViewer" [(ngModel)]="options.display.showImagesInViewer" (change)="saveOptions()" />
 						<label class="form-check-label" for="showImagesInViewer"> <span class="me-1" aria-hidden="true">🔍</span>{{ translate('Options_ShowImagesInViewerDefault') }} </label>
 						<div class="form-text">{{ translate('Options_ShowImagesInViewerDescription') }}</div>

@@ -74,6 +74,7 @@ describe('OptionsComponent', () => {
 
 		it('should initialise with default options', () => {
 			expect(component.options.display.darkMode).toBe(false);
+			expect(component.options.display.fullScreenGallery).toBe(false);
 			expect(component.options.display.imageDisplayMode).toBe('fitOnPage');
 			expect(component.options.display.resizeImagesToFillPage).toBe(false);
 			expect(component.options.display.resizeImagesToFitOnPage).toBe(true);
@@ -98,6 +99,7 @@ describe('OptionsComponent', () => {
 				display: {
 					autoRemoveBrokenImages: false,
 					darkMode: true,
+					fullScreenGallery: true,
 					imageDisplayMode: 'fullWidth',
 					resizeImagesToFillPage: false,
 					resizeImagesToFitOnPage: false,
@@ -128,6 +130,7 @@ describe('OptionsComponent', () => {
 
 			expect(mockChromeService.getStorageData).toHaveBeenCalled();
 			expect(component.options.display.darkMode).toBe(testOptions.display.darkMode);
+			expect(component.options.display.fullScreenGallery).toBe(testOptions.display.fullScreenGallery);
 			expect(component.options.display.imageDisplayMode).toBe(testOptions.display.imageDisplayMode);
 			expect(component.options.display.resizeImagesToFillPage).toBe(testOptions.display.resizeImagesToFillPage);
 			expect(component.options.display.resizeImagesToFitOnPage).toBe(testOptions.display.resizeImagesToFitOnPage);

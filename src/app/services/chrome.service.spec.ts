@@ -52,6 +52,7 @@ describe('ChromeService', () => {
 			// Should return all defaults when storage is empty
 			expect(result).toBeDefined();
 			expect(result.display.darkMode).toBe(false);
+			expect(result.display.fullScreenGallery).toBe(false);
 			expect(result.display.imageDisplayMode).toBe('fitOnPage');
 			expect(result.display.resizeImagesToFitOnPage).toBe(true);
 			expect(result.display.resizeImagesToFullWidth).toBe(false);
@@ -88,6 +89,7 @@ describe('ChromeService', () => {
 
 			// Should merge stored data with defaults
 			expect(result.display.darkMode).toBe(true); // from stored data
+			expect(result.display.fullScreenGallery).toBe(false); // from defaults
 			expect(result.display.imageDisplayMode).toBe('fitOnPage'); // from defaults
 			expect(result.display.resizeImagesToFitOnPage).toBe(true); // from defaults
 			expect(result.display.resizeImagesToFullWidth).toBe(false); // from defaults
@@ -780,7 +782,7 @@ describe('ChromeService', () => {
 
 		it('should merge display and safety updates into the existing storage data', async () => {
 			const currentData = new ChromeStorageData({
-				display: { darkMode: false, imageDisplayMode: 'fitOnPage' },
+				display: { darkMode: false, fullScreenGallery: false, imageDisplayMode: 'fitOnPage' },
 				safety: { enableOverloadProtection: true, overloadProtectionLimit: 250 },
 			});
 			vi.spyOn(service, 'getStorageData').mockResolvedValue(currentData);
@@ -791,6 +793,7 @@ describe('ChromeService', () => {
 				expect.objectContaining({
 					display: expect.objectContaining({
 						darkMode: true,
+						fullScreenGallery: false,
 						imageDisplayMode: 'fitOnPage',
 					}),
 				})
