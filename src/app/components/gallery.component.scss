@@ -109,7 +109,6 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 20px;
 	padding: 15px;
 	background-color: var(--bg-secondary);
 	border-radius: 8px;
@@ -969,7 +968,7 @@
 	z-index: 100;
 	background-color: var(--card-bg-color, #ffffff);
 	border-bottom: 1px solid var(--border-color, #dee2e6);
-	padding: 1rem;
+	padding: 0.75rem 1rem;
 	transition: background-color 0.3s ease;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
@@ -987,38 +986,116 @@
 	border-bottom-color: var(--border-color, #333333);
 }
 
-.sticky-controls-header {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	margin-bottom: 0;
-
-	.collapse-btn {
-		min-width: 2rem;
-		padding: 0.375rem 0.5rem;
-		font-size: 0.875rem;
-		transition: transform 0.2s ease;
-
-		@media (prefers-reduced-motion: reduce) {
-			transition: none;
-		}
-	}
-}
-
-.sticky-controls-label {
-	font-weight: 600;
-	color: var(--text-color);
+.sticky-gallery-controls .collapse-btn {
+	min-width: 2rem;
+	padding: 0.375rem 0.5rem;
 	font-size: 0.875rem;
-	user-select: none;
+	line-height: 1;
 }
 
 .sticky-controls-content {
-	display: grid;
-	gap: 1rem;
+	display: block;
 	animation: slideDown 0.2s ease-out;
 
 	@media (prefers-reduced-motion: reduce) {
 		animation: none;
+	}
+}
+
+.sticky-controls-main {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	column-gap: 0.75rem;
+	row-gap: 0.5rem;
+	padding: 0.5rem 0.625rem;
+	border: 1px solid var(--border-color, #dee2e6);
+	border-radius: 8px;
+	background-color: var(--bg-secondary);
+
+	.sticky-controls-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		min-width: 0;
+	}
+
+	.display-controls {
+		background: transparent;
+		border: 0;
+		border-radius: 0;
+		margin: 0;
+		padding: 0;
+		min-width: 0;
+		gap: 0.75rem;
+	}
+
+	.stats-info {
+		display: flex;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+		min-width: 0;
+	}
+
+	.control-group {
+		gap: 0.5rem;
+
+		label {
+			min-width: auto;
+			font-size: 0.8rem;
+		}
+	}
+
+	.button-group {
+		gap: 0.35rem;
+		flex-wrap: wrap;
+	}
+
+	.sticky-controls-actions {
+		display: flex;
+		align-items: center;
+		justify-self: end;
+		gap: 0.4rem;
+		white-space: nowrap;
+	}
+}
+
+.sticky-controls-progress {
+	margin-top: 0.45rem;
+}
+
+.sticky-controls-collapsed {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.sticky-gallery-controls--compressed {
+	padding: 0.5rem 0.75rem;
+
+	.sticky-controls-main {
+		column-gap: 0.5rem;
+		row-gap: 0.35rem;
+		padding: 0.375rem 0.5rem;
+	}
+
+	.sticky-controls-meta .stats-info .stat {
+		font-size: 0.75rem;
+		padding: 0.25rem 0.45rem;
+	}
+
+	.sticky-controls-meta .stats-info .stat.keyboard-hint {
+		display: none;
+	}
+
+	.display-controls {
+		gap: 0.5rem;
+	}
+
+	.display-controls .btn,
+	.sticky-controls-actions .btn,
+	.sticky-controls-meta .btn {
+		padding: 0.2rem 0.45rem;
+		font-size: 0.75rem;
 	}
 }
 
@@ -1038,21 +1115,23 @@
 		padding: 0.75rem;
 	}
 
-	.sticky-controls-content {
-		gap: 0.75rem;
+	.sticky-controls-main {
+		grid-template-columns: 1fr;
+		padding: 0.5rem;
+		gap: 0.5rem;
 	}
 
-	.gallery-stats {
-		flex-direction: column;
+	.sticky-controls-meta {
+		align-items: flex-start;
+	}
 
-		.stats-info {
-			flex-wrap: wrap;
-			gap: 0.5rem;
-		}
+	.sticky-controls-actions {
+		justify-self: start;
+	}
 
-		.stats-actions {
-			width: 100%;
-		}
+	.sticky-controls-meta .stats-info {
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 
 	.display-controls {

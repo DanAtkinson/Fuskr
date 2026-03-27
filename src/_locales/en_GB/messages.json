@@ -110,10 +110,7 @@
 		"description": "Tooltip for disabling bidirectional infinite scrolling",
 		"message": "Disable infinite gallery mode"
 	},
-	"Gallery_DisplayMode": {
-		"description": "Label for display mode controls",
-		"message": "Display Mode:"
-	},
+
 	"Gallery_DownloadAddingMetadata": {
 		"description": "Status message when adding metadata to ZIP",
 		"message": "Adding metadata..."

@@ -53,6 +53,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	showImageViewer = signal(false);
 	showUrlList = signal(false);
 	stickyControlsCollapsed = signal(false);
+	stickyControlsCompressed = signal(false);
 	stickyControlsEnabled = signal(true);
 	toastMessage = signal('');
 	toastVisible = signal(false);
@@ -390,6 +391,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			this.showBrokenImages.set(settings.display.toggleBrokenImages);
 			this.stickyControlsCollapsed.set(settings.display.stickyControlsCollapsed);
 			this.stickyControlsEnabled.set(settings.display.stickyControlsEnabled);
+			this.updateStickyControlsCompression();
 			this.enableOverloadProtection.set(settings.safety.enableOverloadProtection);
 			this.overloadProtectionLimit.set(settings.safety.overloadProtectionLimit);
 			this.logger.info('GalleryComponent', 'Overload protection configured', {
@@ -405,6 +407,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	async toggleStickyControlsCollapse() {
 		this.stickyControlsCollapsed.set(!this.stickyControlsCollapsed());
+		this.updateStickyControlsCompression();
 		await this.chromeService.updateDisplaySettings({
 			stickyControlsCollapsed: this.stickyControlsCollapsed(),
 		});
@@ -500,6 +503,8 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	@HostListener('window:scroll')
 	handleWindowScroll() {
+		this.updateStickyControlsCompression();
+
 		if (!this.isInfiniteMode()) {
 			return;
 		}
@@ -512,6 +517,11 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			this.scrollLoadCheckTimeout = null;
 			void this.maybeLoadMoreFromViewportEdges();
 		}, 50);
+	}
+
+	private updateStickyControlsCompression(): void {
+		const shouldCompress = this.stickyControlsEnabled() && !this.stickyControlsCollapsed() && this.visibleMediaItems().length > 0 && window.scrollY > 80;
+		this.stickyControlsCompressed.set(shouldCompress);
 	}
 
 	async maybeLoadMoreBackward() {

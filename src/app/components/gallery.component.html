@@ -35,27 +35,59 @@
 
 		<!-- Sticky Gallery Controls -->
 		@if (visibleMediaItems().length > 0) {
-			<div class="sticky-gallery-controls" [attr.data-sticky-enabled]="stickyControlsEnabled()">
-				<div class="sticky-controls-header">
-					<button class="btn btn-sm btn-outline-secondary collapse-btn" type="button" (click)="toggleStickyControlsCollapse()" [title]="stickyControlsCollapsed() ? translate('Gallery_ExpandControls') : translate('Gallery_CollapseControls')" [attr.aria-expanded]="!stickyControlsCollapsed()" aria-controls="sticky-controls-content">
-						<span aria-hidden="true">{{ stickyControlsCollapsed() ? '▶' : '▼' }}</span>
-					</button>
-					<span class="sticky-controls-label">{{ translate('Gallery_Controls') }}</span>
-				</div>
-
+			<div class="sticky-gallery-controls" [attr.data-sticky-enabled]="stickyControlsEnabled()" [class.sticky-gallery-controls--compressed]="stickyControlsCompressed()">
 				@if (!stickyControlsCollapsed()) {
 					<div id="sticky-controls-content" class="sticky-controls-content">
-						<!-- Gallery Stats -->
-						<div class="gallery-stats">
-							<div class="stats-info">
-								<span class="stat">{{ totalImages() }} {{ translate('Gallery_Stats_Total') }}</span>
-								<span class="stat">{{ loadedImages() }} {{ translate('Gallery_Stats_Loaded') }}</span>
-								@if (brokenImages() > 0) {
-									<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
-								}
-								<span class="stat keyboard-hint"> <span class="me-1" aria-hidden="true">⌨️</span>{{ translate('Gallery_KeyboardNavigation') }} </span>
+						<div class="sticky-controls-main">
+							<div class="sticky-controls-meta">
+								<button class="btn btn-sm btn-outline-secondary collapse-btn" type="button" (click)="toggleStickyControlsCollapse()" [title]="translate('Gallery_CollapseControls')" [attr.aria-expanded]="true" aria-controls="sticky-controls-content">
+									<span aria-hidden="true">▼</span>
+								</button>
+								<div class="stats-info">
+									<span class="stat">{{ totalImages() }} {{ translate('Gallery_Stats_Total') }}</span>
+									<span class="stat">{{ loadedImages() }} {{ translate('Gallery_Stats_Loaded') }}</span>
+									@if (brokenImages() > 0) {
+										<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
+									}
+									<span class="stat keyboard-hint"><span class="me-1" aria-hidden="true">⌨️</span>{{ translate('Gallery_KeyboardNavigation') }}</span>
+								</div>
 							</div>
-							<div class="stats-actions">
+
+							<div class="display-controls">
+								<div class="control-group">
+									<div id="displayModeControls" class="button-group" role="group" [attr.aria-labelledby]="'displayModeControls'">
+										<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode() === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
+											{{ translate('Gallery_FitPage') }}
+										</button>
+										<button type="button" (click)="setImageDisplayMode('fullWidth')" [class]="imageDisplayMode() === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFullWidth')">
+											{{ translate('Gallery_FullWidth') }}
+										</button>
+										<button type="button" (click)="setImageDisplayMode('fillPage')" [class]="imageDisplayMode() === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFillPage')">
+											{{ translate('Gallery_FillPage') }}
+										</button>
+										<button type="button" (click)="setImageDisplayMode('thumbnails')" [class]="imageDisplayMode() === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToThumbnails')">
+											{{ translate('Gallery_Thumbnails') }}
+										</button>
+									</div>
+								</div>
+								<div class="control-group">
+									<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
+										@if (brokenImages() > 0 || loading()) {
+											<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
+												{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
+											</button>
+										}
+										@if (brokenImages() > 0) {
+											<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
+												{{ translate('Images_RemoveBrokenImages') }}
+											</button>
+										}
+									</div>
+								</div>
+							</div>
+
+							<div class="sticky-controls-actions">
+								<button type="button" (click)="toggleInfiniteMode()" [class]="isInfiniteMode() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="isInfiniteMode() ? translate('Gallery_DisableInfiniteMode') : translate('Gallery_EnableInfiniteMode')"><span aria-hidden="true">♾️</span>{{ isInfiniteMode() ? translate('Gallery_InfiniteModeOn') : translate('Gallery_InfiniteModeOff') }}</button>
 								<button class="btn btn-secondary btn-sm" type="button" (click)="downloadAll()" [disabled]="isDownloading()">
 									@if (isDownloading()) {
 										<div class="spinner-border spinner-border-sm me-2" role="status">
@@ -66,50 +98,19 @@
 									}
 									{{ isDownloading() ? downloadStatus() : translate('Gallery_DownloadAll') }}
 								</button>
-								@if (isDownloading() && downloadProgress() > 0) {
-									<div class="progress mt-2" style="height: 4px">
-										<div aria-valuemax="100" aria-valuemin="0" class="progress-bar" role="progressbar" [attr.aria-valuenow]="downloadProgress()" [style.width.%]="downloadProgress()"></div>
-									</div>
-								}
 							</div>
 						</div>
-
-						<!-- Display Mode Controls -->
-						<div class="display-controls">
-							<div class="control-group">
-								<label for="displayModeControls">{{ translate('Gallery_DisplayMode') }}</label>
-								<div id="displayModeControls" class="button-group" role="group" [attr.aria-labelledby]="'displayModeControls'">
-									<button type="button" (click)="setImageDisplayMode('fitOnPage')" [class]="imageDisplayMode() === 'fitOnPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFitOnPage')">
-										{{ translate('Gallery_FitPage') }}
-									</button>
-									<button type="button" (click)="setImageDisplayMode('fullWidth')" [class]="imageDisplayMode() === 'fullWidth' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFullWidth')">
-										{{ translate('Gallery_FullWidth') }}
-									</button>
-									<button type="button" (click)="setImageDisplayMode('fillPage')" [class]="imageDisplayMode() === 'fillPage' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToFillPage')">
-										{{ translate('Gallery_FillPage') }}
-									</button>
-									<button type="button" (click)="setImageDisplayMode('thumbnails')" [class]="imageDisplayMode() === 'thumbnails' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ResizeImagesToThumbnails')">
-										{{ translate('Gallery_Thumbnails') }}
-									</button>
-								</div>
+						@if (isDownloading() && downloadProgress() > 0) {
+							<div class="sticky-controls-progress progress mt-2" style="height: 4px">
+								<div aria-valuemax="100" aria-valuemin="0" class="progress-bar" role="progressbar" [attr.aria-valuenow]="downloadProgress()" [style.width.%]="downloadProgress()"></div>
 							</div>
-							<div class="control-group">
-								<label for="galleryOptionsControls">{{ translate('Gallery_Options') }}</label>
-								<div id="galleryOptionsControls" class="button-group" role="group" [attr.aria-labelledby]="'galleryOptionsControls'">
-									@if (brokenImages() > 0 || loading()) {
-										<button type="button" (click)="toggleBrokenImagesVisibility()" [class]="showBrokenImages() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="translate('Images_ToggleBrokenImages')">
-											{{ translate(showBrokenImages() ? 'Gallery_HideBroken' : 'Gallery_ShowBroken') }}
-										</button>
-									}
-									@if (brokenImages() > 0) {
-										<button type="button" (click)="removeBrokenImages()" class="btn btn-sm btn-outline-danger" [title]="translate('Images_RemoveBrokenImages')">
-											{{ translate('Images_RemoveBrokenImages') }}
-										</button>
-									}
-									<button type="button" (click)="toggleInfiniteMode()" [class]="isInfiniteMode() ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-secondary'" [title]="isInfiniteMode() ? translate('Gallery_DisableInfiniteMode') : translate('Gallery_EnableInfiniteMode')"><span aria-hidden="true">♾️</span>{{ isInfiniteMode() ? translate('Gallery_InfiniteModeOn') : translate('Gallery_InfiniteModeOff') }}</button>
-								</div>
-							</div>
-						</div>
+						}
+					</div>
+				} @else {
+					<div class="sticky-controls-collapsed">
+						<button class="btn btn-sm btn-outline-secondary collapse-btn" type="button" (click)="toggleStickyControlsCollapse()" [title]="translate('Gallery_ExpandControls')" [attr.aria-expanded]="false" aria-controls="sticky-controls-content">
+							<span aria-hidden="true">▶</span>
+						</button>
 					</div>
 				}
 			</div>
