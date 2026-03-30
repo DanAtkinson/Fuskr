@@ -120,10 +120,11 @@ testWithExtension.describe('Gallery', () => {
 			const itemCount = await imageItems.count();
 			expect(itemCount).toBe(3);
 
-			const statsBar = page.locator('.gallery-stats').first();
-			await expect(statsBar).toBeAttached({ timeout: 5000 });
-			const statsText = await statsBar.textContent();
-			expect(statsText).toContain('3');
+			const totalStat = page
+				.locator('.sticky-gallery-controls .stats-info .stat')
+				.filter({ hasText: /3\s+total/i })
+				.first();
+			await expect(totalStat).toBeVisible({ timeout: 5000 });
 
 			await page.close();
 		}
