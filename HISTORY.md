@@ -2,27 +2,157 @@
 
 ## 📋 Complete Changelog
 
-### 5.0.7
+### 5.0.7 🚀
+
+#### Major Features
+
+- **♾️ Infinite Gallery Mode** — Load pages of images continuously as user scrolls, with loaded-range statistics and continuation guards
+- **🖥️ Persisted Full-Screen Layout Toggle** — Maximise gallery viewing area with preference persistence
+- **📌 Sticky Collapsible Controls** — Global toggle for persistent control bar positioning with improved responsiveness
+- **📊 Progressive Loading Feedback** — Real-time loading indicators for manual mode and gallery generation
+- **🍞 Toast Notifications** — User feedback for copy-to-clipboard actions
+- **🎨 OS-Native Emoji Replacement** — Completely removed Font Awesome dependency in favour of standard Unicode emojis
+- **🦊 Firefox Privacy Permissions** — Implemented data collection consent gating with opt-in logging per Firefox requirements
+- **🛠️ Development Build Mode** — Support for building extension in development mode to aid debugging
+- **🪝 Pre-Commit Hooks** — Added Husky with lint-staged for automatic code quality checks
+
+#### Architectural Improvements
+
+- **📡 Angular Signals Refactor** — Converted reactive state management to Angular signals for improved performance and maintainability
+- **♿ Enhanced Accessibility** — Modal focus trap, improved alt text, and aria-live counter for screen readers
+- **🪵 Legacy Code Removal** — Removed defunct `app-routing.module.ts`; routing now defined in `src/main.ts`
 
 #### Bug Fixes
 
-- **🖼️ End key now navigates to the last visible image** — When broken images were hidden, the End key would overshoot the visible list and silently do nothing. All keyboard navigation (End, Home, arrow keys) now uses the filtered visible image list ([#94](https://github.com/DanAtkinson/Fuskr/issues/94))
-- **🛡️ Navigation blocked during active ZIP download** — Clicking "View Options" or "History" while a ZIP download was in progress would silently cancel it. A confirmation prompt is now shown, and the browser's `beforeunload` event is also handled to catch tab closes and navigations ([#94](https://github.com/DanAtkinson/Fuskr/issues/94))
-- **🦊 Firefox build corrections** — Resolved Firefox extension build issues; replaced use of `alert()`/`prompt()` with browser-compatible alternatives
+- **⌨️ Keyboard Navigation** — Fixed navigation bounds to respect visible media items only (addresses [#94](https://github.com/DanAtkinson/Fuskr/issues/94))
+- **🔒 ZIP Download Protection** — Navigation blocked during active downloads with confirmation prompt and `beforeunload` handler (addresses [#94](https://github.com/DanAtkinson/Fuskr/issues/94))
+- **🦊 Firefox Compatibility** — Corrected build issues and removed browser-incompatible `alert()`/`prompt()` usage
+- **🔗 URL Handling** — Fixed percent-encoded sequence handling in `createFuskUrl` and `createTab`
+- **🔧 Extension ID** — Improved extension ID resolution without requiring `chrome://extensions` page
+- **🎛️ Gallery Controls** — Fixed display and sticky bar wrapping issues; prevented vertical button wrapping
+- **🚨 Oversized Images** — Suppressed NG0913 warning via IMAGE_CONFIG
+- **⚠️ Background Script** — Prevented unhandled rejection in FuskrRecent context menu
+
+#### Testing & Infrastructure
+
+- **🎭 Playwright E2E Tests** — Added comprehensive end-to-end test suite for Chrome extension with Chromium fixture
+- **🔄 Vitest Migration** — Replaced Karma with Vitest for faster, more reliable unit testing with improved watch mode
+- **📈 Test Coverage** — Increased coverage with additional tests for auto-removal, compression modes, video errors, and metadata; enforced 80% watermarks
+- **Node.js v24 LTS** — Upgraded from v22 for improved performance and compatibility
+- **Angular v21.1.2** — Updated to latest stable release
+- **Jasmine v6** — Updated testing framework
+- **Security Fixes** — Addressed CVE-2026-25536 and other vulnerabilities including lodash, tar, node-forge, and flatted
+
+#### Documentation
+
+- **📚 Rewrote Contributing Guide** — Updated `CONTRIBUTING.markdown` with current development practices
+- **📝 README Corrections** — Fixed inaccuracies and extension store details
+- **📋 Manifest Documentation** — Added documentation for host permissions reason
+
+---
+
+### 5.0.6
+
+#### Features
+
+- **🗑️ Auto-Remove Broken Images Setting** — Persistent option to automatically remove images that fail to load, with manual removal capability
+- **🔗 Open in Tab Button** — Added button to open images directly in a new tab (addresses [#93](https://github.com/DanAtkinson/Fuskr/issues/93))
+- **📦 ZIP Download Performance** — Sped up large archive downloads using STORE compression for media at scale; kept DEFLATE for small sets and metadata
+
+#### Bug Fixes
+
+- **🔍 Gallery Viewer Scaling** — Fixed scaling issues at >125% OS zoom levels (addresses [#93](https://github.com/DanAtkinson/Fuskr/issues/93))
+- **📝 Duplicate Filename Handling** — Implemented proper zero-padded suffix numbering for duplicate filenames in downloads
+- **🔐 Base64 URL Encoding** — Implemented base64 encoding for URL parameters to prevent corruption in history storage
+- **👤 Incognito Mode Support** — Fixed incognito mode by switching to split mode architecture
+- **📜 History Page** — Corrected critical history page display issues
 
 #### Improvements
 
-- **🧪 Playwright end-to-end tests** — Added full Playwright e2e test suite for the Chrome extension, loading the unpacked extension in a real Chromium browser
-- **⚡ Migrated from Karma to Vitest** — Faster, more reliable unit test runner with improved watch mode and coverage reporting
-- **📈 Increased unit test coverage** — Additional tests for session auto-removal, compression modes, video error handling, metadata, and URL decoding; 80% coverage watermarks enforced on the build
+- **🎯 Options Page Layout** — Left-aligned labels and descriptions for better visual hierarchy
 
-#### Dependency Updates
+---
 
-- Upgraded to Angular v21.1.2 (latest stable)
-- Updated to Node.js v24 LTS across all configurations
-- Font Awesome upgraded from 6.x to 7.1.0
-- Fixed CVE-2026-25536 security vulnerability
-- Multiple dependency bumps for security and compatibility (tar, lodash, flatted, hono, immutable, node-forge, jasmine-core, @types/jasmine)
+### 5.0.5
+
+#### Bug Fixes
+
+- **🔑 Manifest Key Removal** — Removed unnecessary key from manifest for Chrome Web Store API compatibility
+
+---
+
+### 5.0.4
+
+#### Bug Fixes
+
+- **🛠️ Build Issues** — Fixed v5.0.3 build errors and prepared v5.0.4 for next development cycle
+
+---
+
+### 5.0.3
+
+#### Features
+
+- **⏱️ Progressive Gallery Rendering** — Implemented progressive rendering for improved perceived performance
+
+#### Bug Fixes
+
+- **🔧 Extension ID** — Corrected extension ID issues
+
+---
+
+### 5.0.2
+
+#### Features & Improvements
+
+- **📍 Automated GitHub Pages Deployment** — Modern website with GitHub Actions automated deployment
+- **🌐 Internationalisation of UI** — Hardcoded strings in options page now properly internationalised
+- **📋 Accessibility Enhancements** — Comprehensive HTML accessibility improvements across the extension
+- **🔗 Context Menu Options Access** — Fixed by using explicit tab creation instead of `chrome.runtime.openOptionsPage()`
+- **⚙️ Overload Protection** — Increased limit to 250; added logging UI toggle in options page
+- **🎨 Code Formatting** — Added Prettier code formatting with comprehensive auto-fix capabilities
+- **✅ ESLint Configuration** — Added modern ESLint configuration for code quality
+
+#### Infrastructure
+
+- **🔄 GitHub Actions** — Replaced Travis CI with GitHub Actions for CI/CD pipeline
+- **✅ Linting & Formatting** — Enhanced linting and formatting infrastructure configured for automated checks
+- **📝 Documentation** — Comprehensive documentation restructure and modernisation
+- **💾 Line Endings** — Fixed line ending issues with `.gitattributes`; corrected manifest to CRLF
+
+#### Bug Fixes
+
+- **🔐 URL Corruption** — Fixed URL corruption in history storage with base64 encoding
+- **🛠️ Build Scripts** — Fixed Node.js version in GitHub Actions workflows
+- **⚠️ TypeScript Errors** — Eliminated all TypeScript `any` types and modernised Angular patterns
+
+#### Security
+
+- **🔐 Extension Security Keys** — Added extension security keys for Chrome Web Store submission
+- **🛡️ Vulnerability Fixes** — Fixed Node.js security vulnerabilities (lodash, tar, etc.)
+
+---
+
+### 5.0.1
+
+#### Features & Improvements
+
+- **🔐 Context Menu Fixes** — Resolved context menu access issues for options page
+- **📋 Feature Overload Protection** — Added 250-item limit with logging UI toggle
+- **🌐 Internationalisation** — Initial internationalisation work on UI strings
+
+#### Infrastructure
+
+- **🔄 GitHub Actions Setup** — Implemented GitHub Actions for CI/CD with automated building and Chrome Web Store deployment
+- **✅ ESLint & Prettier** — Added ESLint and Prettier for code quality with automated formatting
+- **🛡️ TypeScript Improvements** — Eliminated TypeScript `any` types throughout codebase; modernised Angular patterns
+- **📚 Documentation** — Modernised documentation structure and improved troubleshooting guides
+
+#### Bug Fixes
+
+- **🔐 URL History** — Fixed URL corruption in history storage using base64 encoding
+- **🦊 Firefox Build** — Corrected Firefox build compatibility issues
+- **⚠️ Console Warnings** — Fixed logger issues and replaced deprecated `substr()` with `substring()`
 
 ---
 
@@ -38,6 +168,8 @@
 - **🔄 Chrome Sync Ready** - Modern storage architecture prepared for cross-device synchronisation
 - **🛡️ Type Safety** - Complete TypeScript migration with proper typing throughout the codebase
 - **📦 Clean Dependencies** - Organised folder structure with proper imports and modular design
+
+---
 
 ### 4.0.75
 
