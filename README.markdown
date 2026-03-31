@@ -7,9 +7,11 @@
 ![Firefox](https://img.shields.io/badge/Firefox-109+-orange.svg)
 ![Version](https://img.shields.io/badge/version-5.0.6-blue.svg)
 
-> **✨ Angular 21 Rewrite with TypeScript & Manifest V3 ✨**
->
 > Transform single image URLs into stunning galleries with intelligent pattern recognition!
+> 
+> Ever landed on a single photo and suspected there are more just like it? Fuskr finds them for you. When an image URL contains a number — like `example.com/photos/08.jpg` — Fuskr works out that there are probably images named `07.jpg`, `09.jpg`, and so on, fetches them all, and displays them together as a neat, browsable gallery in a new tab.
+> 
+> There's no manual work involved. Right-click any image on a page and choose **"Fusk"**, or paste a URL directly into the browser toolbar — Fuskr does the rest. You can choose whether to look forwards, backwards, or both from the current image, and pick how many images to include. It works with photos and videos alike, and handles websites that use leading zeroes in their filenames (e.g. `001`, `002`, `003`) without any fuss.
 
 ## 🚀 Quick Start Guide
 
