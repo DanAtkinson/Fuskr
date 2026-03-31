@@ -1795,7 +1795,13 @@ describe('GalleryComponent', () => {
 				}
 			).knownMediaUrls = new Set(items.map((item) => item.url));
 
-			const brokenEdgeUrls = Array.from({ length: 10 }, (_, i) => `https://example.com/image${String(20 - i).padStart(3, '0')}.jpg`);
+			const brokenEdgeUrls = Array.from({ length: 10 }, (_, i) => `https://example.com/image${String(21 + i).padStart(3, '0')}.jpg`);
+			(
+				component as unknown as {
+					knownMediaUrls: Set<string>;
+				}
+			).knownMediaUrls = new Set([...items.map((item) => item.url), ...brokenEdgeUrls]);
+
 			(
 				component as unknown as {
 					brokenUrls: { set(v: Set<string>): void };
@@ -1840,7 +1846,13 @@ describe('GalleryComponent', () => {
 				}
 			).knownMediaUrls = new Set(items.map((item) => item.url));
 
-			const brokenEdgeUrls = Array.from({ length: 10 }, (_, i) => `https://example.com/image${String(20 - i).padStart(3, '0')}.jpg`);
+			const brokenEdgeUrls = Array.from({ length: 10 }, (_, i) => `https://example.com/image${String(21 + i).padStart(3, '0')}.jpg`);
+			(
+				component as unknown as {
+					knownMediaUrls: Set<string>;
+				}
+			).knownMediaUrls = new Set([...items.map((item) => item.url), ...brokenEdgeUrls]);
+
 			(
 				component as unknown as {
 					brokenUrls: { set(v: Set<string>): void };

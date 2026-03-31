@@ -1672,8 +1672,8 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		const threshold = GalleryComponent.infiniteContinuationPromptThresholds[GalleryComponent.infiniteContinuationPromptThresholds.length - 1];
 		let consecutiveBroken = 0;
 
-		for (let offset = 0; offset < threshold; offset++) {
-			const value = direction === 'forward' ? boundary - offset : boundary + offset;
+		for (let offset = 1; offset <= threshold; offset++) {
+			const value = direction === 'forward' ? boundary + offset : boundary - offset;
 			if (value < 0) {
 				break;
 			}
