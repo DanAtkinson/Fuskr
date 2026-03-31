@@ -61,13 +61,15 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	// Computed signals
 	visibleMediaItems = computed(() => {
+		const allMediaItems = this.mediaItems().filter((item): item is MediaItem => Boolean(item));
 		if (this.showBrokenImages()) {
-			return this.mediaItems();
+			return allMediaItems;
 		}
-		return this.mediaItems().filter((item) => !this.brokenUrls().has(item.url));
+		return allMediaItems.filter((item) => !this.brokenUrls().has(item.url));
 	});
 	allUrlsText = computed(() =>
 		this.mediaItems()
+			.filter((item): item is MediaItem => Boolean(item))
 			.map((item) => item.url)
 			.join('\n')
 	);
@@ -1939,9 +1941,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			const batch = items.slice(i, i + concurrencyLimit);
 
 			// Process batch in parallel
-			const updatePromises = batch.map(async (mediaItem, batchIndex) => {
-				const globalIndex = i + batchIndex;
-
+			const updatePromises = batch.map(async (mediaItem) => {
 				try {
 					// Make HTTP request to get actual media type
 					const result = await this.mediaTypeService.determineMediaType(mediaItem.url);
@@ -1949,9 +1949,19 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 					// Update the mediaItem in place only if the type changed
 					if (result.type !== mediaItem.type || result.mimeType !== mediaItem.mimeType) {
 						this.mediaItems.update((current) => {
+							const index = current.findIndex((item) => item?.url === mediaItem.url);
+							if (index === -1) {
+								return current;
+							}
+
+							const existing = current[index];
+							if (!existing) {
+								return current;
+							}
+
 							const next = [...current];
-							next[globalIndex] = {
-								...mediaItem,
+							next[index] = {
+								...existing,
 								type: result.type,
 								mimeType: result.mimeType,
 								contentLength: result.contentLength,

@@ -662,6 +662,13 @@ describe('GalleryComponent', () => {
 			expect(result).toBe('url1.jpg\nurl2.jpg\nurl3.jpg');
 		});
 
+		it('should ignore undefined media entries in computed URL and visible lists', () => {
+			component.mediaItems.set([{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' }, undefined, { url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' }] as unknown as MediaItem[]);
+
+			expect(component.getAllUrlsText()).toBe('url1.jpg\nurl3.jpg');
+			expect(component.visibleMediaItems().map((item) => item.url)).toEqual(['url1.jpg', 'url3.jpg']);
+		});
+
 		it('should copy all URLs to clipboard', async () => {
 			vi.spyOn(navigator.clipboard, 'writeText').mockReturnValue(Promise.resolve());
 			vi.spyOn(console, 'log');
