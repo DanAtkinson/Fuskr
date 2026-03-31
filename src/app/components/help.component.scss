@@ -1,9 +1,9 @@
 // Help Component Styles
 .help-container {
-	max-width: 900px;
 	margin: 0 auto;
-	padding: 20px;
+	max-width: 900px;
 	min-height: 100vh;
+	padding: 20px;
 }
 
 // ─── Header ──────────────────────────────────────────────────────────────────
@@ -12,17 +12,17 @@
 	margin-bottom: 30px;
 
 	.header-top {
+		align-items: center;
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
 		margin-bottom: 8px;
 
 		h1,
 		h1 span[aria-hidden='true'] {
-			margin: 0;
 			color: var(--text-color);
 			font-size: 2.5rem;
 			font-weight: 300;
+			margin: 0;
 		}
 
 		.header-controls {
@@ -33,9 +33,9 @@
 }
 
 .version-badge {
-	margin: 0;
-	font-size: 0.9rem;
 	color: var(--text-secondary);
+	font-size: 0.9rem;
+	margin: 0;
 }
 
 // ─── Cards ───────────────────────────────────────────────────────────────────
@@ -44,10 +44,10 @@
 	.card-header {
 		background-color: var(--bg-secondary);
 		border-bottom: 1px solid var(--border-color);
-		padding: 16px 20px;
 		border-radius: 8px 8px 0 0;
 		// Override the global .card padding so the header spans edge-to-edge
 		margin: -20px -20px 20px;
+		padding: 16px 20px;
 
 		h2 {
 			color: var(--text-color);
@@ -64,41 +64,41 @@
 // ─── Typography helpers ───────────────────────────────────────────────────────
 
 .section-subheading {
+	color: var(--text-color);
 	font-size: 1rem;
 	font-weight: 600;
-	color: var(--text-color);
-	margin-top: 1.25rem;
 	margin-bottom: 0.5rem;
+	margin-top: 1.25rem;
 }
 
 // ─── Examples ────────────────────────────────────────────────────────────────
 
 .example-block {
 	background-color: var(--bg-secondary);
-	border: 1px solid var(--border-color);
 	border-left: 4px solid var(--primary-color);
 	border-radius: 4px;
-	padding: 12px 16px;
+	border: 1px solid var(--border-color);
 	margin: 12px 0;
+	padding: 12px 16px;
 
 	code {
+		color: var(--text-color);
 		display: block;
 		font-size: 0.95rem;
 		word-break: break-all;
-		color: var(--text-color);
 	}
 }
 
 .example-label {
-	margin: 0 0 8px;
-	font-size: 0.85rem;
 	color: var(--text-secondary);
+	font-size: 0.85rem;
+	margin: 0 0 8px;
 }
 
 .example-desc {
-	margin: 8px 0 0;
-	font-size: 0.85rem;
 	color: var(--text-secondary);
+	font-size: 0.85rem;
+	margin: 8px 0 0;
 }
 
 // ─── Tables ───────────────────────────────────────────────────────────────────
@@ -125,28 +125,28 @@
 
 .usage-method {
 	background-color: var(--bg-secondary);
-	border: 1px solid var(--border-color);
 	border-radius: 6px;
+	border: 1px solid var(--border-color);
 	padding: 16px;
 
 	p {
-		margin: 0;
-		font-size: 0.95rem;
 		color: var(--text-secondary);
+		font-size: 0.95rem;
+		margin: 0;
 	}
 }
 
 // ─── Inline link button ───────────────────────────────────────────────────────
 
 .help-inline-link {
-	padding: 0;
-	height: auto;
+	color: var(--primary-color);
 	font-size: inherit;
 	font-weight: inherit;
-	vertical-align: baseline;
-	color: var(--primary-color);
+	height: auto;
+	padding: 0;
 	text-decoration: underline;
 	text-underline-offset: 2px;
+	vertical-align: baseline;
 
 	&:hover {
 		color: var(--primary-color);
@@ -164,13 +164,13 @@
 }
 
 .privacy-point {
+	align-items: flex-start;
 	display: flex;
 	gap: 12px;
-	align-items: flex-start;
 
 	.privacy-icon {
-		font-size: 1.1rem;
 		flex-shrink: 0;
+		font-size: 1.1rem;
 		margin-top: 2px;
 	}
 }
@@ -188,12 +188,12 @@
 
 	// H3 = version number heading (e.g. "5.0.7")
 	::ng-deep .history-version-heading {
+		border-bottom: 1px solid var(--border-color);
+		color: var(--text-color);
 		font-size: 1.1rem;
 		font-weight: 600;
-		color: var(--text-color);
 		margin: 1.25rem 0 0.4rem;
 		padding-bottom: 4px;
-		border-bottom: 1px solid var(--border-color);
 
 		&:first-child {
 			margin-top: 0;
@@ -202,12 +202,12 @@
 
 	// H4 = subsection heading (e.g. "Bug Fixes")
 	::ng-deep .history-subsection-heading {
+		color: var(--text-secondary);
 		font-size: 0.85rem;
 		font-weight: 600;
-		text-transform: uppercase;
 		letter-spacing: 0.06em;
-		color: var(--text-secondary);
 		margin: 0.75rem 0 0.3rem;
+		text-transform: uppercase;
 	}
 
 	::ng-deep .history-list {
@@ -215,15 +215,16 @@
 		padding-left: 1.5rem;
 
 		li {
-			font-size: 0.95rem;
 			color: var(--text-color);
+			font-size: 0.95rem;
 			margin-bottom: 3px;
+			text-align: left;
 		}
 	}
 
 	::ng-deep .history-para {
-		font-size: 0.95rem;
 		color: var(--text-color);
+		font-size: 0.95rem;
 		margin: 0.25rem 0;
 	}
 
@@ -238,10 +239,10 @@
 	}
 
 	::ng-deep code {
-		font-size: 0.875em;
 		background-color: var(--bg-secondary);
-		border: 1px solid var(--border-color);
 		border-radius: 3px;
+		border: 1px solid var(--border-color);
+		font-size: 0.875em;
 		padding: 1px 4px;
 	}
 }
@@ -261,8 +262,8 @@
 
 .external-link {
 	color: var(--primary-color);
-	text-decoration: none;
 	font-weight: 600;
+	text-decoration: none;
 
 	&:hover {
 		text-decoration: underline;
@@ -270,15 +271,15 @@
 }
 
 .version-footer {
-	font-size: 0.9rem;
 	color: var(--text-secondary);
+	font-size: 0.9rem;
 }
 
 // ─── Theme toggle ─────────────────────────────────────────────────────────────
 
 .theme-toggle {
-	border: 1px solid var(--border-color);
 	background-color: var(--bg-color);
+	border: 1px solid var(--border-color);
 	color: var(--text-color);
 
 	&:hover {
@@ -296,8 +297,8 @@
 
 	.help-header {
 		.header-top {
-			flex-direction: column;
 			align-items: flex-start;
+			flex-direction: column;
 			gap: 15px;
 
 			h1 {
