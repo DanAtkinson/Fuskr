@@ -7,6 +7,18 @@
 	box-sizing: border-box;
 }
 
+.options-header-row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.options-help-btn {
+	flex-shrink: 0;
+	margin-top: 4px;
+}
+
 h1 {
 	color: #2c3e50;
 	margin-bottom: 30px;

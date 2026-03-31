@@ -437,6 +437,13 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		this.router.navigate(['/history']);
 	}
 
+	navigateToHelp() {
+		if (this.isDownloading() && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
+			return;
+		}
+		this.router.navigate(['/help']);
+	}
+
 	navigateToOptions() {
 		if (this.isDownloading() && !confirm(this.translate('Gallery_DownloadInProgress_ConfirmLeave'))) {
 			return;

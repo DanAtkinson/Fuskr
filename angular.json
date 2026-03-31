@@ -47,6 +47,11 @@
 								"input": "src",
 								"output": "."
 							},
+							{
+								"glob": "HISTORY.md",
+								"input": ".",
+								"output": "."
+							},
 						],
 						"styles": [
 							"node_modules/bootstrap/dist/css/bootstrap.min.css",

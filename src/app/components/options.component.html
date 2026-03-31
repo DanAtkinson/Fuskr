@@ -1,7 +1,10 @@
 <div class="container-fluid options-container">
 	<div class="row">
-		<div class="col-12">
+		<div class="col-12 options-header-row">
 			<h1 class="mb-4"><span class="me-2" aria-hidden="true">⚙️</span>{{ translate('Options_Title') }}</h1>
+			<button class="btn btn-outline-secondary options-help-btn" type="button" (click)="navigateToHelp()" [title]="translate('Help_ViewHelp')">
+				<span aria-hidden="true">❓</span>
+			</button>
 		</div>
 	</div>
 

@@ -148,6 +148,7 @@ input[type='checkbox'] {
 	border-radius: 8px;
 	padding: 20px;
 	box-shadow: var(--shadow);
+	color: var(--text-color);
 
 	&:hover {
 		box-shadow: var(--shadow-hover);

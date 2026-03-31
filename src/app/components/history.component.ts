@@ -101,6 +101,10 @@ export class HistoryComponent extends BaseComponent implements OnInit {
 		this.router.navigate(['/gallery'], { queryParams: { url: encodedUrl } });
 	}
 
+	navigateToHelp() {
+		this.router.navigate(['/help']);
+	}
+
 	navigateToOptions() {
 		this.router.navigate(['/options']);
 	}

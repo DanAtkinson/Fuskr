@@ -26,6 +26,9 @@
 	"Application_ContextMenu_Fusk": {
 		"message": "Fusk"
 	},
+	"Application_ContextMenu_Help": {
+		"message": "Help"
+	},
 	"Application_ContextMenu_History": {
 		"message": "History"
 	},
@@ -379,6 +382,18 @@
 	"Gallery_WelcomeText": {
 		"description": "Welcome message description",
 		"message": "Enter a URL with numbers in the filename to generate an image gallery."
+	},
+	"Help_BackToGallery": {
+		"description": "Tooltip for the back to gallery button on the help page",
+		"message": "Back to Gallery"
+	},
+	"Help_Title": {
+		"description": "Page title for the help page",
+		"message": "Help & About"
+	},
+	"Help_ViewHelp": {
+		"description": "Tooltip for the help button shown in navigation headers",
+		"message": "Help & About"
 	},
 	"History_BrokenImages": {
 		"description": "Label for images that failed to load",

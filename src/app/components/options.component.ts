@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ChromeStorageData } from '@models/chrome-storage';
 import { LoggerService, LogLevel } from '@services/logger.service';
 import { BaseComponent } from './base.component';
@@ -25,6 +26,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 	statusMessage = signal('');
 
 	// Injected services
+	public router = inject(Router);
 	private logger = inject(LoggerService);
 
 	constructor() {
@@ -43,6 +45,10 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		await this.logger.exportLogs();
 		this.logger.info('options.debugPanel.exported', 'User exported debug logs');
 		this.showStatus('Debug logs exported!');
+	}
+
+	navigateToHelp() {
+		this.router.navigate(['/help']);
 	}
 
 	getLogLevelName(level: number): string {

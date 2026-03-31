@@ -219,6 +219,12 @@ export class BackgroundScript {
 					ParentId: this.parentId,
 					Title: this.l18nify('ContextMenu_Options'),
 				});
+
+				this.createContextMenu({
+					Id: 'FuskrHelp',
+					ParentId: this.parentId,
+					Title: this.l18nify('ContextMenu_Help'),
+				});
 			} catch (error) {
 				console.error('Error creating context menus:', error);
 			}
@@ -404,6 +410,9 @@ export class BackgroundScript {
 			case 'FuskrOptions':
 				this.optionsOnClick(tab);
 				return;
+			case 'FuskrHelp':
+				this.helpOnClick(tab);
+				return;
 		}
 
 		if (typeof info.menuItemId === 'string') {
@@ -488,6 +497,17 @@ export class BackgroundScript {
 		};
 		chrome.storage.sync.set({
 			behaviour: this.options.behaviour,
+		});
+	}
+
+	private helpOnClick(tab: chrome.tabs.Tab): void {
+		// Query current active tab to ensure we get the correct window context
+		chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+			const activeTab = tabs[0] || tab;
+			chrome.tabs.create({
+				url: chrome.runtime.getURL('index.html#/help'),
+				windowId: activeTab.windowId,
+			});
 		});
 	}
 
