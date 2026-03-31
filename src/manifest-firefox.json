@@ -42,7 +42,7 @@
 	],
 	"browser_specific_settings": {
 		"gecko": {
-			"id": "fuskr@danatkinson.com",
+			"id": "{6fbd1009-d97d-45b7-97d6-1b34d4182a0c}",
 			"strict_min_version": "140.0",
 			"data_collection_permissions": {
 				"required": ["none"],
