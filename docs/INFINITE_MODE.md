@@ -174,27 +174,15 @@ Add unit tests in `src/app/components/gallery.component.spec.ts` for infinity-to
 ---
 
 ### Phase 8: Angular CDK Virtualisation (Follow-Up Only)
-**Status**: In Progress
+**Status**: Deferred
 
 If performance still warrants it after infinite mode lands, prototype `cdk-virtual-scroll-viewport` only for thumbnails mode. Do not couple this to the first release.
 
 **Tasks** (separate PR):
-- [x] Add `@angular/cdk` to `package.json`
-- [x] Wrap thumbnail gallery in `cdk-virtual-scroll-viewport`
-- [x] Keep the first prototype scoped to thumbnails mode with infinite mode continuing to use the existing non-virtualised gallery path
-- [x] Add automated Playwright comparison of virtual-thumbnail rendered DOM count and scrollability vs. the non-virtual thumbnail fallback
-- [ ] Record manual memory and scroll performance measurements across large galleries/browsers
+- [ ] Add `@angular/cdk` to `package.json`
+- [ ] Wrap thumbnail gallery in `cdk-virtual-scroll-viewport`
+- [ ] Benchmark memory and scroll performance vs. sentinel-based approach
 - [ ] Decide whether to keep experiment or revert
-
-**E2E Tests** (`e2e/tests/gallery.spec.ts`):
-- [x] Add large-gallery thumbnail virtualisation comparison test (virtual DOM count remains below total item count, fallback path renders full count)
-
-**Files**:
-- `src/app/components/gallery.component.ts`
-- `src/app/components/gallery.component.html`
-- `src/app/components/gallery.component.scss`
-- `src/app/components/gallery.component.spec.ts`
-- `e2e/tests/gallery.spec.ts`
 
 ---
 
@@ -202,13 +190,13 @@ If performance still warrants it after infinite mode lands, prototype `cdk-virtu
 
 | File | Purpose |
 |------|---------|
-| `src/app/components/gallery.component.ts` | Main gallery state, generation flow, counters, keyboard navigation; home for infinite-mode orchestration and thumbnail virtualisation logic |
-| `src/app/components/gallery.component.html` | Gallery rendering loop; contains both the standard gallery path and the thumbnail virtual-scroll branch |
-| `src/app/components/gallery.component.scss` | Style toggle, sentinels, visual indicators, and virtual-thumbnail viewport layout |
+| `src/app/components/gallery.component.ts` | Main gallery state, generation flow, counters, keyboard navigation; home for infinite-mode orchestration and scroll preservation |
+| `src/app/components/gallery.component.html` | Gallery rendering loop; place to add ♾️ control and boundary sentinels |
+| `src/app/components/gallery.component.scss` | Style toggle, sentinels, and visual indicators |
 | `src/app/services/fuskr.service.ts` | URL pattern parsing and generation logic (reused for forward/backward batch extension) |
 | `src/app/services/media-type.service.ts` | Background MIME/type detection; newly inserted items must join incrementally |
-| `src/app/components/gallery.component.spec.ts` | Unit coverage for toggle state, range tracking, append/prepend behaviour, and thumbnail virtualisation |
-| `e2e/tests/gallery.spec.ts` | Browser-level verification of infinite loading and thumbnail virtualisation/fallback behaviour |
+| `src/app/components/gallery.component.spec.ts` | Unit coverage for toggle state, range tracking, append/prepend behaviour |
+| `e2e/tests/gallery.spec.ts` | Browser-level verification of scroll-triggered loading and position preservation |
 
 ---
 
@@ -217,7 +205,6 @@ If performance still warrants it after infinite mode lands, prototype `cdk-virtu
 - [x] Run gallery unit tests; infinite-mode tests pass
 - [x] Run `npm run test:coverage`; coverage and thresholds remain healthy
 - [x] Run targeted gallery e2e (`chromium-extension`) for infinite append flow
-- [x] Run targeted gallery e2e for thumbnail virtualisation benchmark/comparison flow
 - [x] Run `npm run build` to verify lint/test/build health
 - [ ] Manually test: Generate gallery from sequence with room on both sides
 - [ ] Manually test: Enable infinite mode, scroll downward to trigger append
