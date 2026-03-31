@@ -650,6 +650,9 @@
 		.image-item {
 			display: block;
 			margin-bottom: 20px;
+			width: max-content;
+			max-width: none;
+			overflow: visible;
 			border-radius: 0;
 			background: none;
 			box-shadow: none;
@@ -658,12 +661,15 @@
 				transform: none;
 			}
 
-			img {
+			img,
+			video,
+			.fusk-media {
 				width: auto;
 				height: auto;
 				max-width: none;
 				max-height: none;
 				object-fit: none;
+				transform: none !important;
 
 				&.fusk-image {
 					width: auto;
