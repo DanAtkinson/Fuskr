@@ -23,14 +23,22 @@ jobs:
       - name: Install dependencies
         run: npm ci
         
-      - name: Run full build pipeline
-        run: npm run build
-        
       - name: Extract version from tag
         id: version
         run: |
           echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Update package.json with tag version
+        run: |
+          npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
+          cat package.json | grep '"version"'
+        
+      - name: Sync version to manifests
+        run: npm run sync:version
+        
+      - name: Run full build pipeline (skipping version sync)
+        run: npm run build:extensions:prod
 
       - name: Build release notes (includes Product Details)
         id: notes
