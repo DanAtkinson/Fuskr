@@ -138,54 +138,102 @@
 		}
 
 		@if (visibleMediaItems().length > 0) {
-			<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode() === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode() === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode() === 'thumbnails'">
-				@if (isInfiniteMode()) {
-					<div id="infinite-top-sentinel" class="infinite-sentinel infinite-sentinel-top" aria-hidden="true"></div>
-				}
-				@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
-					<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
-						@if (mediaItem.type === 'video') {
-							<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
-								<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
-								{{ translate('Gallery_VideoNotSupported') }}
-							</video>
-						} @else {
-							<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(i)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
-						}
-						@if (mediaItem.loadingState === 'loading') {
-							<div class="media-loading-indicator">
-								<div class="spinner-small"></div>
+			@if (isThumbnailVirtualisationEnabled()) {
+				<cdk-virtual-scroll-viewport #thumbnailViewport id="image-gallery" class="image-gallery image-gallery-virtual image-gallery-virtual--thumbnails images-are-thumbnails" [itemSize]="190" [style.--thumbnail-columns]="thumbnailColumnCount()">
+					<div *cdkVirtualFor="let row of virtualThumbnailRows(); let rowIndex = index" class="thumbnail-row">
+						@for (mediaItem of row; track mediaItem.url; let columnIndex = $index) {
+							@let mediaIndex = getThumbnailMediaIndex(rowIndex, columnIndex);
+							<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
+								@if (mediaItem.type === 'video') {
+									<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, mediaIndex)" (keydown.enter)="openImageViewer(mediaItem.url, mediaIndex)" (keydown.space)="openImageViewer(mediaItem.url, mediaIndex)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="mediaIndex" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (mediaIndex + 1) + ' in viewer'" controls preload="metadata">
+										<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
+										{{ translate('Gallery_VideoNotSupported') }}
+									</video>
+								} @else {
+									<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, mediaIndex)" (keydown.enter)="openImageViewer(mediaItem.url, mediaIndex)" (keydown.space)="openImageViewer(mediaItem.url, mediaIndex)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(mediaIndex)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="mediaIndex" tabindex="0" role="button" [attr.aria-label]="'Open image ' + (mediaIndex + 1) + ' in viewer'" />
+								}
+								@if (mediaItem.loadingState === 'loading') {
+									<div class="media-loading-indicator">
+										<div class="spinner-small"></div>
+									</div>
+								}
+								@if (mediaItem.loadingState === 'error') {
+									<div class="media-error-indicator">
+										<span aria-hidden="true">⚠️</span>
+										<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
+									</div>
+								}
+								<div class="image-overlay">
+									<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
+									<div class="image-actions">
+										<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
+											<span aria-hidden="true">⬇️</span>
+										</button>
+										<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
+											<span aria-hidden="true">📋</span>
+										</button>
+										<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
+											<span aria-hidden="true">↗️</span>
+										</button>
+										<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, mediaIndex); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
+											<span aria-hidden="true">🔍</span>
+										</button>
+									</div>
+								</div>
 							</div>
 						}
-						@if (mediaItem.loadingState === 'error') {
-							<div class="media-error-indicator">
-								<span aria-hidden="true">⚠️</span>
-								<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
-							</div>
-						}
-						<div class="image-overlay">
-							<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
-							<div class="image-actions">
-								<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
-									<span aria-hidden="true">⬇️</span>
-								</button>
-								<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
-									<span aria-hidden="true">📋</span>
-								</button>
-								<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
-									<span aria-hidden="true">↗️</span>
-								</button>
-								<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
-									<span aria-hidden="true">🔍</span>
-								</button>
+					</div>
+				</cdk-virtual-scroll-viewport>
+			} @else {
+				<div id="image-gallery" class="image-gallery" [class.images-are-full-width]="imageDisplayMode() === 'fullWidth'" [class.images-are-full-page]="imageDisplayMode() === 'fillPage'" [class.images-are-thumbnails]="imageDisplayMode() === 'thumbnails'">
+					@if (isInfiniteMode()) {
+						<div id="infinite-top-sentinel" class="infinite-sentinel infinite-sentinel-top" aria-hidden="true"></div>
+					}
+					@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
+						<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
+							@if (mediaItem.type === 'video') {
+								<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
+									<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
+									{{ translate('Gallery_VideoNotSupported') }}
+								</video>
+							} @else {
+								<img class="fusk-image fusk-media" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (load)="onImageLoad($event)" [alt]="getImageAltText(i)" [src]="mediaItem.url" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open image ' + (i + 1) + ' in viewer'" />
+							}
+							@if (mediaItem.loadingState === 'loading') {
+								<div class="media-loading-indicator">
+									<div class="spinner-small"></div>
+								</div>
+							}
+							@if (mediaItem.loadingState === 'error') {
+								<div class="media-error-indicator">
+									<span aria-hidden="true">⚠️</span>
+									<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
+								</div>
+							}
+							<div class="image-overlay">
+								<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
+								<div class="image-actions">
+									<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
+										<span aria-hidden="true">⬇️</span>
+									</button>
+									<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
+										<span aria-hidden="true">📋</span>
+									</button>
+									<button class="btn btn-sm btn-outline-success" type="button" (click)="openInTab(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_OpenVideoInTab' : 'Gallery_OpenImageInTab')">
+										<span aria-hidden="true">↗️</span>
+									</button>
+									<button class="btn btn-sm btn-outline-info" type="button" (click)="openImageViewer(mediaItem.url, i); $event.stopPropagation()" [title]="translate(mediaItem.type === 'video' ? 'Gallery_ShowVideoInViewer' : 'Images_ShowImagesInViewer')">
+										<span aria-hidden="true">🔍</span>
+									</button>
+								</div>
 							</div>
 						</div>
-					</div>
-				}
-				@if (isInfiniteMode()) {
-					<div id="infinite-bottom-sentinel" class="infinite-sentinel infinite-sentinel-bottom" aria-hidden="true"></div>
-				}
-			</div>
+					}
+					@if (isInfiniteMode()) {
+						<div id="infinite-bottom-sentinel" class="infinite-sentinel infinite-sentinel-bottom" aria-hidden="true"></div>
+					}
+				</div>
+			}
 		}
 
 		<!-- URL List Section -->

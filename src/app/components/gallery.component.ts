@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit, HostListener, inject, signal, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, ViewChild, inject, signal, computed } from '@angular/core';
+import { CdkVirtualScrollViewport, ScrollingModule } from '@angular/cdk/scrolling';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,12 +16,15 @@ import { saveAs } from 'file-saver';
 	standalone: true,
 	styleUrls: ['./gallery.component.scss'],
 	templateUrl: './gallery.component.html',
-	imports: [CommonModule, FormsModule],
+	imports: [CommonModule, FormsModule, ScrollingModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy {
 	private static readonly infiniteBatchSize = 50;
 	private static readonly infiniteContinuationPromptThresholds = [10, 50, 100] as const;
 	private static readonly infiniteMaxItems = 2000;
+	private static readonly thumbnailVirtualGap = 20;
+	private static readonly thumbnailVirtualItemMinWidth = 150;
+	private static readonly thumbnailVirtualRowHeight = 190;
 	private static readonly viewerInfinitePreloadDistance = 2;
 
 	// Public signals (alphabetically)
@@ -55,6 +59,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	stickyControlsCollapsed = signal(false);
 	stickyControlsCompressed = signal(false);
 	stickyControlsEnabled = signal(true);
+	thumbnailColumnCount = signal(1);
 	toastMessage = signal('');
 	toastVisible = signal(false);
 	totalImages = signal(0);
@@ -71,6 +76,21 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			.map((item) => item.url)
 			.join('\n')
 	);
+	virtualThumbnailRows = computed(() => {
+		if (!this.isThumbnailVirtualisationEnabled()) {
+			return [] as MediaItem[][];
+		}
+
+		const columns = Math.max(1, this.thumbnailColumnCount());
+		const items = this.visibleMediaItems();
+		const rows: MediaItem[][] = [];
+
+		for (let i = 0; i < items.length; i += columns) {
+			rows.push(items.slice(i, i + columns));
+		}
+
+		return rows;
+	});
 
 	// Private signals
 	private autoRemoveBrokenImagesSession = false; // Session-only: enabled after manual removal
@@ -89,8 +109,12 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	private lastPromptedBrokenThresholdForward = 0;
 	private observerSetupTimeout: ReturnType<typeof setTimeout> | null = null;
 	private scrollLoadCheckTimeout: ReturnType<typeof setTimeout> | null = null;
+	private thumbnailLayoutTimeout: ReturnType<typeof setTimeout> | null = null;
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
+
+	@ViewChild('thumbnailViewport')
+	private thumbnailViewport?: CdkVirtualScrollViewport;
 
 	// Injected services
 	private fuskrService = inject(FuskrService);
@@ -503,6 +527,10 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			clearTimeout(this.scrollLoadCheckTimeout);
 			this.scrollLoadCheckTimeout = null;
 		}
+		if (this.thumbnailLayoutTimeout) {
+			clearTimeout(this.thumbnailLayoutTimeout);
+			this.thumbnailLayoutTimeout = null;
+		}
 		this.teardownInfiniteSentinelObservers();
 	}
 
@@ -522,6 +550,12 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			this.scrollLoadCheckTimeout = null;
 			void this.maybeLoadMoreFromViewportEdges();
 		}, 50);
+	}
+
+	@HostListener('window:resize')
+	handleWindowResize() {
+		this.updateStickyControlsCompression();
+		this.scheduleThumbnailVirtualLayoutUpdate();
 	}
 
 	private updateStickyControlsCompression(): void {
@@ -808,6 +842,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	async setImageDisplayMode(mode: 'fitOnPage' | 'fullWidth' | 'fillPage' | 'thumbnails') {
 		this.imageDisplayMode.set(mode);
+		this.scheduleThumbnailVirtualLayoutUpdate();
 
 		// Save to storage
 		try {
@@ -819,6 +854,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	async toggleBrokenImagesVisibility() {
 		this.showBrokenImages.update((v) => !v);
+		this.scheduleThumbnailVirtualLayoutUpdate();
 
 		// Update visibility of broken images
 		const brokenImages = document.querySelectorAll('img.error');
@@ -855,6 +891,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 	async toggleFullScreenGallery() {
 		this.fullScreenGallery.update((v) => !v);
+		this.scheduleThumbnailVirtualLayoutUpdate();
 
 		// Save to storage
 		try {
@@ -872,10 +909,19 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		} else {
 			this.teardownInfiniteSentinelObservers();
 		}
+		this.scheduleThumbnailVirtualLayoutUpdate();
 	}
 
 	getViewerTotalCount(): number {
 		return this.showBrokenImages() ? this.mediaItems().length : this.visibleMediaItems().length;
+	}
+
+	isThumbnailVirtualisationEnabled(): boolean {
+		return this.imageDisplayMode() === 'thumbnails' && !this.isInfiniteMode();
+	}
+
+	getThumbnailMediaIndex(rowIndex: number, columnIndex: number): number {
+		return rowIndex * this.thumbnailColumnCount() + columnIndex;
 	}
 
 	getInfiniteLoadedRangeLabel(): string {
@@ -1051,7 +1097,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		const idx = this.currentGalleryIndex();
 		this.currentGalleryIndex.set(idx < lastIndex ? idx + 1 : 0);
 		this.scrollToCurrentImage();
-		this.highlightCurrentImage();
+		this.scheduleCurrentImageHighlight();
 	}
 
 	private navigateToPreviousImage() {
@@ -1059,19 +1105,19 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		const idx = this.currentGalleryIndex();
 		this.currentGalleryIndex.set(idx > 0 ? idx - 1 : lastIndex);
 		this.scrollToCurrentImage();
-		this.highlightCurrentImage();
+		this.scheduleCurrentImageHighlight();
 	}
 
 	private navigateToFirstImage() {
 		this.currentGalleryIndex.set(0);
 		this.scrollToCurrentImage();
-		this.highlightCurrentImage();
+		this.scheduleCurrentImageHighlight();
 	}
 
 	private navigateToLastImage() {
 		this.currentGalleryIndex.set(this.visibleMediaItems().length - 1);
 		this.scrollToCurrentImage();
-		this.highlightCurrentImage();
+		this.scheduleCurrentImageHighlight();
 	}
 
 	private openCurrentImage() {
@@ -1106,12 +1152,15 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		const idx = this.currentGalleryIndex();
 		if (idx < 0) return;
 
-		// Find the image element by its index
-		const imageElements = document.querySelectorAll('.image-item');
-		const targetElement = imageElements[idx] as HTMLElement;
+		if (this.isThumbnailVirtualisationEnabled() && this.thumbnailViewport) {
+			const rowIndex = Math.floor(idx / Math.max(1, this.thumbnailColumnCount()));
+			this.thumbnailViewport.scrollToIndex(rowIndex, 'smooth');
+			return;
+		}
+
+		const targetElement = document.querySelector<HTMLElement>(`.image-item [data-index="${idx}"]`);
 
 		if (targetElement) {
-			// Scroll the element into view with smooth behavior
 			targetElement.scrollIntoView({
 				behavior: 'smooth',
 				block: 'center',
@@ -1121,32 +1170,62 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	}
 
 	private highlightCurrentImage() {
-		// Remove previous highlights
 		document.querySelectorAll('.image-item.keyboard-focused').forEach((el) => {
 			el.classList.remove('keyboard-focused');
 		});
 
-		// Add highlight to current image
 		const idx = this.currentGalleryIndex();
 		if (idx >= 0) {
-			const imageElements = document.querySelectorAll('.image-item');
-			const targetElement = imageElements[idx];
+			const targetElement = document.querySelector<HTMLElement>(`.image-item [data-index="${idx}"]`)?.closest('.image-item');
 			if (targetElement) {
 				targetElement.classList.add('keyboard-focused');
 			}
 		}
 	}
 
+	private scheduleCurrentImageHighlight() {
+		setTimeout(() => {
+			this.highlightCurrentImage();
+		}, 0);
+	}
+
 	// Private methods (alphabetically)
 	private initializeKeyboardNavigation() {
-		// Set initial focus to first image if gallery has items
 		if (this.mediaItems().length > 0) {
 			this.currentGalleryIndex.set(0);
-			// Small delay to ensure DOM is updated
+			this.scheduleThumbnailVirtualLayoutUpdate();
 			setTimeout(() => {
 				this.highlightCurrentImage();
 			}, 100);
 		}
+	}
+
+	private scheduleThumbnailVirtualLayoutUpdate() {
+		if (this.thumbnailLayoutTimeout) {
+			clearTimeout(this.thumbnailLayoutTimeout);
+		}
+
+		this.thumbnailLayoutTimeout = setTimeout(() => {
+			this.thumbnailLayoutTimeout = null;
+			this.updateThumbnailVirtualLayout();
+		}, 0);
+	}
+
+	private updateThumbnailVirtualLayout() {
+		if (!this.isThumbnailVirtualisationEnabled()) {
+			return;
+		}
+
+		const viewportWidth = this.thumbnailViewport?.getViewportSize() ?? document.getElementById('image-gallery')?.clientWidth ?? (document.querySelector('.gallery-container') as HTMLElement | null)?.clientWidth ?? window.innerWidth;
+
+		const columns = Math.max(1, Math.floor((viewportWidth + GalleryComponent.thumbnailVirtualGap) / (GalleryComponent.thumbnailVirtualItemMinWidth + GalleryComponent.thumbnailVirtualGap)));
+
+		if (this.thumbnailColumnCount() !== columns) {
+			this.thumbnailColumnCount.set(columns);
+		}
+
+		this.thumbnailViewport?.checkViewportSize();
+		this.scheduleCurrentImageHighlight();
 	}
 
 	private addToHistory() {
@@ -1469,6 +1548,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 				this.loading.set(false);
 			} else {
 				this.tryInitialiseInfinitePattern();
+				this.scheduleThumbnailVirtualLayoutUpdate();
 			}
 		} catch (error) {
 			this.errorMessage.set(this.translate('Gallery_ErrorGenerating') + ' ' + (error as Error).message);

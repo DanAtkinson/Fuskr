@@ -1867,4 +1867,69 @@ describe('GalleryComponent', () => {
 			expect(nextThreshold(100)).toBeNull();
 		});
 	});
+
+	describe('Thumbnail Virtualisation', () => {
+		beforeEach(() => {
+			component.mediaItems.set([
+				{ url: 'thumb1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'thumb2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'thumb3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'thumb4.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'thumb5.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			]);
+			(
+				component as unknown as {
+					brokenUrls: { set(v: Set<string>): void };
+				}
+			).brokenUrls.set(new Set());
+		});
+
+		it('should enable thumbnail virtualisation only for thumbnails mode when infinite mode is off', () => {
+			expect(component.isThumbnailVirtualisationEnabled()).toBe(false);
+
+			component.imageDisplayMode.set('thumbnails');
+			expect(component.isThumbnailVirtualisationEnabled()).toBe(true);
+
+			component.isInfiniteMode.set(true);
+			expect(component.isThumbnailVirtualisationEnabled()).toBe(false);
+		});
+
+		it('should chunk visible thumbnail items into rows using the current column count', () => {
+			component.imageDisplayMode.set('thumbnails');
+			component.thumbnailColumnCount.set(2);
+
+			const rows = component.virtualThumbnailRows();
+
+			expect(rows).toHaveLength(3);
+			expect(rows[0].map((item) => item.url)).toEqual(['thumb1.jpg', 'thumb2.jpg']);
+			expect(rows[1].map((item) => item.url)).toEqual(['thumb3.jpg', 'thumb4.jpg']);
+			expect(rows[2].map((item) => item.url)).toEqual(['thumb5.jpg']);
+		});
+
+		it('should compute absolute media indices for virtual thumbnail rows', () => {
+			component.thumbnailColumnCount.set(3);
+
+			expect(component.getThumbnailMediaIndex(0, 0)).toBe(0);
+			expect(component.getThumbnailMediaIndex(1, 0)).toBe(3);
+			expect(component.getThumbnailMediaIndex(1, 2)).toBe(5);
+		});
+
+		it('should scroll the virtual viewport to the correct row for keyboard navigation', () => {
+			const scrollToIndex = vi.fn();
+			(component as unknown as { thumbnailViewport?: { scrollToIndex: typeof scrollToIndex } }).thumbnailViewport = {
+				scrollToIndex,
+			};
+			component.imageDisplayMode.set('thumbnails');
+			component.thumbnailColumnCount.set(3);
+			component.currentGalleryIndex.set(5);
+
+			(
+				component as unknown as {
+					scrollToCurrentImage: () => void;
+				}
+			).scrollToCurrentImage();
+
+			expect(scrollToIndex).toHaveBeenCalledWith(1, 'smooth');
+		});
+	});
 });

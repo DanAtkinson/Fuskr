@@ -37,7 +37,8 @@ async function loadGalleryWithItems(
 	page: import('@playwright/test').Page,
 	extensionId: string,
 	fuskrPattern: string,
-	expectedItemCount: number
+	expectedItemCount: number,
+	options?: { acceptGenerationDialog?: boolean }
 ): Promise<void> {
 	await stubGalleryImageResponses(page);
 	await page.goto(`chrome-extension://${extensionId}/index.html#/gallery`, {
@@ -50,10 +51,37 @@ async function loadGalleryWithItems(
 
 	const generateButton = page.getByRole('button', { name: /generate gallery/i });
 	await expect(generateButton).toBeVisible();
+	if (options?.acceptGenerationDialog) {
+		page.once('dialog', async (dialog) => {
+			await dialog.accept();
+		});
+	}
 	await generateButton.click();
 
 	await expect(page.locator('.image-item')).toHaveCount(expectedItemCount, {
 		timeout: 10000,
+	});
+}
+
+async function captureGalleryRenderMetrics(page: import('@playwright/test').Page): Promise<{
+	isVirtualised: boolean;
+	renderedItemCount: number;
+	renderedRowCount: number;
+	scrollTop: number;
+	scrollHeight: number;
+	clientHeight: number;
+}> {
+	return page.evaluate(() => {
+		const gallery = document.getElementById('image-gallery');
+
+		return {
+			isVirtualised: gallery?.classList.contains('cdk-virtual-scroll-viewport') ?? false,
+			renderedItemCount: document.querySelectorAll('.image-item').length,
+			renderedRowCount: document.querySelectorAll('.thumbnail-row').length,
+			scrollTop: gallery instanceof HTMLElement ? gallery.scrollTop : 0,
+			scrollHeight: gallery instanceof HTMLElement ? gallery.scrollHeight : 0,
+			clientHeight: gallery instanceof HTMLElement ? gallery.clientHeight : 0,
+		};
 	});
 }
 
@@ -265,6 +293,67 @@ testWithExtension.describe('Gallery', () => {
 
 		await page.keyboard.press('Escape');
 		await expect(page.locator('.image-viewer-modal')).toBeHidden({ timeout: 5000 });
+
+		await page.close();
+	});
+
+	testWithExtension('should render fewer DOM nodes in thumbnail virtual mode than in the non-virtual thumbnail fallback', async ({ extensionContext: { context, extensionId } }) => {
+		const fuskrPattern = 'https://example.com/image[000-179].jpg';
+		const expectedItemCount = 180;
+		const page = await context.newPage();
+
+		await loadGalleryWithItems(page, extensionId, fuskrPattern, expectedItemCount, {
+			acceptGenerationDialog: true,
+		});
+
+		const thumbnailsButton = page.getByRole('button', { name: /thumbnails/i });
+		await expect(thumbnailsButton).toBeVisible({ timeout: 5000 });
+		await thumbnailsButton.click();
+
+		const virtualGallery = page.locator('.image-gallery-virtual--thumbnails');
+		await expect(virtualGallery).toBeVisible({ timeout: 5000 });
+
+		await expect
+			.poll(async () => (await captureGalleryRenderMetrics(page)).renderedRowCount, {
+				timeout: 5000,
+			})
+			.toBeGreaterThan(0);
+
+		const virtualMetricsBeforeScroll = await captureGalleryRenderMetrics(page);
+		expect(virtualMetricsBeforeScroll.isVirtualised).toBe(true);
+		expect(virtualMetricsBeforeScroll.renderedItemCount).toBeLessThan(expectedItemCount);
+		expect(virtualMetricsBeforeScroll.scrollHeight).toBeGreaterThan(virtualMetricsBeforeScroll.clientHeight);
+
+		await virtualGallery.evaluate((element) => {
+			element.scrollTo({ top: element.scrollHeight, behavior: 'auto' });
+		});
+		await page.waitForTimeout(250);
+
+		const virtualMetricsAfterScroll = await captureGalleryRenderMetrics(page);
+		expect(virtualMetricsAfterScroll.isVirtualised).toBe(true);
+		expect(virtualMetricsAfterScroll.scrollTop).toBeGreaterThan(0);
+		expect(virtualMetricsAfterScroll.renderedItemCount).toBeLessThan(expectedItemCount);
+
+		await virtualGallery.evaluate((element) => {
+			element.scrollTo({ top: 0, behavior: 'auto' });
+		});
+		await page.waitForTimeout(250);
+
+		const infiniteToggle = page
+			.locator('button')
+			.filter({ hasText: /infinite\s+(on|off)/i })
+			.first();
+		await expect(infiniteToggle).toBeVisible({ timeout: 5000 });
+		await infiniteToggle.click();
+
+		await expect(page.locator('.image-gallery-virtual--thumbnails')).toHaveCount(0, {
+			timeout: 5000,
+		});
+		await expect(page.locator('#image-gallery.images-are-thumbnails')).toBeVisible({ timeout: 5000 });
+
+		const fallbackMetrics = await captureGalleryRenderMetrics(page);
+		expect(fallbackMetrics.isVirtualised).toBe(false);
+		expect(fallbackMetrics.renderedItemCount).toBe(expectedItemCount);
 
 		await page.close();
 	});
