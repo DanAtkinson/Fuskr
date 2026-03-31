@@ -35,7 +35,7 @@ jobs:
       - name: Build release notes (includes Product Details)
         id: notes
         run: |
-          echo "BODY<<'EOF'" >> $GITHUB_OUTPUT
+          echo "BODY<<EOF" >> $GITHUB_OUTPUT
           echo "## Fuskr Extension ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
           echo >> $GITHUB_OUTPUT
           echo "### 📝 Product details (for Chrome Web Store)" >> $GITHUB_OUTPUT
