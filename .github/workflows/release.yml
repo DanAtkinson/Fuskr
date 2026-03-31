@@ -9,10 +9,14 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
         
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -69,38 +73,42 @@ jobs:
           name: chrome-product-details
           path: store/chrome-product-details.md
           if-no-files-found: warn
+
+      - name: Persist version files to default branch
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin "${DEFAULT_BRANCH}"
+          git checkout -B "${DEFAULT_BRANCH}" "origin/${DEFAULT_BRANCH}"
+
+          npm version "${VERSION}" --no-git-tag-version
+          npm run sync:version
+
+          if git diff --quiet -- package.json src/manifest.json src/manifest-firefox.json; then
+            echo "Version files are already up to date on ${DEFAULT_BRANCH}."
+            exit 0
+          fi
+
+          git add package.json src/manifest.json src/manifest-firefox.json
+          git commit -m "chore(release): sync version ${VERSION} from tag ${TAG_NAME}"
+          git push origin "HEAD:${DEFAULT_BRANCH}"
           
       - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.TAG_NAME }}
-          release_name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
+          name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
           body: ${{ steps.notes.outputs.BODY }}
           draft: false
           prerelease: false
-          
-      - name: Upload Chrome Extension
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/fuskr-chromium.zip
-          asset_name: fuskr-chromium-${{ steps.version.outputs.VERSION }}.zip
-          asset_content_type: application/zip
-          
-      - name: Upload Firefox Extension  
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/fuskr-firefox.zip
-          asset_name: fuskr-firefox-${{ steps.version.outputs.VERSION }}.zip
-          asset_content_type: application/zip
+          files: |
+            dist/fuskr-chromium.zip
+            dist/fuskr-firefox.zip
           
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v7
