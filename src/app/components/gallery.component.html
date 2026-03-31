@@ -46,6 +46,10 @@
 								<div class="stats-info">
 									<span class="stat">{{ totalImages() }} {{ translate('Gallery_Stats_Total') }}</span>
 									<span class="stat">{{ loadedImages() }} {{ translate('Gallery_Stats_Loaded') }}</span>
+									@let infiniteLoadedRange = getInfiniteLoadedRangeLabel();
+									@if (infiniteLoadedRange) {
+										<span class="stat">{{ translate('Gallery_Stats_Range') }} {{ infiniteLoadedRange }}</span>
+									}
 									@if (brokenImages() > 0) {
 										<span class="stat">{{ brokenImages() }} {{ translate('Gallery_Stats_Broken') }}</span>
 									}

@@ -878,6 +878,21 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		return this.showBrokenImages() ? this.mediaItems().length : this.visibleMediaItems().length;
 	}
 
+	getInfiniteLoadedRangeLabel(): string {
+		if (!this.isInfiniteMode() || this.infinitePatternBaseUrl === '') {
+			return '';
+		}
+
+		const minLoaded = this.getLoadedBoundary('min');
+		const maxLoaded = this.getLoadedBoundary('max');
+		if (minLoaded === null || maxLoaded === null) {
+			return '';
+		}
+
+		const format = (value: number) => (this.infinitePatternPadLength > 0 ? value.toString().padStart(this.infinitePatternPadLength, '0') : value.toString());
+		return `${format(minLoaded)}-${format(maxLoaded)}`;
+	}
+
 	canNavigateViewerBackward(): boolean {
 		return this.currentViewerIndex() > 0 || (this.isInfiniteMode() && this.canLoadMoreBackward());
 	}

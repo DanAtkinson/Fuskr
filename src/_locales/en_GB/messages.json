@@ -324,6 +324,10 @@
 		"description": "Statistics label for loaded images",
 		"message": "loaded"
 	},
+	"Gallery_Stats_Range": {
+		"description": "Statistics label for loaded numeric range while infinite mode is active",
+		"message": "range"
+	},
 	"Gallery_Stats_Total": {
 		"description": "Statistics label for total images",
 		"message": "total"
