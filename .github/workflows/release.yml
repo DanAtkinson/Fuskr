@@ -74,30 +74,6 @@ jobs:
           path: store/chrome-product-details.md
           if-no-files-found: warn
 
-      - name: Persist version files to default branch
-        env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
-          TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git fetch origin "${DEFAULT_BRANCH}"
-          git checkout -B "${DEFAULT_BRANCH}" "origin/${DEFAULT_BRANCH}"
-
-          npm version "${VERSION}" --no-git-tag-version
-          npm run sync:version
-
-          if git diff --quiet -- package.json src/manifest.json src/manifest-firefox.json; then
-            echo "Version files are already up to date on ${DEFAULT_BRANCH}."
-            exit 0
-          fi
-
-          git add package.json src/manifest.json src/manifest-firefox.json
-          git commit -m "chore(release): sync version ${VERSION} from tag ${TAG_NAME}"
-          git push origin "HEAD:${DEFAULT_BRANCH}"
-          
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -119,3 +95,48 @@ jobs:
             dist/chromium/**
             dist/firefox/**
           retention-days: 90
+
+      - name: Compute next version (patch bump)
+        id: next
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: |
+          node -e "
+            const [maj,min,pat] = process.env.VERSION.split('.').map(Number);
+            if ([maj,min,pat].some(n => Number.isNaN(n))) throw new Error('VERSION must be in semver format major.minor.patch, got: ' + process.env.VERSION);
+            console.log('NEXT_VERSION=' + [maj,min,pat+1].join('.'));
+          " >> $GITHUB_OUTPUT
+
+      - name: Bump master to next patch version (post-release)
+        if: success()
+        env:
+          NEXT_VERSION: ${{ steps.next.outputs.NEXT_VERSION }}
+          TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git fetch origin "${DEFAULT_BRANCH}"
+          git checkout -B "${DEFAULT_BRANCH}" "origin/${DEFAULT_BRANCH}"
+
+          # Safety guard: only mutate the configured default branch (master).
+          # If the repository's default branch is ever renamed, this prevents
+          # accidental version bumps on an unexpected branch.
+          if [ "${DEFAULT_BRANCH}" != "master" ]; then
+            echo "Skipping version bump: default branch is '${DEFAULT_BRANCH}', expected 'master'."
+            exit 0
+          fi
+
+          CURRENT_VERSION="$(node -p "require('./package.json').version")"
+          if [ "${CURRENT_VERSION}" = "${NEXT_VERSION}" ]; then
+            echo "master already at ${NEXT_VERSION}; nothing to do."
+            exit 0
+          fi
+
+          npm version "${NEXT_VERSION}" --no-git-tag-version
+          npm run sync:version
+
+          git add package.json src/manifest.json src/manifest-firefox.json
+          git commit -m "chore: bump version to ${NEXT_VERSION} after release ${TAG_NAME}"
+          git push origin "HEAD:${DEFAULT_BRANCH}"
