@@ -156,6 +156,119 @@ testWithExtension.describe('Gallery', () => {
 		await page.close();
 	});
 
+	testWithExtension('should prepend earlier items when infinite mode is enabled and user scrolls to top', async ({ extensionContext: { context, extensionId } }) => {
+		const fuskrPattern = 'https://example.com/image[005-015].jpg';
+		const page = await context.newPage();
+
+		await loadGalleryWithItems(page, extensionId, fuskrPattern, 11);
+
+		const infiniteToggle = page
+			.locator('button')
+			.filter({ hasText: /infinite\s+(on|off)/i })
+			.first();
+		await expect(infiniteToggle).toBeVisible({ timeout: 5000 });
+		await infiniteToggle.click();
+
+		// Move away from the top first, then return to trigger prepend logic.
+		await page.evaluate(() => {
+			window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+		});
+		await page.waitForTimeout(200);
+		await page.evaluate(() => {
+			window.scrollTo({ top: 0, behavior: 'auto' });
+		});
+
+		await expect
+			.poll(async () => page.locator('.image-item').count(), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(11);
+
+		await page.close();
+	});
+
+	testWithExtension('should stop loading additional items after infinite mode is disabled', async ({ extensionContext: { context, extensionId } }) => {
+		const fuskrPattern = 'https://example.com/image[000-011].jpg';
+		const page = await context.newPage();
+
+		await loadGalleryWithItems(page, extensionId, fuskrPattern, 12);
+
+		const infiniteToggle = page
+			.locator('button')
+			.filter({ hasText: /infinite\s+(on|off)/i })
+			.first();
+		await expect(infiniteToggle).toBeVisible({ timeout: 5000 });
+		await infiniteToggle.click();
+
+		await page.evaluate(() => {
+			window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+		});
+
+		await expect
+			.poll(async () => page.locator('.image-item').count(), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(12);
+
+		// Disable infinite mode and verify count remains stable despite more scrolling.
+		await infiniteToggle.click();
+		await page.waitForTimeout(500);
+		const countAfterDisable = await page.locator('.image-item').count();
+
+		for (let i = 0; i < 3; i++) {
+			await page.evaluate(() => {
+				window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' });
+			});
+			await page.waitForTimeout(250);
+		}
+
+		await expect
+			.poll(async () => page.locator('.image-item').count(), {
+				timeout: 3000,
+			})
+			.toBe(countAfterDisable);
+
+		await page.close();
+	});
+
+	testWithExtension('should load and advance in image viewer when navigating past the end during infinite mode', async ({ extensionContext: { context, extensionId } }) => {
+		const fuskrPattern = 'https://example.com/image[000-011].jpg';
+		const page = await context.newPage();
+
+		await loadGalleryWithItems(page, extensionId, fuskrPattern, 12);
+
+		const infiniteToggle = page
+			.locator('button')
+			.filter({ hasText: /infinite\s+(on|off)/i })
+			.first();
+		await expect(infiniteToggle).toBeVisible({ timeout: 5000 });
+		await infiniteToggle.click();
+
+		await page.locator('.image-item').last().click();
+		await expect(page.locator('.image-viewer-modal')).toBeVisible({ timeout: 5000 });
+
+		const nextButton = page.locator('.image-viewer-modal .next-btn');
+		await expect(nextButton).toBeEnabled({ timeout: 5000 });
+		await nextButton.click();
+
+		await expect
+			.poll(async () => page.locator('.image-item').count(), {
+				timeout: 10000,
+			})
+			.toBeGreaterThan(12);
+
+		await expect
+			.poll(async () => page.locator('.image-viewer-modal .viewer-counter').innerText(), {
+				timeout: 10000,
+			})
+			.toContain('13');
+
+		await page.keyboard.press('Escape');
+		await expect(page.locator('.image-viewer-modal')).toBeHidden({ timeout: 5000 });
+
+		await page.close();
+	});
+
 	testWithExtension(
 		'should support keyboard navigation with arrow keys in gallery',
 		async ({ extensionContext: { context, extensionId } }) => {

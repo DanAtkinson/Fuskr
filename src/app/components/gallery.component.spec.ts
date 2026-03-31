@@ -1606,6 +1606,59 @@ describe('GalleryComponent', () => {
 			expect(parseNum('https://example.com/image.jpg')).toBeNull();
 		});
 
+		it('should return an empty infinite loaded range label when infinite mode is disabled', () => {
+			component.originalUrl.set('https://example.com/image[001-010].jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			component.mediaItems.set([
+				{
+					url: 'https://example.com/image001.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/image010.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+			]);
+
+			expect(component.getInfiniteLoadedRangeLabel()).toBe('');
+		});
+
+		it('should return a padded infinite loaded range label when infinite mode is enabled', () => {
+			component.originalUrl.set('https://example.com/image[001-010].jpg');
+			(
+				component as unknown as {
+					tryInitialiseInfinitePattern: () => void;
+				}
+			).tryInitialiseInfinitePattern();
+
+			component.isInfiniteMode.set(true);
+			component.mediaItems.set([
+				{
+					url: 'https://example.com/image003.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+				{
+					url: 'https://example.com/image042.jpg',
+					type: 'image',
+					mimeType: 'image/jpeg',
+					loadingState: 'loaded',
+				},
+			]);
+
+			expect(component.getInfiniteLoadedRangeLabel()).toBe('003-042');
+		});
+
 		it('should correctly identify when more items can be appended', () => {
 			component.originalUrl.set('https://example.com/image[01-20].jpg');
 			component.mediaItems.set([

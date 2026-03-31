@@ -14,41 +14,40 @@ Add an opt-in infinite gallery mode controlled from the gallery page via a ♾�
 ## Implementation Phases
 
 ### Phase 1: Transient Gallery-Level Infinity Toggle
-**Status**: In Progress
+**Status**: Completed
 
 Add a page action in `src/app/components/gallery.component.html`, `src/app/components/gallery.component.ts`, and `src/app/components/gallery.component.scss` that enables or disables infinite mode for the current gallery session only. This does not touch persisted options or the options page.
 
 **Tasks**:
-- [ ] Add ♾️ toggle button to gallery controls in template
-- [ ] Wire `toggleInfiniteMode()` method in component (already scaffolded)
-- [ ] Add styling for toggle button and visual state indicators
-- [ ] Ensure toggle state stays transient (resets on new gallery generation)
+- [x] Add ♾️ toggle button to gallery controls in template
+- [x] Wire `toggleInfiniteMode()` method in component
+- [x] Add styling for toggle button and visual state indicators
+- [x] Ensure toggle state stays transient (resets on new gallery generation)
 
 **Files**:
 - `src/app/components/gallery.component.html` — add toggle button and sentinels
-- `src/app/components/gallery.component.ts` — wire toggle handler (scaffolded)
+- `src/app/components/gallery.component.ts` — wire toggle handler
 - `src/app/components/gallery.component.scss` — style toggle and indicators
 
 ---
 
 ### Phase 2: Gallery Sequence Tracking & Range State
-**Status**: In Progress
+**Status**: Completed
 
 Refactor gallery sequence tracking so the component knows the active loaded range rather than only the initial generated list. Reuse the existing pattern parsing and URL generation logic in `src/app/services/fuskr.service.ts`, but introduce explicit range/window state.
 
 **Scaffolded State** (in `gallery.component.ts`):
 - `isInfiniteMode` — toggle signal
 - `infinitePatternBaseUrl` — pattern template with `__FUSKR_INFINITY__` placeholder
-- `infinitePatternStart` / `infinitePatternEnd` — active numeric bounds
 - `infinitePatternPadLength` — zero-padding width for URL generation
 - `infinitePatternStep` — increment (default 1)
 - `isLoadingBackward` / `isLoadingForward` — load-in-progress flags
 - `knownMediaUrls` — Set of URLs already added (duplicate prevention)
 
 **Tasks**:
-- [ ] Verify pattern extraction in `tryInitialiseInfinitePattern()` correctly parses `[start-end]` from URL
-- [ ] Test that `buildInfiniteUrl()` and `parseInfiniteNumber()` correctly round-trip values
-- [ ] Ensure `knownMediaUrls` is seeded with initial gallery URLs and updated on all loads
+- [x] Verify pattern extraction in `tryInitialiseInfinitePattern()` correctly parses `[start-end]` from URL
+- [x] Test that `buildInfiniteUrl()` and `parseInfiniteNumber()` correctly round-trip values
+- [x] Ensure `knownMediaUrls` is seeded with initial gallery URLs and updated on all loads
 
 **Files**:
 - `src/app/components/gallery.component.ts` — orchestration, boundary methods, URL builders
@@ -56,16 +55,17 @@ Refactor gallery sequence tracking so the component knows the active loaded rang
 ---
 
 ### Phase 3: Bidirectional Scroll-Triggered Extension
-**Status**: Planned
+**Status**: Completed
 
 Add start and end sentinels or equivalent viewport-boundary detection in `src/app/components/gallery.component.html` / `src/app/components/gallery.component.ts`. When infinite mode is active and the user approaches the bottom, append the next batch; when the user approaches the top of the currently loaded range, prepend the previous batch. Preserve visible position when prepending so the gallery does not jump.
 
 **Tasks**:
-- [ ] Add start/end sentinel elements in template (e.g., divs with `#startSentinel` / `#endSentinel` refs)
-- [ ] Implement IntersectionObserver in `ngOnInit()` to detect when sentinels enter viewport
-- [ ] Wire observer callbacks to `maybeLoadMoreBackward()` and `maybeLoadMoreForward()` (scaffolded)
-- [ ] Implement measured-height scroll restoration: measure container height before prepend, calculate new first item, then adjust scroll offset
-- [ ] Guard all loads with `isInfiniteMode()` check so disabling stops further boundary loads
+- [x] Add start/end sentinel elements in template
+- [x] Implement `IntersectionObserver`-based boundary detection
+- [x] Wire observer callbacks to `maybeLoadMoreBackward()` and `maybeLoadMoreForward()`
+- [x] Implement measured-height scroll restoration on prepend
+- [x] Guard all loads with `isInfiniteMode()` checks so disabling stops boundary loads
+- [x] Add viewport-edge fallback checks to improve reliability when sentinel intersections are missed
 
 **Scroll Preservation Algorithm**:
 ```
@@ -85,16 +85,16 @@ After prepend:
 ---
 
 ### Phase 4: Incremental Load Integration with Lifecycle
-**Status**: Planned
+**Status**: Completed
 
 Ensure appended and prepended items are converted into `MediaItem`s the same way as initial loads, join the existing broken-image filtering, update loaded/broken counters correctly, and participate in background MIME/type detection.
 
 **Tasks**:
-- [ ] Use `createMediaItemsFromUrls()` for both append and prepend (already scaffolded)
-- [ ] Call `startProgressiveTypeDetectionForUrls()` for new batches
-- [ ] Ensure broken-image callbacks work for new items (inherit from existing flow)
-- [ ] Update `loadedImages` and `brokenImages` counters after each load
-- [ ] Verify viewer index and focus do not shift unexpectedly
+- [x] Use `createMediaItemsFromUrls()` for both append and prepend
+- [x] Call `startProgressiveTypeDetectionForUrls()` for new batches
+- [x] Ensure broken-image callbacks work for new items
+- [x] Update `loadedImages` and `brokenImages` counters after each load
+- [x] Verify viewer index/focus behaviour in modal navigation paths while loading more items
 
 **Files**:
 - `src/app/components/gallery.component.ts` — item creation, type detection hooks
@@ -102,20 +102,22 @@ Ensure appended and prepended items are converted into `MediaItem`s the same way
 ---
 
 ### Phase 5: Infinite-Mode Limits & Guardrails
-**Status**: Planned
+**Status**: Completed
 
 Reuse the existing overload-protection concepts but adapt them for incremental loading so the feature cannot expand indefinitely without guardrails. Decide whether the cap is based on total loaded items, pattern bounds, or both.
 
 **Decisions to Make**:
 1. **Hard limit**: Maximum total items in memory (e.g. 2000 items cap; if exceeded, remove far-off items)
-2. **Pattern bounds**: Stop loading once min/max pattern values are reached
-3. **User feedback**: Show current loaded range in gallery stats (e.g., "Loaded: items 5–105")
+2. **Pattern bounds**: Continue beyond initial bracket range; stop only on lower bound (`0`) and hard cap
+3. **User feedback**: Show current loaded range in gallery stats (e.g., "range 005-105")
 
 **Tasks**:
-- [ ] Decide on hard cap strategy (soft warn at threshold, or hard stop)
-- [ ] Implement `canLoadMoreBackward()` to return false if pattern min is reached
-- [ ] Implement `canLoadMoreForward()` to return false if pattern max is reached
-- [ ] (Optional) Add memory-based cap: trim prepended items if total exceeds threshold
+- [x] Decide on hard cap strategy (hard stop at `infiniteMaxItems`)
+- [x] Implement `canLoadMoreBackward()` lower-bound checks
+- [x] Implement `canLoadMoreForward()` continuation checks for uncapped forward loading
+- [x] Add progressive continuation prompts for broken edges (`10`, `50`, `100`, then no further prompts)
+- [x] Add user-facing loaded range stat while infinite mode is enabled
+- [ ] (Optional, deferred) Add memory-based cap to trim older off-screen items when total loaded items exceed a threshold during very long sessions
 
 **Files**:
 - `src/app/components/gallery.component.ts` — boundary checks, stats display
@@ -123,16 +125,16 @@ Reuse the existing overload-protection concepts but adapt them for incremental l
 ---
 
 ### Phase 6: Preserve Interaction Behaviour Across Range Changes
-**Status**: Planned
+**Status**: Completed
 
 Validate that keyboard navigation, current focused image/index, modal viewer state, and scroll restoration continue to work correctly after both prepend and append operations.
 
 **Tests**:
-- [ ] Keyboard navigation (arrow keys, Home/End) works in gallery after prepend
-- [ ] Keyboard navigation works in modal viewer after prepend
-- [ ] Viewer index does not shift unexpectedly when items are prepended
-- [ ] Modal remains open and focused during append
-- [ ] Escape closes modal after either prepend or append
+- [x] Keyboard navigation (arrow keys, Home/End) works in gallery after prepend/append
+- [x] Keyboard navigation works in modal viewer during infinite loading
+- [x] Viewer index advances correctly when loading is triggered near either edge
+- [x] Modal remains open and focused during append/prepend-triggered navigation
+- [x] Escape closes modal after append/prepend states
 
 **Files**:
 - `src/app/components/gallery.component.ts` — navigation handlers (already robust)
@@ -140,33 +142,30 @@ Validate that keyboard navigation, current focused image/index, modal viewer sta
 ---
 
 ### Phase 7: Automated Test Coverage
-**Status**: Planned
+**Status**: Completed
 
 Add unit tests in `src/app/components/gallery.component.spec.ts` for infinity-toggle state, range extension, duplicate prevention, prepend scroll preservation logic, and lifecycle integration. Extend `e2e/tests/gallery.spec.ts` with at least one real bidirectional infinite-scroll scenario.
 
 **Unit Tests** (`gallery.component.spec.ts`):
-- [ ] Toggle button initialises infinite mode to false
-- [ ] Toggling sets `isInfiniteMode` to true, calls `tryInitialiseInfinitePattern()`
-- [ ] Pattern extraction correctly parses `[start-end]` from URL
-- [ ] `buildInfiniteUrl()` formats numbers correctly with padding
-- [ ] `parseInfiniteNumber()` extracts numeric value from URL
-- [ ] `canLoadMoreBackward()` returns false when min is reached
-- [ ] `canLoadMoreForward()` returns false when max is reached
-- [ ] `knownMediaUrls` prevents duplicate URLs on append
-- [ ] `knownMediaUrls` prevents duplicate URLs on prepend
-- [ ] Forward load appends new items, updates total correctly
-- [ ] Backward load prepends new items, updates total correctly
-- [ ] Prepend does not add broken URLs to view
-- [ ] Disabling infinite mode stops further sentinel-triggered loads
-- [ ] Generating new gallery resets infinite mode state
+- [x] Toggle button initialises infinite mode to false
+- [x] Toggling sets `isInfiniteMode` to true, calls `tryInitialiseInfinitePattern()`
+- [x] Pattern extraction correctly parses bracketed ranges
+- [x] `buildInfiniteUrl()` formats numbers correctly with padding
+- [x] `parseInfiniteNumber()` extracts numeric values from matching URLs
+- [x] Duplicate prevention via `knownMediaUrls` for infinite batches
+- [x] Forward loading can continue beyond initial bracket end
+- [x] Continuation guard prompts and threshold escalation behaviour
+- [x] Modal viewer near-edge navigation triggers incremental loads
+- [x] Viewer count reflects visible-vs-total semantics when broken items are hidden/shown
+- [x] Loaded-range stat helper returns expected values
+- [x] Generating a new gallery resets infinite mode session state
 
 **E2E Tests** (`e2e/tests/gallery.spec.ts`):
-- [ ] Generate gallery from pattern with room on both sides (e.g., `[05-15]` seed, extend to `[01-19]`)
-- [ ] Enable infinite mode
-- [ ] Scroll to bottom; verify next batch appends (no duplicates, correct order)
-- [ ] Scroll to top; verify previous batch prepends (no jump, page stays readable)
-- [ ] Verify viewer still works after append and prepend
-- [ ] Disable infinite mode; scroll more; verify no further loads
+- [x] Enable infinite mode on gallery page
+- [x] Scroll down and verify append beyond initial generated range
+- [x] Add explicit upward/prepend e2e validation
+- [x] Add explicit viewer-behaviour e2e validation during infinite loading
+- [x] Add explicit disable-and-stop-loading e2e validation
 
 **Files**:
 - `src/app/components/gallery.component.spec.ts`
@@ -203,9 +202,10 @@ If performance still warrants it after infinite mode lands, prototype `cdk-virtu
 
 ## Verification Checklist
 
-- [ ] Run `npm run test -- gallery.component.spec.ts` after implementation; all new tests pass
-- [ ] Run `npm run test:e2e` for gallery e2e tests; bidirectional scroll scenario passes
-- [ ] Run `npm run build` to verify no lint/format errors
+- [x] Run gallery unit tests; infinite-mode tests pass
+- [x] Run `npm run test:coverage`; coverage and thresholds remain healthy
+- [x] Run targeted gallery e2e (`chromium-extension`) for infinite append flow
+- [x] Run `npm run build` to verify lint/test/build health
 - [ ] Manually test: Generate gallery from sequence with room on both sides
 - [ ] Manually test: Enable infinite mode, scroll downward to trigger append
 - [ ] Manually test: Scroll upward to trigger prepend
@@ -220,6 +220,6 @@ If performance still warrants it after infinite mode lands, prototype `cdk-virtu
 ## Further Considerations
 
 1. **Batch size tuning** — Currently `INFINITE_BATCH_SIZE = 50`. Consider whether this should match initial progressive chunking or be tuned separately for scroll responsiveness.
-2. **Memory management** — Decide whether prepended items should remain indefinitely or whether the gallery should eventually trim far-off items to cap memory usage in a later iteration.
-3. **User feedback** — Consider surfacing the current loaded range to the user once the gallery can expand in both directions (e.g., "Loaded: items 5–105 of 500").
-4. **Animation** — Consider smooth scroll restoration or brief visual feedback when new items are prepended/appended.
+2. **Memory management** — Decide whether items added at the top should remain indefinitely or whether the gallery should eventually trim far-off items to cap memory usage in a later iteration.
+3. **User feedback** — Consider surfacing the current loaded range to the user once the gallery can expand in both directions (e.g., "Loaded: items 5-105 of 500").
+4. **Animation** — Consider smooth scroll restoration or brief visual feedback when items are added at the top or bottom.
