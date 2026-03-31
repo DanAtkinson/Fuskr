@@ -2,7 +2,23 @@
 
 ## 📋 Complete Changelog
 
-### 5.0.7 🚀
+### 5.0.9 🤞 Resolved Release issues
+
+- There was an issue with the 5.0.7 and 5.0.8 releases in that the versions were not updating when they should have. This should be corrected now.
+
+### 5.0.8 ⚠️ Faulty Release
+
+- Release workflow bug: version updates during tag builds were not persisted back to the repository branch.
+- Result: source version files could remain out of sync after release.
+- Status: superseded by workflow fix in a later release.
+
+### 5.0.7 ⚠️ Faulty Release
+
+- Release workflow bug: version updates during tag builds were not persisted back to the repository branch.
+- Result: source version files could remain out of sync after release.
+- Status: superseded by workflow fix in a later release.
+
+### 5.0.7 🚀 (Feature Content)
 
 #### Major Features
 
