@@ -46,36 +46,39 @@ jobs:
         id: notes
         run: |
           STORE_URL="https://chrome.google.com/webstore/detail/${{ secrets.CHROME_EXTENSION_ID }}"
-          echo "BODY<<'EOF'" >> $GITHUB_OUTPUT
-          echo "## 🚀 Fuskr Extension ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "This release has been automatically deployed to the Chrome Web Store." >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### 🔗 Store listing" >> $GITHUB_OUTPUT
-          echo "${STORE_URL}" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### 📦 Downloads" >> $GITHUB_OUTPUT
-          echo "- Chrome/Edge/Chromium: available on the Chrome Web Store" >> $GITHUB_OUTPUT
-          echo "- Firefox: 'fuskr-firefox-${{ steps.version.outputs.VERSION }}.zip' (manual installation)" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### � Product details (for store)" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          if [ -f store/chrome-product-details.md ]; then
-            cat store/chrome-product-details.md >> $GITHUB_OUTPUT
-          else
-            echo "Product details file not found (store/chrome-product-details.md)." >> $GITHUB_OUTPUT
-          fi
-          echo >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### 🔧 Manual Installation (Development)" >> $GITHUB_OUTPUT
-          echo "1. Download 'fuskr-chromium-${{ steps.version.outputs.VERSION }}.zip'" >> $GITHUB_OUTPUT
-          echo "2. Extract the ZIP file" >> $GITHUB_OUTPUT
-          echo "3. Open Chrome → Extensions → Enable Developer Mode" >> $GITHUB_OUTPUT
-          echo "4. Click 'Load unpacked' and select the extracted folder" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### 📋 Changes" >> $GITHUB_OUTPUT
-          echo "See the commit history for detailed changes in this release." >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          delimiter="FUSKR_CHROME_RELEASE_NOTES_$(date +%s%N)"
+          {
+            echo "BODY<<${delimiter}"
+            echo "## 🚀 Fuskr Extension ${{ steps.version.outputs.VERSION }}"
+            echo
+            echo "This release has been automatically deployed to the Chrome Web Store."
+            echo
+            echo "### 🔗 Store listing"
+            echo "${STORE_URL}"
+            echo
+            echo "### 📦 Downloads"
+            echo "- Chrome/Edge/Chromium: available on the Chrome Web Store"
+            echo "- Firefox: 'fuskr-firefox-${{ steps.version.outputs.VERSION }}.zip' (manual installation)"
+            echo
+            echo "### Product details (for store)"
+            echo
+            if [ -f store/chrome-product-details.md ]; then
+              cat store/chrome-product-details.md
+            else
+              echo "Product details file not found (store/chrome-product-details.md)."
+            fi
+            echo
+            echo
+            echo "### 🔧 Manual Installation (Development)"
+            echo "1. Download 'fuskr-chromium-${{ steps.version.outputs.VERSION }}.zip'"
+            echo "2. Extract the ZIP file"
+            echo "3. Open Chrome → Extensions → Enable Developer Mode"
+            echo "4. Click 'Load unpacked' and select the extracted folder"
+            echo
+            echo "### 📋 Changes"
+            echo "See the commit history for detailed changes in this release."
+            echo "${delimiter}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload product details as artifact
         uses: actions/upload-artifact@v7
