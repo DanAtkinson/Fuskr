@@ -39,25 +39,28 @@ jobs:
       - name: Build release notes (includes Product Details)
         id: notes
         run: |
-          echo "BODY<<EOF" >> $GITHUB_OUTPUT
-          echo "## Fuskr Extension ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### 📝 Product details (for Chrome Web Store)" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          if [ -f store/chrome-product-details.md ]; then
-            cat store/chrome-product-details.md >> $GITHUB_OUTPUT
-          else
-            echo "Product details file not found (store/chrome-product-details.md)." >> $GITHUB_OUTPUT
-          fi
-          echo >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### Installation" >> $GITHUB_OUTPUT
-          echo "- Chrome/Edge/Chromium: use 'fuskr-chromium.zip' (load unpacked for development)" >> $GITHUB_OUTPUT
-          echo "- Firefox: use 'fuskr-firefox.zip' (temporary add-on)" >> $GITHUB_OUTPUT
-          echo >> $GITHUB_OUTPUT
-          echo "### Changes" >> $GITHUB_OUTPUT
-          echo "See commits for details." >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          delimiter="FUSKR_RELEASE_NOTES_$(date +%s%N)"
+          {
+            echo "BODY<<${delimiter}"
+            echo "## Fuskr Extension ${{ steps.version.outputs.VERSION }}"
+            echo
+            echo "### 📝 Product details (for Chrome Web Store)"
+            echo
+            if [ -f store/chrome-product-details.md ]; then
+              cat store/chrome-product-details.md
+            else
+              echo "Product details file not found (store/chrome-product-details.md)."
+            fi
+            echo
+            echo
+            echo "### Installation"
+            echo "- Chrome/Edge/Chromium: use 'fuskr-chromium.zip' (load unpacked for development)"
+            echo "- Firefox: use 'fuskr-firefox.zip' (temporary add-on)"
+            echo
+            echo "### Changes"
+            echo "See commits for details."
+            echo "${delimiter}"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Upload product details as artifact
         uses: actions/upload-artifact@v7
