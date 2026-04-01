@@ -1,0 +1,62 @@
+name: Sync Version Files
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to apply (major.minor.patch), for example 5.0.12
+        required: true
+        type: string
+
+jobs:
+  sync-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24.x"
+
+      - name: Validate version input
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          if ! [[ "${INPUT_VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Version must be in major.minor.patch format. Got: ${INPUT_VERSION}"
+            exit 1
+          fi
+
+      - name: Update package and manifest versions
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          npm version "${INPUT_VERSION}" --no-git-tag-version
+          npm run sync:version
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(version): sync version files to ${{ inputs.version }}"
+          title: "chore(version): sync version files to ${{ inputs.version }}"
+          body: |
+            Automated version sync after release.
+
+            Updated files:
+            - package.json
+            - package-lock.json
+            - src/manifest.json
+            - src/manifest-firefox.json
+          branch: "chore/sync-version-${{ inputs.version }}"
+          base: ${{ github.event.repository.default_branch }}
+          labels: |
+            chore
+            release

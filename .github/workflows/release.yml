@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
     
     steps:
       - name: Checkout repository
@@ -33,16 +32,8 @@ jobs:
         run: |
           echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
           echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Update package.json with tag version
-        run: |
-          npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
-          cat package.json | grep '"version"'
         
-      - name: Sync version to manifests
-        run: npm run sync:version
-        
-      - name: Run full build pipeline (skipping version sync)
+      - name: Build extension packages
         run: npm run build:extensions:prod
 
       - name: Build release notes (includes Product Details)
@@ -96,60 +87,3 @@ jobs:
             dist/chromium/**
             dist/firefox/**
           retention-days: 90
-
-      - name: Compute next version (patch bump)
-        id: next
-        env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
-        run: |
-          node -e "
-            const [maj,min,pat] = process.env.VERSION.split('.').map(Number);
-            if ([maj,min,pat].some(n => Number.isNaN(n))) throw new Error('VERSION must be in semver format major.minor.patch, got: ' + process.env.VERSION);
-            console.log('NEXT_VERSION=' + [maj,min,pat+1].join('.'));
-          " >> $GITHUB_OUTPUT
-
-      - name: Create post-release version bump PR
-        if: success()
-        env:
-          NEXT_VERSION: ${{ steps.next.outputs.NEXT_VERSION }}
-          TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-        run: |
-          BRANCH="chore/bump-version-to-${NEXT_VERSION}"
-
-          # Skip everything if a PR already exists for this branch (idempotent re-runs)
-          EXISTING_PR=$(gh pr list --head "${BRANCH}" --json number --jq '.[0].number')
-          if [ -n "${EXISTING_PR}" ]; then
-            echo "PR #${EXISTING_PR} already exists for ${BRANCH}. Skipping."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Branch from the default branch, not the release tag
-          git fetch origin "${DEFAULT_BRANCH}"
-          git checkout -b "${BRANCH}" "origin/${DEFAULT_BRANCH}"
-
-          # Apply the next version bump
-          npm version "${NEXT_VERSION}" --no-git-tag-version
-          npm run sync:version
-
-          # Skip if there is nothing to change (version already bumped on default branch)
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "Version ${NEXT_VERSION} is already set on ${DEFAULT_BRANCH}. Nothing to do."
-            exit 0
-          fi
-
-          git add package.json package-lock.json src/manifest.json src/manifest-firefox.json
-          git commit -m "chore: bump version to ${NEXT_VERSION} after release ${TAG_NAME}"
-          git push origin "${BRANCH}"
-
-          gh pr create \
-            --title "chore: bump version to ${NEXT_VERSION} after release ${TAG_NAME}" \
-            --body "Automated post-release version bump.
-
-Increments version from \`${TAG_NAME}\` to \`${NEXT_VERSION}\` in \`package.json\`, \`package-lock.json\`, and the extension manifests." \
-            --base "${DEFAULT_BRANCH}" \
-            --head "${BRANCH}"
