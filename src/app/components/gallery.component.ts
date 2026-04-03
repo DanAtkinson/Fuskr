@@ -22,6 +22,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	private static readonly infiniteContinuationPromptThresholds = [10, 50, 100] as const;
 	private static readonly infiniteMaxItems = 2000;
 	private static readonly viewerInfinitePreloadDistance = 2;
+	private static readonly viewerImagePreloadDistance = 3;
 
 	// Public signals (alphabetically)
 	autoRemoveBrokenImages = signal(false);
@@ -58,6 +59,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	toastMessage = signal('');
 	toastVisible = signal(false);
 	totalImages = signal(0);
+	viewerImageLoading = signal(false);
 
 	// Computed signals
 	visibleMediaItems = computed(() => {
@@ -92,6 +94,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	private observerSetupTimeout: ReturnType<typeof setTimeout> | null = null;
 	private scrollLoadCheckTimeout: ReturnType<typeof setTimeout> | null = null;
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
+	private preloadCache = new Map<string, HTMLImageElement>();
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
 
 	// Injected services
@@ -464,9 +467,14 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 		if (idx < visibleItems.length - 1) {
 			const newIdx = idx + 1;
+			this.preloadViewerImages(newIdx);
 			this.currentViewerIndex.set(newIdx);
-			this.currentViewerImage.set(visibleItems[newIdx].url);
-			this.currentMediaItem.set(visibleItems[newIdx]);
+			this.currentGalleryIndex.set(newIdx);
+			this.highlightCurrentImage();
+			const nextItem = visibleItems[newIdx];
+			this.viewerImageLoading.set(nextItem.type !== 'video' && !this.isImageCached(nextItem.url));
+			this.currentViewerImage.set(nextItem.url);
+			this.currentMediaItem.set(nextItem);
 			return;
 		}
 
@@ -504,6 +512,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	}
 
 	ngOnDestroy(): void {
+		this.preloadCache.clear();
 		if (this.observerSetupTimeout) {
 			clearTimeout(this.observerSetupTimeout);
 			this.observerSetupTimeout = null;
@@ -711,10 +720,45 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		}
 	}
 
+	private preloadViewerImages(centreIndex: number): void {
+		const items = this.visibleMediaItems();
+		const dist = GalleryComponent.viewerImagePreloadDistance;
+		const start = Math.max(0, centreIndex - dist);
+		const end = Math.min(items.length - 1, centreIndex + dist);
+
+		// Evict entries outside the new window
+		const keep = new Set(items.slice(start, end + 1).map((i) => i.url));
+		for (const url of this.preloadCache.keys()) {
+			if (!keep.has(url)) {
+				this.preloadCache.delete(url);
+			}
+		}
+
+		// Preload images not yet in cache (skip videos)
+		for (let i = start; i <= end; i++) {
+			const item = items[i];
+			if (item && item.type !== 'video' && !this.preloadCache.has(item.url)) {
+				const img = new Image();
+				img.src = item.url;
+				this.preloadCache.set(item.url, img);
+			}
+		}
+	}
+
+	private isImageCached(url: string): boolean {
+		const cached = this.preloadCache.get(url);
+		return cached !== undefined && cached.complete && cached.naturalWidth > 0;
+	}
+
 	openImageViewer(url: string, index: number) {
+		this.preloadViewerImages(index);
 		this.viewerTriggerElement = document.activeElement as HTMLElement;
+		const item = this.visibleMediaItems()[index];
+		this.viewerImageLoading.set(item?.type !== 'video' && !this.isImageCached(url));
 		this.currentViewerImage.set(url);
 		this.currentViewerIndex.set(index);
+		this.currentGalleryIndex.set(index);
+		this.highlightCurrentImage();
 		// Find the media item in visibleMediaItems using the visible index
 		this.currentMediaItem.set(this.visibleMediaItems()[index] || null);
 		this.showImageViewer.set(true);
@@ -738,9 +782,14 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 
 		if (idx > 0) {
 			const newIdx = idx - 1;
+			this.preloadViewerImages(newIdx);
 			this.currentViewerIndex.set(newIdx);
-			this.currentViewerImage.set(visibleItems[newIdx].url);
-			this.currentMediaItem.set(visibleItems[newIdx]);
+			this.currentGalleryIndex.set(newIdx);
+			this.highlightCurrentImage();
+			const prevItem = visibleItems[newIdx];
+			this.viewerImageLoading.set(prevItem.type !== 'video' && !this.isImageCached(prevItem.url));
+			this.currentViewerImage.set(prevItem.url);
+			this.currentMediaItem.set(prevItem);
 			return;
 		}
 
@@ -1095,9 +1144,13 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	private goToFirstImageInViewer() {
 		const visible = this.visibleMediaItems();
 		this.currentViewerIndex.set(0);
+		this.currentGalleryIndex.set(0);
+		this.highlightCurrentImage();
 		if (visible.length > 0) {
-			this.currentViewerImage.set(visible[0].url);
-			this.currentMediaItem.set(visible[0]);
+			const firstItem = visible[0];
+			this.viewerImageLoading.set(firstItem.type !== 'video' && !this.isImageCached(firstItem.url));
+			this.currentViewerImage.set(firstItem.url);
+			this.currentMediaItem.set(firstItem);
 		}
 	}
 
@@ -1105,9 +1158,13 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		const visible = this.visibleMediaItems();
 		const lastIndex = visible.length - 1;
 		this.currentViewerIndex.set(lastIndex);
+		this.currentGalleryIndex.set(lastIndex);
+		this.highlightCurrentImage();
 		if (lastIndex >= 0) {
-			this.currentViewerImage.set(visible[lastIndex].url);
-			this.currentMediaItem.set(visible[lastIndex]);
+			const lastItem = visible[lastIndex];
+			this.viewerImageLoading.set(lastItem.type !== 'video' && !this.isImageCached(lastItem.url));
+			this.currentViewerImage.set(lastItem.url);
+			this.currentMediaItem.set(lastItem);
 		}
 	}
 
@@ -1135,13 +1192,15 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			el.classList.remove('keyboard-focused');
 		});
 
-		// Add highlight to current image
+		// Add highlight to current image and move DOM focus to it
 		const idx = this.currentGalleryIndex();
 		if (idx >= 0) {
 			const imageElements = document.querySelectorAll('.image-item');
 			const targetElement = imageElements[idx];
 			if (targetElement) {
 				targetElement.classList.add('keyboard-focused');
+				const focusable = targetElement.querySelector<HTMLElement>('img, video');
+				focusable?.focus({ preventScroll: true }); // scrollToCurrentImage handles scrolling
 			}
 		}
 	}
@@ -1707,9 +1766,11 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return;
 		}
 
+		const advItem = visibleItems[nextIndex];
 		this.currentViewerIndex.set(nextIndex);
-		this.currentViewerImage.set(visibleItems[nextIndex].url);
-		this.currentMediaItem.set(visibleItems[nextIndex]);
+		this.viewerImageLoading.set(advItem.type !== 'video' && !this.isImageCached(advItem.url));
+		this.currentViewerImage.set(advItem.url);
+		this.currentMediaItem.set(advItem);
 	}
 
 	private async promptInfiniteContinuation(direction: 'forward' | 'backward', brokenCount: number): Promise<boolean> {

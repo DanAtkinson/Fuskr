@@ -367,6 +367,14 @@
 	min-height: 200px; // Ensure minimum height
 	overflow: hidden; // Prevent content overflow
 
+	.viewer-spinner {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 150px;
+		min-width: 150px;
+	}
+
 	img {
 		max-width: calc(100% - 100px); // Leave space for navigation buttons
 		max-height: calc(70vh - 40px); // Account for header/footer

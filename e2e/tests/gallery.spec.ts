@@ -421,4 +421,115 @@ testWithExtension.describe('Gallery', () => {
 			await page.close();
 		}
 	);
+
+	testWithExtension(
+		'should apply keyboard-focused to the clicked image when the viewer opens',
+		async ({ extensionContext: { context, extensionId } }) => {
+			const fuskrPattern = 'https://example.com/image[1-3].jpg';
+			const page = await context.newPage();
+
+			await loadGalleryWithItems(page, extensionId, fuskrPattern, 3);
+
+			const imageItems = page.locator('.image-item');
+			await imageItems.nth(1).locator('img').click();
+			await expect(page.locator('.image-viewer-modal')).toBeVisible({ timeout: 5000 });
+
+			await expect(imageItems.nth(1)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.keyboard.press('Escape');
+			await expect(page.locator('.image-viewer-modal')).toBeHidden({ timeout: 5000 });
+			await expect(imageItems.nth(1)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.close();
+		}
+	);
+
+	testWithExtension(
+		'should open the viewer with Enter when an image is keyboard-focused via arrow navigation',
+		async ({ extensionContext: { context, extensionId } }) => {
+			const fuskrPattern = 'https://example.com/image[1-3].jpg';
+			const page = await context.newPage();
+
+			await loadGalleryWithItems(page, extensionId, fuskrPattern, 3);
+
+			await blurFormFocus(page);
+			await page.keyboard.press('ArrowRight');
+			await expect(page.locator('.image-item.keyboard-focused')).toHaveCount(1, { timeout: 3000 });
+
+			await page.keyboard.press('Enter');
+			await expect(page.locator('.image-viewer-modal')).toBeVisible({ timeout: 5000 });
+			await expect(page.locator('.image-viewer-modal .viewer-counter')).toBeVisible({ timeout: 3000 });
+
+			await page.keyboard.press('Escape');
+			await expect(page.locator('.image-viewer-modal')).toBeHidden({ timeout: 5000 });
+
+			await page.close();
+		}
+	);
+
+	testWithExtension(
+		'should update keyboard-focused when navigating with the next button in the viewer',
+		async ({ extensionContext: { context, extensionId } }) => {
+			const fuskrPattern = 'https://example.com/image[1-3].jpg';
+			const page = await context.newPage();
+
+			await loadGalleryWithItems(page, extensionId, fuskrPattern, 3);
+
+			const imageItems = page.locator('.image-item');
+			await imageItems.first().locator('img').click();
+			await expect(page.locator('.image-viewer-modal')).toBeVisible({ timeout: 5000 });
+			await expect(imageItems.nth(0)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.locator('.image-viewer-modal .next-btn').click();
+			await expect(imageItems.nth(1)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.locator('.image-viewer-modal .next-btn').click();
+			await expect(imageItems.nth(2)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.keyboard.press('Escape');
+			await page.close();
+		}
+	);
+
+	testWithExtension(
+		'should update keyboard-focused when navigating in the viewer with arrow keys',
+		async ({ extensionContext: { context, extensionId } }) => {
+			const fuskrPattern = 'https://example.com/image[1-3].jpg';
+			const page = await context.newPage();
+
+			await loadGalleryWithItems(page, extensionId, fuskrPattern, 3);
+
+			const imageItems = page.locator('.image-item');
+			await imageItems.last().locator('img').click();
+			await expect(page.locator('.image-viewer-modal')).toBeVisible({ timeout: 5000 });
+			await expect(imageItems.nth(2)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.keyboard.press('ArrowLeft');
+			await expect(imageItems.nth(1)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.keyboard.press('Escape');
+			await page.close();
+		}
+	);
+
+	testWithExtension(
+		'should move keyboard-focused to the first item when Home is pressed in the viewer',
+		async ({ extensionContext: { context, extensionId } }) => {
+			const fuskrPattern = 'https://example.com/image[1-3].jpg';
+			const page = await context.newPage();
+
+			await loadGalleryWithItems(page, extensionId, fuskrPattern, 3);
+
+			const imageItems = page.locator('.image-item');
+			await imageItems.last().locator('img').click();
+			await expect(page.locator('.image-viewer-modal')).toBeVisible({ timeout: 5000 });
+			await expect(imageItems.nth(2)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.keyboard.press('Home');
+			await expect(imageItems.nth(0)).toHaveClass(/keyboard-focused/, { timeout: 3000 });
+
+			await page.keyboard.press('Escape');
+			await page.close();
+		}
+	);
 });

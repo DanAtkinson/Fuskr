@@ -635,6 +635,75 @@ describe('GalleryComponent', () => {
 		});
 	});
 
+	describe('Gallery Keyboard Focus Sync', () => {
+		beforeEach(() => {
+			component.mediaItems.set([
+				{ url: 'url1.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url2.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+				{ url: 'url3.jpg', type: 'image', mimeType: 'image/jpeg', loadingState: 'loaded' },
+			]);
+			(component as unknown as { brokenUrls: { set(v: Set<string>): void } }).brokenUrls.set(new Set());
+		});
+
+		it('openImageViewer should set currentGalleryIndex to the opened index', () => {
+			component.openImageViewer('url2.jpg', 1);
+			expect(component.currentGalleryIndex()).toBe(1);
+		});
+
+		it('nextImage should keep currentGalleryIndex in sync with the viewer', () => {
+			component.currentViewerIndex.set(0);
+			component.currentGalleryIndex.set(0);
+			component.nextImage();
+			expect(component.currentGalleryIndex()).toBe(1);
+		});
+
+		it('previousImage should keep currentGalleryIndex in sync with the viewer', () => {
+			component.currentViewerIndex.set(2);
+			component.currentGalleryIndex.set(2);
+			component.previousImage();
+			expect(component.currentGalleryIndex()).toBe(1);
+		});
+
+		it('Home key in viewer should set currentGalleryIndex to 0', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(2);
+			component.currentGalleryIndex.set(2);
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'Home' }));
+			expect(component.currentGalleryIndex()).toBe(0);
+		});
+
+		it('End key in viewer should set currentGalleryIndex to the last index', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(0);
+			component.currentGalleryIndex.set(0);
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'End' }));
+			expect(component.currentGalleryIndex()).toBe(2);
+		});
+
+		it('ArrowRight in viewer should advance currentGalleryIndex', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(0);
+			component.currentGalleryIndex.set(0);
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+			expect(component.currentGalleryIndex()).toBe(1);
+		});
+
+		it('ArrowLeft in viewer should retreat currentGalleryIndex', () => {
+			component.showImageViewer.set(true);
+			component.currentViewerIndex.set(2);
+			component.currentGalleryIndex.set(2);
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+			expect(component.currentGalleryIndex()).toBe(1);
+		});
+
+		it('Enter should open the viewer for the currently keyboard-focused image', () => {
+			component.currentGalleryIndex.set(1);
+			component.handleKeyboardEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+			expect(component.showImageViewer()).toBe(true);
+			expect(component.currentViewerImage()).toBe('url2.jpg');
+		});
+	});
+
 	describe('URL List Features', () => {
 		beforeEach(() => {
 			component.mediaItems.set([

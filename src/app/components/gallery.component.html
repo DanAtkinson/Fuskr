@@ -229,7 +229,14 @@
 								{{ translate('Gallery_VideoNotSupported') }}
 							</video>
 						} @else {
-							<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" />
+							@if (viewerImageLoading()) {
+								<div class="viewer-spinner" aria-label="Loading image">
+									<div class="spinner-border text-secondary" role="status">
+										<span class="visually-hidden">Loading…</span>
+									</div>
+								</div>
+							}
+							<img [src]="currentViewerImage()" [alt]="getImageAltText(currentViewerIndex())" [class.d-none]="viewerImageLoading()" (load)="viewerImageLoading.set(false)" (error)="viewerImageLoading.set(false)" />
 						}
 						<button class="btn btn-lg btn-outline-secondary nav-btn next-btn" type="button" [title]="translate('Gallery_NextImage')" (click)="nextImage()" [disabled]="!canNavigateViewerForward()">
 							<span aria-hidden="true">▶</span>
