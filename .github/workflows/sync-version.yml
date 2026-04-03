@@ -43,7 +43,7 @@ jobs:
           npm run sync:version
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "chore(version): sync version files to ${{ inputs.version }}"
           title: "chore(version): sync version files to ${{ inputs.version }}"
