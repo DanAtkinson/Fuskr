@@ -271,15 +271,15 @@ describe('OptionsComponent', () => {
 			component.options.display.darkMode = false;
 			component.onDarkModeChange();
 
-			const computedStyle = getComputedStyle(document.body);
-
-			// In JSDOM the light-mode defaults come from stylesheet CSS, so the inline variables should be cleared.
+			// In light mode the component only removes the dark-mode class; it sets no inline
+			// CSS custom properties. Light-mode values come from the stylesheet, so inline
+			// styles should all be empty.
 			expect(document.body.classList.contains('dark-mode')).toBe(false);
-			expect(computedStyle.getPropertyValue('--bg-color').trim()).toBe('');
-			expect(computedStyle.getPropertyValue('--bg-secondary').trim()).toBe('');
-			expect(computedStyle.getPropertyValue('--text-color').trim()).toBe('');
-			expect(computedStyle.getPropertyValue('--text-secondary').trim()).toBe('');
-			expect(computedStyle.getPropertyValue('--border-color').trim()).toBe('');
+			expect(document.body.style.getPropertyValue('--bg-color').trim()).toBe('');
+			expect(document.body.style.getPropertyValue('--bg-secondary').trim()).toBe('');
+			expect(document.body.style.getPropertyValue('--text-color').trim()).toBe('');
+			expect(document.body.style.getPropertyValue('--text-secondary').trim()).toBe('');
+			expect(document.body.style.getPropertyValue('--border-color').trim()).toBe('');
 		});
 
 		it('should verify card elements have dark background in dark mode', () => {
