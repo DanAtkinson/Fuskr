@@ -36,6 +36,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	customCountValue = signal('10');
 	darkMode = signal(false);
 	downloadProgress = signal(0);
+	downloadStates = signal<Record<string, 'saving' | 'saved' | 'error'>>({});
 	downloadStatus = signal('');
 	enableOverloadProtection = signal(true);
 	errorMessage = signal('');
@@ -93,6 +94,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 	private lastPromptedBrokenThresholdForward = 0;
 	private observerSetupTimeout: ReturnType<typeof setTimeout> | null = null;
 	private scrollLoadCheckTimeout: ReturnType<typeof setTimeout> | null = null;
+	private singleDownloadStateTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 	private toastTimeout: ReturnType<typeof setTimeout> | null = null;
 	private preloadCache = new Map<string, HTMLImageElement>();
 	private viewerTriggerElement: HTMLElement | null = null; // Element that opened the image viewer
@@ -282,10 +284,48 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 		}
 	}
 
-	downloadImage(url: string, event: Event) {
+	downloadImage(url: string, event: Event): void {
 		event.stopPropagation();
 		const filename = this.getFilename(url);
-		this.chromeService.downloadFile(url, filename);
+
+		this.setSingleDownloadState(url, 'saving');
+
+		void (async () => {
+			try {
+				const downloadId = await this.chromeService.startDownload(url, filename);
+
+				if (downloadId === null) {
+					this.setSingleDownloadState(url, 'saved', 2000);
+					this.showToast(this.translate('Gallery_DownloadStarted', [filename]));
+					return;
+				}
+
+				const result = await this.chromeService.waitForDownloadCompletion(downloadId);
+				if (result === 'complete') {
+					this.setSingleDownloadState(url, 'saved', 2000);
+					this.showToast(this.translate('Gallery_DownloadItemSaved', [filename]));
+					return;
+				}
+
+				if (result === 'interrupted') {
+					this.setSingleDownloadState(url, 'error', 3000);
+					this.showToast(this.translate('Gallery_DownloadItemFailed', [filename]), true);
+					return;
+				}
+
+				// If the browser does not expose onChanged reliably, at least confirm start.
+				this.setSingleDownloadState(url, 'saved', 2000);
+				this.showToast(this.translate('Gallery_DownloadStarted', [filename]));
+			} catch (error) {
+				this.logger.error('gallery.download.singleFailed', `Failed to download ${filename}`, error);
+				this.setSingleDownloadState(url, 'error', 3000);
+				this.showToast(this.translate('Gallery_DownloadItemFailed', [filename]), true);
+			}
+		})();
+	}
+
+	getDownloadState(url: string): 'idle' | 'saving' | 'saved' | 'error' {
+		return this.downloadStates()[url] ?? 'idle';
 	}
 
 	async generateGallery(): Promise<void> {
@@ -521,6 +561,10 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			clearTimeout(this.scrollLoadCheckTimeout);
 			this.scrollLoadCheckTimeout = null;
 		}
+		for (const timeout of this.singleDownloadStateTimeouts.values()) {
+			clearTimeout(timeout);
+		}
+		this.singleDownloadStateTimeouts.clear();
 		this.teardownInfiniteSentinelObservers();
 	}
 
@@ -2131,5 +2175,33 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			this.toastVisible.set(false);
 			this.toastTimeout = null;
 		}, 2500);
+	}
+
+	private setSingleDownloadState(url: string, state: 'saving' | 'saved' | 'error', clearAfterMs?: number): void {
+		const existingTimeout = this.singleDownloadStateTimeouts.get(url);
+		if (existingTimeout) {
+			clearTimeout(existingTimeout);
+			this.singleDownloadStateTimeouts.delete(url);
+		}
+
+		this.downloadStates.update((current) => ({
+			...current,
+			[url]: state,
+		}));
+
+		if (clearAfterMs && clearAfterMs > 0) {
+			const timeout = setTimeout(() => {
+				this.downloadStates.update((current) => {
+					if (!(url in current)) {
+						return current;
+					}
+					const remaining = { ...current };
+					delete remaining[url];
+					return remaining;
+				});
+				this.singleDownloadStateTimeouts.delete(url);
+			}, clearAfterMs);
+			this.singleDownloadStateTimeouts.set(url, timeout);
+		}
 	}
 }

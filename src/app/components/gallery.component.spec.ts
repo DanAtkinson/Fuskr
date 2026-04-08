@@ -266,16 +266,68 @@ describe('GalleryComponent', () => {
 			expect(mockChromeService.openTab).toHaveBeenCalledWith(testUrl);
 		});
 
-		it('should download single image', () => {
+		it('should download single image with completion tracking', async () => {
 			const testUrl = 'https://example.com/test.jpg';
 			const mockEvent = new Event('click');
 			vi.spyOn(mockEvent, 'stopPropagation');
 			mockFuskrService.getImageFilename.mockReturnValue('test.jpg');
+			mockChromeService.startDownload.mockResolvedValue(42);
+			mockChromeService.waitForDownloadCompletion.mockResolvedValue('complete');
 
 			component.downloadImage(testUrl, mockEvent);
+			await Promise.resolve();
+			await Promise.resolve();
 
 			expect(mockEvent.stopPropagation).toHaveBeenCalled();
-			expect(mockChromeService.downloadFile).toHaveBeenCalledWith(testUrl, 'test.jpg');
+			expect(mockChromeService.startDownload).toHaveBeenCalledWith(testUrl, 'test.jpg');
+			expect(mockChromeService.waitForDownloadCompletion).toHaveBeenCalledWith(42);
+			expect(component.getDownloadState(testUrl)).toBe('saved');
+		});
+
+		it('should mark single download as saved when browser download id is unavailable', async () => {
+			const testUrl = 'https://example.com/no-id.jpg';
+			const mockEvent = new Event('click');
+			vi.spyOn(mockEvent, 'stopPropagation');
+			mockFuskrService.getImageFilename.mockReturnValue('no-id.jpg');
+			mockChromeService.startDownload.mockResolvedValue(null);
+
+			component.downloadImage(testUrl, mockEvent);
+			await Promise.resolve();
+			await Promise.resolve();
+
+			expect(mockChromeService.startDownload).toHaveBeenCalledWith(testUrl, 'no-id.jpg');
+			expect(mockChromeService.waitForDownloadCompletion).not.toHaveBeenCalled();
+			expect(component.getDownloadState(testUrl)).toBe('saved');
+		});
+
+		it('should mark single download as error when browser reports interruption', async () => {
+			const testUrl = 'https://example.com/interrupted.jpg';
+			const mockEvent = new Event('click');
+			vi.spyOn(mockEvent, 'stopPropagation');
+			mockFuskrService.getImageFilename.mockReturnValue('interrupted.jpg');
+			mockChromeService.startDownload.mockResolvedValue(7);
+			mockChromeService.waitForDownloadCompletion.mockResolvedValue('interrupted');
+
+			component.downloadImage(testUrl, mockEvent);
+			await Promise.resolve();
+			await Promise.resolve();
+
+			expect(mockChromeService.waitForDownloadCompletion).toHaveBeenCalledWith(7);
+			expect(component.getDownloadState(testUrl)).toBe('error');
+		});
+
+		it('should mark single download as error when startDownload throws', async () => {
+			const testUrl = 'https://example.com/fail.jpg';
+			const mockEvent = new Event('click');
+			vi.spyOn(mockEvent, 'stopPropagation');
+			mockFuskrService.getImageFilename.mockReturnValue('fail.jpg');
+			mockChromeService.startDownload.mockRejectedValue(new Error('failed'));
+
+			component.downloadImage(testUrl, mockEvent);
+			await Promise.resolve();
+			await Promise.resolve();
+
+			expect(component.getDownloadState(testUrl)).toBe('error');
 		});
 
 		it('should copy URL to clipboard', async () => {

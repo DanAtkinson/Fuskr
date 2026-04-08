@@ -28,6 +28,14 @@ interface BrowserPermissionsRequest {
 	data_collection?: string[];
 }
 
+interface DownloadDelta {
+	id: number;
+	state?: {
+		current?: 'in_progress' | 'interrupted' | 'complete';
+		previous?: 'in_progress' | 'interrupted' | 'complete';
+	};
+}
+
 interface BrowserAPI {
 	tabs?: {
 		query: (queryInfo: { active: boolean; currentWindow: boolean }, callback: (tabs: TabInfo[]) => void) => void;
@@ -44,7 +52,11 @@ interface BrowserAPI {
 		};
 	};
 	downloads?: {
-		download: (options: { url: string; filename?: string }) => void;
+		download: (options: { url: string; filename?: string }) => Promise<number> | number | void;
+		onChanged?: {
+			addListener: (listener: (downloadDelta: DownloadDelta) => void) => void;
+			removeListener: (listener: (downloadDelta: DownloadDelta) => void) => void;
+		};
 	};
 	i18n?: {
 		getMessage: (messageName: string, substitutions?: string | string[]) => string;
@@ -157,24 +169,7 @@ export class ChromeService {
 	}
 
 	async downloadFile(url: string, filename?: string): Promise<void> {
-		return new Promise((resolve) => {
-			if (this.browserAPI && this.browserAPI.downloads) {
-				this.browserAPI.downloads.download({
-					url,
-					filename: filename || undefined,
-				});
-				resolve();
-			} else {
-				// Fallback for development
-				const link = document.createElement('a');
-				link.href = url;
-				if (filename) {
-					link.download = filename;
-				}
-				link.click();
-				resolve();
-			}
-		});
+		await this.startDownload(url, filename);
 	}
 
 	async getCurrentTab(): Promise<TabInfo | null> {
@@ -383,6 +378,81 @@ export class ChromeService {
 				this.logger.debug('chrome.storage.fallback', 'Setting storage data in development mode');
 				resolve();
 			}
+		});
+	}
+
+	/**
+	 * Starts a browser download and returns the download ID when available.
+	 * In fallback mode (anchor click), returns null because no browser ID exists.
+	 */
+	async startDownload(url: string, filename?: string): Promise<number | null> {
+		if (this.browserAPI?.downloads) {
+			const result = this.browserAPI.downloads.download({
+				url,
+				filename: filename || undefined,
+			});
+
+			if (typeof result === 'number') {
+				return result;
+			}
+
+			if (result && typeof (result as Promise<number>).then === 'function') {
+				return await (result as Promise<number>);
+			}
+
+			return null;
+		}
+
+		// Fallback for development
+		const link = document.createElement('a');
+		link.href = url;
+		if (filename) {
+			link.download = filename;
+		}
+		link.click();
+		return null;
+	}
+
+	/**
+	 * Waits for a specific download to complete or fail using downloads.onChanged.
+	 * Returns timeout when the event API is unavailable or no terminal state arrives.
+	 */
+	async waitForDownloadCompletion(downloadId: number, timeoutMs = 60000): Promise<'complete' | 'interrupted' | 'timeout'> {
+		const onChanged = this.browserAPI?.downloads?.onChanged;
+		if (!onChanged) {
+			return 'timeout';
+		}
+
+		return new Promise<'complete' | 'interrupted' | 'timeout'>((resolve) => {
+			let settled = false;
+			let timeoutHandle: ReturnType<typeof setTimeout> | null = null;
+
+			const finish = (result: 'complete' | 'interrupted' | 'timeout') => {
+				if (settled) {
+					return;
+				}
+				settled = true;
+				if (timeoutHandle !== null) {
+					clearTimeout(timeoutHandle);
+				}
+				onChanged.removeListener(listener);
+				resolve(result);
+			};
+
+			const listener = (delta: DownloadDelta) => {
+				if (delta.id !== downloadId || !delta.state?.current) {
+					return;
+				}
+				if (delta.state.current === 'complete') {
+					finish('complete');
+				}
+				if (delta.state.current === 'interrupted') {
+					finish('interrupted');
+				}
+			};
+
+			onChanged.addListener(listener);
+			timeoutHandle = setTimeout(() => finish('timeout'), timeoutMs);
 		});
 	}
 

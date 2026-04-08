@@ -150,6 +150,18 @@
 		"description": "Prompt message for entering ZIP filename",
 		"message": "Enter filename for the ZIP archive:"
 	},
+	"Gallery_DownloadStarted": {
+		"description": "Toast message when an individual media download has started",
+		"message": "Started downloading $1"
+	},
+	"Gallery_DownloadItemSaved": {
+		"description": "Toast message when an individual media download has completed",
+		"message": "Saved $1"
+	},
+	"Gallery_DownloadItemFailed": {
+		"description": "Toast message when an individual media download fails",
+		"message": "Failed to save $1"
+	},
 	"Gallery_DownloadSaving": {
 		"description": "Status message when saving ZIP file",
 		"message": "Saving file..."

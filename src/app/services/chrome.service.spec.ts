@@ -659,6 +659,107 @@ describe('ChromeService', () => {
 			});
 		});
 
+		it('should return the download ID when startDownload resolves with one', async () => {
+			const download = vi.fn().mockResolvedValue(99);
+			(service as unknown as { browserAPI: unknown }).browserAPI = {
+				downloads: { download },
+			};
+
+			await expect(service.startDownload('https://example.com/file.jpg', 'file.jpg')).resolves.toBe(99);
+		});
+
+		it('should return sync download ID when browser API returns a number', async () => {
+			const download = vi.fn().mockReturnValue(17);
+			(service as unknown as { browserAPI: unknown }).browserAPI = {
+				downloads: { download },
+			};
+
+			await expect(service.startDownload('https://example.com/sync.jpg', 'sync.jpg')).resolves.toBe(17);
+		});
+
+		it('should return null when downloads API returns no ID', async () => {
+			const download = vi.fn();
+			(service as unknown as { browserAPI: unknown }).browserAPI = {
+				downloads: { download },
+			};
+
+			await expect(service.startDownload('https://example.com/noid.jpg', 'noid.jpg')).resolves.toBeNull();
+		});
+
+		it('should resolve waitForDownloadCompletion when onChanged reports completion', async () => {
+			let listener: ((delta: { id: number; state?: { current?: string } }) => void) | null = null;
+			const addListener = vi.fn((fn: (delta: { id: number; state?: { current?: string } }) => void) => {
+				listener = fn;
+			});
+			const removeListener = vi.fn();
+
+			(service as unknown as { browserAPI: unknown }).browserAPI = {
+				downloads: {
+					download: vi.fn(),
+					onChanged: {
+						addListener,
+						removeListener,
+					},
+				},
+			};
+
+			const waitPromise = service.waitForDownloadCompletion(12, 5000);
+			expect(addListener).toHaveBeenCalledTimes(1);
+
+			listener?.({ id: 12, state: { current: 'complete' } });
+
+			await expect(waitPromise).resolves.toBe('complete');
+			expect(removeListener).toHaveBeenCalledTimes(1);
+		});
+
+		it('should timeout waitForDownloadCompletion when onChanged API is unavailable', async () => {
+			(service as unknown as { browserAPI: unknown }).browserAPI = {
+				downloads: {
+					download: vi.fn(),
+				},
+			};
+
+			await expect(service.waitForDownloadCompletion(10, 10)).resolves.toBe('timeout');
+		});
+
+		it('should resolve waitForDownloadCompletion as interrupted when onChanged reports interruption', async () => {
+			let listener: ((delta: { id: number; state?: { current?: string } }) => void) | null = null;
+			const addListener = vi.fn((fn: (delta: { id: number; state?: { current?: string } }) => void) => {
+				listener = fn;
+			});
+			const removeListener = vi.fn();
+
+			(service as unknown as { browserAPI: unknown }).browserAPI = {
+				downloads: {
+					download: vi.fn(),
+					onChanged: {
+						addListener,
+						removeListener,
+					},
+				},
+			};
+
+			const waitPromise = service.waitForDownloadCompletion(33, 5000);
+			listener?.({ id: 33, state: { current: 'interrupted' } });
+
+			await expect(waitPromise).resolves.toBe('interrupted');
+			expect(removeListener).toHaveBeenCalledTimes(1);
+		});
+
+		it('should use anchor fallback in startDownload when downloads API is unavailable', async () => {
+			const click = vi.fn();
+			const anchor = { href: '', download: '', click } as unknown as HTMLAnchorElement;
+			const createElementSpy = vi.spyOn(document, 'createElement').mockReturnValue(anchor);
+			(service as unknown as { browserAPI: unknown }).browserAPI = null;
+
+			await expect(service.startDownload('https://example.com/fallback.jpg', 'fallback.jpg')).resolves.toBeNull();
+
+			expect(createElementSpy).toHaveBeenCalledWith('a');
+			expect(anchor.href).toBe('https://example.com/fallback.jpg');
+			expect(anchor.download).toBe('fallback.jpg');
+			expect(click).toHaveBeenCalledTimes(1);
+		});
+
 		it('should fall back to an anchor download when downloads API is unavailable', async () => {
 			const click = vi.fn();
 			const anchor = { href: '', download: '', click } as unknown as HTMLAnchorElement;

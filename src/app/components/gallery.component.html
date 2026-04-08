@@ -143,7 +143,7 @@
 					<div id="infinite-top-sentinel" class="infinite-sentinel infinite-sentinel-top" aria-hidden="true"></div>
 				}
 				@for (mediaItem of visibleMediaItems(); track mediaItem.url; let i = $index) {
-					<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState">
+					<div class="image-item wrap" [attr.data-loading-state]="mediaItem.loadingState" [attr.data-download-state]="getDownloadState(mediaItem.url)">
 						@if (mediaItem.type === 'video') {
 							<video class="fusk-media fusk-video" (click)="openImageViewer(mediaItem.url, i)" (keydown.enter)="openImageViewer(mediaItem.url, i)" (keydown.space)="openImageViewer(mediaItem.url, i)" (error)="onImageError($event)" (loadeddata)="onImageLoad($event)" [attr.data-original-url]="mediaItem.url" [attr.data-index]="i" tabindex="0" role="button" [attr.aria-label]="'Open video ' + (i + 1) + ' in viewer'" controls preload="metadata">
 								<source [src]="mediaItem.url" [type]="mediaItem.mimeType || 'video/mp4'" />
@@ -163,11 +163,39 @@
 								<span>{{ mediaItem.errorMessage || translate('Gallery_MediaLoadError') }}</span>
 							</div>
 						}
+						@if (getDownloadState(mediaItem.url) === 'saving') {
+							<div class="media-download-indicator" role="status" aria-live="polite">
+								<div class="spinner-small"></div>
+								<span>{{ translate('Gallery_DownloadSaving') }}</span>
+							</div>
+						}
+						@if (getDownloadState(mediaItem.url) === 'saved') {
+							<div class="media-download-indicator media-download-indicator--success" role="status" aria-live="polite">
+								<span aria-hidden="true">✓</span>
+								<span>{{ translate('Gallery_DownloadComplete') }}</span>
+							</div>
+						}
+						@if (getDownloadState(mediaItem.url) === 'error') {
+							<div class="media-download-indicator media-download-indicator--error" role="status" aria-live="polite">
+								<span aria-hidden="true">✕</span>
+								<span>{{ translate('Gallery_DownloadFailed') }}</span>
+							</div>
+						}
 						<div class="image-overlay">
 							<span class="image-filename">{{ getFilename(mediaItem.url) }}</span>
 							<div class="image-actions">
 								<button class="btn btn-sm btn-outline-primary" type="button" (click)="downloadImage(mediaItem.url, $event)" [title]="translate(mediaItem.type === 'video' ? 'Gallery_DownloadVideo' : 'Images_DownloadImage')">
-									<span aria-hidden="true">⬇️</span>
+									@if (getDownloadState(mediaItem.url) === 'saving') {
+										<div class="spinner-border spinner-border-sm" role="status">
+											<span class="visually-hidden">{{ translate('Gallery_Loading') }}</span>
+										</div>
+									} @else if (getDownloadState(mediaItem.url) === 'saved') {
+										<span aria-hidden="true">✓</span>
+									} @else if (getDownloadState(mediaItem.url) === 'error') {
+										<span aria-hidden="true">✕</span>
+									} @else {
+										<span aria-hidden="true">⬇️</span>
+									}
 								</button>
 								<button class="btn btn-sm btn-outline-secondary" type="button" (click)="copyUrl(mediaItem.url, $event)" [title]="translate('Gallery_CopyUrl')">
 									<span aria-hidden="true">📋</span>

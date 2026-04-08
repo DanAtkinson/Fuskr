@@ -16,6 +16,8 @@ export class BaseComponentTestHelper {
 			isExtensionContext: vi.fn(),
 			openTab: vi.fn(),
 			downloadFile: vi.fn(),
+			startDownload: vi.fn().mockResolvedValue(1),
+			waitForDownloadCompletion: vi.fn().mockResolvedValue('complete'),
 			hasLoggingPermission: vi.fn().mockResolvedValue(true),
 			requestLoggingPermission: vi.fn().mockResolvedValue(true),
 		} as unknown as Mocked<ChromeService>;
@@ -38,6 +40,9 @@ export class BaseComponentTestHelper {
 				Gallery_DownloadNoImages: 'No images to download',
 				Gallery_DownloadPreparing: 'Preparing download...',
 				Gallery_DownloadSaving: 'Saving ZIP file...',
+				Gallery_DownloadStarted: 'Started downloading $1',
+				Gallery_DownloadItemSaved: 'Saved $1',
+				Gallery_DownloadItemFailed: 'Failed to save $1',
 				Gallery_EnableFullScreenGallery: 'Enable full-screen gallery layout',
 				Gallery_ErrorGenerating: 'Error generating gallery:',
 				Gallery_ErrorNoPattern: 'No fuskable pattern found in the URL. Try a URL with numbers in the filename.',
