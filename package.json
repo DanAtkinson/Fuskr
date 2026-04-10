@@ -1,7 +1,7 @@
 {
   "name": "fuskr",
   "description": "Fuskr is an extension for Google Chrome which allows users to create image galleries from a single image based on their filename.",
-  "version": "5.0.15",
+  "version": "5.0.16",
   "engines": {
     "node": ">=22.0.0",
     "npm": ">=10.0.0"
@@ -29,10 +29,10 @@
     "sync:version": "node src/build/sync-version.js",
     "test:ci": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:e2e:report": "playwright show-report",
-    "test:e2e": "playwright test",
+    "test:e2e:report": "npm run pretest:e2e && playwright show-report",
+    "pretest:e2e": "playwright install chromium",
+    "test:e2e": "npm run pretest:e2e && playwright test",
     "test": "vitest",
-    "version:sync": "npm run sync:version",
     "watch": "ng build --watch --configuration development",
     "zip:builds": "node src/build/zip-build.js dist/chromium dist/fuskr-chromium.zip && node src/build/zip-build.js dist/firefox dist/fuskr-firefox.zip"
   },
