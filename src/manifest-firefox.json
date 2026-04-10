@@ -15,9 +15,7 @@
 		}
 	},
 	"background": {
-		"scripts": [
-			"js/background.js"
-		]
+		"scripts": ["js/background.js"]
 	},
 	"options_ui": {
 		"page": "index.html#/options",
@@ -26,17 +24,8 @@
 	"omnibox": {
 		"keyword": "fuskr"
 	},
-	"permissions": [
-		"tabs",
-		"downloads",
-		"contextMenus",
-		"activeTab",
-		"storage"
-	],
-	"host_permissions": [
-		"http://*/*",
-		"https://*/*"
-	],
+	"permissions": ["tabs", "downloads", "contextMenus", "activeTab", "storage"],
+	"host_permissions": ["http://*/*", "https://*/*"],
 	"icons": {
 		"16": "assets/images/16x16.png",
 		"48": "assets/images/48x48.png",
@@ -47,12 +36,8 @@
 	},
 	"web_accessible_resources": [
 		{
-			"resources": [
-				"assets/*"
-			],
-			"matches": [
-				"<all_urls>"
-			]
+			"resources": ["assets/*"],
+			"matches": ["<all_urls>"]
 		}
 	],
 	"browser_specific_settings": {
@@ -60,12 +45,8 @@
 			"id": "{6fbd1009-d97d-45b7-97d6-1b34d4182a0c}",
 			"strict_min_version": "142.0",
 			"data_collection_permissions": {
-				"required": [
-					"none"
-				],
-				"optional": [
-					"technicalAndInteraction"
-				]
+				"required": ["none"],
+				"optional": ["technicalAndInteraction"]
 			}
 		}
 	}
