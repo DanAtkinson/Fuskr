@@ -70,7 +70,7 @@ jobs:
           if-no-files-found: warn
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.TAG_NAME }}
           name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
