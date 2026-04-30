@@ -5,7 +5,7 @@
 [![Playwright](https://img.shields.io/badge/Playwright-e2e-green.svg)](https://playwright.dev)
 ![Chrome](https://img.shields.io/badge/Chrome-88+-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-109+-orange.svg)
-![Version](https://img.shields.io/badge/version-5.0.6-blue.svg)
+![Version](https://img.shields.io/badge/version-5.0.15-blue.svg)
 
 > Transform single image URLs into stunning galleries with intelligent pattern recognition!
 > 
