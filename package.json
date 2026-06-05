@@ -13,7 +13,7 @@
     "build:background": "webpack --config src/config/webpack.background.js",
     "build:extensions:prod": "npm run build:angular:prod && npm run build:background && npm run copy:files && npm run organise:builds && npm run zip:builds",
     "build:extensions:dev": "npm run build:angular:dev && npm run build:background && npm run copy:files && npm run organise:builds && npm run zip:builds",
-    "build:firefox:validate": "web-ext lint --source-dir=dist/firefox",
+    "build:firefox:validate": "node src/build/prepare-firefox-validation.js && web-ext lint --source-dir=dist/firefox",
     "build": "npm run clean && npm run sync:version && npm run format && npm run lint && npm run test:ci && npm run build:extensions:prod",
     "build:dev": "npm run clean && npm run sync:version && npm run format && npm run lint && npm run test:ci && npm run build:extensions:dev",
     "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('dist')) fs.rmSync('dist', {recursive: true, force: true})\"",
