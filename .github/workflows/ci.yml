@@ -31,7 +31,7 @@ jobs:
       cache: 'npm'
 
    - name: 🔧 Install dependencies
-     run: npm ci
+     run: npm ci --legacy-peer-deps
 
    - name: 🧪 Run tests
      run: npm run test:ci
@@ -63,7 +63,7 @@ jobs:
       cache: 'npm'
 
    - name: 🔧 Install dependencies
-     run: npm ci
+     run: npm ci --legacy-peer-deps
 
    - name: 🔍 Run linter
      run: npm run lint
@@ -89,7 +89,7 @@ jobs:
       cache: 'npm'
 
    - name: 🔧 Install dependencies
-     run: npm ci
+     run: npm ci --legacy-peer-deps
 
    - name: 🏗️ Build for production
      run: npm run build
@@ -138,7 +138,7 @@ jobs:
       cache: 'npm'
 
    - name: 🔧 Install dependencies
-     run: npm ci
+     run: npm ci --legacy-peer-deps
 
    - name: 🎭 Install Playwright Chromium
      run: npx playwright install chromium --with-deps
