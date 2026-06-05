@@ -2,6 +2,7 @@
 	"compileOnSave": false,
 	"compilerOptions": {
 		"baseUrl": "./",
+		"rootDir": "./src",
 		"outDir": "./dist/out-tsc",
 		"forceConsistentCasingInFileNames": true,
 		"esModuleInterop": true,
@@ -10,6 +11,7 @@
 		"noPropertyAccessFromIndexSignature": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
+		"ignoreDeprecations": "6.0",
 		// TODO: enable exactOptionalPropertyTypes once gallery.component, chrome.service and media-type.service
 		// are updated to not assign `undefined` to optional properties (TS2375/TS2379)
 		"sourceMap": true,

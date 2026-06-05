@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, HostListener, inject, signal, computed } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, inject, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,6 +15,7 @@ import { saveAs } from 'file-saver';
 	standalone: true,
 	styleUrls: ['./gallery.component.scss'],
 	templateUrl: './gallery.component.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [CommonModule, FormsModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy {

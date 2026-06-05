@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,6 +11,7 @@ import { BaseComponent } from './base.component';
 	standalone: true,
 	styleUrls: ['./options.component.scss'],
 	templateUrl: './options.component.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [CommonModule, FormsModule],
 })
 export class OptionsComponent extends BaseComponent implements OnInit {

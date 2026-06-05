@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
@@ -11,6 +11,7 @@ import { BaseComponent } from '@components/base.component';
 	standalone: true,
 	imports: [CommonModule],
 	styleUrls: ['./help.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	templateUrl: './help.component.html',
 })
 export class HelpComponent extends BaseComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ChromeService } from '@services/chrome.service';
 import { LoggerService } from '@services/logger.service';
@@ -8,6 +8,7 @@ import { LoggerService } from '@services/logger.service';
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss'],
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.Eager,
 	imports: [RouterOutlet],
 })
 export class AppComponent implements OnInit {

@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ChromeService } from '@services/chrome.service';
@@ -11,6 +11,7 @@ import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history
 	standalone: true,
 	imports: [CommonModule],
 	styleUrls: ['./history.component.scss'],
+	changeDetection: ChangeDetectionStrategy.Eager,
 	templateUrl: './history.component.html',
 })
 export class HistoryComponent extends BaseComponent implements OnInit {

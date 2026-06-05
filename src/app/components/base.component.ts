@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { ChromeService } from '@services/chrome.service';
 
 /**
@@ -6,6 +6,7 @@ import { ChromeService } from '@services/chrome.service';
  */
 @Component({
 	template: '',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	standalone: true,
 })
 export abstract class BaseComponent {
