@@ -12,6 +12,41 @@ const distPath = process.argv[2] || 'dist/chromium';
 
 console.log(`Organising build output in: ${distPath}`);
 
+/**
+ * Recursively merge source directory contents into target directory.
+ * Existing files are overwritten to keep output deterministic.
+ */
+const mergeDirectory = (sourceDir, targetDir) => {
+	const entries = fs.readdirSync(sourceDir, { withFileTypes: true });
+
+	entries.forEach((entry) => {
+		const sourcePath = path.join(sourceDir, entry.name);
+		const targetPath = path.join(targetDir, entry.name);
+
+		if (entry.isDirectory()) {
+			if (!fs.existsSync(targetPath)) {
+				fs.mkdirSync(targetPath, { recursive: true });
+			}
+			mergeDirectory(sourcePath, targetPath);
+			return;
+		}
+
+		if (fs.existsSync(targetPath)) {
+			fs.unlinkSync(targetPath);
+		}
+		fs.renameSync(sourcePath, targetPath);
+	});
+};
+
+// Angular application builder outputs into a nested "browser" folder by default.
+// Flatten it so extension files are placed at the package root.
+const browserOutputPath = path.join(distPath, 'browser');
+if (fs.existsSync(browserOutputPath) && fs.statSync(browserOutputPath).isDirectory()) {
+	console.log('Flattening browser/ output into extension root');
+	mergeDirectory(browserOutputPath, distPath);
+	fs.rmSync(browserOutputPath, { recursive: true, force: true });
+}
+
 // Create directories
 const dirs = ['js', 'css'];
 dirs.forEach((dir) => {
