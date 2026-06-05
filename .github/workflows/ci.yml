@@ -7,9 +7,9 @@ on:
   branches: [master, main]
 
 env:
- # Opt into Node.js 24 for all actions to avoid the Node.js 20 deprecation
+ # Opt into Node.js 26 for all actions to avoid the Node.js 20 deprecation
  # warning emitted by transitively-used actions (e.g. actions/github-script).
- FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+ FORCE_JAVASCRIPT_ACTIONS_TO_NODE26: true
 
 jobs:
  test:
@@ -18,7 +18,7 @@ jobs:
 
   strategy:
    matrix:
-    node-version: [24.x]
+    node-version: [26.x]
 
   steps:
    - name: 📁 Checkout repository
@@ -40,7 +40,7 @@ jobs:
      run: npm run build
 
    - name: 📊 Upload coverage reports
-     if: matrix.node-version == '24.x'
+     if: matrix.node-version == '26.x'
      uses: codecov/codecov-action@v6
      with:
       files: ./coverage/fuskr/lcov.info
@@ -59,7 +59,7 @@ jobs:
    - name: 📦 Setup Node.js
      uses: actions/setup-node@v6
      with:
-      node-version: '24.x'
+      node-version: '26.x'
       cache: 'npm'
 
    - name: 🔧 Install dependencies
@@ -85,7 +85,7 @@ jobs:
    - name: 📦 Setup Node.js
      uses: actions/setup-node@v6
      with:
-      node-version: '24.x'
+      node-version: '26.x'
       cache: 'npm'
 
    - name: 🔧 Install dependencies
@@ -134,7 +134,7 @@ jobs:
    - name: 📦 Setup Node.js
      uses: actions/setup-node@v6
      with:
-      node-version: '24.x'
+      node-version: '26.x'
       cache: 'npm'
 
    - name: 🔧 Install dependencies
