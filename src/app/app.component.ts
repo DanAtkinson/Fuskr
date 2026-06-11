@@ -8,7 +8,7 @@ import { LoggerService } from '@services/logger.service';
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.scss'],
 	standalone: true,
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [RouterOutlet],
 })
 export class AppComponent implements OnInit {

@@ -15,7 +15,7 @@ import { saveAs } from 'file-saver';
 	standalone: true,
 	styleUrls: ['./gallery.component.scss'],
 	templateUrl: './gallery.component.html',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, FormsModule],
 })
 export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy {

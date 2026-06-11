@@ -11,7 +11,7 @@ import { GalleryHistoryEntry, GalleryHistory } from '@interfaces/gallery-history
 	standalone: true,
 	imports: [CommonModule],
 	styleUrls: ['./history.component.scss'],
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './history.component.html',
 })
 export class HistoryComponent extends BaseComponent implements OnInit {

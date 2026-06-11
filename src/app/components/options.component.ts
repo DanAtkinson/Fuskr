@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,20 +11,30 @@ import { BaseComponent } from './base.component';
 	standalone: true,
 	styleUrls: ['./options.component.scss'],
 	templateUrl: './options.component.html',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, FormsModule],
 })
 export class OptionsComponent extends BaseComponent implements OnInit {
 	// Public properties (alphabetically)
-	loggerConfig: { enabled: boolean; logLevel: LogLevel; maxLogs: number; logCount: number } = {
+	get loggerConfig() {
+		return this.loggerConfigState();
+	}
+
+	get options() {
+		return this.optionsState();
+	}
+
+	showDebugPanel = signal(false);
+	statusMessage = signal('');
+
+	// Private signals
+	private loggerConfigState = signal({
 		enabled: false,
 		logLevel: LogLevel.INFO,
 		maxLogs: 0,
 		logCount: 0,
-	};
-	options: ChromeStorageData = new ChromeStorageData();
-	showDebugPanel = signal(false);
-	statusMessage = signal('');
+	});
+	private optionsState = signal(new ChromeStorageData());
 
 	// Injected services
 	public router = inject(Router);
@@ -37,7 +47,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 	// Public methods (alphabetically)
 	clearLogs() {
 		this.logger.clearLogs();
-		this.loggerConfig = this.logger.getConfig();
+		this.loggerConfigState.set(this.logger.getConfig());
 		this.logger.info('options.debugPanel.cleared', 'User cleared debug logs');
 		this.showStatus('Debug logs cleared!');
 	}
@@ -58,7 +68,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 
 	async loadOptions() {
 		try {
-			this.options = await this.chromeService.getStorageData();
+			this.optionsState.set(await this.chromeService.getStorageData());
 			// Apply dark mode class to document
 			document.body.classList.toggle('dark-mode', this.options.display.darkMode);
 			this.logger.debug('options.loaded', 'Options loaded successfully');
@@ -80,7 +90,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		// an INFO entry which would otherwise overwrite other contexts' logs.
 		await this.logger.loadLogsFromStorage();
 		this.logger.configure({ enabled: this.options.logging.enabled, logLevel: Number(this.options.logging.logLevel) });
-		this.loggerConfig = this.logger.getConfig();
+		this.loggerConfigState.set(this.logger.getConfig());
 
 		// Auto-expand the debug panel when logging is already enabled.
 		if (this.loggerConfig.enabled) {
@@ -96,7 +106,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 	async onLogLevelChange(level: number | string) {
 		const numLevel = Number(level);
 		this.logger.configure({ logLevel: numLevel });
-		this.loggerConfig = this.logger.getConfig();
+		this.loggerConfigState.set(this.logger.getConfig());
 		this.options.logging.logLevel = numLevel;
 		await this.chromeService.setStorageData(this.options);
 	}
@@ -118,7 +128,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		}
 
 		this.logger.configure({ enabled: isEnabled });
-		this.loggerConfig = this.logger.getConfig();
+		this.loggerConfigState.set(this.logger.getConfig());
 		this.options.logging.enabled = isEnabled;
 		await this.chromeService.setStorageData(this.options);
 
@@ -159,7 +169,7 @@ export class OptionsComponent extends BaseComponent implements OnInit {
 		this.showDebugPanel.set(!this.showDebugPanel());
 		this.logger.debug('options.debugPanel.toggled', `Panel visibility: ${this.showDebugPanel()}`);
 		if (this.showDebugPanel()) {
-			this.loggerConfig = this.logger.getConfig();
+			this.loggerConfigState.set(this.logger.getConfig());
 		}
 	}
 

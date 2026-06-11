@@ -6,7 +6,7 @@ import { ChromeService } from '@services/chrome.service';
  */
 @Component({
 	template: '',
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	standalone: true,
 })
 export abstract class BaseComponent {

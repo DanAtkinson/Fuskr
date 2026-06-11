@@ -11,7 +11,7 @@ import { BaseComponent } from '@components/base.component';
 	standalone: true,
 	imports: [CommonModule],
 	styleUrls: ['./help.component.scss'],
-	changeDetection: ChangeDetectionStrategy.Eager,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './help.component.html',
 })
 export class HelpComponent extends BaseComponent implements OnInit {
