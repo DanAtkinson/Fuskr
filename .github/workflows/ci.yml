@@ -6,6 +6,9 @@ on:
  pull_request:
   branches: [master, main]
 
+permissions:
+ contents: read
+
 env:
  # Opt into Node.js 26 for all actions to avoid the Node.js 20 deprecation
  # warning emitted by transitively-used actions (e.g. actions/github-script).
