@@ -41,7 +41,7 @@ jobs:
 
    - name: 📊 Upload coverage reports
      if: matrix.node-version == '26.x'
-     uses: codecov/codecov-action@v6
+     uses: codecov/codecov-action@v7
      with:
       files: ./coverage/fuskr/lcov.info
       flags: unittests
