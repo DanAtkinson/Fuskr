@@ -1,7 +1,7 @@
 # 🖼️ Fuskr - Image Gallery Generator
 
 [![CI/CD Pipeline](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml/badge.svg)](https://github.com/DanAtkinson/Fuskr/actions/workflows/ci.yml)
-[![Angular](https://img.shields.io/badge/Angular-21-red.svg)](https://angular.dev)
+[![Angular](https://img.shields.io/badge/Angular-22-green.svg)](https://angular.dev)
 [![Playwright](https://img.shields.io/badge/Playwright-e2e-green.svg)](https://playwright.dev)
 ![Chrome](https://img.shields.io/badge/Chrome-88+-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-109+-orange.svg)
