@@ -181,6 +181,11 @@ describe('FuskrService', () => {
 			const fuskUrl = service.createFuskUrl('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20001.jpg', 1000, 0);
 			expect(fuskUrl).toBe('https://example.com/Brasil%20Sr%20Agnes%202005/images/Picture%20[000-1001].jpg');
 		});
+
+		it('should handle URLs with non-standard file extensions', () => {
+			const fuskUrl = service.createFuskUrl('http://cdn.example.com/images/u598538_001.bro', 5, 0);
+			expect(fuskUrl).toBe('http://cdn.example.com/images/u598538_[000-006].bro');
+		});
 	});
 
 	describe('generateImageGallery Method', () => {
@@ -210,6 +215,21 @@ describe('FuskrService', () => {
 			expect(urls[0]).toBe('http://example.com/testa.jpg');
 			expect(urls[1]).toBe('http://example.com/testb.jpg');
 			expect(urls[2]).toBe('http://example.com/testc.jpg');
+		});
+
+		it('should generate gallery from URL with non-standard file extension', () => {
+			const result = service.generateImageGallery('http://cdn.example.com/images/u598538_[001-010].bro');
+			expect(result.originalUrl).toBe('http://cdn.example.com/images/u598538_[001-010].bro');
+			expect(result.urls.length).toBe(10);
+			expect(result.urls[0]).toBe('http://cdn.example.com/images/u598538_001.bro');
+			expect(result.urls[9]).toBe('http://cdn.example.com/images/u598538_010.bro');
+		});
+
+		it('should auto-detect range for URL with non-standard file extension', () => {
+			const result = service.generateImageGallery('http://cdn.example.com/images/u598538_001.bro', 3);
+			expect(result.originalUrl).toBe('http://cdn.example.com/images/u598538_[000-004].bro');
+			expect(result.urls.length).toBe(5);
+			expect(result.urls).toContain('http://cdn.example.com/images/u598538_001.bro');
 		});
 	});
 

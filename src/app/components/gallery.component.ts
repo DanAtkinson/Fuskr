@@ -1498,15 +1498,7 @@ export class GalleryComponent extends BaseComponent implements OnInit, OnDestroy
 			return false;
 		}
 
-		// Check for common image and video extensions
-		const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
-		const videoExtensions = ['.mp4', '.webm', '.avi', '.mov', '.mkv', '.flv', '.wmv', '.m4v'];
-		const urlWithoutQuery = url.split('?')[0].toLowerCase();
-
-		const hasImageExtension = imageExtensions.some((ext) => urlWithoutQuery.endsWith(ext));
-		const hasVideoExtension = videoExtensions.some((ext) => urlWithoutQuery.endsWith(ext));
-
-		return hasImageExtension || hasVideoExtension;
+		return true;
 	}
 
 	private async performGalleryGeneration() {
