@@ -257,6 +257,43 @@ describe('MediaTypeService', () => {
 			expect(result.type).toBe('unknown');
 			expect(result.mimeType).toBe('application/octet-stream');
 		});
+
+		it('should return unknown for non-standard file extensions like .bro', () => {
+			const result = service['fallbackTypeDetection']('https://cdn.example.com/images/u598538_001.bro');
+			expect(result.type).toBe('unknown');
+			expect(result.mimeType).toBe('application/octet-stream');
+		});
+	});
+
+	describe('determineMediaType with non-standard extensions', () => {
+		it('should detect image type from Content-Type header for .bro URL', async () => {
+			const mockResponse: Partial<Response> = {
+				ok: true,
+				headers: {
+					get: vi.fn().mockImplementation((header: string) => {
+						if (header === 'Content-Type') return 'image/jpeg';
+						if (header === 'Content-Length') return '54321';
+						return null;
+					}),
+				} as unknown as Headers,
+			};
+
+			window.fetch = vi.fn().mockReturnValue(Promise.resolve(mockResponse));
+
+			const result = await service.determineMediaType('https://cdn.example.com/images/u598538_001.bro');
+
+			expect(result.type).toBe('image');
+			expect(result.mimeType).toBe('image/jpeg');
+		});
+
+		it('should fall back gracefully for .bro URL when HEAD request fails', async () => {
+			window.fetch = vi.fn().mockReturnValue(Promise.reject(new Error('Network error')));
+
+			const result = await service.determineMediaType('https://cdn.example.com/images/u598538_001.bro');
+
+			expect(result.type).toBe('unknown');
+			expect(result.mimeType).toBe('application/octet-stream');
+		});
 	});
 
 	describe('MIME Type Detection', () => {

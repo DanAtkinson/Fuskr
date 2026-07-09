@@ -1531,6 +1531,52 @@ describe('GalleryComponent', () => {
 			).getValidImageUrls();
 			expect(urls).toEqual(['https://site/img1.jpg', 'https://site/vid1.mp4']);
 		});
+
+		it('should include URLs with non-standard file extensions', () => {
+			const img = document.createElement('img');
+			img.className = 'fusk-image';
+			Object.defineProperty(img, 'complete', { value: true });
+			Object.defineProperty(img, 'naturalHeight', { value: 100 });
+			img.src = 'https://cdn.example.com/images/u598538_001.bro';
+
+			document.body.appendChild(img);
+
+			const urls = (
+				component as unknown as {
+					getValidImageUrls: () => string[];
+				}
+			).getValidImageUrls();
+			expect(urls).toContain('https://cdn.example.com/images/u598538_001.bro');
+		});
+	});
+
+	describe('isValidMediaUrl', () => {
+		it('should return true for standard image extensions', () => {
+			const isValid = (component as unknown as { isValidMediaUrl: (url: string) => boolean }).isValidMediaUrl;
+			expect(isValid.call(component, 'https://example.com/image.jpg')).toBe(true);
+			expect(isValid.call(component, 'https://example.com/image.png')).toBe(true);
+		});
+
+		it('should return true for non-standard file extensions', () => {
+			const isValid = (component as unknown as { isValidMediaUrl: (url: string) => boolean }).isValidMediaUrl;
+			expect(isValid.call(component, 'https://cdn.example.com/images/u598538_001.bro')).toBe(true);
+		});
+
+		it('should return false for data URLs', () => {
+			const isValid = (component as unknown as { isValidMediaUrl: (url: string) => boolean }).isValidMediaUrl;
+			expect(isValid.call(component, 'data:image/svg+xml;base64,abc123')).toBe(false);
+		});
+
+		it('should return false for blob URLs', () => {
+			const isValid = (component as unknown as { isValidMediaUrl: (url: string) => boolean }).isValidMediaUrl;
+			expect(isValid.call(component, 'blob:https://example.com/1234')).toBe(false);
+		});
+
+		it('should return false for non-HTTP URLs', () => {
+			const isValid = (component as unknown as { isValidMediaUrl: (url: string) => boolean }).isValidMediaUrl;
+			expect(isValid.call(component, 'ftp://example.com/image.jpg')).toBe(false);
+			expect(isValid.call(component, 'file:///local/image.jpg')).toBe(false);
+		});
 	});
 
 	describe('updateImageCounts', () => {
