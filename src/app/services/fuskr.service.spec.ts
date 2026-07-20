@@ -150,6 +150,11 @@ describe('FuskrService', () => {
 			expect(urls).toContain('http://domain.com/path/file/00.jpg');
 			expect(urls).toContain('http://domain.com/path/file/99.jpg');
 		});
+
+		it('should handle one-based brace patterns with multiple bracket groups', () => {
+			const urls = service.getLinks('http://domain.com/[01-02]/[40-41]/{1}{2}.jpg');
+			expect(urls).toEqual(['http://domain.com/01/40/0140.jpg', 'http://domain.com/01/41/0141.jpg', 'http://domain.com/02/40/0240.jpg', 'http://domain.com/02/41/0241.jpg']);
+		});
 	});
 
 	describe('createFuskUrl Method', () => {
