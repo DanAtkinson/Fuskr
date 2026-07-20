@@ -229,6 +229,8 @@ export class FuskrService {
 	}
 
 	private getGroupPlaceholderRegex(groupNumber: number): RegExp {
+		// Match both the legacy zero-based placeholder and the new one-based placeholder
+		// for the current bracket group so existing URLs keep working.
 		return new RegExp(`\\{(?:${groupNumber}|${groupNumber + 1})\\}`, 'g');
 	}
 
