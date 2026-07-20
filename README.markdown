@@ -77,6 +77,29 @@ Fuskr recognises these URL patterns and automatically converts simple URLs to br
 - `photo[001-999].png` → `photo[001-999].png` (no change)
 - `file[05-20].gif` → `file[05-20].gif` (no change)
 
+### Complex URL Structures and Grouped Ranges
+
+You can combine multiple bracket ranges in the same URL, including ranges in folder names:
+
+- `https://example.com/gallery/[01-03]/image[07-08].jpg`
+
+Fuskr expands bracket groups from left to right. If you need to reuse an earlier bracket value later in the URL, add a grouped placeholder with braces:
+
+- `{1}` = the first bracket group
+- `{2}` = the second bracket group
+- and so on
+
+For example, this pattern:
+
+- `https://example.com/[01-10]/[40-99]/{1}{2}.jpg`
+
+generates URLs such as:
+
+- `https://example.com/01/40/0140.jpg`
+- `https://example.com/02/45/0245.jpg`
+
+Older zero-based placeholders such as `{0}` are still accepted for compatibility.
+
 ## 📦 Installation
 
 ### Chrome Web Store

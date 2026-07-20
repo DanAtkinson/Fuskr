@@ -185,7 +185,7 @@ export class FuskrService {
 			let link = prefix + thisNumString + suffix;
 
 			if (this.groupRegex.test(link)) {
-				link = link.replace(new RegExp('\\{' + groupNumber + '\\}', 'g'), thisNumString);
+				link = link.replace(this.getGroupPlaceholderRegex(groupNumber), thisNumString);
 			}
 
 			if (this.isFuskable(link)) {
@@ -212,7 +212,7 @@ export class FuskrService {
 			let link = prefix + thisNumString + suffix;
 
 			if (this.groupRegex.test(link)) {
-				link = link.replace(new RegExp('\\{' + groupNumber + '\\}', 'g'), thisNumString);
+				link = link.replace(this.getGroupPlaceholderRegex(groupNumber), thisNumString);
 			}
 
 			if (this.isFuskable(link)) {
@@ -226,6 +226,12 @@ export class FuskrService {
 		}
 
 		return retUrls;
+	}
+
+	private getGroupPlaceholderRegex(groupNumber: number): RegExp {
+		// Match both the legacy zero-based placeholder and the new one-based placeholder
+		// for the current bracket group so existing URLs keep working.
+		return new RegExp(`\\{(?:${groupNumber}|${groupNumber + 1})\\}`, 'g');
 	}
 
 	private padString(number: number, stringLength: number, padding: string): string {
