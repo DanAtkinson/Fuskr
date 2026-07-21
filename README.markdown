@@ -85,20 +85,18 @@ You can combine multiple bracket ranges in the same URL, including ranges in fol
 
 Fuskr expands bracket groups from left to right. If you need to reuse an earlier bracket value later in the URL, add a grouped placeholder with braces:
 
-- `{1}` = the first bracket group
-- `{2}` = the second bracket group
+- `{0}` = the first bracket group
+- `{1}` = the second bracket group
 - and so on
 
 For example, this pattern:
 
-- `https://example.com/[01-10]/[40-99]/{1}{2}.jpg`
+- `https://example.com/[01-10]/[40-99]/{0}{1}.jpg`
 
 generates URLs such as:
 
 - `https://example.com/01/40/0140.jpg`
 - `https://example.com/02/45/0245.jpg`
-
-Older zero-based placeholders such as `{0}` are still accepted for compatibility.
 
 ## 📦 Installation
 
