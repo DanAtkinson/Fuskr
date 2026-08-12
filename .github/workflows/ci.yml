@@ -1,161 +1,161 @@
 name: CI/CD Pipeline
 
 on:
- push:
-  branches: [master, main, develop]
- pull_request:
-  branches: [master, main]
+    push:
+        branches: [master, main, develop]
+    pull_request:
+        branches: [master, main]
 
 permissions:
- contents: read
+    contents: read
 
 env:
- # Opt into Node.js 26 for all actions to avoid the Node.js 20 deprecation
- # warning emitted by transitively-used actions (e.g. actions/github-script).
- FORCE_JAVASCRIPT_ACTIONS_TO_NODE26: true
+    # Opt into Node.js 26 for all actions to avoid the Node.js 20 deprecation
+    # warning emitted by transitively-used actions (e.g. actions/github-script).
+    FORCE_JAVASCRIPT_ACTIONS_TO_NODE26: true
 
 jobs:
- test:
-  name: Test & Build
-  runs-on: ubuntu-latest
+    test:
+        name: Test & Build
+        runs-on: ubuntu-latest
 
-  strategy:
-   matrix:
-    node-version: [26.x]
+        strategy:
+            matrix:
+                node-version: [26.x]
 
-  steps:
-   - name: 📁 Checkout repository
-     uses: actions/checkout@v7
+        steps:
+            - name: 📁 Checkout repository
+              uses: actions/checkout@v7
 
-   - name: 📦 Setup Node.js ${{ matrix.node-version }}
-     uses: actions/setup-node@v7
-     with:
-		  node-version-file: '.nvmrc'
-      cache: 'npm'
+            - name: 📦 Setup Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v7
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
 
-   - name: 🔧 Install dependencies
-     run: npm ci --legacy-peer-deps
+            - name: 🔧 Install dependencies
+              run: npm ci --legacy-peer-deps
 
-   - name: 🧪 Run tests
-     run: npm run test:ci
+            - name: 🧪 Run tests
+              run: npm run test:ci
 
-   - name: 🏗️ Build project
-     run: npm run build
+            - name: 🏗️ Build project
+              run: npm run build
 
-   - name: 📊 Upload coverage reports
-     if: matrix.node-version == '26.x'
-     uses: codecov/codecov-action@v7
-     with:
-      files: ./coverage/fuskr/lcov.info
-      flags: unittests
-      name: codecov-umbrella
-      fail_ci_if_error: false
+            - name: 📊 Upload coverage reports
+              if: matrix.node-version == '26.x'
+              uses: codecov/codecov-action@v7
+              with:
+                  files: ./coverage/fuskr/lcov.info
+                  flags: unittests
+                  name: codecov-umbrella
+                  fail_ci_if_error: false
 
- lint:
-  name: Code Quality
-  runs-on: ubuntu-latest
+    lint:
+        name: Code Quality
+        runs-on: ubuntu-latest
 
-  steps:
-   - name: 📁 Checkout repository
-     uses: actions/checkout@v7
+        steps:
+            - name: 📁 Checkout repository
+              uses: actions/checkout@v7
 
-   - name: 📦 Setup Node.js
-     uses: actions/setup-node@v7
-     with:
-		  node-version-file: '.nvmrc'
-      cache: 'npm'
+            - name: 📦 Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
 
-   - name: 🔧 Install dependencies
-     run: npm ci --legacy-peer-deps
+            - name: 🔧 Install dependencies
+              run: npm ci --legacy-peer-deps
 
-   - name: 🔍 Run linter
-     run: npm run lint
+            - name: 🔍 Run linter
+              run: npm run lint
 
-   - name: 🎨 Check code formatting
-     run: |
-      echo "Checking code formatting with Prettier..."
-      npm run format:check
+            - name: 🎨 Check code formatting
+              run: |
+                  echo "Checking code formatting with Prettier..."
+                  npm run format:check
 
- build-extensions:
-  name: Build Browser Extensions
-  runs-on: ubuntu-latest
-  needs: [test, lint]
+    build-extensions:
+        name: Build Browser Extensions
+        runs-on: ubuntu-latest
+        needs: [test, lint]
 
-  steps:
-   - name: 📁 Checkout repository
-     uses: actions/checkout@v7
+        steps:
+            - name: 📁 Checkout repository
+              uses: actions/checkout@v7
 
-   - name: 📦 Setup Node.js
-     uses: actions/setup-node@v7
-     with:
-		  node-version-file: '.nvmrc'
-      cache: 'npm'
+            - name: 📦 Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
 
-   - name: 🔧 Install dependencies
-     run: npm ci --legacy-peer-deps
+            - name: 🔧 Install dependencies
+              run: npm ci --legacy-peer-deps
 
-   - name: 🏗️ Build for production
-     run: npm run build
+            - name: 🏗️ Build for production
+              run: npm run build
 
-   - name: 📦 Package Chrome extension
-     run: |
-      if [ -f "package-chrome.json" ]; then
-        npm run package:chrome
-      else
-        echo "Chrome packaging script not found, skipping"
-      fi
+            - name: 📦 Package Chrome extension
+              run: |
+                  if [ -f "package-chrome.json" ]; then
+                    npm run package:chrome
+                  else
+                    echo "Chrome packaging script not found, skipping"
+                  fi
 
-   - name: 🦊 Package Firefox extension
-     run: |
-      if [ -f "package-firefox.json" ]; then
-        npm run package:firefox
-      else
-        echo "Firefox packaging script not found, skipping"
-      fi
+            - name: 🦊 Package Firefox extension
+              run: |
+                  if [ -f "package-firefox.json" ]; then
+                    npm run package:firefox
+                  else
+                    echo "Firefox packaging script not found, skipping"
+                  fi
 
-   - name: 🔍 Validate Firefox extension
-     run: npm run build:firefox:validate
+            - name: 🔍 Validate Firefox extension
+              run: npm run build:firefox:validate
 
-   - name: 📤 Upload build artifacts
-     uses: actions/upload-artifact@v7
-     with:
-      name: extension-builds
-      path: |
-       dist/
-       *.zip
-      retention-days: 30
+            - name: 📤 Upload build artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: extension-builds
+                  path: |
+                      dist/
+                      *.zip
+                  retention-days: 30
 
- e2e-chrome:
-  name: E2E Tests (Chrome)
-  runs-on: ubuntu-latest
-  needs: [test]
+    e2e-chrome:
+        name: E2E Tests (Chrome)
+        runs-on: ubuntu-latest
+        needs: [test]
 
-  steps:
-   - name: 📁 Checkout repository
-     uses: actions/checkout@v7
+        steps:
+            - name: 📁 Checkout repository
+              uses: actions/checkout@v7
 
-   - name: 📦 Setup Node.js
-     uses: actions/setup-node@v7
-     with:
-		  node-version-file: '.nvmrc'
-      cache: 'npm'
+            - name: 📦 Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
 
-   - name: 🔧 Install dependencies
-     run: npm ci --legacy-peer-deps
+            - name: 🔧 Install dependencies
+              run: npm ci --legacy-peer-deps
 
-   - name: 🎭 Install Playwright Chromium
-     run: npx playwright install chromium --with-deps
+            - name: 🎭 Install Playwright Chromium
+              run: npx playwright install chromium --with-deps
 
-   - name: 🏗️ Build Chromium extension
-     run: npm run build:extensions:prod
+            - name: 🏗️ Build Chromium extension
+              run: npm run build:extensions:prod
 
-   - name: 🧪 Run Playwright e2e tests
-     run: SKIP_BUILD=1 npm run test:e2e
+            - name: 🧪 Run Playwright e2e tests
+              run: SKIP_BUILD=1 npm run test:e2e
 
-   - name: 📊 Upload Playwright report
-     if: always()
-     uses: actions/upload-artifact@v7
-     with:
-      name: playwright-report
-      path: playwright-report/
-      retention-days: 14
+            - name: 📊 Upload Playwright report
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: playwright-report
+                  path: playwright-report/
+                  retention-days: 14

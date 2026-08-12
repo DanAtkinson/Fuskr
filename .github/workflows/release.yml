@@ -1,92 +1,92 @@
 name: Build and Release Extension
 
 on:
-  push:
-    tags:
-      - 'v*.*.*'  # Triggers on version tags like v5.0.2
-  workflow_dispatch:  # Allow manual triggering
+    push:
+        tags:
+            - 'v*.*.*' # Triggers on version tags like v5.0.2
+    workflow_dispatch: # Allow manual triggering
 
 jobs:
-  build-and-release:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-        
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version-file: '.nvmrc'
-          cache: 'npm'
-          
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-        
-      - name: Extract version from tag
-        id: version
-        run: |
-          echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
-          echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-        
-      - name: Build extension packages
-        run: npm run build:extensions:prod
+    build-and-release:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
 
-      - name: Build release notes (includes Product Details)
-        id: notes
-        run: |
-          delimiter="FUSKR_RELEASE_NOTES_$(date +%s%N)"
-          {
-            echo "BODY<<${delimiter}"
-            echo "## Fuskr Extension ${{ steps.version.outputs.VERSION }}"
-            echo
-            echo "### 📝 Product details (for Chrome Web Store)"
-            echo
-            if [ -f store/chrome-product-details.md ]; then
-              cat store/chrome-product-details.md
-            else
-              echo "Product details file not found (store/chrome-product-details.md)."
-            fi
-            echo
-            echo
-            echo "### Installation"
-            echo "- Chrome/Edge/Chromium: use 'fuskr-chromium.zip' (load unpacked for development)"
-            echo "- Firefox: use 'fuskr-firefox.zip' (temporary add-on)"
-            echo
-            echo "### Changes"
-            echo "See commits for details."
-            echo "${delimiter}"
-          } >> "$GITHUB_OUTPUT"
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
 
-      - name: Upload product details as artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: chrome-product-details
-          path: store/chrome-product-details.md
-          if-no-files-found: warn
+            - name: Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: ${{ steps.version.outputs.TAG_NAME }}
-          name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
-          body: ${{ steps.notes.outputs.BODY }}
-          draft: false
-          prerelease: false
-          files: |
-            dist/fuskr-chromium.zip
-            dist/fuskr-firefox.zip
-          
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v7
-        with:
-          name: extension-builds-${{ steps.version.outputs.VERSION }}
-          path: |
-            dist/*.zip
-            dist/chromium/**
-            dist/firefox/**
-          retention-days: 90
+            - name: Install dependencies
+              run: npm ci --legacy-peer-deps
+
+            - name: Extract version from tag
+              id: version
+              run: |
+                  echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+                  echo "TAG_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+            - name: Build extension packages
+              run: npm run build:extensions:prod
+
+            - name: Build release notes (includes Product Details)
+              id: notes
+              run: |
+                  delimiter="FUSKR_RELEASE_NOTES_$(date +%s%N)"
+                  {
+                    echo "BODY<<${delimiter}"
+                    echo "## Fuskr Extension ${{ steps.version.outputs.VERSION }}"
+                    echo
+                    echo "### 📝 Product details (for Chrome Web Store)"
+                    echo
+                    if [ -f store/chrome-product-details.md ]; then
+                      cat store/chrome-product-details.md
+                    else
+                      echo "Product details file not found (store/chrome-product-details.md)."
+                    fi
+                    echo
+                    echo
+                    echo "### Installation"
+                    echo "- Chrome/Edge/Chromium: use 'fuskr-chromium.zip' (load unpacked for development)"
+                    echo "- Firefox: use 'fuskr-firefox.zip' (temporary add-on)"
+                    echo
+                    echo "### Changes"
+                    echo "See commits for details."
+                    echo "${delimiter}"
+                  } >> "$GITHUB_OUTPUT"
+
+            - name: Upload product details as artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: chrome-product-details
+                  path: store/chrome-product-details.md
+                  if-no-files-found: warn
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v3
+              with:
+                  tag_name: ${{ steps.version.outputs.TAG_NAME }}
+                  name: Fuskr Extension ${{ steps.version.outputs.TAG_NAME }}
+                  body: ${{ steps.notes.outputs.BODY }}
+                  draft: false
+                  prerelease: false
+                  files: |
+                      dist/fuskr-chromium.zip
+                      dist/fuskr-firefox.zip
+
+            - name: Upload Build Artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: extension-builds-${{ steps.version.outputs.VERSION }}
+                  path: |
+                      dist/*.zip
+                      dist/chromium/**
+                      dist/firefox/**
+                  retention-days: 90
