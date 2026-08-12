@@ -79,7 +79,7 @@
     "prettier": "^3.9.6",
     "sass-embedded": "^1.100.0",
     "ts-loader": "^9.6.2",
-    "typescript": "~6.0.3",
+    "typescript": "6.0.3",
     "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10",
     "web-ext": "^10.6.0",
@@ -111,6 +111,7 @@
   },
   "overrides": {
     "@modelcontextprotocol/sdk": "1.26.0",
-    "qs": "^6.15.0"
+    "qs": "^6.15.0",
+    "typescript": "6.0.3"
   }
 }
