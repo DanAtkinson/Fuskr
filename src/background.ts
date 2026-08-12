@@ -551,7 +551,7 @@ export class BackgroundScript {
 			return;
 		}
 
-		let direction: -1 | 0 | 1 | null = null;
+		let direction: -1 | 0 | 1;
 		switch (menuItemInfo[2]) {
 			case 'One':
 				direction = 1;
