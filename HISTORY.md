@@ -2,6 +2,26 @@
 
 ## 📋 Complete Changelog
 
+### 5.0.16 🚀 (Compatibility and build stability)
+
+#### Features & Improvements
+
+- **🧩 Non-Standard Media URLs** — Removed extension-based filtering so Fuskr can generate galleries from a wider range of numbered media URLs
+- **🔗 Grouped Range Documentation** — Clarified linked placeholder usage for grouped ranges to match the current zero-based placeholder format (`{0}`, `{1}`, and so on)
+
+#### Build, Tooling & CI
+
+- **🅰️ Angular 22 Upgrade** — Updated the Angular stack to v22 and refreshed the surrounding Vite, Vitest, ESLint, and build tooling
+- **🧪 Test Pipeline Hardening** — Simplified Vite path resolution to use native tsconfig path support for more reliable clean-install test runs
+- **🦊 Firefox Validation Fixes** — Updated Firefox build preparation and upgraded validation tooling so Manifest V3 Firefox packages validate correctly
+- **🏗️ Packaging Fixes** — Corrected build output structure and related packaging issues for Chromium and Firefox artefacts
+- **🤖 CI Modernisation** — Updated GitHub Actions workflow tooling and standardised CI around Node.js 26
+
+#### Maintenance
+
+- **📦 Dependency Refresh** — Updated application and development dependencies, including audited security-related package bumps
+- **📝 Documentation Refresh** — Updated README and release documentation to reflect the current application state and release process
+
 ### 5.0.7 - 5.0.14 Release issues
 
 - There was an issue with the 5.0.7 and 5.0.12 releases in that the version numbers were not updating when they should have. It doesn't break the extension but isn't user friendly. This is corrected from 5.0.15 onwards.

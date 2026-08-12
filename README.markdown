@@ -4,14 +4,20 @@
 [![Angular](https://img.shields.io/badge/Angular-22-green.svg)](https://angular.dev)
 [![Playwright](https://img.shields.io/badge/Playwright-e2e-green.svg)](https://playwright.dev)
 ![Chrome](https://img.shields.io/badge/Chrome-88+-green.svg)
-![Firefox](https://img.shields.io/badge/Firefox-109+-orange.svg)
-![Version](https://img.shields.io/badge/version-5.0.15-blue.svg)
+![Firefox](https://img.shields.io/badge/Firefox-142+-orange.svg)
+![Version](https://img.shields.io/badge/version-5.0.16-blue.svg)
 
 > Transform single image URLs into stunning galleries with intelligent pattern recognition!
 > 
 > Ever landed on a single photo and suspected there are more just like it? Fuskr finds them for you. When an image URL contains a number — like `example.com/photos/08.jpg` — Fuskr works out that there are probably images named `07.jpg`, `09.jpg`, and so on, fetches them all, and displays them together as a neat, browsable gallery in a new tab.
 > 
-> There's no manual work involved. Right-click any image on a page and choose **"Fusk"**, or paste a URL directly into the browser toolbar — Fuskr does the rest. You can choose whether to look forwards, backwards, or both from the current image, and pick how many images to include. It works with photos and videos alike, and handles websites that use leading zeroes in their filenames (e.g. `001`, `002`, `003`) without any fuss.
+> There's no manual work involved. Right-click any image on a page and choose **"Fusk"**, or paste a URL directly into the browser toolbar — Fuskr does the rest. You can choose whether to look forwards, backwards, or both from the current image, and pick how many images to include. It works with photos and videos alike, supports grouped range placeholders, handles non-standard media URLs, and copes with websites that use leading zeroes in their filenames (e.g. `001`, `002`, `003`) without any fuss.
+
+## 🆕 What's New in 5.0.16
+
+- **Angular 22 toolchain refresh** - Fuskr now targets Angular 22 with updated build, lint, and test dependencies.
+- **Improved URL compatibility** - Gallery generation now works more reliably with non-standard file formats and complex grouped ranges.
+- **Stronger CI and packaging** - The Chromium/Firefox build pipeline, Vitest configuration, and Firefox Manifest V3 validation have been corrected and hardened.
 
 ## 🚀 Quick Start Guide
 
@@ -129,7 +135,7 @@ generates URLs such as:
 ## 📱 Browser Support
 
 - **Chrome** 88+ (Manifest V3 support)
-- **Firefox** 109+ (Manifest V3 support)
+- **Firefox** 142+ (Manifest V3 support)
 - **Edge** 88+ (Chromium-based)
 
 ## 🛠️ Development
@@ -138,9 +144,9 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 
 ## 📋 Version History
 
-**Current Version: 5.0.6** - Angular 21 rewrite with TypeScript & Manifest V3
+**Current Version: 5.0.16** - Angular 22 release with updated build tooling, CI hardening, and Firefox validation fixes
 
-🔗 **[View Complete Version History](HISTORY.md)** - See detailed changelog from v1.0 to v5.0.0
+🔗 **[View Complete Version History](HISTORY.md)** - See the detailed changelog from v1.0 to v5.0.16
 
 ---
 
@@ -148,8 +154,8 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 
 - 🛠️ **[Developer Guide](DEVELOPER.md)** - Setup, architecture, and contribution guidelines
 - 📚 **[Version History](HISTORY.md)** - Complete changelog with all versions
-- 🧪 **Testing** - 264 passing unit tests with comprehensive coverage
-- 🔧 **Build System** - Angular CLI + Vite build pipeline with automated packaging for both Chromium and Firefox
+- 🧪 **Testing** - 419 passing unit tests plus Playwright end-to-end coverage
+- 🔧 **Build System** - Angular CLI + Vite build pipeline with automated packaging and Firefox validation for Chromium and Firefox
 
 ## 🤝 Contributing
 
