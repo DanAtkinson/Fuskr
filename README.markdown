@@ -5,7 +5,7 @@
 [![Playwright](https://img.shields.io/badge/Playwright-e2e-green.svg)](https://playwright.dev)
 ![Chrome](https://img.shields.io/badge/Chrome-88+-green.svg)
 ![Firefox](https://img.shields.io/badge/Firefox-142+-orange.svg)
-![Version](https://img.shields.io/badge/version-5.0.16-blue.svg)
+![Version](https://img.shields.io/badge/version-5.0.17-blue.svg)
 
 > Transform single image URLs into stunning galleries with intelligent pattern recognition!
 > 
@@ -13,7 +13,12 @@
 > 
 > There's no manual work involved. Right-click any image on a page and choose **"Fusk"**, or paste a URL directly into the browser toolbar — Fuskr does the rest. You can choose whether to look forwards, backwards, or both from the current image, and pick how many images to include. It works with photos and videos alike, supports grouped range placeholders, handles non-standard media URLs, and copes with websites that use leading zeroes in their filenames (e.g. `001`, `002`, `003`) without any fuss.
 
-## 🆕 What's New in 5.0.16
+## 🆕 What's New in 5.0.17
+
+- **Fixed Firefox packaging bug** - Corrected a build pipeline ordering issue that could overwrite the Firefox manifest with the Chrome one, causing Firefox to reject the extension with a `background.service_worker is currently disabled` error.
+- **Dependency refresh** - Updated Angular, tooling, and other dependencies to their latest compatible versions.
+
+## What's New in 5.0.16
 
 - **Angular 22 toolchain refresh** - Fuskr now targets Angular 22 with updated build, lint, and test dependencies.
 - **Improved URL compatibility** - Gallery generation now works more reliably with non-standard file formats and complex grouped ranges.
@@ -144,9 +149,9 @@ For developers who want to build, modify, or contribute to Fuskr, please see [DE
 
 ## 📋 Version History
 
-**Current Version: 5.0.16** - Angular 22 release with updated build tooling, CI hardening, and Firefox validation fixes
+**Current Version: 5.0.17** - Firefox packaging fix and dependency refresh, built on the Angular 22 release
 
-🔗 **[View Complete Version History](HISTORY.md)** - See the detailed changelog from v1.0 to v5.0.16
+🔗 **[View Complete Version History](HISTORY.md)** - See the detailed changelog from v1.0 to v5.0.17
 
 ---
 

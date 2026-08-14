@@ -2,6 +2,18 @@
 
 ## 📋 Complete Changelog
 
+### 5.0.17 🚀 (Firefox packaging fix)
+
+#### Bug Fixes
+
+- **🦊 Firefox Background Script Fix** — Corrected a build pipeline ordering bug where the Chromium `manifest.json` (using `background.service_worker`) could overwrite the Firefox manifest (`background.scripts`) during packaging, causing Firefox to reject the extension with `background.service_worker is currently disabled. Add background.scripts.`
+- **🏗️ Build Pipeline Ordering** — `organise:builds` now runs before `copy:files` so the correct Firefox manifest and background scripts are written last and are not clobbered by Angular's flattened build output
+
+#### Maintenance
+
+- **📦 Dependency Refresh** — Updated Angular, Angular CLI, Analog Vite plugin, TypeScript ESLint, and other tooling dependencies to their latest compatible versions
+- **📝 Store Listing Update** — Refreshed the Chrome Web Store product description with current feature list and version history
+
 ### 5.0.16 🚀 (Compatibility and build stability)
 
 #### Features & Improvements

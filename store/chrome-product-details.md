@@ -29,6 +29,10 @@ https://en.wikipedia.org/wiki/Fusker - Fusker is a type of website or utility th
 === Version History ===
 (Dates reflect recorded release tags; some early releases predate version tagging and have no recorded date.)
 
+- 5.0.17 (2026-08-14) -
+           - Fixed a Firefox packaging bug where the extension could fail to load with "background.service_worker is currently disabled".
+           - Corrected build pipeline ordering so the Firefox manifest and background script are no longer overwritten by the Chrome build output.
+           - Updated Angular and other dependencies to their latest compatible versions.
 - 5.0.16 (2026-08-12) -
            - Updated to Angular 22 and refreshed the underlying build, test and lint tooling.
            - Fixed Firefox Manifest V3 packaging and validation so Firefox builds pass store checks.
