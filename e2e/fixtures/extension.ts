@@ -1,6 +1,6 @@
-import { test as base, chromium, BrowserContext } from '@playwright/test';
-import path from 'path';
-import fs from 'fs';
+import { test as base, chromium, BrowserContext, Page } from '@playwright/test';
+import path from 'node:path';
+import fs from 'node:fs';
 
 export const EXTENSION_PATH = path.resolve(__dirname, '..', '..', 'dist', 'chromium');
 
@@ -19,6 +19,7 @@ export const EXTENSION_PATH = path.resolve(__dirname, '..', '..', 'dist', 'chrom
 export async function launchExtensionContext(): Promise<{
 	context: BrowserContext;
 	extensionId: string;
+	extensionUrl: string;
 }> {
 	if (!fs.existsSync(EXTENSION_PATH)) {
 		throw new Error(
@@ -41,7 +42,7 @@ export async function launchExtensionContext(): Promise<{
 
 	const extensionId = await resolveExtensionId(context);
 
-	return { context, extensionId };
+	return { context, extensionId, extensionUrl: `chrome-extension://${extensionId}` };
 }
 
 /**
@@ -53,13 +54,11 @@ export async function launchExtensionContext(): Promise<{
  * Polls with retries to handle slow startup in CI.
  */
 async function resolveExtensionId(context: BrowserContext): Promise<string> {
-	// Check already-registered service workers (race: may have registered before we attached)
 	for (const worker of context.serviceWorkers()) {
 		const id = extractExtensionId(worker.url());
 		if (id) return id;
 	}
 
-	// Wait for the serviceworker event
 	try {
 		const worker = await context.waitForEvent('serviceworker', { timeout: 15_000 });
 		const id = extractExtensionId(worker.url());
@@ -68,7 +67,6 @@ async function resolveExtensionId(context: BrowserContext): Promise<string> {
 		// Timeout — fall through to polling
 	}
 
-	// Poll as a last resort (handles cases where the event fired before we listened)
 	for (let i = 0; i < 10; i++) {
 		await new Promise((r) => setTimeout(r, 500));
 		for (const worker of context.serviceWorkers()) {
@@ -84,8 +82,9 @@ async function resolveExtensionId(context: BrowserContext): Promise<string> {
 	);
 }
 
+
 function extractExtensionId(url: string): string {
-	const match = url.match(/chrome-extension:\/\/([a-z]{32})\//);
+	const match = /chrome-extension:\/\/([a-z]{32})\//.exec(url);
 	return match ? match[1] : '';
 }
 
@@ -95,12 +94,18 @@ function extractExtensionId(url: string): string {
  */
 export const testWithExtension = base.extend<{
 	extensionContext: { context: BrowserContext; extensionId: string };
+	extensionPage: Page;
 }>({
 	// eslint-disable-next-line no-empty-pattern
 	extensionContext: async ({}, use) => {
 		const result = await launchExtensionContext();
 		await use(result);
 		await result.context.close();
+	},
+	extensionPage: async ({ extensionContext }, use) => {
+		const page = await extensionContext.context.newPage();
+		await use(page);
+		await page.close();
 	},
 });
 

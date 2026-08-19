@@ -4,8 +4,8 @@ This document tracks the steps required to publish Fuskr to the Firefox Add-ons 
 
 ## Extension Details
 
-- **Extension ID**: `fuskr@danatkinson.com`
-- **Minimum Firefox version**: 128.0 (MV3 support)
+- **Extension ID**: `{6fbd1009-d97d-45b7-97d6-1b34d4182a0c}`
+- **Minimum Firefox version**: 142.0 (MV3 support)
 - **Manifest version**: 3
 
 ## Pre-submission Checklist
@@ -21,8 +21,8 @@ This document tracks the steps required to publish Fuskr to the Firefox Add-ons 
 
 - [ ] `manifest_version` is `3`
 - [ ] `action` key is used (not `browser_action`)
-- [ ] `browser_specific_settings.gecko.id` = `fuskr@danatkinson.com`
-- [ ] `browser_specific_settings.gecko.strict_min_version` = `128.0`
+- [ ] `browser_specific_settings.gecko.id` = `{6fbd1009-d97d-45b7-97d6-1b34d4182a0c}`
+- [ ] `browser_specific_settings.gecko.strict_min_version` = `142.0`
 - [ ] `host_permissions` lists URL patterns separately from `permissions`
 - [ ] `content_security_policy.extension_pages` does **not** include `'unsafe-eval'`
 - [ ] `web_accessible_resources` uses MV3 object format with `resources` and `matches`

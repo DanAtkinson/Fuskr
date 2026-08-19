@@ -1,0 +1,65 @@
+name: Deploy to Firefox Add-ons
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'Version to deploy (for example, 5.0.17)'
+                required: true
+                type: string
+
+permissions:
+    contents: read
+
+jobs:
+    deploy-firefox:
+        name: Submit Firefox extension to AMO
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+
+            - name: Install dependencies
+              run: npm ci --legacy-peer-deps
+
+            - name: Verify requested version
+              env:
+                  INPUT_VERSION: ${{ inputs.version }}
+              run: |
+                  test "${INPUT_VERSION}" = "$(node -p "require('./package.json').version")" || {
+                    echo "Requested version ${INPUT_VERSION} does not match package.json"
+                    exit 1
+                  }
+
+            - name: Build Firefox extension
+              run: npm run build
+
+            - name: Validate Firefox extension
+              run: npm run build:firefox:validate
+
+            - name: Sign and submit to AMO
+              env:
+                  WEB_EXT_API_KEY: ${{ secrets.AMO_API_KEY }}
+                  WEB_EXT_API_SECRET: ${{ secrets.AMO_API_SECRET }}
+              run: |
+                  npx web-ext sign \
+                    --source-dir=dist/firefox \
+                    --channel=listed \
+                    --artifacts-dir=web-ext-artifacts
+
+            - name: Upload signed extension artifact
+              uses: actions/upload-artifact@v7
+              with:
+                  name: firefox-amo-${{ inputs.version }}
+                  path: web-ext-artifacts/*.xpi
+                  if-no-files-found: error
+                  retention-days: 30

@@ -73,6 +73,15 @@ npm run build:extensions:prod   # Build first
 npm run test:e2e                # Then run e2e tests
 ```
 
+Gherkin-based BDD tests are stored in `e2e/features/` with step definitions in `e2e/steps/`:
+
+```bash
+npm run test:e2e:bdd             # Chromium BDD tests
+npm run test:e2e:bdd:firefox     # Experimental Firefox BDD tests
+```
+
+The Firefox BDD run is experimental and non-blocking in CI. AMO deployment is available through the manual `deploy-firefox.yml` workflow once the required AMO secrets are configured.
+
 ### Writing tests
 
 - Unit test files are named `*.spec.ts` and live next to the source file they test (e.g. `gallery.component.spec.ts`)

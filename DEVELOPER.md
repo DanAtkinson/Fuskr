@@ -228,6 +228,14 @@ The project uses GitHub Actions for continuous integration and deployment. The w
 - Automatic extension packaging
 - Build artifact uploads with 30-day retention
 
+### Playwright BDD Tests
+
+- Gherkin features live in `e2e/features/` and step definitions live in `e2e/steps/`.
+- Run the Chromium BDD suite with `npm run test:e2e:bdd`.
+- Example media is checked into `e2e/fixtures/images/` and referenced through GitHub raw URLs.
+- Firefox BDD uses an experimental preloaded profile and runs separately with `npm run test:e2e:bdd:firefox`; it is non-blocking in CI while Firefox MV3 extension loading is investigated.
+- Firefox AMO deployment is manual-dispatch-only through `.github/workflows/deploy-firefox.yml` until its credentials and first submission are verified.
+
 **Trigger Events:**
 
 - Push to `master`, `main`, or `develop` branches
