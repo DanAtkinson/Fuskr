@@ -8,6 +8,10 @@ import JSZip from 'jszip';
 export const FIREFOX_EXTENSION_PATH = path.resolve(__dirname, '..', '..', 'dist', 'firefox');
 export const FIREFOX_EXTENSION_ID = '{6fbd1009-d97d-45b7-97d6-1b34d4182a0c}';
 
+// The internal UUID Firefox uses for moz-extension:// URLs. We pin this via the
+// extensions.webextensions.uuids pref so the URL is predictable across installs.
+const FIREFOX_EXTENSION_UUID = '6fbd1009-d97d-45b7-97d6-1b34d4182a0c';
+
 /**
  * Packs the extension directory into a .xpi (zip) file and places it in the
  * Firefox profile's extensions directory. Firefox loads packed .xpi files from
@@ -58,14 +62,18 @@ export async function launchFirefoxExtensionContext(): Promise<{
 			'extensions.autoDisableScopes': 0,
 			'extensions.enabledScopes': 15,
 			'xpinstall.signatures.required': false,
+			// Pin the internal UUID Firefox assigns for moz-extension:// URLs.
+			// Without this, Firefox generates a random UUID per install and the
+			// moz-extension:// URL becomes unpredictable.
+			'extensions.webextensions.uuids': JSON.stringify({
+				[FIREFOX_EXTENSION_ID]: FIREFOX_EXTENSION_UUID,
+			}),
 		},
 	});
 
-	const extensionId = FIREFOX_EXTENSION_ID.replace(/[{}]/g, '');
-
 	return {
 		context,
-		extensionId,
-		extensionUrl: `moz-extension://${extensionId}`,
+		extensionId: FIREFOX_EXTENSION_UUID,
+		extensionUrl: `moz-extension://${FIREFOX_EXTENSION_UUID}`,
 	};
 }
