@@ -1,10 +1,39 @@
-import { BrowserContext, firefox } from '@playwright/test';
+import { firefox } from '@playwright/test';
+import type { BrowserContext } from '@playwright/test';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import JSZip from 'jszip';
 
 export const FIREFOX_EXTENSION_PATH = path.resolve(__dirname, '..', '..', 'dist', 'firefox');
 export const FIREFOX_EXTENSION_ID = '{6fbd1009-d97d-45b7-97d6-1b34d4182a0c}';
+
+// The internal UUID Firefox uses for moz-extension:// URLs. We pin this via the
+// extensions.webextensions.uuids pref so the URL is predictable across installs.
+const FIREFOX_EXTENSION_UUID = '6fbd1009-d97d-45b7-97d6-1b34d4182a0c';
+
+/**
+ * Packs the extension directory into a .xpi (zip) file and places it in the
+ * Firefox profile's extensions directory. Firefox loads packed .xpi files from
+ * the profile on startup; it does NOT load unpacked directories from there.
+ */
+async function packExtensionAsXpi(extensionDir: string, destXpiPath: string): Promise<void> {
+	const zip = new JSZip();
+	const addDir = (dirPath: string, zipPath: string) => {
+		for (const entry of fs.readdirSync(dirPath)) {
+			const fullPath = path.join(dirPath, entry);
+			const entryZipPath = zipPath ? `${zipPath}/${entry}` : entry;
+			if (fs.statSync(fullPath).isDirectory()) {
+				addDir(fullPath, entryZipPath);
+			} else {
+				zip.file(entryZipPath, fs.readFileSync(fullPath));
+			}
+		}
+	};
+	addDir(extensionDir, '');
+	const content = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
+	fs.writeFileSync(destXpiPath, content);
+}
 
 export async function launchFirefoxExtensionContext(): Promise<{
 	context: BrowserContext;
@@ -19,9 +48,13 @@ export async function launchFirefoxExtensionContext(): Promise<{
 	}
 
 	const profilePath = fs.mkdtempSync(path.join(os.tmpdir(), 'fuskr-firefox-'));
-	const extensionPath = path.join(profilePath, 'extensions', FIREFOX_EXTENSION_ID);
-	fs.mkdirSync(path.dirname(extensionPath), { recursive: true });
-	fs.cpSync(FIREFOX_EXTENSION_PATH, extensionPath, { recursive: true });
+	const extensionsDir = path.join(profilePath, 'extensions');
+	fs.mkdirSync(extensionsDir, { recursive: true });
+
+	// Firefox loads packed .xpi files from the profile's extensions directory.
+	// The file must be named <extensionId>.xpi so Firefox assigns the correct ID.
+	const xpiPath = path.join(extensionsDir, `${FIREFOX_EXTENSION_ID}.xpi`);
+	await packExtensionAsXpi(FIREFOX_EXTENSION_PATH, xpiPath);
 
 	const context = await firefox.launchPersistentContext(profilePath, {
 		headless: true,
@@ -29,14 +62,18 @@ export async function launchFirefoxExtensionContext(): Promise<{
 			'extensions.autoDisableScopes': 0,
 			'extensions.enabledScopes': 15,
 			'xpinstall.signatures.required': false,
+			// Pin the internal UUID Firefox assigns for moz-extension:// URLs.
+			// Without this, Firefox generates a random UUID per install and the
+			// moz-extension:// URL becomes unpredictable.
+			'extensions.webextensions.uuids': JSON.stringify({
+				[FIREFOX_EXTENSION_ID]: FIREFOX_EXTENSION_UUID,
+			}),
 		},
 	});
 
-	const extensionId = FIREFOX_EXTENSION_ID.replace(/[{}]/g, '');
-
 	return {
 		context,
-		extensionId,
-		extensionUrl: `moz-extension://${extensionId}`,
+		extensionId: FIREFOX_EXTENSION_UUID,
+		extensionUrl: `moz-extension://${FIREFOX_EXTENSION_UUID}`,
 	};
 }
