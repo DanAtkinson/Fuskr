@@ -84,7 +84,7 @@
     "prettier": "^3.9.6",
     "sass-embedded": "^1.102.0",
     "ts-loader": "^9.6.2",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "typescript-eslint": "^8.67.0",
     "vitest": "^4.1.11",
     "web-ext": "^10.6.0",
