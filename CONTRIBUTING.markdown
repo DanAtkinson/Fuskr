@@ -80,7 +80,7 @@ npm run test:e2e:bdd             # Chromium BDD tests
 npm run test:e2e:bdd:firefox     # Experimental Firefox BDD tests
 ```
 
-The Firefox BDD run is experimental and non-blocking in CI. AMO deployment is available through the manual `deploy-firefox.yml` workflow once the required AMO secrets are configured.
+The Firefox BDD run is experimental and is **not executed in CI** — Playwright cannot reliably load the unpacked Firefox extension in headless mode. Run it manually if you need to sanity-check Firefox behaviour, and verify Firefox manually before a release. AMO deployment is available through the manual `deploy-firefox.yml` workflow once the required AMO secrets are configured.
 
 ### Writing tests
 

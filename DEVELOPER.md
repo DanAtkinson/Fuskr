@@ -233,7 +233,7 @@ The project uses GitHub Actions for continuous integration and deployment. The w
 - Gherkin features live in `e2e/features/` and step definitions live in `e2e/steps/`.
 - Run the Chromium BDD suite with `npm run test:e2e:bdd`.
 - Example media is checked into `e2e/fixtures/images/` and referenced through GitHub raw URLs.
-- Firefox BDD uses an experimental preloaded profile and runs separately with `npm run test:e2e:bdd:firefox`; it is non-blocking in CI while Firefox MV3 extension loading is investigated.
+- Firefox BDD uses an experimental preloaded profile and runs separately with `npm run test:e2e:bdd:firefox`; it is **not run in CI** because Playwright consistently fails to load the unpacked/temporary Firefox extension (`NS_ERROR_NOT_AVAILABLE` on every `moz-extension://` navigation, across three independent fix attempts). Treat it as a manual, best-effort local check, and cover Firefox manually before releases instead.
 - Firefox AMO deployment is manual-dispatch-only through `.github/workflows/deploy-firefox.yml` until its credentials and first submission are verified.
 
 **Trigger Events:**
